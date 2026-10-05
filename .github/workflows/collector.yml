@@ -1,0 +1,18 @@
+name: PCF3 Collector
+on:
+  workflow_dispatch:
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    permissions: {contents: write}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: pip install requests
+      - run: python pcf3_collector_default.py
+      - run: |
+          git config user.name "pcf3-bot"
+          git config user.email "bot@pcf3.local"
+          git add PCF3_LIVE_PACKET_DEFAULT.txt
+          git diff --staged --quiet || (git commit -m "manual: packet $(date -u +%Y-%m-%dT%H:%M:%SZ)" && git push)
