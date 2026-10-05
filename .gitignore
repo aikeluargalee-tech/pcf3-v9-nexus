@@ -1,7 +1,11 @@
 __pycache__/
 *.pyc
 .env
+*_cache.json
 gamma_cache.json
+etf_cache.json
+pfc3_*.json
+PFC3_LIVE_PACKET_*.txt
 PCF3_LIVE_PACKET_*.txt
 !PCF3_LIVE_PACKET_DEFAULT.txt
 .DS_Store
