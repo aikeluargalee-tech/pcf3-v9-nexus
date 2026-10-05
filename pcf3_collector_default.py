@@ -54,7 +54,7 @@ if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')
 if hasattr(sys.stderr, 'reconfigure'):
     sys.stderr.reconfigure(encoding='utf-8')
-# v7.0 FINAL P0 Fixes per Manus + Kimi review:
+# FINAL P0 Fixes per Manus + Kimi review:
 # - Machine-readable status per metric: LIVE/CACHED/DERIVED/PROXY/STALE/MISSING/MOCK + age_seconds + confidence HIGH/MED/LOW + source + calc_version
 # - Data Mode badges: LIVE/CACHED/PROXY/MOCK/DERIVED impossible to confuse
 # - Method badges: OBSERVED/CALCULATED/PROXY/CACHED/ESTIMATED/UNAVAILABLE
@@ -67,7 +67,7 @@ if hasattr(sys.stderr, 'reconfigure'):
 # - Positioning: Transparent heuristic assistant for human review not validated system
 # - PCF3 naming fixed, self-audited not third-party audited, delta packet mode
 
-# ===== v8.0 PRODUCTION READY IMPLEMENTATION - Manus P0 Fixes Actually Implemented =====
+# ===== PRODUCTION READY IMPLEMENTATION - Manus P0 Fixes Actually Implemented =====
 
 def get_metric_status(status_type, age_seconds, confidence, source, calc_version, method):
     """Manus P0: Machine-readable status per metric - returns dict for JSON"""
@@ -266,17 +266,17 @@ def get_why_decision_drivers(metrics_status, base_size, max_size):
 def generate_production_packet():
     """Generate packet with Manus P0 fixes fully implemented"""
     metrics_status = {
-        'spot': get_metric_status('LIVE', 3, 'HIGH', 'api.binance.com', 'v5.3-spot-ticker', 'OBSERVED'),
-        'oi': get_metric_status('LIVE', 8, 'HIGH', 'api.binance.com fapi/v1/openInterest', 'v5.3-oi', 'OBSERVED'),
-        'funding': get_metric_status('LIVE', 12, 'HIGH', 'api.binance.com fapi/v1/fundingRate', 'v5.3-funding', 'OBSERVED'),
-        'book': get_metric_status('LIVE', 3, 'HIGH', 'api.binance.com depth $500', 'v5.3-orderbook', 'OBSERVED'),
-        'etf': get_metric_status('PROXY', 28800, 'MEDIUM', 'Farside via AllOrigins fragile transport', 'v5.3-etf-proxy', 'PROXY'),
-        'macro_yahoo': get_metric_status('PROXY', 180, 'MEDIUM', 'Yahoo via AllOrigins fragile', 'v5.3-macro-proxy', 'PROXY'),
-        'fred_walcl': get_metric_status('PROXY', 259200, 'LOW', 'FRED WALCL weekly lag 3d', 'v5.3-fred-weekly', 'PROXY'),
-        'gamma': get_metric_status('CACHED', 86400, 'LOW', 'gamma_cache.json prior session', 'v5.3-gamma-cache', 'CACHED'),
-        'liq_map': get_metric_status('DERIVED', 45, 'LOW', 'Binance order book + liquidation proxy', 'v5.3-liq-derived', 'ESTIMATED'),
-        'sth_cost': get_metric_status('DERIVED', 7200, 'LOW', 'Glassnode formula proxy', 'v5.3-sth-proxy', 'ESTIMATED'),
-        'exchange_flow': get_metric_status('DERIVED', 720, 'LOW', 'Binance reserves proxy', 'v5.3-exchange-flow', 'PROXY'),
+        'spot': get_metric_status('LIVE', 3, 'HIGH', 'api.binance.com', 'spot-ticker', 'OBSERVED'),
+        'oi': get_metric_status('LIVE', 8, 'HIGH', 'api.binance.com fapi/v1/openInterest', 'oi', 'OBSERVED'),
+        'funding': get_metric_status('LIVE', 12, 'HIGH', 'api.binance.com fapi/v1/fundingRate', 'funding', 'OBSERVED'),
+        'book': get_metric_status('LIVE', 3, 'HIGH', 'api.binance.com depth $500', 'orderbook', 'OBSERVED'),
+        'etf': get_metric_status('PROXY', 28800, 'MEDIUM', 'Farside via AllOrigins fragile transport', 'etf-proxy', 'PROXY'),
+        'macro_yahoo': get_metric_status('PROXY', 180, 'MEDIUM', 'Yahoo via AllOrigins fragile', 'macro-proxy', 'PROXY'),
+        'fred_walcl': get_metric_status('PROXY', 259200, 'LOW', 'FRED WALCL weekly lag 3d', 'fred-weekly', 'PROXY'),
+        'gamma': get_metric_status('CACHED', 86400, 'LOW', 'gamma_cache.json prior session', 'gamma-cache', 'CACHED'),
+        'liq_map': get_metric_status('DERIVED', 45, 'LOW', 'Binance order book + liquidation proxy', 'liq-derived', 'ESTIMATED'),
+        'sth_cost': get_metric_status('DERIVED', 7200, 'LOW', 'Glassnode formula proxy', 'sth-proxy', 'ESTIMATED'),
+        'exchange_flow': get_metric_status('DERIVED', 720, 'LOW', 'Binance reserves proxy', 'exchange-flow', 'PROXY'),
     }
     
     scorecard = 83
@@ -3106,7 +3106,7 @@ def fetch_vix_crypto_impact_module(vix_price, dvol_price=None):
 
 
 def fetch_puell_multiple_raw(daily_closes_365=None, spot_price=None):
-    """v5.2 NEW Phase 1 — Puell Multiple RAW — miner revenue stress — daily issuance value / 365-day MA"""
+    """Phase 1 — Puell Multiple RAW — miner revenue stress — daily issuance value / 365-day MA"""
     try:
         now_iso = utc_now_iso()
         # Daily issuance = 450 BTC/day post 2024 halving (3.125 * 144)
@@ -3117,7 +3117,7 @@ def fetch_puell_multiple_raw(daily_closes_365=None, spot_price=None):
             if requests:
                 try:
                     url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=365"
-                    r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-v5.2"})
+                    r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-Bot"})
                     if r.status_code == 200:
                         data = r.json()
                         closes = [float(k[4]) for k in data if len(k)>=5]
@@ -3174,7 +3174,7 @@ def fetch_puell_multiple_raw(daily_closes_365=None, spot_price=None):
         return None, f"MISSING {e}"
 
 def fetch_hash_ribbons_raw():
-    """v5.2 NEW Phase 1 — Hash Ribbons RAW — miner capitulation via hash rate 30d vs 60d MA"""
+    """Phase 1 — Hash Ribbons RAW — miner capitulation via hash rate 30d vs 60d MA"""
     try:
         now_iso = utc_now_iso()
         hash_rates = None
@@ -3182,7 +3182,7 @@ def fetch_hash_ribbons_raw():
             try:
                 # blockchain.info hash-rate chart 2y
                 url = "https://api.blockchain.info/charts/hash-rate?timespan=2years&format=json&sampled=true"
-                r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-v5.2-Hash"})
+                r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-Bot-Hash"})
                 if r.status_code == 200:
                     j = r.json()
                     vals = j.get("values", [])
@@ -3250,7 +3250,7 @@ def fetch_hash_ribbons_raw():
         return None, f"MISSING {e}"
 
 def fetch_sopr_streak_raw(sopr_current=None):
-    """v5.2 NEW Phase 1 — SOPR Streak & Reclaim RAW — sustained loss then reclaim >1"""
+    """Phase 1 — SOPR Streak & Reclaim RAW — sustained loss then reclaim >1"""
     try:
         now_iso = utc_now_iso()
         # SOPR history — try to load from file if exists, else synthetic
@@ -3338,7 +3338,7 @@ def fetch_sopr_streak_raw(sopr_current=None):
         return None, f"MISSING {e}"
 
 def fetch_valuation_percentiles_raw(mvrv_z=None, nupl=None, sopr=None, puell=None):
-    """v5.2 NEW Phase 1 — Valuation Percentiles RAW — relative extremes vs 2-year history per Grok"""
+    """Phase 1 — Valuation Percentiles RAW — relative extremes vs 2-year history per Grok"""
     try:
         now_iso = utc_now_iso()
         # Load history file if exists
@@ -3432,7 +3432,7 @@ def fetch_valuation_percentiles_raw(mvrv_z=None, nupl=None, sopr=None, puell=Non
         return None, f"MISSING {e}"
 
 def fetch_volume_climax_raw(rvol_history_data=None, daily_closes_250=None, daily_highs_250=None, daily_lows_250=None):
-    """v5.2 NEW Phase 1 — Volume Climax + Dry-up RAW — spike then declining volume on retest"""
+    """Phase 1 — Volume Climax + Dry-up RAW — spike then declining volume on retest"""
     try:
         now_iso = utc_now_iso()
         # Use RVOL history if available
@@ -3517,7 +3517,7 @@ def fetch_volume_climax_raw(rvol_history_data=None, daily_closes_250=None, daily
         return None, f"MISSING {e}"
 
 def fetch_pi_cycle_top_raw(daily_closes_350=None, spot_price=None):
-    """v5.2 NEW Phase 2 OPTIONAL SECONDARY — Pi Cycle Top 111DMA vs 350DMA*2 — top indicator secondary only"""
+    """Phase 2 OPTIONAL SECONDARY — Pi Cycle Top 111DMA vs 350DMA*2 — top indicator secondary only"""
     try:
         now_iso = utc_now_iso()
         closes = daily_closes_350
@@ -3525,7 +3525,7 @@ def fetch_pi_cycle_top_raw(daily_closes_350=None, spot_price=None):
             if requests:
                 try:
                     url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=400"
-                    r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-v5.2-Pi"})
+                    r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-Bot-Pi"})
                     if r.status_code == 200:
                         data = r.json()
                         closes = [float(k[4]) for k in data if len(k)>=5]
@@ -3579,7 +3579,7 @@ def fetch_pi_cycle_top_raw(daily_closes_350=None, spot_price=None):
         return None, f"MISSING {e}"
 
 def fetch_rainbow_chart_raw(daily_closes_long=None, spot_price=None):
-    """v5.2 NEW Phase 2 OPTIONAL SECONDARY — Rainbow Chart log regression bands — secondary only"""
+    """Phase 2 OPTIONAL SECONDARY — Rainbow Chart log regression bands — secondary only"""
     try:
         now_iso = utc_now_iso()
         closes = daily_closes_long
@@ -3587,7 +3587,7 @@ def fetch_rainbow_chart_raw(daily_closes_long=None, spot_price=None):
             if requests:
                 try:
                     url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=1000"
-                    r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-v5.2-Rainbow"})
+                    r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-Bot-Rainbow"})
                     if r.status_code == 200:
                         data = r.json()
                         closes = [float(k[4]) for k in data if len(k)>=5]
@@ -4619,14 +4619,14 @@ def main():
         }
         vix_impact_status = "MANUAL_REAL_V51"
 
-    print("Fetching v5.2 Phase 1 — Puell Multiple + Hash Ribbons + SOPR Streak + Percentiles + Volume Climax...")
-    # Prepare daily closes 365/400 for v5.2
+    print("Fetching Phase 1 — Puell Multiple + Hash Ribbons + SOPR Streak + Percentiles + Volume Climax...")
+    # Prepare daily closes 365/400 for analysis
     daily_closes_365 = daily_closes_250
     if daily_closes_250 and len(daily_closes_250) < 365:
         try:
             if requests:
                 url365 = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=365"
-                r365 = requests.get(url365, timeout=15, headers={"User-Agent": "PCF3-v5.2"})
+                r365 = requests.get(url365, timeout=15, headers={"User-Agent": "PCF3-Bot"})
                 if r365.status_code == 200:
                     d365 = r365.json()
                     daily_closes_365 = [float(k[4]) for k in d365 if len(k)>=5]
@@ -4636,7 +4636,7 @@ def main():
     try:
         if requests:
             url400 = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=400"
-            r400 = requests.get(url400, timeout=15, headers={"User-Agent": "PCF3-v5.2"})
+            r400 = requests.get(url400, timeout=15, headers={"User-Agent": "PCF3-Bot"})
             if r400.status_code == 200:
                 d400 = r400.json()
                 daily_closes_400 = [float(k[4]) for k in d400 if len(k)>=5]
@@ -4646,7 +4646,7 @@ def main():
     try:
         if requests:
             url1000 = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=1000"
-            r1000 = requests.get(url1000, timeout=15, headers={"User-Agent": "PCF3-v5.2"})
+            r1000 = requests.get(url1000, timeout=15, headers={"User-Agent": "PCF3-Bot"})
             if r1000.status_code == 200:
                 d1000 = r1000.json()
                 daily_closes_1000 = [float(k[4]) for k in d1000 if len(k)>=5]
@@ -4684,7 +4684,7 @@ def main():
         volume_climax_data = {"rvol_current_pct": 147.0, "volume_climax_signal": "Normal participation", "volume_climax_zone": "Normal", "timestamp": now_iso, "source": "RVOL proxy", "method": "climax", "status": "MANUAL_REAL_V52_CLIMAX"}
         volume_climax_status = "MANUAL_REAL_V52_CLIMAX"
 
-    print("Fetching v5.2 Phase 2 OPTIONAL SECONDARY — Pi Cycle Top + Rainbow Chart...")
+    print("Fetching Phase 2 OPTIONAL SECONDARY — Pi Cycle Top + Rainbow Chart...")
     pi_cycle_data, pi_cycle_status = fetch_pi_cycle_top_raw(daily_closes_400, spot_price)
     if not pi_cycle_data:
         pi_cycle_data = {"pi_111ma": 80000, "pi_350ma_x2": 95000, "pi_signal": "Below — No Pi top signal", "pi_zone": "No top signal", "timestamp": now_iso, "source": "Binance 400 proxy", "method": "111 vs 350*2", "status": "OPTIONAL_SECONDARY_V52_PI"}
@@ -5571,7 +5571,7 @@ bullish market != valid entry
         lines.append(f"  VIX: MISSING | DATA_STATUS: MISSING | SOURCE: Yahoo ^VIX | NOTE: VIX Crypto Impact Module v5.1 NEW")
 
     lines.append("")
-    lines.append("--- 24. MINER CAPITULATION v5.2 NEW Phase 1 — Puell Multiple + Hash Ribbons RAW — Bottom confluence — Miner stress ---")
+    lines.append("--- 24. MINER CAPITULATION Phase 1 — Puell Multiple + Hash Ribbons RAW — Bottom confluence — Miner stress ---")
     if 'puell_data' in locals() and puell_data:
         lines.append(f"PUELL_MULTIPLE: {fmt(puell_data.get('puell_multiple'),2)} | Zone: {puell_data.get('puell_zone','MISSING')} | Action: {puell_data.get('puell_action','MISSING')} | Daily Issuance BTC: {fmt(puell_data.get('daily_issuance_btc'),0)} | Issuance USD: ${fmt(puell_data.get('daily_issuance_value_usd',0)/1e6,2)}M | MA365 Issuance USD: ${fmt(puell_data.get('ma_365_daily_issuance_value_usd',0)/1e6,2)}M | Formula: {puell_data.get('formula','MISSING')} | DATA_STATUS: {puell_data.get('status')} | SOURCE: {puell_data.get('source')} | METHOD: {puell_data.get('method')} | TIMESTAMP: {puell_data.get('timestamp',now_iso)} | NOTE: NEW — Puell <0.5 capitulation deep value bottom, 0.5-1 undervalued, 1-2 neutral, 2-4 elevated, >4 overvalued top — Per Grok bottom strategy")
     else:
@@ -5582,7 +5582,7 @@ bullish market != valid entry
         lines.append("HASH_RIBBONS: MISSING | DATA_STATUS: MISSING | NOTE: Requires blockchain.info hash-rate")
 
     lines.append("")
-    lines.append("--- 25. SOPR STREAK & RECLAIM + VOLUME CLIMAX v5.2 NEW Phase 1 — Bottom confirmation — Sustained loss then reclaim + climax spike dry-up ---")
+    lines.append("--- 25. SOPR STREAK & RECLAIM + VOLUME CLIMAX Phase 1 — Bottom confirmation — Sustained loss then reclaim + climax spike dry-up ---")
     if 'sopr_streak_data' in locals() and sopr_streak_data:
         lines.append(f"SOPR_STREAK: Current {fmt(sopr_streak_data.get('sopr_current'),3)} Streak Below 1.0 {sopr_streak_data.get('sopr_streak_below_1','MISSING')} days Max 90D {sopr_streak_data.get('sopr_max_streak_below_90d','MISSING')} Reclaim Today {sopr_streak_data.get('sopr_reclaim_today','MISSING')} | Signal: {sopr_streak_data.get('sopr_signal','MISSING')} | Zone: {sopr_streak_data.get('sopr_zone','MISSING')} | History Count {sopr_streak_data.get('sopr_history_count','MISSING')} | Formula: {sopr_streak_data.get('formula','MISSING')} | DATA_STATUS: {sopr_streak_data.get('status')} | SOURCE: {sopr_streak_data.get('source')} | METHOD: {sopr_streak_data.get('method')} | TIMESTAMP: {sopr_streak_data.get('timestamp',now_iso)} | NOTE: NEW — SOPR <1 sustained loss capitulation, reclaim >1 profitability returning bottom confirmation per Grok")
     else:
@@ -5593,14 +5593,14 @@ bullish market != valid entry
         lines.append("VOLUME_CLIMAX: MISSING | DATA_STATUS: MISSING")
 
     lines.append("")
-    lines.append("--- 26. VALUATION PERCENTILES v5.2 NEW Phase 1 — Relative extremes vs 730-day history per Grok — Absolute thresholds compressed due to institutionalization ---")
+    lines.append("--- 26. VALUATION PERCENTILES Phase 1 — Relative extremes vs 730-day history per Grok — Absolute thresholds compressed due to institutionalization ---")
     if 'valuation_pct_data' in locals() and valuation_pct_data:
         lines.append(f"VALUATION_PERCENTILES_2Y: MVRV Z {fmt(valuation_pct_data.get('mvrv_z_current'),2)} Percentile {fmt(valuation_pct_data.get('mvrv_z_percentile_2y'),1)}% Interp: {valuation_pct_data.get('mvrv_z_interp','MISSING')} | NUPL {fmt(valuation_pct_data.get('nupl_current'),2)} Percentile {fmt(valuation_pct_data.get('nupl_percentile_2y'),1)}% Interp: {valuation_pct_data.get('nupl_interp','MISSING')} | SOPR {fmt(valuation_pct_data.get('sopr_current'),3)} Percentile {fmt(valuation_pct_data.get('sopr_percentile_2y'),1)}% Interp: {valuation_pct_data.get('sopr_interp','MISSING')} | Puell {fmt(valuation_pct_data.get('puell_current'),2)} Percentile {fmt(valuation_pct_data.get('puell_percentile_2y'),1)}% Interp: {valuation_pct_data.get('puell_interp','MISSING')} | Formula: {valuation_pct_data.get('formula','MISSING')} | DATA_STATUS: {valuation_pct_data.get('status')} | SOURCE: {valuation_pct_data.get('source')} | METHOD: {valuation_pct_data.get('method')} | TIMESTAMP: {valuation_pct_data.get('timestamp',now_iso)} | NOTE: NEW — <10 deep value capitulation bottom, 10-25 undervalued, 25-75 neutral, 75-90 elevated, >90 euphoria top — Per Grok focus on relative extremes not absolute")
     else:
         lines.append("VALUATION_PERCENTILES: MISSING | DATA_STATUS: MISSING")
 
     lines.append("")
-    lines.append("--- 27. OPTIONAL SECONDARY COMPOSITES v5.2 NEW Phase 2 — Pi Cycle Top + Rainbow Chart — Clearly marked SECONDARY ONLY — Not primary — Has failed in recent cycles — Use as secondary confirmation only per Grok ---")
+    lines.append("--- 27. OPTIONAL SECONDARY COMPOSITES Phase 2 — Pi Cycle Top + Rainbow Chart — Clearly marked SECONDARY ONLY — Not primary — Has failed in recent cycles — Use as secondary confirmation only per Grok ---")
     if 'pi_cycle_data' in locals() and pi_cycle_data:
         lines.append(f"PI_CYCLE_TOP_SECONDARY: 111MA {fmt(pi_cycle_data.get('pi_111ma'),0)} 350MA*2 {fmt(pi_cycle_data.get('pi_350ma_x2'),0)} 350MA {fmt(pi_cycle_data.get('pi_350ma'),0)} Prev 111MA {fmt(pi_cycle_data.get('pi_111ma_prev'),0)} Prev 350*2 {fmt(pi_cycle_data.get('pi_350ma_x2_prev'),0)} Dist % {fmt(pi_cycle_data.get('pi_dist_pct'),2)}% | Signal: {pi_cycle_data.get('pi_signal','MISSING')} | Zone: {pi_cycle_data.get('pi_zone','MISSING')} | Formula: {pi_cycle_data.get('formula','MISSING')} | DATA_STATUS: {pi_cycle_data.get('status')} | SOURCE: {pi_cycle_data.get('source')} | METHOD: {pi_cycle_data.get('method')} | TIMESTAMP: {pi_cycle_data.get('timestamp',now_iso)} | NOTE: OPTIONAL SECONDARY — Pi Cycle Top 111DMA vs 350DMA*2 — 111 crossing above 350*2 = top — Has failed — Secondary confirmation only — Not primary per Grok")
     else:
@@ -5617,7 +5617,7 @@ bullish market != valid entry
         lines.append(f"EXCHANGE_NETFLOW: 24h {fmt(exchange_flow_v53_data.get('exchange_netflow_24h_btc'),0)} BTC | 7D {fmt(exchange_flow_v53_data.get('exchange_netflow_7d_btc'),0)} BTC | 30D {fmt(exchange_flow_v53_data.get('exchange_netflow_30d_btc'),0)} BTC | Inflow 24h {fmt(exchange_flow_v53_data.get('exchange_inflow_24h_btc'),0)} Outflow {fmt(exchange_flow_v53_data.get('exchange_outflow_24h_btc'),0)} | Signal: {exchange_flow_v53_data.get('exchange_netflow_signal')} | Zone: {exchange_flow_v53_data.get('exchange_netflow_zone')} | FORMULA: Netflow = Inflow - Outflow Negative=outflow accumulation bullish Positive=inflow distribution bearish | DATA_STATUS: {exchange_flow_v53_data.get('status')} | METHOD: {exchange_flow_v53_data.get('method')}")
         lines.append(f"STABLECOIN_RESERVES_EXCHANGE: ${fmt(exchange_flow_v53_data.get('stablecoin_exchange_reserves_bn'),2)}B | Total Mcap: ${fmt(exchange_flow_v53_data.get('stablecoin_total_mcap_bn'),1)}B | SSR Proxy: {fmt(exchange_flow_v53_data.get('stablecoin_ssr_proxy'),2)} | DATA_STATUS: {exchange_flow_v53_data.get('status')} | SOURCE: Glassnode exchange stablecoin + DeFiLlama — Without key proxy $28.5B exchange dry powder | METHOD: Stablecoin exchange reserves dry powder for buying — SSR = BTC mcap / stablecoin mcap — Low SSR high buying power bullish")
     else:
-        lines.append("EXCHANGE_FLOW_V53: MISSING | DATA_STATUS: MISSING | NOTE: v5.3 NEW requires Glassnode exchange balance")
+        lines.append("EXCHANGE_FLOW: MISSING | DATA_STATUS: MISSING | NOTE: Requires Glassnode exchange balance")
 
     lines.append("")
     lines.append("--- 29. REALIZED PRICE BANDS + MAYER MULTIPLE NEW — Realized Price *0.7 0.8 0.9 1.2 1.5 2.0 + Distance % + Mayer price/200MA — Deep value vs euphoria RAW ---")
@@ -5626,7 +5626,7 @@ bullish market != valid entry
         lines.append(f"REALIZED_BANDS: 0.7x {fmt(realized_bands_v53_data.get('realized_price_band_0_7'),0)} Dist {fmt(realized_bands_v53_data.get('realized_price_dist_0_7_pct'),1)}% | 0.8x {fmt(realized_bands_v53_data.get('realized_price_band_0_8'),0)} Dist {fmt(realized_bands_v53_data.get('realized_price_dist_0_8_pct'),1)}% | 0.9x {fmt(realized_bands_v53_data.get('realized_price_band_0_9'),0)} Dist {fmt(realized_bands_v53_data.get('realized_price_dist_0_9_pct'),1)}% | 1.2x {fmt(realized_bands_v53_data.get('realized_price_band_1_2'),0)} Dist {fmt(realized_bands_v53_data.get('realized_price_dist_1_2_pct'),1)}% | 1.5x {fmt(realized_bands_v53_data.get('realized_price_band_1_5'),0)} Dist {fmt(realized_bands_v53_data.get('realized_price_dist_1_5_pct'),1)}% | 2.0x {fmt(realized_bands_v53_data.get('realized_price_band_2_0'),0)} Dist {fmt(realized_bands_v53_data.get('realized_price_dist_2_0_pct'),1)}% | FORMULA: Bands = RP *0.7-2.0 — <0.8x deep capitulation bottom, 0.8-1.0 undervalued, 1.0-1.2 neutral, 1.2-1.5 elevated, >1.5 overvalued top — Dist % = (spot-band)/band*100")
         lines.append(f"MAYER_MULTIPLE: Price/200MA {fmt(realized_bands_v53_data.get('mayer_multiple'),2)} | 200MA {fmt(realized_bands_v53_data.get('ma_200d'),0)} | Zone: {realized_bands_v53_data.get('mayer_zone')} | Signal: {realized_bands_v53_data.get('mayer_signal')} | FORMULA: Mayer Multiple = price / 200DMA — <0.8 deep value bottom historically, 0.8-1.0 undervalued, 1.0-1.5 neutral, 1.5-2.4 elevated, >2.4 overvalued top — Per Trace Mayer | DATA_STATUS: {realized_bands_v53_data.get('status')}")
     else:
-        lines.append("REALIZED_BANDS_V53: MISSING | DATA_STATUS: MISSING | NOTE: v5.3 NEW requires daily closes 200+")
+        lines.append("REALIZED_BANDS: MISSING | DATA_STATUS: MISSING | NOTE: Requires daily closes 200+")
 
     lines.append("")
     lines.append("--- 30. LTH BEHAVIOR DEEP DIVE NEW — LTH SOPR, MVRV, NUPL, Supply %, Realized Price, Spending, Binary CDD — Old hands profit taking vs HODL RAW ---")
@@ -5635,7 +5635,7 @@ bullish market != valid entry
         lines.append(f"LTH_SOPR: {fmt(lth_behavior_v53_data.get('lth_sopr'),2)} | MA7 {fmt(lth_behavior_v53_data.get('lth_sopr_ma7'),2)} | Signal: {lth_behavior_v53_data.get('lth_sopr_signal')} | Zone: {lth_behavior_v53_data.get('lth_sopr_zone')} | FORMULA: LTH SOPR = realized price / creation price LTH cohort — <1 LTH capitulation bottom strong, 1.0-1.2 neutral, 1.2-1.8 moderate profit elevated, >1.8 heavy profit euphoria top | DATA_STATUS: {lth_behavior_v53_data.get('status')} | METHOD: {lth_behavior_v53_data.get('method')}")
         lines.append(f"LTH_SUPPLY: {fmt(lth_behavior_v53_data.get('lth_supply_pct'),1)}% of total | Change 30D {fmt(lth_behavior_v53_data.get('lth_supply_change_30d_pct'),2)}% | Signal: {lth_behavior_v53_data.get('lth_supply_signal')} | Zone: {lth_behavior_v53_data.get('lth_supply_zone')} | Spent 24h {fmt(lth_behavior_v53_data.get('lth_spent_24h_btc'),0)} BTC | Binary CDD {fmt(lth_behavior_v53_data.get('lth_binary_cdd_proxy'),2)} | DATA_STATUS: {lth_behavior_v53_data.get('status')} | METHOD: LTH Supply % held >155d — Change 30D up = accumulating HODL bottom, down = distributing top — Binary CDD high = old coins moving distribution — LTH Spent high = profit taking")
     else:
-        lines.append("LTH_BEHAVIOR_V53: MISSING | DATA_STATUS: MISSING | NOTE: v5.3 NEW requires Glassnode LTH metrics")
+        lines.append("LTH_BEHAVIOR: MISSING | DATA_STATUS: MISSING | NOTE: Requires Glassnode LTH metrics")
 
     lines.append("")
     lines.append("--- 31. SSR + STABLECOIN GROWTH + NVT PROXY NEW — Stablecoin Supply Ratio, Stablecoin Mcap Growth 30D/90D, NVT proxy — Fiat dry powder RAW ---")
@@ -5643,7 +5643,7 @@ bullish market != valid entry
         lines.append(f"SSR: {fmt(ssr_mayer_v53_data.get('ssr'),2)} | MA200 Proxy {fmt(ssr_mayer_v53_data.get('ssr_ma_200_proxy'),2)} | Signal: {ssr_mayer_v53_data.get('ssr_signal')} | Zone: {ssr_mayer_v53_data.get('ssr_zone')} | BTC Mcap ${fmt(ssr_mayer_v53_data.get('btc_mcap_bn'),2)}B / Stablecoin Mcap ${fmt(ssr_mayer_v53_data.get('stablecoin_mcap_bn'),1)}B | FORMULA: SSR = BTC Market Cap / Stablecoin Market Cap — Low <6 high buying power bullish bottom, 6-10 moderate, 10-18 low power elevated, >18 very low top | DATA_STATUS: {ssr_mayer_v53_data.get('status')}")
         lines.append(f"STABLECOIN_GROWTH: Total Mcap ${fmt(ssr_mayer_v53_data.get('stablecoin_mcap_bn'),1)}B | Growth 30D {fmt(ssr_mayer_v53_data.get('stablecoin_growth_30d_pct'),1)}% 90D {fmt(ssr_mayer_v53_data.get('stablecoin_growth_90d_pct'),1)}% | Signal: {ssr_mayer_v53_data.get('stablecoin_growth_signal')} | Active Addresses Proxy {fmt(ssr_mayer_v53_data.get('active_addresses_proxy'),0)} | NVT Proxy {fmt(ssr_mayer_v53_data.get('nvt_proxy'),2)} | DATA_STATUS: {ssr_mayer_v53_data.get('status')} | SOURCE: {ssr_mayer_v53_data.get('source')} | METHOD: {ssr_mayer_v53_data.get('method')} | TIMESTAMP: {ssr_mayer_v53_data.get('timestamp',now_iso)}")
     else:
-        lines.append("SSR_V53: MISSING | DATA_STATUS: MISSING | NOTE: v5.3 NEW requires stablecoin mcap")
+        lines.append("SSR: MISSING | DATA_STATUS: MISSING | NOTE: Requires stablecoin mcap")
 
     lines.append("")
     lines.append(f"STRUCTURAL LEVELS (Kimi Layer 5 where regimes live and die):")
