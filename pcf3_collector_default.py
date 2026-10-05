@@ -348,7 +348,7 @@ def fetch_json(url, timeout=12):
     last_err = None
     for u in urls_to_try:
         try:
-            r = requests.get(u, timeout=timeout, headers={"User-Agent": "PCF3-Bot"})
+            r = requests.get(u, timeout=timeout, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
             r.raise_for_status()
             return r.json(), "LIVE_API", u
         except Exception as e:
@@ -453,7 +453,7 @@ def fetch_volume_profile(spot_price=None):
         return None, "MISSING", "no requests"
     try:
         url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=720"
-        r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-Bot"})
+        r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
         r.raise_for_status()
         klines = r.json()
         if not klines or len(klines) < 100:
@@ -550,7 +550,7 @@ def fetch_sth_cost_basis(klines_90d=None):
     if api_key and requests:
         try:
             url = f"https://api.glassnode.com/v1/metrics/indicators/sth_realized_price?a=BTC&api_key={api_key}"
-            r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot"})
+            r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
             r.raise_for_status()
             data = r.json()
             if data and len(data) > 0:
@@ -584,7 +584,7 @@ def fetch_sth_cost_basis(klines_90d=None):
     try:
         # Fetch 90d daily klines for proxy
         url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=90"
-        r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot"})
+        r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
         r.raise_for_status()
         klines = r.json()
 
@@ -645,7 +645,7 @@ def fetch_order_book_depth(psych_levels=None):
 
     try:
         url = "https://api.binance.com/api/v3/depth?symbol=BTCUSDT&limit=1000"
-        r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot"})
+        r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
         r.raise_for_status()
         data = r.json()
         bids = [(float(p), float(q)) for p, q in data.get("bids", [])]
@@ -1024,7 +1024,7 @@ def fetch_aggtrades_cvd(symbol="BTCUSDT", limit=1000):
         return None, "MISSING"
     try:
         url = f"https://api.binance.com/api/v3/aggTrades?symbol={symbol}&limit={limit}"
-        r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot"})
+        r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
         r.raise_for_status()
         trades = r.json()
         # trades: {a,p,q,f,l,T,m}
@@ -1089,7 +1089,7 @@ def fetch_long_short_ratios(symbol="BTCUSDT"):
         data = {}
         for key, url in urls.items():
             try:
-                r = requests.get(url, timeout=8, headers={"User-Agent": "PCF3-Bot"})
+                r = requests.get(url, timeout=8, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
                 r.raise_for_status()
                 j = r.json()
                 data[key] = j[-1] if isinstance(j, list) and j else j
@@ -1161,7 +1161,7 @@ def fetch_global_liquidity():
         for fid, desc in tickers.items():
             try:
                 url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={fid}&cosd=2024-01-01&coed=2026-09-30"
-                r = requests.get(url, timeout=10, headers={"User-Agent": "PCF3-Bot"})
+                r = requests.get(url, timeout=10, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
                 if r.status_code == 200 and "DATE" in r.text[:100]:
                     lines = r.text.strip().split("\n")
                     if len(lines) >= 2:
@@ -2471,7 +2471,7 @@ def fetch_rvol_time(symbol="BTCUSDT"):
     try:
         # Fetch 1h klines last 500 hours (~20 days)
         url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval=1h&limit=500"
-        r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot"})
+        r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
         r.raise_for_status()
         klines = r.json()
         if not klines or len(klines) < 100:
@@ -2682,7 +2682,7 @@ def fetch_rvol_history(klines_1h_500=None):
             return None, "MISSING"
         if klines_1h_500 is None:
             url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=500"
-            r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot"})
+            r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
             r.raise_for_status()
             klines_1h_500 = r.json()
         if not klines_1h_500 or len(klines_1h_500)<100:
@@ -2835,7 +2835,7 @@ def fetch_fred_series(series_id, limit=500):
             return None, "MISSING"
         url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
         # Try direct
-        r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-Bot"})
+        r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
         if r.status_code != 200:
             # Try AllOrigins proxy
             proxy_url = "https://api.allorigins.win/raw?url=" + requests.utils.quote(url)
@@ -2997,14 +2997,14 @@ def fetch_dvol_raw():
         if not requests:
             return None, "MISSING no requests"
         url = "https://www.deribit.com/api/v2/public/get_index_price?index_name=btc_dvol"
-        r = requests.get(url, timeout=10, headers={"User-Agent": "PCF3-Bot"})
+        r = requests.get(url, timeout=10, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
         if r.status_code == 200:
             j = r.json()
             price = j.get("result", {}).get("index_price")
             if price:
                 return {"dvol_price": float(price), "source": url, "status": "LIVE_API_DERIBIT_DVOL", "timestamp": utc_now_iso()}, "LIVE_API_DERIBIT_DVOL"
         url2 = "https://www.deribit.com/api/v2/public/get_volatility_index"
-        r2 = requests.get(url2, timeout=10, headers={"User-Agent": "PCF3-Bot"})
+        r2 = requests.get(url2, timeout=10, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
         if r2.status_code == 200:
             j2 = r2.json()
             result = j2.get("result", {})
@@ -3117,7 +3117,7 @@ def fetch_puell_multiple_raw(daily_closes_365=None, spot_price=None):
             if requests:
                 try:
                     url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=365"
-                    r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-Bot"})
+                    r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
                     if r.status_code == 200:
                         data = r.json()
                         closes = [float(k[4]) for k in data if len(k)>=5]
@@ -4278,7 +4278,7 @@ def fetch_klines_extra(symbol="BTCUSDT", interval="1d", limit=250):
         return None, "MISSING"
     try:
         url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
-        r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-Bot"})
+        r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
         r.raise_for_status()
         return r.json(), "LIVE_API"
     except Exception as e:
@@ -4626,7 +4626,7 @@ def main():
         try:
             if requests:
                 url365 = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=365"
-                r365 = requests.get(url365, timeout=15, headers={"User-Agent": "PCF3-Bot"})
+                r365 = requests.get(url365, timeout=15, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
                 if r365.status_code == 200:
                     d365 = r365.json()
                     daily_closes_365 = [float(k[4]) for k in d365 if len(k)>=5]
@@ -4636,7 +4636,7 @@ def main():
     try:
         if requests:
             url400 = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=400"
-            r400 = requests.get(url400, timeout=15, headers={"User-Agent": "PCF3-Bot"})
+            r400 = requests.get(url400, timeout=15, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
             if r400.status_code == 200:
                 d400 = r400.json()
                 daily_closes_400 = [float(k[4]) for k in d400 if len(k)>=5]
@@ -4646,7 +4646,7 @@ def main():
     try:
         if requests:
             url1000 = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=1000"
-            r1000 = requests.get(url1000, timeout=15, headers={"User-Agent": "PCF3-Bot"})
+            r1000 = requests.get(url1000, timeout=15, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
             if r1000.status_code == 200:
                 d1000 = r1000.json()
                 daily_closes_1000 = [float(k[4]) for k in d1000 if len(k)>=5]
