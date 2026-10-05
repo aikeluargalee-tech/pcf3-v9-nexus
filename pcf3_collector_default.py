@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
 PCF3 PRODUCTION READY FINAL — FULL RAW + PSYCH + REGIME + SMA 10/20 + MSNR + TOP-DOWN + VIX + PUELL HASH RIBBONS SOPR STREAK VOLUME CLIMAX PERCENTILES 2Y + OPTIONAL PI RAINBOW + EXCHANGE FLOW + REALIZED BANDS MAYER + LTH BEHAVIOR + SSR — DEFAULT PACKET FOR ANY LLM — PSYCH INTEGRATED — P0 FIXES
-Built from v2.0 Raw Integrated + BPLP psych-level logic as raw section
+Built from Raw Integrated + BPLP psych-level logic as raw section
 
 GOAL: Provide LLM with valuable real data to analyze BTC around psychological levels $80k/$90k/$100k
 - Real data only, autonomous, EXAMPLE:0, provenance-aware
 - Copy → Paste to any LLM (ChatGPT, Claude, Gemini, Meta AI, Grok)
 - HTML + Python both generate same raw packet
 
-WHAT'S NEW IN v3.0 vs v2.0:
+WHAT'S NEW IN vs :
 New Section 14: PSYCHOLOGICAL LEVELS + VOLUME PROFILE + STH CONFLUENCE + ORDER BOOK DEPTH + SWEEP vs ABSORPTION
 
 From BPLP v1-v3 integrated as RAW (not playbook opinions):
@@ -42,7 +42,7 @@ From BPLP v1-v3 integrated as RAW (not playbook opinions):
    - +2 if HVN near (<1.5%), +2 if POC near, +3 if STH near (<3%)
    - $80k ⭐ STRONG score 5 when volume + STH line up, $90k score 0 until volume builds
 
-ARCHITECTURE: v2.0 + Section 14 — Still RAW ONLY, no opinions, EXAMPLE:0
+ARCHITECTURE: + Section 14 — Still RAW ONLY, no opinions, EXAMPLE:0
 - Python collector: pip install requests, python pfc3_collector_v3_0_raw_psych.py → generates PFC3_LIVE_PACKET_V3_0_RAW_PSYCH.txt
 - HTML viewer: open pfc3_v3_0_dashboard.html → live auto 30s → Copy Packet button
 
@@ -348,7 +348,7 @@ def fetch_json(url, timeout=12):
     last_err = None
     for u in urls_to_try:
         try:
-            r = requests.get(u, timeout=timeout, headers={"User-Agent": "PCF3-v3.0-RawPsych"})
+            r = requests.get(u, timeout=timeout, headers={"User-Agent": "PCF3-Bot"})
             r.raise_for_status()
             return r.json(), "LIVE_API", u
         except Exception as e:
@@ -375,7 +375,7 @@ def fetch_farside_etf():
     if not requests:
         return None, "MISSING", "no requests"
     try:
-        r = requests.get(url, timeout=15, headers={"User-Agent": "Mozilla/5.0 PCF3-v3.0"})
+        r = requests.get(url, timeout=15, headers={"User-Agent": "Mozilla/5.0 PCF3-Bot"})
         r.raise_for_status()
         html = r.text
         tr_pat = r"<tr[^>]*>(.*?)</tr>"
@@ -453,7 +453,7 @@ def fetch_volume_profile(spot_price=None):
         return None, "MISSING", "no requests"
     try:
         url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=720"
-        r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-v3.0"})
+        r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-Bot"})
         r.raise_for_status()
         klines = r.json()
         if not klines or len(klines) < 100:
@@ -550,7 +550,7 @@ def fetch_sth_cost_basis(klines_90d=None):
     if api_key and requests:
         try:
             url = f"https://api.glassnode.com/v1/metrics/indicators/sth_realized_price?a=BTC&api_key={api_key}"
-            r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-v3.0"})
+            r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot"})
             r.raise_for_status()
             data = r.json()
             if data and len(data) > 0:
@@ -584,7 +584,7 @@ def fetch_sth_cost_basis(klines_90d=None):
     try:
         # Fetch 90d daily klines for proxy
         url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=90"
-        r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-v3.0"})
+        r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot"})
         r.raise_for_status()
         klines = r.json()
 
@@ -645,7 +645,7 @@ def fetch_order_book_depth(psych_levels=None):
 
     try:
         url = "https://api.binance.com/api/v3/depth?symbol=BTCUSDT&limit=1000"
-        r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-v3.0"})
+        r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot"})
         r.raise_for_status()
         data = r.json()
         bids = [(float(p), float(q)) for p, q in data.get("bids", [])]
@@ -743,7 +743,7 @@ def get_bplp_real_raw_data():
     }
 
 
-# === REGIME HELPERS v4.0 — Kimi + Grok ===
+# === REGIME HELPERS — Kimi + Grok ===
 def ema(series, period):
     if not series or len(series) < period:
         return [None]*len(series)
@@ -1017,14 +1017,14 @@ def calculate_6_regimes(adx_vals, atr_vals, atr_avg_vals, closes, ema50_vals, em
     return {"regime_6":regime_6,"trend_vs_range":trend_vs_range,"vol_regime":vol_regime,"direction":direction,"adx":adx_now,"atr_ratio":atr_ratio,"atr_now":atr_now,"atr_avg":atr_avg_now,"bbwidth_now":bb_now,"bbwidth_pct":bb_pct,"price":price,"ema50":ema50_now,"ema200":ema200_now}
 
 
-# === ENHANCEMENTS v4.2 FULL — 1 to 7 ===
+# === ENHANCEMENTS  — 1 to 7 ===
 def fetch_aggtrades_cvd(symbol="BTCUSDT", limit=1000):
     """Enhancement #1: CVD live slope via aggTrades REST approximation of websocket"""
     if not requests:
         return None, "MISSING"
     try:
         url = f"https://api.binance.com/api/v3/aggTrades?symbol={symbol}&limit={limit}"
-        r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-v4.2-FULL-CVD"})
+        r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot"})
         r.raise_for_status()
         trades = r.json()
         # trades: {a,p,q,f,l,T,m}
@@ -1089,7 +1089,7 @@ def fetch_long_short_ratios(symbol="BTCUSDT"):
         data = {}
         for key, url in urls.items():
             try:
-                r = requests.get(url, timeout=8, headers={"User-Agent": "PCF3-v4.2-LS"})
+                r = requests.get(url, timeout=8, headers={"User-Agent": "PCF3-Bot"})
                 r.raise_for_status()
                 j = r.json()
                 data[key] = j[-1] if isinstance(j, list) and j else j
@@ -1161,7 +1161,7 @@ def fetch_global_liquidity():
         for fid, desc in tickers.items():
             try:
                 url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={fid}&cosd=2024-01-01&coed=2026-09-30"
-                r = requests.get(url, timeout=10, headers={"User-Agent": "PCF3-v4.2-Liquidity"})
+                r = requests.get(url, timeout=10, headers={"User-Agent": "PCF3-Bot"})
                 if r.status_code == 200 and "DATE" in r.text[:100]:
                     lines = r.text.strip().split("\n")
                     if len(lines) >= 2:
@@ -1352,7 +1352,7 @@ def backtest_regime(daily_closes, daily_highs, daily_lows):
 
 
 def detect_av_levels_raw(opens, highs, lows, closes):
-    """MSNR v4.8 CORE — A/V levels body-focused — close pivot + opposite colour flip — from 62-page spec pages 15-22"""
+    """MSNR CORE — A/V levels body-focused — close pivot + opposite colour flip — from 62-page spec pages 15-22"""
     levels=[]
     try:
         if not closes or len(closes)<7:
@@ -1409,7 +1409,7 @@ def detect_av_levels_raw(opens, highs, lows, closes):
         return [], f"MISSING {e}"
 
 def detect_ocl_levels_raw(opens, highs, lows, closes):
-    """MSNR v4.8 — OCL Open-Close Gap Levels — same-colour consecutive gap — pages 23-27"""
+    """MSNR — OCL Open-Close Gap Levels — same-colour consecutive gap — pages 23-27"""
     levels=[]
     try:
         if not opens or not closes or len(closes)<3:
@@ -1440,7 +1440,7 @@ def detect_ocl_levels_raw(opens, highs, lows, closes):
         return [], f"MISSING {e}"
 
 def track_freshness_msnr(levels, highs, lows, closes, opens, atr_vals, buffer_pct, spot_price):
-    """MSNR v4.8 — Freshness States — FRESH solid never retested UNFRESH dashed wick touched body held BROKEN grey body close through — pages 15-22"""
+    """MSNR — Freshness States — FRESH solid never retested UNFRESH dashed wick touched body held BROKEN grey body close through — pages 15-22"""
     tracked=[]
     try:
         if not levels:
@@ -1498,7 +1498,7 @@ def track_freshness_msnr(levels, highs, lows, closes, opens, atr_vals, buffer_pc
         return [], f"MISSING {e}"
 
 def calc_storyline_msnr(weekly_closes, weekly_highs, weekly_lows, daily_closes, daily_highs, daily_lows, fourh_closes, fourh_highs, fourh_lows, sma_data, total_score, regime_6):
-    """MSNR v4.8 — Storyline — Higher TF Filter Weekly 50% Daily 30% 4H 20% — Bull/Bear/Range — pages 31-38"""
+    """MSNR — Storyline — Higher TF Filter Weekly 50% Daily 30% 4H 20% — Bull/Bear/Range — pages 31-38"""
     try:
         def tf_bias(closes, highs, lows, sma10, sma20):
             if not closes or len(closes)<20:
@@ -1537,7 +1537,7 @@ def calc_storyline_msnr(weekly_closes, weekly_highs, weekly_lows, daily_closes, 
         return None, f"MISSING {e}"
 
 def detect_sbr_rbs_flips_msnr(tracked, closes, highs, lows, spot_price):
-    """MSNR v4.8 — SBR/RBS Flips — Support Broken becomes Resistance + Resistance Broken becomes Support"""
+    """MSNR — SBR/RBS Flips — Support Broken becomes Resistance + Resistance Broken becomes Support"""
     flips=[]
     try:
         if not tracked:
@@ -1560,7 +1560,7 @@ def detect_sbr_rbs_flips_msnr(tracked, closes, highs, lows, spot_price):
         return [], f"MISSING {e}"
 
 def calc_performance_msnr(tracked, closes, highs, lows):
-    """MSNR v4.8 — Historical Performance — reaction >=0.8% within 5 candles"""
+    """MSNR — Historical Performance — reaction >=0.8% within 5 candles"""
     try:
         stats={"total_levels":len(tracked),"fresh":0,"unfresh":0,"broken":0,"reactions":0,"reaction_rate_pct":None,"avg_bounce_pct":None,"method":"Reaction = price moved >=0.8% away after first touch within 5 candles before break — historical performance — fresh aligned with storyline highest prob per doc page 45"}
         bounces=[]
@@ -1596,7 +1596,7 @@ def calc_performance_msnr(tracked, closes, highs, lows):
         return {"total_levels":0,"fresh":0,"unfresh":0,"broken":0,"reactions":0,"reaction_rate_pct":0,"avg_bounce_pct":0,"method":f"MISSING {e}"}, f"MISSING {e}"
 
 def fetch_msnr_v48_raw(daily_opens_250, daily_highs_250, daily_lows_250, daily_closes_250, weekly_opens_100, weekly_highs_100, weekly_lows_100, weekly_closes_100, fourh_opens_100, fourh_highs_100, fourh_lows_100, fourh_closes_100, oneh_opens_250, oneh_highs_250, oneh_lows_250, oneh_closes_250, spot_price, sma_data, total_score, regime_6, atr_daily_vals):
-    """MSNR v4.8 FULL — Body-focused A/V + OCL + Freshness + Storyline + SBR/RBS + Performance — 62-page spec"""
+    """MSNR  — Body-focused A/V + OCL + Freshness + Storyline + SBR/RBS + Performance — 62-page spec"""
     try:
         now_iso=utc_now_iso()
         daily_av, _ = detect_av_levels_raw(daily_opens_250, daily_highs_250, daily_lows_250, daily_closes_250)
@@ -1646,7 +1646,7 @@ def fetch_msnr_v48_raw(daily_opens_250, daily_highs_250, daily_lows_250, daily_c
         return None, f"MISSING {e}"
 
 def fetch_msnr_v48_raw_refined(msnr_raw, vp_data, sth_data, sma_data, psych_data, spot_price):
-    """MSNR v4.8 Refined — Confluence with PCF3 stack Psych HVN POC STH SMA Regime + Workflow + Limitations"""
+    """MSNR Refined — Confluence with PCF3 stack Psych HVN POC STH SMA Regime + Workflow + Limitations"""
     try:
         if not msnr_raw:
             return None, "MISSING msnr_raw"
@@ -2471,7 +2471,7 @@ def fetch_rvol_time(symbol="BTCUSDT"):
     try:
         # Fetch 1h klines last 500 hours (~20 days)
         url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval=1h&limit=500"
-        r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-v4.3-RVOL"})
+        r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot"})
         r.raise_for_status()
         klines = r.json()
         if not klines or len(klines) < 100:
@@ -2682,7 +2682,7 @@ def fetch_rvol_history(klines_1h_500=None):
             return None, "MISSING"
         if klines_1h_500 is None:
             url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=500"
-            r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-v4.4-RVOL-History"})
+            r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot"})
             r.raise_for_status()
             klines_1h_500 = r.json()
         if not klines_1h_500 or len(klines_1h_500)<100:
@@ -2835,7 +2835,7 @@ def fetch_fred_series(series_id, limit=500):
             return None, "MISSING"
         url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
         # Try direct
-        r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-v4.7"})
+        r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-Bot"})
         if r.status_code != 200:
             # Try AllOrigins proxy
             proxy_url = "https://api.allorigins.win/raw?url=" + requests.utils.quote(url)
@@ -2927,7 +2927,7 @@ def fetch_macro_v47_raw():
         spx_dist = (spx_price - spx_sma200)/spx_sma200*100 if spx_price and spx_sma200 else None
         vix_price = vix_raw["price"] if vix_raw else None
         vix_sma20 = sma_simple(vix_raw["closes"], 20) if vix_raw else None
-        # v5.1 DETAILED REGIMES per article: <15 Complacency, 15-20 Normal, 20-30 Elevated Stress, >30 Acute Panic, >40-50 Capitulation
+        # DETAILED REGIMES per article: <15 Complacency, 15-20 Normal, 20-30 Elevated Stress, >30 Acute Panic, >40-50 Capitulation
         if vix_price is None:
             vix_regime = "MISSING"
             vix_regime_detailed_v47 = "MISSING"
@@ -2992,19 +2992,19 @@ def fetch_macro_v47_raw():
         return None, f"MISSING {e}"
 
 def fetch_dvol_raw():
-    """v5.1 NEW - DVOL - Deribit Bitcoin Volatility Index 30-day implied vol from BTC options"""
+    """ - DVOL - Deribit Bitcoin Volatility Index 30-day implied vol from BTC options"""
     try:
         if not requests:
             return None, "MISSING no requests"
         url = "https://www.deribit.com/api/v2/public/get_index_price?index_name=btc_dvol"
-        r = requests.get(url, timeout=10, headers={"User-Agent": "PCF3-v5.1-VIX"})
+        r = requests.get(url, timeout=10, headers={"User-Agent": "PCF3-Bot"})
         if r.status_code == 200:
             j = r.json()
             price = j.get("result", {}).get("index_price")
             if price:
                 return {"dvol_price": float(price), "source": url, "status": "LIVE_API_DERIBIT_DVOL", "timestamp": utc_now_iso()}, "LIVE_API_DERIBIT_DVOL"
         url2 = "https://www.deribit.com/api/v2/public/get_volatility_index"
-        r2 = requests.get(url2, timeout=10, headers={"User-Agent": "PCF3-v5.1-VIX"})
+        r2 = requests.get(url2, timeout=10, headers={"User-Agent": "PCF3-Bot"})
         if r2.status_code == 200:
             j2 = r2.json()
             result = j2.get("result", {})
@@ -3016,7 +3016,7 @@ def fetch_dvol_raw():
     return None, "MISSING"
 
 def fetch_vix_crypto_impact_module(vix_price, dvol_price=None):
-    """v5.1 NEW - Full article logic - VIX regimes + crypto significance"""
+    """ - Full article logic - VIX regimes + crypto significance"""
     try:
         if vix_price is None:
             return None, "MISSING VIX price"
@@ -3722,7 +3722,7 @@ def fetch_realized_price_bands_v53_raw(daily_closes_250=None, daily_closes_1000=
     """NEW — Realized Price Bands + Mayer Multiple RAW — Realized Price *0.7 0.8 0.9 1.2 1.5 2.0 bands + Mayer price/200MA"""
     try:
         now_iso = utc_now_iso()
-        # Realized Price proxy — avg cost basis of all coins — ~0.85 * 90d SMA as in v4.7 but enhance with longer
+        # Realized Price proxy — avg cost basis of all coins — ~0.85 * 90d SMA as in but enhance with longer
         realized_price = None
         if daily_closes_250 and len(daily_closes_250) >= 200:
             # Realized Price ~ 200-day VWAP-like with discount — typical 40-50k in 2024-2025
@@ -4173,7 +4173,7 @@ def fetch_scorecard_v47_raw(macro_v47, onchain_v47, derivatives_v47, ta_v47, reg
             "verdict": verdict,
             "method_detail": "Per article: Only take full-size trades at ≥75–80 Half size at 60 Below that — no trade sitting on hands is position",
             "timestamp": now_iso,
-            "source": "Macro v4.7 + TA v4.7 + On-chain + Derivatives + SMA + Regime 3 — Scorecard RAW per article",
+            "source": "Macro + TA + On-chain + Derivatives + SMA + Regime 3 — Scorecard RAW per article",
             "method": "Confluence scorecard Weight Macro/liquidity 25 HTF trend 25 On-chain not overheated 20 Derivatives not crowded 15 TA trigger 15 = 100 Full ≥75 Half 60 Below no trade",
             "status": "LIVE_AUTO_V47_SCORECARD"
         }
@@ -4278,7 +4278,7 @@ def fetch_klines_extra(symbol="BTCUSDT", interval="1d", limit=250):
         return None, "MISSING"
     try:
         url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
-        r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-v4.1-FULL"})
+        r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-Bot"})
         r.raise_for_status()
         return r.json(), "LIVE_API"
     except Exception as e:
@@ -4389,7 +4389,7 @@ def main():
             time.sleep(0.15)
 
     
-    # === REGIME EXTRA KLINES v4.1 FULL ===
+    # === REGIME EXTRA KLINES  ===
     print("Fetching Regime klines daily 250 + weekly 100...")
     daily_klines_250, daily_250_status = fetch_klines_extra("BTCUSDT", "1d", 250)
     weekly_klines_100, weekly_100_status = fetch_klines_extra("BTCUSDT", "1w", 100)
@@ -4451,7 +4451,7 @@ def main():
         regime_3_data = calculate_regime_scores(daily_closes_250, daily_highs_250, daily_lows_250, weekly_closes_100, weekly_highs_100, weekly_lows_100)
         regime_6_data = calculate_6_regimes(adx_daily_250, atr_daily_250, full_atr_avg_250, daily_closes_250, ema50_daily_250, ema200_daily_250, bb_width_daily_250)
 
-    # === ENHANCEMENTS v4.2 FULL — 1 to 7 — FETCH ===
+    # === ENHANCEMENTS  — 1 to 7 — FETCH ===
     print("Fetching Enhancement #1 CVD live via aggTrades...")
     cvd_data, cvd_status = fetch_aggtrades_cvd("BTCUSDT", 1000)
     if not cvd_data:
@@ -4502,7 +4502,7 @@ def main():
         }
         backtest_status = "MANUAL_REAL_GROK"
 
-    print("Fetching Institutional Trio — ADX + VWAP + RVOL Time — Enhancement v4.3...")
+    print("Fetching Institutional Trio — ADX + VWAP + RVOL Time — Enhancement...")
     rvol_data, rvol_status = fetch_rvol_time("BTCUSDT")
     if not rvol_data:
         rvol_data = {
@@ -4522,7 +4522,7 @@ def main():
         }
         trio_status = "MANUAL_REAL_BPLP"
 
-    print("Fetching v4.4 VWAP Bands + ADX DI + RVOL History for Decision Engine...")
+    print("Fetching VWAP Bands + ADX DI + RVOL History for Decision Engine...")
     vwap_bands_data, vwap_bands_status = fetch_vwap_bands(klines_data, daily_klines_250)
     if not vwap_bands_data:
         vwap_bands_data = {
@@ -4549,7 +4549,7 @@ def main():
         rvol_history_status = "MANUAL_REAL_BPLP"
 
     
-    print("Fetching v4.6 SMA 10/20 Trend Protocol RAW — NEW COMPLETE SET...")
+    print("Fetching SMA 10/20 Trend Protocol RAW — NEW COMPLETE SET...")
     sma_data, sma_status = fetch_sma_trend_protocol(daily_closes_250, daily_highs_250, daily_lows_250, daily_opens_250, klines_data, weekly_closes_100, weekly_highs_100, weekly_lows_100, spot_price)
     if not sma_data:
         sma_data = {
@@ -4571,7 +4571,7 @@ def main():
         }
         sma_status = "MANUAL_REAL_SMA_v4.6"
 
-    print("Fetching v4.7 Macro M2 Real Yields Credit Spreads DXY SPX VIX USDJPY JGBs...")
+    print("Fetching Macro M2 Real Yields Credit Spreads DXY SPX VIX USDJPY JGBs...")
     macro_v47_data, macro_v47_status = fetch_macro_v47_raw()
     if not macro_v47_data:
         macro_v47_data = {
@@ -4589,7 +4589,7 @@ def main():
         }
         macro_v47_status = "MANUAL_REAL_V47"
 
-    print("Fetching v5.1 VIX Crypto Impact Module + DVOL...")
+    print("Fetching VIX Crypto Impact Module + DVOL...")
     dvol_data, dvol_status = fetch_dvol_raw()
     if not dvol_data:
         dvol_data = {"dvol_price": 48.5, "source": "Deribit btc_dvol cached real", "status": "MANUAL_REAL_DVOL", "timestamp": now_iso}
@@ -4614,7 +4614,7 @@ def main():
             "vix_vs_dvol_interpretation": "Both calm - Risk-on",
             "timestamp": now_iso,
             "source": "Article + Deribit cached real",
-            "method": "v5.1 VIX regimes",
+            "method": "VIX regimes",
             "status": "MANUAL_REAL_V51"
         }
         vix_impact_status = "MANUAL_REAL_V51"
@@ -4717,17 +4717,17 @@ def main():
         ssr_mayer_v53_data = {"ssr": 10.5, "ssr_signal": "Neutral SSR", "ssr_zone": "Neutral", "stablecoin_mcap_bn": 160.0, "btc_mcap_bn": 1.6, "stablecoin_growth_30d_pct": 5.2, "stablecoin_growth_90d_pct": 12.3, "timestamp": now_iso, "source": "SSR proxy", "method": "SSR", "status": "MANUAL_REAL_V53"}
         ssr_mayer_v53_status = "MANUAL_REAL_V53"
 
-    print("Fetching v4.7 On-chain Exchange Reserves Realized Price LTH...")
+    print("Fetching On-chain Exchange Reserves Realized Price LTH...")
     onchain_v47_data, onchain_v47_status = fetch_onchain_v47_raw(daily_closes_250)
     if not onchain_v47_data:
         onchain_v47_data = {"exchange_reserves_btc": 2300000, "exchange_netflow_btc_24h": -1200, "exchange_reserves_status": "MANUAL", "realized_price": 45000, "realized_price_dist_pct": 80.0, "realized_price_status": "PROXY", "lth_sopr": 1.15, "lth_supply_pct": 72.5, "lth_realized_price": 35000, "timestamp": now_iso, "source": "Glassnode proxy", "method": "proxy", "status": "MANUAL"}
 
-    print("Fetching v4.7 Derivatives Basis Skew OI vs Price Funding Persistence Liq Heatmap...")
+    print("Fetching Derivatives Basis Skew OI vs Price Funding Persistence Liq Heatmap...")
     deriv_v47_data, deriv_v47_status = fetch_derivatives_v47_raw(spot_price, daily_closes_250, funding, oi_current)
     if not deriv_v47_data:
         deriv_v47_data = {"futures_basis_perp_spot_pct": 0.05, "futures_basis_3m_ann_pct": 8.5, "futures_basis_status": "PROXY", "options_25d_skew_pct": -2.5, "options_skew_status": "PROXY", "oi_vs_price_divergence": "OI rising price flat", "funding_persistence_7d_days_above_005": 2, "funding_persistence_pct": 28.5, "liq_heatmap_100_buckets": [], "timestamp": now_iso, "source": "Binance + Deribit proxy", "method": "proxy", "status": "MANUAL"}
 
-    print("Fetching v4.7 TA ATH Range Prior Week EMA Break+Retest...")
+    print("Fetching TA ATH Range Prior Week EMA Break+Retest...")
     ta_v47_data, ta_v47_status = fetch_ta_v47_raw(daily_closes_250, daily_highs_250, daily_lows_250, weekly_closes_100, weekly_highs_100, weekly_lows_100, spot_price)
 
     # --- MSNR NEW — Fetch raw A/V OCL Freshness Storyline Flips Performance ---
@@ -4785,7 +4785,7 @@ def main():
     if not ta_v47_data:
         ta_v47_data = {"ath_price": 109000, "ath_dist_pct": -22.0, "range_20d_high": 89000, "range_20d_low": 83000, "range_90d_high": 95000, "range_90d_low": 75000, "prior_week_high": 88000, "prior_week_low": 82000, "weekly_ema20": 78000, "weekly_ema50": 72000, "weekly_ema20_slope_5w_pct": 1.2, "golden_cross_20_50": True, "monthly_trend_proxy": "Bull", "break_retest_bull": False, "break_retest_bear": False, "timestamp": now_iso, "source": "Binance", "method": "proxy", "status": "MANUAL"}
 
-    print("Fetching v4.7 Scorecard 25/25/20/15/15...")
+    print("Fetching Scorecard 25/25/20/15/15...")
     # Need regime_3_data placeholder if not yet computed
     if 'regime_3_data' not in locals() or regime_3_data is None:
         regime_3_data = {"total_score": 72, "bias": "Constructive"}
@@ -4793,12 +4793,12 @@ def main():
     if not scorecard_v47_data:
         scorecard_v47_data = {"macro_liquidity_aligned_25": 15, "htf_trend_aligned_25": 18, "onchain_not_overheated_20": 12, "derivatives_not_crowded_15": 8, "ta_trigger_at_level_15": 10, "total_confluence_100": 63, "verdict": "Half size 60-74", "timestamp": now_iso, "source": "scorecard", "method": "25/25/20/15/15", "status": "MANUAL"}
 
-    print("Fetching v4.7 Execution ATR Stop Targets R:R Position Size Thesis...")
+    print("Fetching Execution ATR Stop Targets R:R Position Size Thesis...")
     exec_v47_data, exec_v47_status = fetch_execution_v47_raw(spot_price, daily_lows_250, daily_highs_250, atr_daily_250, daily_closes_250)
     if not exec_v47_data:
         exec_v47_data = {"atr_daily": 1500, "swing_low_10d": 82000, "swing_high_10d": 89000, "stop_long_structural": 80500, "stop_dist_pct": 5.5, "target_1_1_5R": 90000, "target_2_prior_high": 95000, "target_3_3R": 95000, "rr_min_required": 2.5, "rr_at_target2": 2.8, "risk_per_trade_pct": 0.75, "max_portfolio_heat_pct": 5.0, "thesis_template": "Because X I buy at Y wrong below Z targeting W", "timestamp": now_iso, "source": "ATR + swing", "method": "execution", "status": "MANUAL"}
 
-    print("Fetching v4.7 Validation Expectancy PF Max DD Sharpe Monte Carlo...")
+    print("Fetching Validation Expectancy PF Max DD Sharpe Monte Carlo...")
     validation_v47_data, validation_v47_status = fetch_validation_v47_raw(regime_6_data if 'regime_6_data' in locals() else None)
     if not validation_v47_data:
         validation_v47_data = {"win_rate_pct": 40.0, "avg_win_R": 3.0, "avg_loss_R": 1.0, "expectancy_R": 0.6, "profit_factor": 2.0, "max_drawdown_pct": 15.0, "sharpe": 1.2, "monte_carlo_worst_losing_streak": 6, "timestamp": now_iso, "source": "article", "method": "validation", "status": "MANUAL"}
@@ -4849,8 +4849,8 @@ def main():
         }
         depth_status = "MANUAL_REAL_BPLP"
 
-    # Decision Engine v4.4 — AFTER vp_data, sth_data, depth_data available — think what trader needs
-    print("Fetching Decision Engine v4.4 — Institutional Trio + Regime + Psych + VWAP Bands + ADX DI + RVOL History...")
+    # Decision Engine — AFTER vp_data, sth_data, depth_data available — think what trader needs
+    print("Fetching Decision Engine — Institutional Trio + Regime + Psych + VWAP Bands + ADX DI + RVOL History...")
     decision_data, decision_status = institutional_decision_engine(adx_di_data, vwap_bands_data, rvol_data, trio_data, regime_3_data, regime_6_data, spot_price, vp_data, sth_data, depth_data)
     if not decision_data:
         decision_data = {
@@ -4967,7 +4967,7 @@ def main():
                     break
             vah=max(inc)+100 if inc else None; val=min(inc) if inc else None
 
-    # 10. Build v3.0 packet
+    # 10. Build packet
     def fmt(v, dec=2):
         if v is None:
             return "MISSING"
@@ -4977,7 +4977,7 @@ def main():
 
 
     # === NEW — Bitcoin Derivatives & Positioning Monitor — Beating the Lag ===
-    print("Fetching v4.9 Derivatives & Positioning Monitor — beating lag PDF workflow...")
+    print("Fetching Derivatives & Positioning Monitor — beating lag PDF workflow...")
     fng_data_for_monitor = None
     try:
         fng_json, _, _ = fetch_json("https://api.alternative.me/fng/?limit=2")
@@ -5323,7 +5323,7 @@ bullish market != valid entry
         lines.append(f"Price_vs_Daily_VWAP_%: {(spot_price-daily_vwap)/daily_vwap*100:.3f}% | FORMULA: (price-VWAP)/VWAP*100")
     lines.append("")
 
-    lines.append("--- 3. SPOT / PERP FLOW + CVD LIVE SLOPE | ENHANCEMENT #1 v4.2 FULL ---")
+    lines.append("--- 3. SPOT / PERP FLOW + CVD LIVE SLOPE | ENHANCEMENT #1  ---")
     lines.append(f"Spot_volume_24h: {fmt(spot_vol)} | Perp_volume_24h: {fmt(perp_vol)} | DATA_STATUS: LIVE_API | SOURCE: /ticker/24hr Binance | METHOD: 24h rolling - LIVE on laptop")
     if cvd_data:
         lines.append(f"CVD_current: {fmt(cvd_data.get('cvd_current'),2)} BTC | Buy_vol: {fmt(cvd_data.get('buy_vol'),2)} Sell_vol: {fmt(cvd_data.get('sell_vol'),2)} Buy/Sell Ratio: {fmt(cvd_data.get('buy_sell_ratio'),3)} Delta: {fmt(cvd_data.get('delta'),2)} Delta_%: {fmt(cvd_data.get('delta_pct'),2)}% | DATA_STATUS: {cvd_data.get('status','LIVE_API')} | SOURCE: {cvd_data.get('source','Binance aggTrades 1000')} | METHOD: {cvd_data.get('method','Delta +qty aggressive buyer -qty aggressive seller CVD=cum')} | TIMESTAMP: {cvd_data.get('timestamp',now_iso)} | NOTE: Enhancement #1 FIXES CVD MISSING - LIVE_API via REST 1000 trades + WebSocket live in dashboard wss://stream.binance.com:9443/ws/btcusdt@aggTrade - CVD divergence price sweeps CVD flat/down iceberg bids absorbing - BPLP sweep vs absorption needs CVD slope NOW LIVE")
@@ -5343,7 +5343,7 @@ bullish market != valid entry
     lines.append(f"MARK_INDEX_SPREAD_%: {fmt(mark_index_spread,4)+'%' if mark_index_spread is not None else 'MISSING'} | FORMULA: (mark-index)/index*100 | NOTE: FIX #2 renamed")
     lines.append("")
 
-    lines.append("--- 5. LIQUIDITY / LIQUIDATION MAP | INTEGRATED FROM V3.3 AS RAW ---")
+    lines.append("--- 5. LIQUIDITY / LIQUIDATION MAP | INTEGRATED RAW ---")
     lines.append(f"LONG_liq_price: {v33_real.get('liq_long_price', 'MISSING')} | Dist_%: -{v33_real.get('liq_long_dist', 'MISSING')}% below | DATA_STATUS: MANUAL_REAL_V33 | SOURCE: Coinglass + V3.3 | NOTE: $4.38B zone $78,800 75k-76k pile 2.6% below")
     lines.append(f"SHORT_cluster: {v33_real.get('liq_short_cluster', 'MISSING')} | Size: {v33_real.get('liq_short_size', 'MISSING')} | Detail: {v33_real.get('liq_short_detail', 'MISSING')} | Dist_%: +{v33_real.get('liq_short_dist', 'MISSING')}% above | DATA_STATUS: MANUAL_REAL_V33 | NOTE: $82k-$86k dense short squeeze wall $4.79B")
     lines.append("")
@@ -5358,7 +5358,7 @@ bullish market != valid entry
         lines.append(f"ETF_1D: MISSING | DATA_STATUS: MISSING | SOURCE: farside.co.uk/btc/")
     lines.append("")
 
-    lines.append("--- 7. OPTIONS GAMMA WALLS | INTEGRATED FROM V3.3 AS RAW ---")
+    lines.append("--- 7. OPTIONS GAMMA WALLS | INTEGRATED RAW ---")
     lines.append(f"Put_wall: {gamma_data.get('put_wall','MISSING')} | Put_OI: {gamma_data.get('put_wall_oi','MISSING')} | DATA_STATUS: {gamma_status} | SOURCE: {gamma_data.get('source','Deribit')} | METHOD: {gamma_data.get('method','max $gamma')}")
     lines.append(f"Call_wall: {gamma_data.get('call_wall','MISSING')} | Call_OI: {gamma_data.get('call_wall_oi','MISSING')} | DATA_STATUS: {gamma_status}")
     lines.append(f"Net_gamma: {gamma_data.get('net_gamma','MISSING')} | Label: {gamma_data.get('net_gamma_label','MISSING')} | DATA_STATUS: {gamma_status} | METHOD: Long=calm low vol Short=shaky high vol risk")
@@ -5374,7 +5374,7 @@ bullish market != valid entry
     lines.append(f"NOTE: Gamma = dealer positioning NOT liquidation heatmap • Separate domains • FIX gamma conflation")
     lines.append("")
 
-    lines.append("--- 8. ON-CHAIN CYCLE COMPONENTS | INTEGRATED FROM V3.3 AS RAW ---")
+    lines.append("--- 8. ON-CHAIN CYCLE COMPONENTS | INTEGRATED RAW ---")
     lines.append(f"MVRV {v33_real.get('mvrv_score', 'MISSING')} Puell {v33_real.get('puell_score', 'MISSING')} RHODL {v33_real.get('rhodl_score', 'MISSING')} SOPR {v33_real.get('sopr_comp', 'MISSING')} NUPL {v33_real.get('nupl_score', 'MISSING')} Formula {v33_real.get('cycle_formula', 'MISSING')} | DATA_STATUS: MANUAL_REAL_V33 | SOURCE: Glassnode / V3.3 | NOTE: Cycle Score 76.70 is ANALYSIS not raw LLM can calculate")
     lines.append(f"MVRV_Z {v33_real.get('mvrv_z', 'MISSING')} Ratio {v33_real.get('mvrv_ratio', 'MISSING')} Z_detail {v33_real.get('mvrv_z_detail', 'MISSING')} well below top >7 LOW | SOPR_live {v33_real.get('sopr_live', 'MISSING')} streak {v33_real.get('sopr_streak', 'MISSING')} <1.08 LOW | STH_MVRV {v33_real.get('sth_mvrv', 'MISSING')} LTH_MVRV {v33_real.get('lth_mvrv', 'MISSING')} peak {v33_real.get('lth_peak', 'MISSING')} no panic | NUPL_val {v33_real.get('nupl_val', 'MISSING')} | DATA_STATUS: MANUAL_REAL_V33")
     lines.append("")
@@ -5412,7 +5412,7 @@ bullish market != valid entry
     lines.append(f"FOMC / CPI / NFP: MISSING | DATA_STATUS: MISSING | SOURCE: manual calendar")
     lines.append("")
 
-    lines.append("--- 14. PSYCHOLOGICAL LEVELS + VOLUME PROFILE + STH CONFLUENCE + ORDER BOOK DEPTH + SWEEP vs ABSORPTION | NEW IN v3.0 — INTEGRATED FROM BPLP AS RAW ---")
+    lines.append("--- 14. PSYCHOLOGICAL LEVELS + VOLUME PROFILE + STH CONFLUENCE + ORDER BOOK DEPTH + SWEEP vs ABSORPTION | NEW IN — INTEGRATED FROM BPLP AS RAW ---")
     bplp_real = get_bplp_real_raw_data()
     # Psych levels auto
     psych_support = bplp_real["psych_support_auto"]
@@ -5464,7 +5464,7 @@ bullish market != valid entry
 
     lines.append("")
     lines.append("")
-    lines.append("--- 15. REGIME DETECTION | NEW IN v4.1 FULL — INTEGRATED FROM KIMI + GROK AS RAW + SCORING — FULLY POPULATED ---")
+    lines.append("--- 15. REGIME DETECTION | NEW IN  — INTEGRATED FROM KIMI + GROK AS RAW + SCORING — FULLY POPULATED ---")
     if regime_6_data:
         lines.append(f"ADX(14) Daily: {fmt(regime_6_data.get('adx'),1)} | DATA_STATUS: LIVE_AUTO | SOURCE: Binance 1d klines 250 | METHOD: ADX >25 trending <20 ranging 20-25 transitional rising <20→25 regime transition highest-alpha moment | TIMESTAMP: {now_iso} | NOTE: From Kimi Layer 1 Trend vs Range primary axis")
         lines.append(f"ATR(14) Daily: {fmt(regime_6_data.get('atr_now'),2)} | ATR 50-day avg: {fmt(regime_6_data.get('atr_avg'),2)} | ATR Ratio: {fmt(regime_6_data.get('atr_ratio'),3)} | DATA_STATUS: LIVE_AUTO | METHOD: ATR ≥1.15x elevated vol ≤0.85x compressed ~1.0 normal ATR % of price for sizing stop distance 1.5-2x ATR | NOTE: From Kimi Layer 2 Volatility regime secondary axis")
@@ -5495,8 +5495,8 @@ bullish market != valid entry
 
     # === NEW — SMA 10/20 TREND PROTOCOL RAW — COMPLETE SET FOR ANY LLM ===
     if sma_data:
-        lines.append(f"--- 17. SMA 10/20 TREND PROTOCOL RAW | SWING TRADE ADAPTED FROM 10/20 SMA DYNAMIC SUPPORT + 2-3 TOUCH RULE + 7-WEEK RULE + PRICE ACTION CONFIRMATION + MARKET REGIME FILTER | ANALYSIS ONLY — NO AUTO TRADE | NEW v4.6 COMPLETE SET ---")
-        lines.append(f"SMA_10_DAILY: {fmt(sma_data.get('sma10_daily'))} | SMA_20_DAILY: {fmt(sma_data.get('sma20_daily'))} | SMA_10_4H: {fmt(sma_data.get('sma10_4h'))} | SMA_20_4H: {fmt(sma_data.get('sma20_4h'))} | SMA_20_WEEKLY: {fmt(sma_data.get('sma20_weekly'))} | DATA_STATUS: {sma_data.get('status','LIVE_AUTO')} | SOURCE: {sma_data.get('source','Binance daily 250 + 4h 100 + weekly 100')} | METHOD: {sma_data.get('method','SMA=sum(close)/n')} | TIMESTAMP: {sma_data.get('timestamp',now_iso)} | NOTE: Primary timeframe Daily BTCUSD/BTC perp Secondary 4H confirmation Indicators 10-period SMA and 20-period SMA only — v4.6 NEW RAW METRICS COMPLETE SET FOR ANY LLM")
+        lines.append(f"--- 17. SMA 10/20 TREND PROTOCOL RAW | SWING TRADE ADAPTED FROM 10/20 SMA DYNAMIC SUPPORT + 2-3 TOUCH RULE + 7-WEEK RULE + PRICE ACTION CONFIRMATION + MARKET REGIME FILTER | ANALYSIS ONLY — NO AUTO TRADE | NEW  ---")
+        lines.append(f"SMA_10_DAILY: {fmt(sma_data.get('sma10_daily'))} | SMA_20_DAILY: {fmt(sma_data.get('sma20_daily'))} | SMA_10_4H: {fmt(sma_data.get('sma10_4h'))} | SMA_20_4H: {fmt(sma_data.get('sma20_4h'))} | SMA_20_WEEKLY: {fmt(sma_data.get('sma20_weekly'))} | DATA_STATUS: {sma_data.get('status','LIVE_AUTO')} | SOURCE: {sma_data.get('source','Binance daily 250 + 4h 100 + weekly 100')} | METHOD: {sma_data.get('method','SMA=sum(close)/n')} | TIMESTAMP: {sma_data.get('timestamp',now_iso)} | NOTE: Primary timeframe Daily BTCUSD/BTC perp Secondary 4H confirmation Indicators 10-period SMA and 20-period SMA only —  RAW METRICS COMPLETE SET FOR ANY LLM")
         lines.append(f"  DIST_FROM_SMA: 10D {fmt(sma_data.get('dist_10_d_pct'),2)}% above/below | 20D {fmt(sma_data.get('dist_20_d_pct'),2)}% | 10 4H {fmt(sma_data.get('dist_10_4h_pct'),2)}% | 20 4H {fmt(sma_data.get('dist_20_4h_pct'),2)}% | 20W {fmt(sma_data.get('dist_20w_pct'),2)}% | DATA_STATUS: {sma_data.get('status','LIVE_AUTO')} | METHOD: (price - SMA)/SMA*100 price far above 10 SMA >3% = avoid chasing extended | NOTE: Preferred entry zone on 4H pullback into SMA zone after daily structure confirms trend intact")
         lines.append(f"  SMA_SLOPE: 10D {fmt(sma_data.get('slope_10_d_pct'),2)}% rising/flat/falling | 20D {fmt(sma_data.get('slope_20_d_pct'),2)}% | 20W {fmt(sma_data.get('slope_20w_pct'),2)}% | SPREAD 10-20 {fmt(sma_data.get('sma_spread'),0)} ({fmt(sma_data.get('sma_spread_pct'),2)}%) | DATA_STATUS: {sma_data.get('status')} | METHOD: Slope=(SMA_now - SMA_5ago)/SMA_5ago*100 Slope upward or flat-to-up = trending | NOTE: Weekly chart must not be in clear downtrend price above rising 20-week SMA preferred")
         lines.append(f"  TOUCH_COUNT_2_3_RULE: 10 SMA touches last 20D {sma_data.get('touch_count_10_20d','MISSING')} | 20 SMA touches {sma_data.get('touch_count_20_20d','MISSING')} | LAST_TOUCH_10 {fmt(sma_data.get('last_touch_10_age_days'),0)} days ago | LAST_TOUCH_20 {fmt(sma_data.get('last_touch_20_age_days'),0)} days ago | CROSS_COUNT_10 20D {sma_data.get('cross_count_10_20d','MISSING')} | OVERLAP_5D {sma_data.get('overlap_days_5d','MISSING')} days flat/overlapping | DATA_STATUS: {sma_data.get('status')} | METHOD: Touch=low<=SMA<=high or abs(close-SMA)/SMA<0.3% then bounce Clean bounce 1-2 touches preferred After 2-3 clean bounces decisive break close below = exit | NOTE: NEW — 2-3 Touch Rule RAW countable for LLM")
@@ -5507,7 +5507,7 @@ bullish market != valid entry
         lines.append(f"  SMA_PROTOCOL_COMPLETE_SET: All 12 new RAW metrics for any LLM — 1) SMA 10/20 D + 4H + 20W values 2) Dist % 3) Slope % 4) Spread 10-20 5) Touch count 10/20 20D + last touch age 6) Weeks above 10/20W 7) Cross count + overlap 5D 8) HH/HL structure 9) Candle pattern RAW engulfing pin bar shooting star strong close back above higher low break retest 10) Failed breakout + bear reversal 11) Extension far above 10 12) Trail stop levels RAW + regime filter trending/choppy + pullback zone — ANALYSIS ONLY NO AUTO TRADE — Copy-paste ready for ChatGPT Claude Gemini Meta AI Grok")
         lines.append("")
     else:
-        lines.append(f"--- 17. SMA 10/20 TREND PROTOCOL RAW | NEW v4.6 — MISSING ---")
+        lines.append(f"--- 17. SMA 10/20 TREND PROTOCOL RAW | NEW — MISSING ---")
         lines.append(f"SMA_TREND: MISSING | DATA_STATUS: MISSING | NOTE: Requires Binance daily 250 + 4h 100 + weekly 100 — LIVE on laptop")
 
     lines.append("")
@@ -5515,7 +5515,7 @@ bullish market != valid entry
     # === ADD SMA to DATA COMPLETENESS ===
     # Will be added later in summary section via separate patch
 
-    lines.append(f"DERIVATIVES REGIME EDGE (Kimi Layer 3) | ENHANCEMENTS #4 v4.2 FULL — Long/Short + OI/mcap LIVE ---")
+    lines.append(f"DERIVATIVES REGIME EDGE (Kimi Layer 3) | ENHANCEMENTS #4  — Long/Short + OI/mcap LIVE ---")
     lines.append(f"  Funding: {v33_real.get('funding_avg', 'MISSING')}% avg {v33_real.get('funding_agg', 'MISSING')}% agg | DATA_STATUS: MANUAL_REAL_V33 | SOURCE: V3.3 + Coinglass | METHOD: Persistently positive + price flat = longs overcrowded distribution risk Deeply negative + price holding = bearishness not confirmed bottoming range Neutral/mild in trend = healthy | NOTE: Funding rates perpetual swaps")
     lines.append(f"  OI: Price flat + OI climbing = leverage building inside range → breakout violent New price high + OI falling = short-cover rally not new longs weaker trend OI + price both making highs = trend confirmation | DATA_STATUS: LIVE_API via fapi openInterest when on laptop + history file | METHOD: OI trend vs price")
     if oi_mcap_data:
@@ -5529,7 +5529,7 @@ bullish market != valid entry
         lines.append(f"  Long/short account ratio: MISSING | DATA_STATUS: MISSING requires Coinglass - Enhancement #4 tries via Binance")
 
     lines.append("")
-    lines.append(f"MACRO / LIQUIDITY CONTEXT (Kimi Layer 4 + Grok Context) | ENHANCEMENTS #2 #3 #5 v4.2 FULL — ETF via AllOrigins + Yahoo via AllOrigins + Global Net Liquidity FRED ---")
+    lines.append(f"MACRO / LIQUIDITY CONTEXT (Kimi Layer 4 + Grok Context) | ENHANCEMENTS #2 #3 #5  — ETF via AllOrigins + Yahoo via AllOrigins + Global Net Liquidity FRED ---")
     for key in ["DXY","US10Y","NASDAQ","SP500","VIX","GOLD","OIL"]:
         d=macro_data.get(key,{})
         price=d.get("price")
@@ -5554,7 +5554,7 @@ bullish market != valid entry
     lines.append(f"  On-chain / Key Levels: Holding major support around low $80ks STH $81,842 + HVN $80,500 7.1% + Put Wall $75k = Supportive +5 | DATA_STATUS: MANUAL_REAL_BPLP + MANUAL_REAL_V33 | SOURCE: PCF3 volume profile + STH + gamma walls | METHOD: Price holding above key cost-basis clusters realized price LTH cost basis = constructive support Price repeatedly rejected at dense supply zones with distribution = corrective pressure")
 
     lines.append("")
-    lines.append(f"VIX CRYPTO IMPACT MODULE v5.1 NEW - Full Article Logic - CBOE VIX 30-day forward vol SPX options fear gauge - Regimes <15 Complacency 15-20 Normal 20-30 Elevated Stress >30 Acute Panic >40-50 Contrarian Capitulation - Crypto Significance - DVOL Comparison:")
+    lines.append(f"VIX CRYPTO IMPACT MODULE  - Full Article Logic - CBOE VIX 30-day forward vol SPX options fear gauge - Regimes <15 Complacency 15-20 Normal 20-30 Elevated Stress >30 Acute Panic >40-50 Contrarian Capitulation - Crypto Significance - DVOL Comparison:")
     if 'vix_impact_data' in locals() and vix_impact_data:
         lines.append(f"  VIX_DEFINITION: {vix_impact_data.get('vix_definition','MISSING')} | SOURCE: CBOE ^VIX SPX options | METHOD: VIX measures expected 30-day forward vol from SPX options, demand for protective puts vs calls, not past realized vol | TIMESTAMP: {vix_impact_data.get('timestamp',now_iso)} | NOTE: When uncertainty rises demand for options spikes VIX higher, when markets trend up calmly hedging declines VIX lower - Per article")
         lines.append(f"  VIX_PRICE: {fmt(vix_impact_data.get('vix_price'),2)} | SMA20: {fmt(macro_v47_data.get('vix_sma20'),2) if 'macro_v47_data' in locals() and macro_v47_data else 'MISSING'} | REGIME_DETAILED: {vix_impact_data.get('vix_regime_detailed','MISSING')} | SHORT: {vix_impact_data.get('vix_regime_short','MISSING')} | DETAIL: {vix_impact_data.get('vix_regime_detail','MISSING')} | DATA_STATUS: {vix_impact_data.get('status')} | SOURCE: Yahoo ^VIX + Article regimes | METHOD: <15 Complacency stable equity capital flows into risk incl crypto, 15-20 Normal baseline avg, 20-30 Elevated Stress growing unease institutions hedge risk-on slows, >30 Acute Panic high distress aggressive de-risking forced deleveraging, >40-50 Contrarian Capitulation peak panic margin exhaustion March 2020 Aug 2024 yen carry unwind marks local BTC bottom")
@@ -5568,7 +5568,7 @@ bullish market != valid entry
         lines.append(f"  DVOL_BTC_VOL_INDEX: {fmt(dvol_p,2) if dvol_p else 'MISSING'} | VIX: {fmt(vix_impact_data.get('vix_price'),2)} | INTERPRETATION: {vix_impact_data.get('vix_vs_dvol_interpretation','MISSING')} | NOTE: {vix_impact_data.get('dvol_note','MISSING')} | DATA_STATUS: {dvol_data.get('status') if 'dvol_data' in locals() and dvol_data else 'MISSING'} | SOURCE: Deribit api/v2/public/get_index_price?index_name=btc_dvol | METHOD: DVOL reflects crypto-native positioning BTC options 30-day IV VIX reflects TradFi SPX options Watching VIX essential because BTC institutional liquidity layer via spot ETFs corporate treasuries macro hedge funds tied to broader risk appetite When TradFi sneezes crypto order book feels impact immediately | TIMESTAMP: {dvol_data.get('timestamp',now_iso) if 'dvol_data' in locals() and dvol_data else now_iso}")
         lines.append(f"  VIX_VS_DVOL: Crypto derivatives has own IV gauge Deribit BTC Vol Index DVOL tracks 30-day IV from BTC options While DVOL reflects crypto-native positioning watching VIX essential because BTC institutional liquidity via US spot ETFs public treasuries macro hedge funds directly tied to risk appetite of broader global financial system When traditional market sneezes crypto order book feels impact immediately per article | DATA_STATUS: {vix_impact_data.get('status')} | NOTE: VIX vs Crypto-Native Volatility DVOL per article")
     else:
-        lines.append(f"  VIX: MISSING | DATA_STATUS: MISSING | SOURCE: Yahoo ^VIX | NOTE: VIX Crypto Impact Module v5.1 NEW")
+        lines.append(f"  VIX: MISSING | DATA_STATUS: MISSING | SOURCE: Yahoo ^VIX | NOTE: VIX Crypto Impact Module ")
 
     lines.append("")
     lines.append("--- 24. MINER CAPITULATION Phase 1 — Puell Multiple + Hash Ribbons RAW — Bottom confluence — Miner stress ---")
@@ -5718,7 +5718,7 @@ bullish market != valid entry
         lines.append(f"  Grok scoring: Total MISSING/100 = MISSING Bias MISSING | Weekly MISSING Daily MISSING | Structure MISSING/40 MAs MISSING/30 Momentum MISSING/20 Context MISSING/10")
 
     lines.append("")
-    lines.append("--- 16. ENHANCEMENTS v4.2 FULL — CVD + LONG/SHORT + OI/mcap + GLOBAL LIQUIDITY + ETF VIA ALLORIGINS + YAHOO VIA ALLORIGINS + PSYCH IMAGES + REGIME BACKTEST | NEW IN v4.2 FULL ---")
+    lines.append("--- 16. ENHANCEMENTS  — CVD + LONG/SHORT + OI/mcap + GLOBAL LIQUIDITY + ETF VIA ALLORIGINS + YAHOO VIA ALLORIGINS + PSYCH IMAGES + REGIME BACKTEST | NEW IN  ---")
     if cvd_data:
         lines.append(f"CVD_LIVE_REST_1000: CVD_current {fmt(cvd_data.get('cvd_current'),2)} Buy {fmt(cvd_data.get('buy_vol'),2)} Sell {fmt(cvd_data.get('sell_vol'),2)} Ratio {fmt(cvd_data.get('buy_sell_ratio'),3)} Delta {fmt(cvd_data.get('delta'),2)} Delta_% {fmt(cvd_data.get('delta_pct'),2)}% Slope {fmt(cvd_data.get('slope'),2)} Slope_% {fmt(cvd_data.get('slope_pct'),2)}% Total_vol {fmt(cvd_data.get('total_vol'),2)} | DATA_STATUS: {cvd_data.get('status')} | SOURCE: {cvd_data.get('source')} | METHOD: {cvd_data.get('method')} | TIMESTAMP: {cvd_data.get('timestamp',now_iso)} | NOTE: Enhancement #1 WebSocket live in dashboard wss://stream.binance.com:9443/ws/btcusdt@aggTrade real-time CVD slope - price new high but CVD flat/down = lack of spot absorption thin breakout prone to pullback")
     if ls_data:
@@ -5728,34 +5728,34 @@ bullish market != valid entry
     if liq_global_data:
         lines.append(f"GLOBAL_NET_LIQUIDITY: Fed ${fmt(liq_global_data.get('fed_total',0)/1e12,3)}T Net ${fmt(liq_global_data.get('fed_net',0)/1e12,3)}T TGA ${fmt(liq_global_data.get('tga',0)/1e12,3)}T RRP ${fmt(liq_global_data.get('rrp',0)/1e12,3)}T ECB ${fmt(liq_global_data.get('ecb',0)/1e12,3)}T BoJ ${fmt(liq_global_data.get('boj',0)/1e12,3)}T PBOC ${fmt(liq_global_data.get('pboc',0)/1e12,3)}T Gross ${fmt(liq_global_data.get('global_gross',0)/1e12,3)}T Net ${fmt(liq_global_data.get('global_net',0)/1e12,3)}T Trend {liq_global_data.get('global_net_trend','MISSING')} | DATA_STATUS: {liq_global_data.get('status')} | SOURCE: {liq_global_data.get('source')} | METHOD: {liq_global_data.get('method')} | TIMESTAMP: {liq_global_data.get('timestamp',now_iso)} | NOTE: Enhancement #5 FRED WALCL WTREGEN RRPONTSYD via https://fred.stlouisfed.org/graph/fredgraph.csv?id=WALCL + AllOrigins fallback https://api.allorigins.win/raw?url=https://fred.stlouisfed.org/graph/fredgraph.csv?id=WALCL - Expanding → trending more likely Contracting → chop Falling DXY + Expanding = strongest trending")
     if trio_data:
-        lines.append(f"INSTITUTIONAL_TRIO_ADX_VWAP_RVOL_TIME: ADX {fmt(trio_data.get('adx'),1)} {trio_data.get('adx_label','MISSING')} + Daily_VWAP {fmt(trio_data.get('daily_vwap'),0)} Dist {fmt(trio_data.get('vwap_dist_pct'),2)}% {trio_data.get('vwap_label','MISSING')} + RVOL_Time {fmt(trio_data.get('rvol_time'),0)}% {trio_data.get('rvol_label','MISSING')} Trio_Score {trio_data.get('trio_score','MISSING')}/3 Verdict {trio_data.get('trio_verdict','MISSING')} | DATA_STATUS: {trio_data.get('status','LIVE_API')} | SOURCE: {trio_data.get('source','Binance klines')} | METHOD: {trio_data.get('method','ADX tells how strongly trending + VWAP tells at which price largest money exchanged + Relative Volume Time tells how current volume compares with historical average at same point in session')} | TIMESTAMP: {trio_data.get('timestamp',now_iso)} | NOTE: Institutional trader favorite ADX + VWAP + Relative Volume Time improve quality of entry and exit — NEW in v4.3 FULL — should we consider this in pcf3 dashboard? YES — embed TV chart with ADX VWAP Volume studies + RVOL Time calculation")
+        lines.append(f"INSTITUTIONAL_TRIO_ADX_VWAP_RVOL_TIME: ADX {fmt(trio_data.get('adx'),1)} {trio_data.get('adx_label','MISSING')} + Daily_VWAP {fmt(trio_data.get('daily_vwap'),0)} Dist {fmt(trio_data.get('vwap_dist_pct'),2)}% {trio_data.get('vwap_label','MISSING')} + RVOL_Time {fmt(trio_data.get('rvol_time'),0)}% {trio_data.get('rvol_label','MISSING')} Trio_Score {trio_data.get('trio_score','MISSING')}/3 Verdict {trio_data.get('trio_verdict','MISSING')} | DATA_STATUS: {trio_data.get('status','LIVE_API')} | SOURCE: {trio_data.get('source','Binance klines')} | METHOD: {trio_data.get('method','ADX tells how strongly trending + VWAP tells at which price largest money exchanged + Relative Volume Time tells how current volume compares with historical average at same point in session')} | TIMESTAMP: {trio_data.get('timestamp',now_iso)} | NOTE: Institutional trader favorite ADX + VWAP + Relative Volume Time improve quality of entry and exit — NEW in  — should we consider this in pcf3 dashboard? YES — embed TV chart with ADX VWAP Volume studies + RVOL Time calculation")
     if rvol_data:
-        lines.append(f"RVOL_TIME_RELATIVE_VOLUME_OF_TIME: Current {fmt(rvol_data.get('current_vol'),1)} BTC Avg_same_hour {fmt(rvol_data.get('avg_vol_same_hour'),1)} BTC RVOL {fmt(rvol_data.get('rvol_time_pct'),0)}% Label {rvol_data.get('rvol_label','MISSING')} UTC_Hour {rvol_data.get('utc_hour','MISSING')}:00 Samples {rvol_data.get('same_hour_samples','MISSING')} | DATA_STATUS: {rvol_data.get('status','LIVE_API')} | SOURCE: {rvol_data.get('source','Binance 1h 500')} | METHOD: {rvol_data.get('method','RVOL Time = current 1h vol / avg vol same UTC hour last 20 days *100% >150% high institutional participation')} | TIMESTAMP: {rvol_data.get('timestamp',now_iso)} | NOTE: Enhancement v4.3 — Relative Volume of Time tells how current volume compares with historical average at very same point in session — from institutional trader transcript 00:00 ADX 00:03 VWAP at which price largest money exchanged 00:13 relative volume of time current vs historical avg same point in session 00:22 improve quality entry/exit")
+        lines.append(f"RVOL_TIME_RELATIVE_VOLUME_OF_TIME: Current {fmt(rvol_data.get('current_vol'),1)} BTC Avg_same_hour {fmt(rvol_data.get('avg_vol_same_hour'),1)} BTC RVOL {fmt(rvol_data.get('rvol_time_pct'),0)}% Label {rvol_data.get('rvol_label','MISSING')} UTC_Hour {rvol_data.get('utc_hour','MISSING')}:00 Samples {rvol_data.get('same_hour_samples','MISSING')} | DATA_STATUS: {rvol_data.get('status','LIVE_API')} | SOURCE: {rvol_data.get('source','Binance 1h 500')} | METHOD: {rvol_data.get('method','RVOL Time = current 1h vol / avg vol same UTC hour last 20 days *100% >150% high institutional participation')} | TIMESTAMP: {rvol_data.get('timestamp',now_iso)} | NOTE: Enhancement — Relative Volume of Time tells how current volume compares with historical average at very same point in session — from institutional trader transcript 00:00 ADX 00:03 VWAP at which price largest money exchanged 00:13 relative volume of time current vs historical avg same point in session 00:22 improve quality entry/exit")
 
 
     if rvol_data:
-        lines.append(f"RVOL_TIME_RELATIVE_VOLUME_OF_TIME: Current {fmt(rvol_data.get('current_vol'),1)} BTC Avg_same_hour {fmt(rvol_data.get('avg_vol_same_hour'),1)} BTC RVOL {fmt(rvol_data.get('rvol_time_pct'),0)}% Label {rvol_data.get('rvol_label','MISSING')} UTC_Hour {rvol_data.get('utc_hour','MISSING')}:00 Samples {rvol_data.get('same_hour_samples','MISSING')} | DATA_STATUS: {rvol_data.get('status','LIVE_API')} | SOURCE: {rvol_data.get('source','Binance 1h 500')} | METHOD: {rvol_data.get('method','RVOL Time = current 1h vol / avg vol same UTC hour last 20 days *100% >150% high institutional participation')} | TIMESTAMP: {rvol_data.get('timestamp',now_iso)} | NOTE: Enhancement v4.3 — Relative Volume of Time tells how current volume compares with historical average at very same point in session — from institutional trader transcript 00:00 ADX 00:03 VWAP at which price largest money exchanged 00:13 relative volume of time current vs historical avg same point in session 00:22 improve quality entry/exit")
+        lines.append(f"RVOL_TIME_RELATIVE_VOLUME_OF_TIME: Current {fmt(rvol_data.get('current_vol'),1)} BTC Avg_same_hour {fmt(rvol_data.get('avg_vol_same_hour'),1)} BTC RVOL {fmt(rvol_data.get('rvol_time_pct'),0)}% Label {rvol_data.get('rvol_label','MISSING')} UTC_Hour {rvol_data.get('utc_hour','MISSING')}:00 Samples {rvol_data.get('same_hour_samples','MISSING')} | DATA_STATUS: {rvol_data.get('status','LIVE_API')} | SOURCE: {rvol_data.get('source','Binance 1h 500')} | METHOD: {rvol_data.get('method','RVOL Time = current 1h vol / avg vol same UTC hour last 20 days *100% >150% high institutional participation')} | TIMESTAMP: {rvol_data.get('timestamp',now_iso)} | NOTE: Enhancement — Relative Volume of Time tells how current volume compares with historical average at very same point in session — from institutional trader transcript 00:00 ADX 00:03 VWAP at which price largest money exchanged 00:13 relative volume of time current vs historical avg same point in session 00:22 improve quality entry/exit")
     if 'vwap_bands_data' in locals() and vwap_bands_data:
-        lines.append(f"VWAP_BANDS: VWAP {fmt(vwap_bands_data.get('vwap'),0)} Upper1 {fmt(vwap_bands_data.get('upper_1sigma'),0)} Lower1 {fmt(vwap_bands_data.get('lower_1sigma'),0)} Upper2 {fmt(vwap_bands_data.get('upper_2sigma'),0)} Lower2 {fmt(vwap_bands_data.get('lower_2sigma'),0)} Stdev {fmt(vwap_bands_data.get('stdev'),0)} Stdev_% {fmt(vwap_bands_data.get('stdev_pct'),2)}% BandWidth {fmt(vwap_bands_data.get('band_width_pct'),2)}% | DATA_STATUS: {vwap_bands_data.get('status','LIVE_AUTO')} | SOURCE: {vwap_bands_data.get('source','Binance 4h VWAP bands')} | METHOD: {vwap_bands_data.get('method','VWAP bands ±1σ ±2σ')} | TIMESTAMP: {vwap_bands_data.get('timestamp',now_iso)} | NOTE: v4.4 Decision — VWAP at which price largest money exchanged + bands institutional entry/exit quality mean reversion vs trend continuation")
+        lines.append(f"VWAP_BANDS: VWAP {fmt(vwap_bands_data.get('vwap'),0)} Upper1 {fmt(vwap_bands_data.get('upper_1sigma'),0)} Lower1 {fmt(vwap_bands_data.get('lower_1sigma'),0)} Upper2 {fmt(vwap_bands_data.get('upper_2sigma'),0)} Lower2 {fmt(vwap_bands_data.get('lower_2sigma'),0)} Stdev {fmt(vwap_bands_data.get('stdev'),0)} Stdev_% {fmt(vwap_bands_data.get('stdev_pct'),2)}% BandWidth {fmt(vwap_bands_data.get('band_width_pct'),2)}% | DATA_STATUS: {vwap_bands_data.get('status','LIVE_AUTO')} | SOURCE: {vwap_bands_data.get('source','Binance 4h VWAP bands')} | METHOD: {vwap_bands_data.get('method','VWAP bands ±1σ ±2σ')} | TIMESTAMP: {vwap_bands_data.get('timestamp',now_iso)} | NOTE: Decision — VWAP at which price largest money exchanged + bands institutional entry/exit quality mean reversion vs trend continuation")
     if 'adx_di_data' in locals() and adx_di_data:
-        lines.append(f"ADX_DI_FULL: ADX {fmt(adx_di_data.get('adx'),1)} Prev {fmt(adx_di_data.get('adx_prev'),1)} Rising {adx_di_data.get('adx_rising','MISSING')} +DI {fmt(adx_di_data.get('plus_di'),1)} -DI {fmt(adx_di_data.get('minus_di'),1)} Spread {fmt(adx_di_data.get('di_spread'),1)} Direction {adx_di_data.get('direction','MISSING')} Bias {adx_di_data.get('bias','MISSING')} Strength {adx_di_data.get('strength','MISSING')} | DATA_STATUS: {adx_di_data.get('status','LIVE_AUTO')} | SOURCE: {adx_di_data.get('source','Binance 1d 250 ADX')} | METHOD: {adx_di_data.get('method','ADX tells how strongly trending')} | TIMESTAMP: {adx_di_data.get('timestamp',now_iso)} | NOTE: v4.4 Decision — ADX tells how strongly market is trending — ADX >25 strong trending <20 weak/range 20-25 transitional no-man's land +DI > -DI bull -DI > +DI bear — institutional transcript 00:00")
+        lines.append(f"ADX_DI_FULL: ADX {fmt(adx_di_data.get('adx'),1)} Prev {fmt(adx_di_data.get('adx_prev'),1)} Rising {adx_di_data.get('adx_rising','MISSING')} +DI {fmt(adx_di_data.get('plus_di'),1)} -DI {fmt(adx_di_data.get('minus_di'),1)} Spread {fmt(adx_di_data.get('di_spread'),1)} Direction {adx_di_data.get('direction','MISSING')} Bias {adx_di_data.get('bias','MISSING')} Strength {adx_di_data.get('strength','MISSING')} | DATA_STATUS: {adx_di_data.get('status','LIVE_AUTO')} | SOURCE: {adx_di_data.get('source','Binance 1d 250 ADX')} | METHOD: {adx_di_data.get('method','ADX tells how strongly trending')} | TIMESTAMP: {adx_di_data.get('timestamp',now_iso)} | NOTE: Decision — ADX tells how strongly market is trending — ADX >25 strong trending <20 weak/range 20-25 transitional no-man's land +DI > -DI bull -DI > +DI bear — institutional transcript 00:00")
     if 'rvol_history_data' in locals() and rvol_history_data:
         curr = rvol_history_data.get('current',{})
-        lines.append(f"RVOL_HISTORY_24H: Current {fmt(curr.get('rvol_pct') if isinstance(curr, dict) else 147,0)}% Avg24h {fmt(rvol_history_data.get('avg_rvol_24h'),0)}% HighCount {rvol_history_data.get('high_rvol_count','MISSING')} LowCount {rvol_history_data.get('low_rvol_count','MISSING')} | DATA_STATUS: {rvol_history_data.get('status','LIVE_API')} | SOURCE: {rvol_history_data.get('source','Binance 1h 500 RVOL history')} | METHOD: {rvol_history_data.get('method','RVOL Time history')} | TIMESTAMP: {rvol_history_data.get('timestamp',now_iso)} | NOTE: v4.4 Decision — RVOL Time history last 24h each hour vs historical avg same UTC hour >150% institutional participation spike chart shows institutional flow trend")
+        lines.append(f"RVOL_HISTORY_24H: Current {fmt(curr.get('rvol_pct') if isinstance(curr, dict) else 147,0)}% Avg24h {fmt(rvol_history_data.get('avg_rvol_24h'),0)}% HighCount {rvol_history_data.get('high_rvol_count','MISSING')} LowCount {rvol_history_data.get('low_rvol_count','MISSING')} | DATA_STATUS: {rvol_history_data.get('status','LIVE_API')} | SOURCE: {rvol_history_data.get('source','Binance 1h 500 RVOL history')} | METHOD: {rvol_history_data.get('method','RVOL Time history')} | TIMESTAMP: {rvol_history_data.get('timestamp',now_iso)} | NOTE: Decision — RVOL Time history last 24h each hour vs historical avg same UTC hour >150% institutional participation spike chart shows institutional flow trend")
         for h in rvol_history_data.get('history_24h',[])[:6]:
             lines.append(f"  RVOL_HOUR: {h.get('timestamp','MISSING')} UTC {h.get('utc_hour','MISSING')}:00 Vol {fmt(h.get('volume'),1)} Avg {fmt(h.get('avg_same_hour'),1)} RVOL {fmt(h.get('rvol_pct'),0)}% {h.get('label','MISSING')} | METHOD: RVOL Time same hour avg")
     if 'decision_data' in locals() and decision_data:
-        lines.append(f"DECISION_ENGINE_v4.4: ACTION {decision_data.get('action','MISSING')} | QUALITY {decision_data.get('quality','MISSING')} {fmt(decision_data.get('quality_pct'),0)}% Score {decision_data.get('score','MISSING')}/{decision_data.get('total_possible','MISSING')} Trio {decision_data.get('trio_score','MISSING')}/3 ADX {fmt(decision_data.get('adx'),1)} VWAP {fmt(decision_data.get('vwap'),0)} Dist {fmt(decision_data.get('vwap_dist_pct'),2)}% RVOL {fmt(decision_data.get('rvol_time'),0)}% Regime {decision_data.get('regime_score','MISSING')}/100 {decision_data.get('regime_6','MISSING')} Psych {decision_data.get('psych_score','MISSING')} | DATA_STATUS: {decision_data.get('status','DECISION_ENGINE_v4.4')} | SOURCE: {decision_data.get('source','Institutional decision engine')} | METHOD: {decision_data.get('method','Decision engine')} | TIMESTAMP: {decision_data.get('timestamp',now_iso)} | NOTE: v4.4 DECISION — think what trader needs — auto decision for entry/exit quality based on institutional trio + regime + psych confluence — Trio 3/3 + Regime >=70 + RVOL >=150% + +DI > -DI = HIGH QUALITY LONG — Trio 2/3 + RVOL HIGH = MEDIUM — RVOL <=80% LOW = STAND ASIDE low participation — ADX <20 = STAND ASIDE chop — VWAP dist <1% fair value <2% near fair value >2% stretched — improves entry/exit quality per institutional transcript 00:22")
+        lines.append(f"DECISION_ENGINE_v4.4: ACTION {decision_data.get('action','MISSING')} | QUALITY {decision_data.get('quality','MISSING')} {fmt(decision_data.get('quality_pct'),0)}% Score {decision_data.get('score','MISSING')}/{decision_data.get('total_possible','MISSING')} Trio {decision_data.get('trio_score','MISSING')}/3 ADX {fmt(decision_data.get('adx'),1)} VWAP {fmt(decision_data.get('vwap'),0)} Dist {fmt(decision_data.get('vwap_dist_pct'),2)}% RVOL {fmt(decision_data.get('rvol_time'),0)}% Regime {decision_data.get('regime_score','MISSING')}/100 {decision_data.get('regime_6','MISSING')} Psych {decision_data.get('psych_score','MISSING')} | DATA_STATUS: {decision_data.get('status','DECISION_ENGINE_v4.4')} | SOURCE: {decision_data.get('source','Institutional decision engine')} | METHOD: {decision_data.get('method','Decision engine')} | TIMESTAMP: {decision_data.get('timestamp',now_iso)} | NOTE: DECISION — think what trader needs — auto decision for entry/exit quality based on institutional trio + regime + psych confluence — Trio 3/3 + Regime >=70 + RVOL >=150% + +DI > -DI = HIGH QUALITY LONG — Trio 2/3 + RVOL HIGH = MEDIUM — RVOL <=80% LOW = STAND ASIDE low participation — ADX <20 = STAND ASIDE chop — VWAP dist <1% fair value <2% near fair value >2% stretched — improves entry/exit quality per institutional transcript 00:22")
         for r in decision_data.get('reasons',[])[:5]:
             lines.append(f"  DECISION_REASON: {r} | METHOD: Decision engine reason")
         for w in decision_data.get('warnings',[])[:3]:
             lines.append(f"  DECISION_WARNING: {w} | METHOD: Decision engine warning")
 
-    # === v4.7 NEW SECTIONS — All RAW, no opinions — Institutional Swing Stack ===
+    # ===  SECTIONS — All RAW, no opinions — Institutional Swing Stack ===
     lines.append("")
-    lines.append("--- 17. SMA 10/20 TREND PROTOCOL RAW | SWING TRADE ADAPTED FROM 10/20 SMA DYNAMIC SUPPORT + 2-3 TOUCH RULE + 7-WEEK RULE + PRICE ACTION CONFIRMATION + MARKET REGIME FILTER | ANALYSIS ONLY — NO AUTO TRADE | NEW v4.6 COMPLETE SET ---")
+    lines.append("--- 17. SMA 10/20 TREND PROTOCOL RAW | SWING TRADE ADAPTED FROM 10/20 SMA DYNAMIC SUPPORT + 2-3 TOUCH RULE + 7-WEEK RULE + PRICE ACTION CONFIRMATION + MARKET REGIME FILTER | ANALYSIS ONLY — NO AUTO TRADE | NEW  ---")
     if 'sma_data' in locals() and sma_data:
-        lines.append(f"SMA_10_DAILY: {fmt(sma_data.get('sma10_daily'),2)} | SMA_20_DAILY: {fmt(sma_data.get('sma20_daily'),2)} | SMA_10_4H: {fmt(sma_data.get('sma10_4h'),2)} | SMA_20_4H: {fmt(sma_data.get('sma20_4h'),2)} | SMA_20_WEEKLY: {fmt(sma_data.get('sma20_weekly'),2)} | DATA_STATUS: {sma_data.get('status','LIVE_AUTO_SMA_TREND_v4.6')} | SOURCE: Binance daily 250 + 4h 100 + weekly 100 klines — SMA 10/20 calculation — ANALYSIS ONLY | METHOD: SMA=sum(close)/n — Touch=low<=SMA<=high or abs(close-SMA)/SMA<0.3% — Slope=(SMA_now - SMA_5ago)/5ago*100 — WeeksAbove=consecutive closes > SMA — CrossCount=price crosses SMA in last 20D — Overlap=abs(SMA10-SMA20)/SMA20<0.5% for 5D — PinBar=lowerWick>2*body — Engulfing=body engulfs prior — FailedBreakout=high breaks recent high but close back inside — LargeBearReversal=range>1.5*ATR14 + close<SMA10 — Extension=dist>3% — TrailStop=SMA level — RegimeFilter: Trending=Price>10>20 + slopes up/flat-to-up + cross<=3 + HH+HL — Choppy=cross>=5 or overlap>=3 + flat/overlapping SMAs | TIMESTAMP: {sma_data.get('timestamp',now_iso)} | NOTE: Primary timeframe Daily BTCUSD/BTC perp Secondary 4H confirmation Indicators 10-period SMA and 20-period SMA only — v4.6 NEW RAW METRICS COMPLETE SET FOR ANY LLM")
+        lines.append(f"SMA_10_DAILY: {fmt(sma_data.get('sma10_daily'),2)} | SMA_20_DAILY: {fmt(sma_data.get('sma20_daily'),2)} | SMA_10_4H: {fmt(sma_data.get('sma10_4h'),2)} | SMA_20_4H: {fmt(sma_data.get('sma20_4h'),2)} | SMA_20_WEEKLY: {fmt(sma_data.get('sma20_weekly'),2)} | DATA_STATUS: {sma_data.get('status','LIVE_AUTO_SMA_TREND_v4.6')} | SOURCE: Binance daily 250 + 4h 100 + weekly 100 klines — SMA 10/20 calculation — ANALYSIS ONLY | METHOD: SMA=sum(close)/n — Touch=low<=SMA<=high or abs(close-SMA)/SMA<0.3% — Slope=(SMA_now - SMA_5ago)/5ago*100 — WeeksAbove=consecutive closes > SMA — CrossCount=price crosses SMA in last 20D — Overlap=abs(SMA10-SMA20)/SMA20<0.5% for 5D — PinBar=lowerWick>2*body — Engulfing=body engulfs prior — FailedBreakout=high breaks recent high but close back inside — LargeBearReversal=range>1.5*ATR14 + close<SMA10 — Extension=dist>3% — TrailStop=SMA level — RegimeFilter: Trending=Price>10>20 + slopes up/flat-to-up + cross<=3 + HH+HL — Choppy=cross>=5 or overlap>=3 + flat/overlapping SMAs | TIMESTAMP: {sma_data.get('timestamp',now_iso)} | NOTE: Primary timeframe Daily BTCUSD/BTC perp Secondary 4H confirmation Indicators 10-period SMA and 20-period SMA only —  RAW METRICS COMPLETE SET FOR ANY LLM")
         lines.append(f"  DIST_FROM_SMA: 10D {fmt(sma_data.get('dist_10_d_pct'),2)}% above/below | 20D {fmt(sma_data.get('dist_20_d_pct'),2)}% | 10 4H {fmt(sma_data.get('dist_10_4h_pct'),2)}% | 20 4H {fmt(sma_data.get('dist_20_4h_pct'),2)}% | 20W {fmt(sma_data.get('dist_20w_pct'),2)}% | SPREAD 10-20 {fmt(sma_data.get('sma_spread'),0)} ({fmt(sma_data.get('sma_spread_pct'),2)}%) | DATA_STATUS: {sma_data.get('status')} | METHOD: (price - SMA)/SMA*100 price far above 10 SMA >3% = avoid chasing extended | NOTE: Preferred entry zone on 4H pullback into SMA zone after daily structure confirms trend intact")
         lines.append(f"  SMA_SLOPE: 10D {fmt(sma_data.get('slope_10_d_pct'),2)}% rising/flat/falling | 20D {fmt(sma_data.get('slope_20_d_pct'),2)}% | 20W {fmt(sma_data.get('slope_20w_pct'),2)}% | SPREAD 10-20 {fmt(sma_data.get('sma_spread'),0)} ({fmt(sma_data.get('sma_spread_pct'),2)}%) | DATA_STATUS: {sma_data.get('status')} | METHOD: Slope=(SMA_now - SMA_5ago)/SMA_5ago*100 Slope upward or flat-to-up = trending | NOTE: Weekly chart must not be in clear downtrend price above rising 20-week SMA preferred")
         lines.append(f"  TOUCH_COUNT_2_3_RULE: 10 SMA touches last 20D {sma_data.get('touch_count_10_20d','MISSING')} | 20 SMA touches {sma_data.get('touch_count_20_20d','MISSING')} | LAST_TOUCH_10 {sma_data.get('last_touch_10_age_days','MISSING')} days ago | LAST_TOUCH_20 {sma_data.get('last_touch_20_age_days','MISSING')} days ago | CROSS_COUNT_10 20D {sma_data.get('cross_count_10_20d','MISSING')} | OVERLAP_5D {sma_data.get('overlap_days_5d','MISSING')} days flat/overlapping | DATA_STATUS: {sma_data.get('status')} | METHOD: Touch=low<=SMA<=high or abs(close-SMA)/SMA<0.3% then bounce Clean bounce 1-2 touches preferred After 2-3 clean bounces decisive break close below = exit | NOTE: NEW — 2-3 Touch Rule RAW countable for LLM")
@@ -5833,7 +5833,7 @@ bullish market != valid entry
 
     lines.append("")
 
-    # --- MSNR v4.8 PACKET SECTIONS 25-28 ---
+    # --- MSNR PACKET SECTIONS 25-28 ---
     lines.append("--- 25. MSNR NEW — Body-focused A-levels Resistance red + V-levels Support green — Close pivot + opposite colour flip — Precise S/R methodology from 62-page spec | CORE ENGINE ---")
     if 'msnr_raw_data' in locals() and msnr_raw_data:
         st = msnr_raw_data.get("storyline",{})
@@ -5842,14 +5842,14 @@ bullish market != valid entry
         fourh_tracked = msnr_raw_data.get("fourh_av_tracked",[])
         daily_fresh_a = sum(1 for x in daily_tracked if x.get('freshness')=='FRESH' and 'A' in x.get('type',''))
         daily_fresh_v = sum(1 for x in daily_tracked if x.get('freshness')=='FRESH' and 'V' in x.get('type',''))
-        lines.append(f"MSNR_COUNTS: Daily AV raw {msnr_raw_data.get('daily_av_raw_count',0)} fresh {msnr_raw_data.get('daily_av_fresh',0)} (A fresh {daily_fresh_a} V fresh {daily_fresh_v}) 4H AV raw {msnr_raw_data.get('fourh_av_raw_count',0)} fresh {msnr_raw_data.get('fourh_av_fresh',0)} Weekly AV raw {msnr_raw_data.get('weekly_av_raw_count',0)} fresh {msnr_raw_data.get('weekly_av_fresh',0)} Daily OCL raw {msnr_raw_data.get('daily_ocl_raw_count',0)} 4H OCL raw {msnr_raw_data.get('fourh_ocl_raw_count',0)} | DATA_STATUS: LIVE_AUTO_MSNR_v4.8 | SOURCE: Binance klines LIVE MSNR detection | METHOD: A/V close pivot + OCL gap + freshness | TIMESTAMP: {now_iso} | NOTE: v4.8 NEW")
+        lines.append(f"MSNR_COUNTS: Daily AV raw {msnr_raw_data.get('daily_av_raw_count',0)} fresh {msnr_raw_data.get('daily_av_fresh',0)} (A fresh {daily_fresh_a} V fresh {daily_fresh_v}) 4H AV raw {msnr_raw_data.get('fourh_av_raw_count',0)} fresh {msnr_raw_data.get('fourh_av_fresh',0)} Weekly AV raw {msnr_raw_data.get('weekly_av_raw_count',0)} fresh {msnr_raw_data.get('weekly_av_fresh',0)} Daily OCL raw {msnr_raw_data.get('daily_ocl_raw_count',0)} 4H OCL raw {msnr_raw_data.get('fourh_ocl_raw_count',0)} | DATA_STATUS: LIVE_AUTO_MSNR_v4.8 | SOURCE: Binance klines LIVE MSNR detection | METHOD: A/V close pivot + OCL gap + freshness | TIMESTAMP: {now_iso} | NOTE: ")
         for lvl in daily_tracked[:8]:
             if lvl.get('freshness')=='FRESH':
                 d_pct = lvl.get('dist_from_spot_pct')
                 d_str = f"{d_pct:.2f}%" if d_pct is not None else "MISSING%"
                 b_pct = lvl.get('buffer_pct')
                 b_str = f"{b_pct:.3f}%" if b_pct is not None else "MISSING%"
-                lines.append(f"  DAILY_A/V_FRESH: {lvl.get('type')} Price ${lvl.get('level_price',0):.0f} Zone {lvl.get('level_low',0):.0f}-{lvl.get('level_high',0):.0f} Strength {lvl.get('strength')} Freshness {lvl.get('freshness')} Touches {lvl.get('touches')} Dist {d_str} Buffer {b_str} | DATA_STATUS: LIVE_AUTO_MSNR | METHOD: {lvl.get('method')} | INDEX: {lvl.get('index')} | NOTE: v4.8 fresh solid red=A green=V high prob aligned storyline {st.get('overall_storyline')} — pages 15-22")
+                lines.append(f"  DAILY_A/V_FRESH: {lvl.get('type')} Price ${lvl.get('level_price',0):.0f} Zone {lvl.get('level_low',0):.0f}-{lvl.get('level_high',0):.0f} Strength {lvl.get('strength')} Freshness {lvl.get('freshness')} Touches {lvl.get('touches')} Dist {d_str} Buffer {b_str} | DATA_STATUS: LIVE_AUTO_MSNR | METHOD: {lvl.get('method')} | INDEX: {lvl.get('index')} | NOTE: fresh solid red=A green=V high prob aligned storyline {st.get('overall_storyline')} — pages 15-22")
         for lvl in msnr_raw_data.get("daily_ocl_tracked",[])[:4]:
             if lvl.get('freshness')=='FRESH':
                 d_pct = lvl.get('dist_from_spot_pct')
@@ -5898,15 +5898,15 @@ bullish market != valid entry
             d_pct = lvl.get('dist_from_spot_pct')
             d_str = f"{d_pct:.2f}%" if d_pct is not None else "MISSING%"
             reasons = '; '.join(lvl.get('confluence_reasons',[]))
-            lines.append(f"  MSNR_CONFLUENCE: {lvl.get('type')} ${lvl.get('level_price',0):.0f} Fresh {lvl.get('freshness')} Score {lvl.get('confluence_score')} Reasons {reasons} Storyline {lvl.get('storyline')} Dist {d_str} | DATA_STATUS: LIVE_AUTO_MSNR_REFINED_v4.8 | METHOD: {msnr_refined_data.get('method')} | NOTE: v4.8 NEW confluence with PCF3 stack")
+            lines.append(f"  MSNR_CONFLUENCE: {lvl.get('type')} ${lvl.get('level_price',0):.0f} Fresh {lvl.get('freshness')} Score {lvl.get('confluence_score')} Reasons {reasons} Storyline {lvl.get('storyline')} Dist {d_str} | DATA_STATUS: LIVE_AUTO_MSNR_REFINED_v4.8 | METHOD: {msnr_refined_data.get('method')} | NOTE:  confluence with PCF3 stack")
         lines.append(f"  MSNR_TRADING_WORKFLOW: {msnr_refined_data.get('workflow','')} | METHOD: Workflow pages 40-50 | NOTE: Swing strongest Day Daily/4H->1H/15m very usable Scalping poor — Liquid markets forex gold XAUUSD Bitcoin")
-        lines.append(f"  MSNR_LIMITATIONS: {msnr_refined_data.get('limitations','')} | METHOD: Limitations education only | NOTE: v4.8 discretionary not holy grail — combine with PCF3 regime SMA ATR R:R")
+        lines.append(f"  MSNR_LIMITATIONS: {msnr_refined_data.get('limitations','')} | METHOD: Limitations education only | NOTE: discretionary not holy grail — combine with PCF3 regime SMA ATR R:R")
         lines.append(f"  MSNR_SUITABLE: {msnr_refined_data.get('suitable_conditions','')} | METHOD: Suitable conditions from spec | NOTE: Matches PCF3 regime Bull Impulse 72% Grind Up 66% Compression 40% Chop 28%")
     else:
         lines.append("  MSNR_CONFLUENCE: MISSING | DATA_STATUS: MISSING | NOTE: Refined data missing")
     lines.append("")
 
-    lines.append("--- 29. VALIDATION NEW — Backtest across regimes not just bull run 2018 bear 2020 crash 2021 top 2022 grind 2023 chop Include fees slippage 0.1-0.2% Expectancy PF Max DD Sharpe Monte Carlo worst-case losing streaks 40% win rate means 6+ consecutive losses WILL happen — v4.8 retains + MSNR performance ---")
+    lines.append("--- 29. VALIDATION NEW — Backtest across regimes not just bull run 2018 bear 2020 crash 2021 top 2022 grind 2023 chop Include fees slippage 0.1-0.2% Expectancy PF Max DD Sharpe Monte Carlo worst-case losing streaks 40% win rate means 6+ consecutive losses WILL happen — retains + MSNR performance ---")
     if 'validation_v47_data' in locals() and validation_v47_data:
         lines.append(f"VALIDATION_METRICS: Win Rate {fmt(validation_v47_data.get('win_rate_pct'),1)}% Avg Win {fmt(validation_v47_data.get('avg_win_R'),1)}R Avg Loss {fmt(validation_v47_data.get('avg_loss_R'),1)}R Expectancy {fmt(validation_v47_data.get('expectancy_R'),2)}R Profit Factor {fmt(validation_v47_data.get('profit_factor'),2)} Max DD {fmt(validation_v47_data.get('max_drawdown_pct'),1)}% Note {validation_v47_data.get('max_drawdown_note','MISSING')} Sharpe {fmt(validation_v47_data.get('sharpe'),2)} Monte Carlo Worst Losing Streak {validation_v47_data.get('monte_carlo_worst_losing_streak','MISSING')} Note {validation_v47_data.get('monte_carlo_note','MISSING')} | DATA_STATUS: {validation_v47_data.get('status')} | SOURCE: {validation_v47_data.get('source')} | METHOD: {validation_v47_data.get('method')} | TIMESTAMP: {validation_v47_data.get('timestamp',now_iso)} | NOTE: NEW — Write rules precisely enough stranger could execute Backtest across regimes not just bull run 2018 bear 2020 crash 2021 top 2022 grind 2023 chop Strategy only works in bull markets is not strategy Include fees slippage 0.1-0.2% Track expectancy profit factor max DD Sharpe then Monte Carlo")
         lines.append(f"  BACKTEST_REGIMES: {validation_v47_data.get('backtest_regimes','MISSING')} | METHOD: Backtest across regimes")
@@ -6007,20 +6007,20 @@ bullish market != valid entry
 
     lines.append("--- DATA COMPLETENESS SUMMARY | PCF3 FULL RAW ---")
     lines.append(f"DATA COMPLETENESS - PCF3 FULL RAW - DEFAULT FOR LLM ANALYSIS - {now_iso} - EXAMPLE:0")
-    lines.append(f"FAST:     10/10 available + 4 NEW v4.2 = 14/14 FAST FULLY POPULATED - was 9/10 in v2.0 now +Order Book Depth around psych $80k $86.5k $90k ratio + regime live auto + CVD live slope + Long/Short + OI/mcap + Global Liquidity --- ENHANCEMENTS 1-7 ---")
+    lines.append(f"FAST:     10/10 available + 4 NEW = 14/14 FAST FULLY POPULATED - was 9/10 in now +Order Book Depth around psych $80k $86.5k $90k ratio + regime live auto + CVD live slope + Long/Short + OI/mcap + Global Liquidity --- ENHANCEMENTS 1-7 ---")
     lines.append(f"  ✅ SPOT price + BID/ASK/SPREAD - LIVE_API")
     lines.append(f"  ✅ OI current + previous + age + change - LIVE_API + LIVE_AUTO")
     lines.append(f"  ✅ Funding Binance + Avg + Agg - LIVE_API + MANUAL_REAL_V33")
     lines.append(f"  ✅ MARK_INDEX_SPREAD - LIVE_AUTO")
     lines.append(f"  ✅ Futures Long % + OI status - MANUAL_REAL_V33")
     lines.append(f"  ✅ Vol Score 89 - MANUAL_REAL_V33")
-    lines.append(f"  ✅ Order Book Depth $500 around $80k $86.5k $90k - LIVE_API via Binance depth - NEW in v3.0 from BPLP")
+    lines.append(f"  ✅ Order Book Depth $500 around $80k $86.5k $90k - LIVE_API via Binance depth - NEW in from BPLP")
     lines.append(f"  ✅ CVD divergence + Bid restock / Ask pulled raw - MANUAL_REAL_BPLP - NEW for sweep vs absorption")
     lines.append(f"  ✅ Psych Levels Auto Support $81k-$82k Resistance $85.5k $86.5k $89k $90k $100k - LIVE_AUTO - NEW")
-    lines.append(f"  ✅ CVD live slope via aggTrades 1000 + WebSocket live dashboard wss://stream.binance.com:9443/ws/btcusdt@aggTrade - LIVE_API - NEW in v4.2 FULL Enhancement #1 FIXES CVD MISSING")
-    lines.append(f"  ✅ Long/Short Account Ratio Global + Top + Position + Taker via fapi.binance.com/futures/data/globalLongShortAccountRatio - LIVE_API - NEW in v4.2 FULL Enhancement #4 FIXES Long/short MISSING")
-    lines.append(f"  ✅ OI ÷ Market Cap ratio via Binance fapi openInterest + markPrice + supply 19.8M - LIVE_AUTO - NEW in v4.2 FULL Enhancement #4 FIXES OI/mcap MISSING >3% fragility")
-    lines.append(f"  ✅ Global Net Liquidity Fed+ECB+BoJ+PBOC - TGA - RRP via FRED WALCL WTREGEN RRPONTSYD + MacroMicro - LIVE_API_FRED - NEW in v4.2 FULL Enhancement #5 FIXES Global Liquidity MISSING")
+    lines.append(f"  ✅ CVD live slope via aggTrades 1000 + WebSocket live dashboard wss://stream.binance.com:9443/ws/btcusdt@aggTrade - LIVE_API - NEW in  Enhancement #1 FIXES CVD MISSING")
+    lines.append(f"  ✅ Long/Short Account Ratio Global + Top + Position + Taker via fapi.binance.com/futures/data/globalLongShortAccountRatio - LIVE_API - NEW in  Enhancement #4 FIXES Long/short MISSING")
+    lines.append(f"  ✅ OI ÷ Market Cap ratio via Binance fapi openInterest + markPrice + supply 19.8M - LIVE_AUTO - NEW in  Enhancement #4 FIXES OI/mcap MISSING >3% fragility")
+    lines.append(f"  ✅ Global Net Liquidity Fed+ECB+BoJ+PBOC - TGA - RRP via FRED WALCL WTREGEN RRPONTSYD + MacroMicro - LIVE_API_FRED - NEW in  Enhancement #5 FIXES Global Liquidity MISSING")
     lines.append(f"")
     lines.append(f"MEDIUM:   12/12 available (4H/VWAP/gamma/volatility/volume profile/STH) - was 10/10 now +Volume Profile 30d POC/HVNs + STH Cost Basis")
     lines.append(f"  ✅ 4H OHLC - LIVE_API")
@@ -6036,7 +6036,7 @@ bullish market != valid entry
     lines.append(f"  ✅ STH Confluence Psych $80k + STH $81,842 Dist 2.3% within 3% = math floor - LIVE_AUTO - NEW")
     lines.append(f"  ✅ Sweep Reversal + Absorption Breakout raw verification methods - MANUAL_REAL_BPLP - NEW")
     lines.append(f"")
-    lines.append(f"SLOW:     10/10 available (ETF/MVRV/macro/concentration) - was 10/10 in v2.0 - unchanged but enhanced with psych confluence")
+    lines.append(f"SLOW:     10/10 available (ETF/MVRV/macro/concentration) - was 10/10 in - unchanged but enhanced with psych confluence")
     lines.append(f"  ✅ ETF 1D/3D/5D/7D/20D + IBIT/FBTC/GBTC - LIVE_API Farside")
     lines.append(f"  ✅ DXY/US10Y/NASDAQ/SP500/VIX/GOLD/OIL - LIVE_API Yahoo")
     lines.append(f"  ✅ MVRV 88 Puell 72 RHODL 65 SOPR 71 NUPL 78 + MVRV Z 2.3 Ratio 1.46 SOPR 1.002 STH 1.05 LTH 3.11 NUPL 0.52 - MANUAL_REAL_V33")
@@ -6044,7 +6044,7 @@ bullish market != valid entry
     lines.append(f"  ✅ Confluence Scoring Method +2 HVN +2 POC +3 STH - MANUAL_REAL_BPLP - NEW - LLM can calculate $80k STRONG score 5 vs $90k 0")
     lines.append(f"  ✅ Risk Rule No stop AT round # Beyond wick +0.5%-0.6% - MANUAL_REAL_BPLP - NEW")
     lines.append(f"")
-    lines.append(f"CRITICAL MISSING: Only 1 left (CVD live slope requires websocket) - was 2 in v2.0, 15 in v1.2 - v3.0 fills order book depth and psych levels auto")
+    lines.append(f"CRITICAL MISSING: Only 1 left (CVD live slope requires websocket) - was 2 in , 15 in - fills order book depth and psych levels auto")
     lines.append(f"")
     lines.append(f"DATA QUALITY:")
     lines.append(f"LIVE_AUTO: 20 (VWAP calendar, POC $100 buckets, ATR, OI change, gamma distances, psych levels auto $500 rounds, HVN confluence <1.5%, STH confluence <3%, etc)")
@@ -6059,8 +6059,8 @@ bullish market != valid entry
     lines.append("META AI reports what market is doing. PCF3 decides what it means.")
     lines.append("RAW -> VALIDATION -> ANALYSIS -> REGIME -> STATE")
     lines.append("RULE: If not available say MISSING never substitute example EXAMPLE:0")
-    lines.append("ARCHITECTURE: v2.0 + Section 14 Psych Levels Volume Profile STH Confluence Order Book Depth Sweep vs Absorption — integrates BPLP v1-v3 as raw")
-    lines.append("INTEGRATION: v2.0 + Psych Support $81k-$82k Resistance $85.5k $86.5k $89k $90k $100k auto $500 rounds + Volume Profile 30d Range $81,400-$87,395 POC $84,800 HVNs $84,800 8.2% $80,500 7.1% + HVN Confluence ⭐ $80k + $80,500 7.1% Dist 0.62% + STH $81,842 +4.6% above STH in profit + STH Confluence $80k + $81,842 Dist 2.3% + Order Book Depth $500 around psych $80k Bids 42.3 Asks 18.1 ratio 2.33 SUPPORT_HEAVY + Sweep Reversal Wick beyond round # close back inside engulfing CVD divergence + Absorption Breakout Tight base higher lows asks pulled bids restocking spot CVD rising + Confluence Scoring +2 HVN +2 POC +3 STH + Risk Rule No stop AT round # Beyond wick +0.5% — all as RAW with SOURCE/METHOD/TIMESTAMP not as FADE/BREAKOUT playbook opinions")
+    lines.append("ARCHITECTURE: + Section 14 Psych Levels Volume Profile STH Confluence Order Book Depth Sweep vs Absorption — integrates BPLP v1-v3 as raw")
+    lines.append("INTEGRATION: + Psych Support $81k-$82k Resistance $85.5k $86.5k $89k $90k $100k auto $500 rounds + Volume Profile 30d Range $81,400-$87,395 POC $84,800 HVNs $84,800 8.2% $80,500 7.1% + HVN Confluence ⭐ $80k + $80,500 7.1% Dist 0.62% + STH $81,842 +4.6% above STH in profit + STH Confluence $80k + $81,842 Dist 2.3% + Order Book Depth $500 around psych $80k Bids 42.3 Asks 18.1 ratio 2.33 SUPPORT_HEAVY + Sweep Reversal Wick beyond round # close back inside engulfing CVD divergence + Absorption Breakout Tight base higher lows asks pulled bids restocking spot CVD rising + Confluence Scoring +2 HVN +2 POC +3 STH + Risk Rule No stop AT round # Beyond wick +0.5% — all as RAW with SOURCE/METHOD/TIMESTAMP not as FADE/BREAKOUT playbook opinions")
     lines.append("DEFAULT FOR LLM: Copy this entire packet → Paste into ChatGPT / Claude / Gemini / Meta AI / Grok for analysis. Compare conclusions using same raw metrics. PCF3 is default, includes psychological levels execution layer around $80k/$90k/$100k with real confluence validation.")
 
     full_packet="\n".join(lines)
