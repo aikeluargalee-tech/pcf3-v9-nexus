@@ -340,12 +340,21 @@ def fmt(v, dec=2):
 def fetch_json(url, timeout=12):
     if not requests:
         return None, "MISSING", f"{url} - no requests"
-    try:
-        r = requests.get(url, timeout=timeout, headers={"User-Agent": "PCF3-v3.0-RawPsych"})
-        r.raise_for_status()
-        return r.json(), "LIVE_API", url
-    except Exception as e:
-        return None, "MISSING", f"{url} - {e}"
+    urls_to_try = [url]
+    if "api.binance.com" in url:
+        urls_to_try.append(url.replace("api.binance.com", "data-api.binance.vision"))
+        urls_to_try.append(url.replace("api.binance.com", "api1.binance.com"))
+        urls_to_try.append(url.replace("api.binance.com", "api3.binance.com"))
+    last_err = None
+    for u in urls_to_try:
+        try:
+            r = requests.get(u, timeout=timeout, headers={"User-Agent": "PCF3-v3.0-RawPsych"})
+            r.raise_for_status()
+            return r.json(), "LIVE_API", u
+        except Exception as e:
+            last_err = e
+            continue
+    return None, "MISSING", f"{url} - {last_err}"
 
 def parse_farside_value(v):
     v = v.strip()
