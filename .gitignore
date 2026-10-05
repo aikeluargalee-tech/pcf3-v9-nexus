@@ -2,6 +2,6 @@ __pycache__/
 *.pyc
 .env
 gamma_cache.json
-PFC3_LIVE_PACKET_*.txt
+PCF3_LIVE_PACKET_*.txt
 !PCF3_LIVE_PACKET_DEFAULT.txt
 .DS_Store
