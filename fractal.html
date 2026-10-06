@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>BTC Fractal Lab — 4H Pattern Matcher (PCF3 Nexus Labs)</title>
+<style>
+  :root {
+    --bg-main: #0B0E14;
+    --card-bg: #121824;
+    --card-hover: #172033;
+    --border-color: #1F293D;
+    --border-focus: #38BDF8;
+    --text-primary: #F0F4F8;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    
+    --brand-orange: #F97316;
+    --brand-orange-glow: rgba(249, 115, 22, 0.15);
+    
+    --green-bright: #10B981;
+    --green-glow: rgba(16, 185, 129, 0.15);
+    
+    --amber-bright: #F59E0B;
+    --amber-glow: rgba(245, 158, 11, 0.15);
+    
+    --cyan-bright: #06B6D4;
+    --cyan-glow: rgba(6, 182, 212, 0.15);
+    
+    --red-bright: #EF4444;
+    --red-glow: rgba(239, 68, 68, 0.15);
+    
+    --purple-bright: #A855F7;
+    --purple-glow: rgba(168, 85, 247, 0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 20px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* Nav Bar */
+  .nav-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 20px;
+    background: #10172a;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-bottom: 24px;
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-title {
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    color: #F8FAFC;
+  }
+  .badge-lab {
+    background: #ea580c;
+    color: #000;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.75px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    text-transform: uppercase;
+  }
+
+  .nav-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+  .nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #1e293b;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s ease-in-out;
+    cursor: pointer;
+  }
+  .nav-btn:hover {
+    background: #334155;
+    border-color: #475569;
+    color: #FFFFFF;
+    transform: translateY(-1px);
+  }
+  .nav-btn.primary {
+    background: #0284c7;
+    border-color: #0369a1;
+    color: #FFFFFF;
+  }
+  .nav-btn.primary:hover {
+    background: #0369a1;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+
+  /* Header Card */
+  .header-card {
+    border-left: 5px solid var(--brand-orange);
+    background: linear-gradient(180deg, rgba(249, 115, 22, 0.08) 0%, #121824 100%);
+  }
+  .header-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+  .header-h1 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #FFFFFF;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .header-desc {
+    color: var(--text-secondary);
+    font-size: 13px;
+    max-width: 820px;
+    line-height: 1.6;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: #0f172a;
+  }
+
+  /* Setup / Thesis Ribbon */
+  .thesis-ribbon {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .thesis-step {
+    background: #0B0E14;
+    border: 1px solid #1F293D;
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .thesis-step-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.75px;
+    text-transform: uppercase;
+    color: #64748B;
+    margin-bottom: 4px;
+  }
+  .thesis-step-val {
+    font-size: 13px;
+    font-weight: 700;
+    color: #F8FAFC;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  /* Grid Layout */
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 900px) {
+    .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  /* KPI Box */
+  .kpi-card {
+    background: #121824;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .kpi-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.75px;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .kpi-val {
+    font-size: 32px;
+    font-weight: 800;
+    margin: 8px 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: -0.02em;
+  }
+  .kpi-sub {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  /* Controls Bar */
+  .controls-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: #0f172a;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+  }
+  .slider-group {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    min-width: 280px;
+    max-width: 520px;
+  }
+  .slider-label {
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    color: #F1F5F9;
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: #1E293B;
+    border-radius: 999px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--brand-orange);
+    border: 2px solid #0B0E14;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
+  }
+  .slider-value {
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-size: 14px;
+    font-weight: 800;
+    background: #0B0E14;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 4px 10px;
+    color: var(--brand-orange);
+    min-width: 55px;
+    text-align: center;
+  }
+
+  /* Chart & Visualizer */
+  .chart-container {
+    background: #0B0E14;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .chart-legend {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-secondary);
+  }
+  .legend-box {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+  #chartCanvas {
+    width: 100%;
+    height: 240px;
+    display: block;
+  }
+
+  /* Analogs Table */
+  .table-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .table-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .table-wrapper {
+    max-height: 420px;
+    overflow-y: auto;
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+  }
+  thead {
+    position: sticky;
+    top: 0;
+    background: #172033;
+    z-index: 2;
+  }
+  th {
+    padding: 12px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.75px;
+    color: #CBD5E1;
+  }
+  td {
+    padding: 12px 16px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  tbody tr {
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  tbody tr:hover {
+    background: rgba(255,255,255,0.03);
+  }
+  tbody tr.selected-row {
+    background: rgba(6, 182, 212, 0.1) !important;
+    border-left: 3px solid var(--cyan-bright);
+  }
+
+  /* Badges */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .tag-win { background: var(--green-glow); color: var(--green-bright); border: 1px solid rgba(16,185,129,0.3); }
+  .tag-loss { background: var(--red-glow); color: var(--red-bright); border: 1px solid rgba(239,68,68,0.3); }
+  .tag-chop { background: var(--amber-glow); color: var(--amber-bright); border: 1px solid rgba(245,158,11,0.3); }
+
+  /* Invalidation & Caution Box */
+  .invalidation-box {
+    background: #1c1308;
+    border: 1px solid #78350f;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .invalidation-icon {
+    font-size: 24px;
+    line-height: 1;
+  }
+  .invalidation-content h3 {
+    font-size: 14px;
+    font-weight: 800;
+    color: #FBBF24;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .invalidation-content p {
+    font-size: 13px;
+    color: #FDE68A;
+    line-height: 1.6;
+  }
+
+  /* Educational Reality Check Card */
+  .quant-critique-card {
+    background: #111827;
+    border: 1px solid #374151;
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .quant-critique-card h3 {
+    font-size: 14px;
+    font-weight: 800;
+    color: #E5E7EB;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .critique-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 14px;
+    font-size: 12px;
+    color: #9CA3AF;
+    line-height: 1.6;
+  }
+  .critique-item {
+    background: #0B0E14;
+    border: 1px solid #1F293D;
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .critique-item strong {
+    color: #F3F4F6;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 13px;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 24px 0 12px 0;
+    font-size: 11px;
+    color: #475569;
+    letter-spacing: 0.5px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Top Navigation Bar -->
+  <div class="nav-bar">
+    <div class="nav-brand">
+      <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--brand-orange); box-shadow:0 0 10px var(--brand-orange);"></span>
+      <span class="brand-title">PCF3 NEXUS • QUANT RESEARCH LAB</span>
+      <span class="badge-lab">EXPERIMENTAL / RECREATIONAL</span>
+    </div>
+    <div class="nav-actions">
+      <button onclick="reloadLiveData()" class="nav-btn">🔄 Refresh 4H Candles</button>
+      <a href="index.html" class="nav-btn primary">← Main Live Dashboard</a>
+      <a href="matrix.html" class="nav-btn">📊 Metrics Matrix (A-J) ↗</a>
+      <a href="PCF3_LIVE_PACKET_DEFAULT.txt" target="_blank" rel="noopener" class="nav-btn">Raw Packet ↗</a>
+    </div>
+  </div>
+
+  <!-- Header Card: Fractal Lab Hypothesis -->
+  <div class="card header-card">
+    <div class="header-title-row">
+      <div>
+        <h1 class="header-h1">
+          <span>BTC 4H Fractal Pattern Lab</span>
+          <span id="feed-status" class="status-pill" style="color:var(--green-bright);">● CONNECTING BINANCE 4H</span>
+        </h1>
+        <p class="header-desc">
+          Automated sliding-window scanner searching historical 4H Bitcoin candles for twins of the <strong>February–March 2023 accumulation breakout</strong>.
+          Evaluates correlation on log z-scores (<code style="color:#38bdf8;">zscore(log(price))</code>) with strict pivot structural validation (<code style="color:#38bdf8;">Pullback2 &lt; Pullback1 * 0.993</code>).
+        </p>
+      </div>
+      <div style="text-align:right; font-size:12px; color:var(--text-muted); font-family:monospace;">
+        Template: Feb 1 - Mar 15, 2023 (~270 bars)<br>
+        <span id="data-loaded-summary">Loading historical candles...</span>
+      </div>
+    </div>
+
+    <!-- The 5-Pivot Setup Ribbon -->
+    <div class="thesis-ribbon">
+      <div class="thesis-step">
+        <div class="thesis-step-label">Pivot 1 • Initial High</div>
+        <div class="thesis-step-val" style="color:#60A5FA;">Peak 1 ($80,000)</div>
+      </div>
+      <div class="thesis-step">
+        <div class="thesis-step-label">Pivot 2 • Higher Low</div>
+        <div class="thesis-step-val" style="color:#A78BFA;">Pullback 1 ($75,000)</div>
+      </div>
+      <div class="thesis-step">
+        <div class="thesis-step-label">Pivot 3 • Breakout Peak</div>
+        <div class="thesis-step-val" style="color:#34D399;">Peak 2 ($87,500)</div>
+      </div>
+      <div class="thesis-step">
+        <div class="thesis-step-label">Pivot 4 • Bear Trap Undercut</div>
+        <div class="thesis-step-val" style="color:var(--brand-orange);">Pullback 2 ($74k - $78k)</div>
+      </div>
+      <div class="thesis-step">
+        <div class="thesis-step-label">Pivot 5 • Target Expansion</div>
+        <div class="thesis-step-val" style="color:#F59E0B;">Expansion ($100,000+)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Invalidation Alert Banner -->
+  <div class="invalidation-box">
+    <div class="invalidation-icon">⚠️</div>
+    <div class="invalidation-content">
+      <h3>Strict Invalidation Rule (No Hopium)</h3>
+      <p>
+        If Bitcoin prints a <strong>Weekly Close above $89,500</strong> without executing the second flush to $74k–$78k, 
+        <strong>the fractal pattern is 100% VOID</strong>. Do not front-run the projection or average into falling knives without structural confirmation.
+      </p>
+    </div>
+  </div>
+
+  <!-- KPI Cards Grid -->
+  <div class="grid-3">
+    <div class="kpi-card">
+      <div class="kpi-title">
+        <span>Historical Matches</span>
+        <span id="kpi-threshold-tag" style="color:var(--brand-orange); font-family:monospace;">corr ≥ 0.85</span>
+      </div>
+      <div id="kpi-matches" class="kpi-val" style="color:#F8FAFC;">--</div>
+      <div class="kpi-sub" id="kpi-matches-sub">Scanning 4H windows with step = 10 bars</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-title">
+        <span>Avg Forward Return</span>
+        <span style="color:#64748B;">4H Post-Pattern Close</span>
+      </div>
+      <div class="kpi-val" style="display:flex; gap:16px; align-items:baseline;">
+        <div>
+          <span style="font-size:11px; color:#94A3B8; display:block; font-weight:400;">+50 BARS (8.3d)</span>
+          <span id="kpi-fwd50" style="color:var(--green-bright); font-size:24px;">--%</span>
+        </div>
+        <div style="width:1px; height:32px; background:#1F293D;"></div>
+        <div>
+          <span style="font-size:11px; color:#94A3B8; display:block; font-weight:400;">+100 BARS (16.6d)</span>
+          <span id="kpi-fwd100" style="color:var(--green-bright); font-size:24px;">--%</span>
+        </div>
+      </div>
+      <div class="kpi-sub">Measured strictly from pattern completion candle</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-title">
+        <span>Hit Rate &gt; +20% Rally</span>
+        <span style="color:#64748B;">Window: 100 bars</span>
+      </div>
+      <div id="kpi-hitrate" class="kpi-val" style="color:#38BDF8;">--%</div>
+      <div class="kpi-sub">
+        <div style="height:6px; background:#1E293B; border-radius:999px; overflow:hidden; margin-top:4px;">
+          <div id="kpi-hitrate-bar" style="width:0%; height:100%; background:#38BDF8; transition:width 0.3s;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Controls Bar -->
+  <div class="controls-bar">
+    <div class="slider-group">
+      <span class="slider-label">Correlation Threshold:</span>
+      <input type="range" id="corrSlider" min="0.70" max="0.95" step="0.01" value="0.85" oninput="updateThreshold(this.value)">
+      <span id="corrValue" class="slider-value">0.85</span>
+    </div>
+
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <label style="font-size:12px; color:#CBD5E1; display:flex; align-items:center; gap:6px; cursor:pointer;">
+        <input type="checkbox" id="structureFilter" checked onchange="runScanner()">
+        <span>Enforce Undercut Rule (<code style="color:#38bdf8;">PB2 &lt; PB1</code>)</span>
+      </label>
+      <button onclick="resetChartOverlay()" class="nav-btn" style="padding:4px 10px; font-size:11px;">Clear Overlay</button>
+    </div>
+  </div>
+
+  <!-- High-Resolution Canvas Chart -->
+  <div class="chart-container">
+    <div class="chart-header">
+      <div style="font-size:13px; font-weight:700; color:#F8FAFC;">
+        Fractal Shape Overlay Visualizer (Normalized Z-Score)
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item">
+          <div class="legend-box" style="background:#10B981;"></div>
+          <span>2023 Template (Pre-breakout)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-box" style="background:var(--brand-orange);"></div>
+          <span>2023 Expansion (+47% Tail)</span>
+        </div>
+        <div class="legend-item" id="legend-overlay-item" style="display:none;">
+          <div class="legend-box" style="background:var(--cyan-bright);"></div>
+          <span id="legend-overlay-text">Selected Historical Analog</span>
+        </div>
+      </div>
+    </div>
+    <canvas id="chartCanvas"></canvas>
+    <div style="margin-top:10px; display:flex; justify-content:space-between; font-size:11px; color:#64748B; font-family:monospace;">
+      <span>Peak 1</span>
+      <span>Pullback 1</span>
+      <span>Peak 2</span>
+      <span style="color:var(--brand-orange);">Pullback 2 (Undercut Floor)</span>
+      <span style="color:var(--green-bright);">+47% Expansion</span>
+    </div>
+  </div>
+
+  <!-- Historical Analogs Table -->
+  <div class="table-card">
+    <div class="table-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <strong style="font-size:14px; color:#FFFFFF;">Top 30 Historical Analogs</strong>
+        <span id="table-count-badge" class="tag" style="background:#1E293B; color:#94A3B8;">0 Matches</span>
+      </div>
+      <span style="font-size:12px; color:#64748B;">Click any row to overlay its exact shape on the chart above</span>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Date (Pattern End)</th>
+            <th>Correlation</th>
+            <th>+50 Bars Return (8.3d)</th>
+            <th>+100 Bars Return (16.6d)</th>
+            <th>Outcome</th>
+            <th>Entry Price</th>
+          </tr>
+        </thead>
+        <tbody id="analogsTbody">
+          <tr>
+            <td colspan="6" style="text-align:center; padding:32px; color:#64748B;">
+              Loading historical Binance candles...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Quant Critique & Regime Arbitration -->
+  <div class="quant-critique-card">
+    <h3>
+      <span>🧠 Quant Reality Check: Why Fractals Alone Fail</span>
+    </h3>
+    <div class="critique-grid">
+      <div class="critique-item">
+        <strong>1. Exogenous Liquidity Difference</strong>
+        In March 2023, the rally from $19,700 to $29,000 was powered by the <strong>Silicon Valley Bank (SVB) collapse</strong> and the emergency <strong>Fed BTFP liquidity injection</strong>. Shape without liquidity expansion is pure noise.
+      </div>
+      <div class="critique-item">
+        <strong>2. Selection / Cherry-Picking Bias</strong>
+        Looking at only the successful 2023 fractal ignores 2018 and 2022 where double-peak lower-pullback structures collapsed into devastating multi-month trend continuation lower.
+      </div>
+      <div class="critique-item">
+        <strong>3. PCF3 Systematic Arbitration</strong>
+        Do not execute based on chart geometry alone. Check the 
+        <a href="matrix.html" style="color:#38bdf8; text-decoration:underline;">PCF3 Metrics Matrix (A-J)</a>: 
+        A valid long requires positive Spot CVD divergence, negative perp funding, and institutional ETF absorption at the range floor.
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    PCF3 NEXUS • 4H FRACTAL LAB • RECREATIONAL QUANT RESEARCH ONLY • NOT FINANCIAL ADVICE • 2026
+  </footer>
+
+</div>
+
+<script>
+// QUANT MATHER ENGINE & BINANCE CLIENT
+var klines = [];
+var templateRaw = [];
+var templateNorm = [];
+var matches = [];
+var activeOverlay = null;
+
+// Helpers
+function zscoreLog(arr) {
+  var logs = arr.map(function(v) { return Math.log(v); });
+  var n = logs.length;
+  var mean = logs.reduce(function(a, b) { return a + b; }, 0) / n;
+  var variance = logs.reduce(function(a, b) { return a + Math.pow(b - mean, 2); }, 0) / n;
+  var std = Math.sqrt(variance) || 1e-9;
+  return logs.map(function(v) { return (v - mean) / std; });
+}
+
+function pearson(a, b) {
+  if (a.length !== b.length) return -1;
+  var n = a.length;
+  var ma = a.reduce(function(s, v) { return s + v; }, 0) / n;
+  var mb = b.reduce(function(s, v) { return s + v; }, 0) / n;
+  var num = 0, da = 0, db = 0;
+  for (var i = 0; i < n; i++) {
+    var xa = a[i] - ma;
+    var xb = b[i] - mb;
+    num += xa * xb;
+    da += xa * xa;
+    db += xb * xb;
+  }
+  return num / (Math.sqrt(da * db) + 1e-9);
+}
+
+function isValidStructure(raw) {
+  var n = raw.length;
+  var p1End = Math.floor(n * 0.35);
+  var p2End = Math.floor(n * 0.70);
+  
+  var peak1Idx = 0;
+  for (var i = 1; i < p1End; i++) {
+    if (raw[i] > raw[peak1Idx]) peak1Idx = i;
+  }
+  
+  var peak2Idx = p1End;
+  for (var j = p1End + 1; j < p2End; j++) {
+    if (raw[j] > raw[peak2Idx]) peak2Idx = j;
+  }
+  
+  var pull1 = Infinity;
+  for (var k = peak1Idx; k < peak2Idx; k++) {
+    if (raw[k] < pull1) pull1 = raw[k];
+  }
+  
+  var pull2 = Infinity;
+  for (var m = peak2Idx; m < n; m++) {
+    if (raw[m] < pull2) pull2 = raw[m];
+  }
+  
+  return pull2 < pull1 * 0.993; // Undercut by at least 0.7%
+}
+
+// Fetch Binance 4H Klines
+async function fetchBinance4H() {
+  var allKlines = [];
+  var start = Date.UTC(2022, 0, 1);
+  var endpoints = [
+    'https://api.binance.com/api/v3/klines',
+    'https://data-api.binance.vision/api/v3/klines'
+  ];
+  
+  for (var page = 0; page < 12; page++) {
+    var fetched = false;
+    for (var ep of endpoints) {
+      try {
+        var url = ep + '?symbol=BTCUSDT&interval=4h&limit=1000&startTime=' + start;
+        var res = await fetch(url);
+        if (res.ok) {
+          var data = await res.json();
+          if (data && data.length) {
+            var parsed = data.map(function(d) {
+              return { time: d[0], close: parseFloat(d[4]) };
+            });
+            allKlines = allKlines.concat(parsed);
+            start = data[data.length - 1][0] + 1;
+            fetched = true;
+            if (data.length < 1000) page = 99; // finished
+            break;
+          }
+        }
+      } catch (err) {
+        // try next endpoint
+      }
+    }
+    if (!fetched) break;
+  }
+  return allKlines;
+}
+
+// Synthetic Fallback Generator (Ensures Zero Blank Screen on Network Throttle)
+function generateFallbackDataset() {
+  var data = [];
+  var time = Date.UTC(2022, 0, 1);
+  var price = 47000;
+  for (var i = 0; i < 4800; i++) {
+    var noise = (Math.sin(i / 140) * 0.002) + ((Math.random() - 0.5) * 0.008);
+    // Mimic 2023 Feb-Mar bottom & rally around bar 1800
+    if (i >= 1600 && i <= 1870) {
+      if (i < 1650) price = 23800 * (1 + noise);
+      else if (i < 1720) price = 21300 * (1 + noise);
+      else if (i < 1800) price = 25200 * (1 + noise);
+      else if (i < 1840) price = 19700 * (1 + noise);
+      else price = price * 1.012; // expansion
+    } else {
+      price = Math.max(16000, price * (1 + noise));
+    }
+    data.push({ time: time, close: price });
+    time += 4 * 3600 * 1000;
+  }
+  return data;
+}
+
+// Initial Loader
+async function initData() {
+  var feedBadge = document.getElementById('feed-status');
+  feedBadge.textContent = '● CONNECTING BINANCE 4H...';
+  feedBadge.style.color = '#F59E0B';
+  
+  try {
+    klines = await fetchBinance4H();
+    if (klines.length < 500) {
+      throw new Error('Incomplete response');
+    }
+    feedBadge.textContent = '● LIVE BINANCE 4H (' + klines.length + ' BARS)';
+    feedBadge.style.color = 'var(--green-bright)';
+  } catch (err) {
+    klines = generateFallbackDataset();
+    feedBadge.textContent = '● OFFLINE SIMULATION 4H (' + klines.length + ' BARS)';
+    feedBadge.style.color = 'var(--brand-orange)';
+  }
+
+  document.getElementById('data-loaded-summary').textContent = 
+    'Loaded ' + klines.length + ' 4H bars (' + new Date(klines[0].time).toISOString().slice(0,10) + ' to ' + new Date(klines[klines.length-1].time).toISOString().slice(0,10) + ')';
+
+  extractTemplate();
+  runScanner();
+}
+
+function reloadLiveData() {
+  initData();
+}
+
+// Extract the Feb 1 - Mar 15, 2023 Template
+function extractTemplate() {
+  var tStart = Date.UTC(2023, 1, 1);
+  var tEnd = Date.UTC(2023, 2, 18);
+  var slice = klines.filter(function(k) {
+    return k.time >= tStart && k.time <= tEnd;
+  }).map(function(k) { return k.close; });
+
+  if (slice.length < 150) {
+    // fallback to sample window around 1/3 of dataset
+    var idx = Math.floor(klines.length * 0.35);
+    slice = klines.slice(idx, idx + 270).map(function(k) { return k.close; });
+  }
+  
+  if (slice.length > 270) {
+    slice = slice.slice(-270);
+  }
+  
+  templateRaw = slice;
+  templateNorm = zscoreLog(templateRaw);
+}
+
+// Scan Sliding Windows
+function runScanner() {
+  var threshold = parseFloat(document.getElementById('corrSlider').value);
+  var enforceFilter = document.getElementById('structureFilter').checked;
+  var L = templateNorm.length;
+  
+  if (klines.length < L + 120) return;
+  
+  var results = [];
+  var step = 10;
+  
+  for (var i = 0; i < klines.length - L - 100; i += step) {
+    var winRaw = klines.slice(i, i + L).map(function(k) { return k.close; });
+    if (winRaw.length !== L) continue;
+    
+    var winNorm = zscoreLog(winRaw);
+    var corr = pearson(winNorm, templateNorm);
+    
+    if (corr >= threshold) {
+      if (!enforceFilter || isValidStructure(winRaw)) {
+        var entry = klines[i + L] ? klines[i + L].close : null;
+        var f50 = klines[i + L + 50] ? klines[i + L + 50].close : null;
+        var f100 = klines[i + L + 100] ? klines[i + L + 100].close : null;
+        
+        results.push({
+          time: klines[i + L].time,
+          date: new Date(klines[i + L].time).toISOString().slice(0, 16).replace('T', ' '),
+          corr: corr,
+          fwd50: (entry && f50) ? (f50 / entry - 1) : null,
+          fwd100: (entry && f100) ? (f100 / entry - 1) : null,
+          entryPrice: entry || 0,
+          windowRaw: winRaw,
+          windowNorm: winNorm
+        });
+      }
+    }
+  }
+
+  results.sort(function(a, b) { return b.corr - a.corr; });
+  matches = results;
+  
+  updateKPIs(threshold);
+  renderTable();
+  renderChart();
+}
+
+function updateThreshold(val) {
+  document.getElementById('corrValue').textContent = parseFloat(val).toFixed(2);
+  document.getElementById('kpi-threshold-tag').textContent = 'corr ≥ ' + parseFloat(val).toFixed(2);
+  runScanner();
+}
+
+function updateKPIs(threshold) {
+  document.getElementById('kpi-matches').textContent = matches.length;
+  document.getElementById('table-count-badge').textContent = matches.length + ' Matches Found';
+  
+  if (matches.length === 0) {
+    document.getElementById('kpi-fwd50').textContent = '--%';
+    document.getElementById('kpi-fwd100').textContent = '--%';
+    document.getElementById('kpi-hitrate').textContent = '--%';
+    document.getElementById('kpi-hitrate-bar').style.width = '0%';
+    return;
+  }
+
+  var validFwd50 = matches.filter(function(m) { return m.fwd50 !== null; });
+  var avg50 = validFwd50.length ? validFwd50.reduce(function(s, m) { return s + m.fwd50; }, 0) / validFwd50.length : 0;
+  
+  var validFwd100 = matches.filter(function(m) { return m.fwd100 !== null; });
+  var avg100 = validFwd100.length ? validFwd100.reduce(function(s, m) { return s + m.fwd100; }, 0) / validFwd100.length : 0;
+  
+  var hitCount = validFwd100.filter(function(m) { return m.fwd100 > 0.20; }).length;
+  var hitRate = validFwd100.length ? (hitCount / validFwd100.length) : 0;
+
+  var f50El = document.getElementById('kpi-fwd50');
+  f50El.textContent = (avg50 >= 0 ? '+' : '') + (avg50 * 100).toFixed(2) + '%';
+  f50El.style.color = avg50 >= 0 ? 'var(--green-bright)' : 'var(--red-bright)';
+
+  var f100El = document.getElementById('kpi-fwd100');
+  f100El.textContent = (avg100 >= 0 ? '+' : '') + (avg100 * 100).toFixed(2) + '%';
+  f100El.style.color = avg100 >= 0 ? 'var(--green-bright)' : 'var(--red-bright)';
+
+  var hitEl = document.getElementById('kpi-hitrate');
+  hitEl.textContent = (hitRate * 100).toFixed(1) + '%';
+  document.getElementById('kpi-hitrate-bar').style.width = Math.min(100, hitRate * 100) + '%';
+}
+
+function renderTable() {
+  var tbody = document.getElementById('analogsTbody');
+  if (matches.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:32px; color:#64748B;">No analogs found matching correlation ≥ ' + document.getElementById('corrValue').textContent + '. Try lowering the slider to 0.75 - 0.80.</td></tr>';
+    return;
+  }
+
+  var html = '';
+  var top30 = matches.slice(0, 30);
+  top30.forEach(function(m, idx) {
+    var tagClass = 'tag-chop';
+    var tagText = '🟡 Modest / Chop';
+    if (m.fwd100 !== null) {
+      if (m.fwd100 > 0.20) {
+        tagClass = 'tag-win';
+        tagText = '🟢 +20%+ Rally';
+      } else if (m.fwd100 < -0.05) {
+        tagClass = 'tag-loss';
+        tagText = '🔴 Breakdown';
+      }
+    }
+
+    var f50Text = m.fwd50 !== null ? ((m.fwd50 >= 0 ? '+' : '') + (m.fwd50 * 100).toFixed(2) + '%') : '-';
+    var f100Text = m.fwd100 !== null ? ((m.fwd100 >= 0 ? '+' : '') + (m.fwd100 * 100).toFixed(2) + '%') : '-';
+
+    html += '<tr id="row-' + idx + '" onclick="selectAnalog(' + idx + ')">';
+    html += '<td style="color:#F1F5F9;">' + m.date + '</td>';
+    html += '<td style="color:var(--green-bright); font-weight:700;">' + m.corr.toFixed(3) + '</td>';
+    html += '<td style="color:' + (m.fwd50 >= 0 ? '#F1F5F9' : 'var(--red-bright)') + ';">' + f50Text + '</td>';
+    html += '<td style="color:' + (m.fwd100 >= 0 ? '#F1F5F9' : 'var(--red-bright)') + '; font-weight:' + (m.fwd100 > 0.2 ? '800' : '400') + ';">' + f100Text + '</td>';
+    html += '<td><span class="tag ' + tagClass + '">' + tagText + '</span></td>';
+    html += '<td style="color:#94A3B8;">$' + Math.round(m.entryPrice).toLocaleString() + '</td>';
+    html += '</tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+function selectAnalog(idx) {
+  var top30 = matches.slice(0, 30);
+  if (!top30[idx]) return;
+  activeOverlay = top30[idx];
+
+  // highlight row
+  var rows = document.querySelectorAll('#analogsTbody tr');
+  rows.forEach(function(r) { r.classList.remove('selected-row'); });
+  var selRow = document.getElementById('row-' + idx);
+  if (selRow) selRow.classList.add('selected-row');
+
+  // update legend
+  var legItem = document.getElementById('legend-overlay-item');
+  var legText = document.getElementById('legend-overlay-text');
+  legItem.style.display = 'flex';
+  legText.textContent = 'Analog (' + activeOverlay.date + ' • corr ' + activeOverlay.corr.toFixed(3) + ')';
+
+  renderChart();
+}
+
+function resetChartOverlay() {
+  activeOverlay = null;
+  document.getElementById('legend-overlay-item').style.display = 'none';
+  var rows = document.querySelectorAll('#analogsTbody tr');
+  rows.forEach(function(r) { r.classList.remove('selected-row'); });
+  renderChart();
+}
+
+// Draw Canvas Chart with High-DPI support
+function renderChart() {
+  var canvas = document.getElementById('chartCanvas');
+  var ctx = canvas.getContext('2d');
+  var rect = canvas.getBoundingClientRect();
+  var dpr = window.devicePixelRatio || 1;
+  
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+
+  var w = rect.width;
+  var h = rect.height;
+
+  ctx.clearRect(0, 0, w, h);
+
+  if (!templateNorm || templateNorm.length === 0) return;
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+  ctx.lineWidth = 1;
+  for (var y = 20; y < h; y += 40) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(w, y);
+    ctx.stroke();
+  }
+
+  // Draw Template Line
+  var minVal = -2.5;
+  var maxVal = 2.5;
+  var n = templateNorm.length;
+
+  function toY(val) {
+    return h - 20 - ((val - minVal) / (maxVal - minVal)) * (h - 40);
+  }
+  function toX(i) {
+    return 10 + (i / (n - 1)) * (w - 20);
+  }
+
+  // Background subtle fill for expansion zone (last 30% of template)
+  var splitIdx = Math.floor(n * 0.70);
+  var splitX = toX(splitIdx);
+  ctx.fillStyle = 'rgba(249, 115, 22, 0.04)';
+  ctx.fillRect(splitX, 0, w - splitX, h);
+
+  // Divider line
+  ctx.strokeStyle = 'rgba(249, 115, 22, 0.2)';
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(splitX, 0);
+  ctx.lineTo(splitX, h);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Draw 2023 Template (Phase 1 green, Phase 2 orange)
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.strokeStyle = '#10B981';
+  for (var i = 0; i <= splitIdx; i++) {
+    var x = toX(i);
+    var y = toY(templateNorm[i]);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.strokeStyle = '#F97316';
+  for (var j = splitIdx; j < n; j++) {
+    var x = toX(j);
+    var y = toY(templateNorm[j]);
+    if (j === splitIdx) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Draw Overlay Analog if selected
+  if (activeOverlay && activeOverlay.windowNorm) {
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#06B6D4';
+    ctx.beginPath();
+    for (var k = 0; k < activeOverlay.windowNorm.length; k++) {
+      var ox = toX(k);
+      var oy = toY(activeOverlay.windowNorm[k]);
+      if (k === 0) ctx.moveTo(ox, oy);
+      else ctx.lineTo(ox, oy);
+    }
+    ctx.stroke();
+
+    // Analog glow dot at end
+    var endX = toX(activeOverlay.windowNorm.length - 1);
+    var endY = toY(activeOverlay.windowNorm[activeOverlay.windowNorm.length - 1]);
+    ctx.fillStyle = '#06B6D4';
+    ctx.beginPath();
+    ctx.arc(endX, endY, 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+// Responsive resize
+window.addEventListener('resize', function() {
+  renderChart();
+});
+
+// Boot on load
+window.addEventListener('DOMContentLoaded', function() {
+  initData();
+});
+</script>
+
+</body>
+</html>
