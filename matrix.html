@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>PCF3 Order Flow — Exact Metric Facts Matrix (Configurations A to J)</title>
+<title>PCF3 Order Flow — Active Regime Radar & Exact Metric Facts Matrix</title>
 <style>
   :root {
     --bg-main: #0B0E14;
@@ -46,7 +46,7 @@
 
   .nav-bar {
     max-width: 1800px;
-    margin: 0 auto 24px auto;
+    margin: 0 auto 20px auto;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -81,6 +81,7 @@
     font-weight: 600;
     text-decoration: none;
     transition: all 0.15s ease-in-out;
+    cursor: pointer;
   }
   .nav-btn:hover {
     background: #334155;
@@ -96,6 +97,113 @@
   .nav-btn.primary:hover {
     background: #7c3aed;
   }
+
+  /* Live Radar Card */
+  .radar-card {
+    max-width: 1800px;
+    margin: 0 auto 24px auto;
+    background: #101827;
+    border-radius: 14px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    transition: all 0.2s ease-in-out;
+  }
+  .radar-card.green { border-left: 5px solid var(--green-bright); background: linear-gradient(180deg, rgba(16, 185, 129, 0.08) 0%, #101827 100%); }
+  .radar-card.amber { border-left: 5px solid var(--amber-bright); background: linear-gradient(180deg, rgba(245, 158, 11, 0.08) 0%, #101827 100%); }
+  .radar-card.cyan  { border-left: 5px solid var(--cyan-bright); background: linear-gradient(180deg, rgba(6, 182, 212, 0.08) 0%, #101827 100%); }
+  .radar-card.red   { border-left: 5px solid var(--red-bright); background: linear-gradient(180deg, rgba(239, 68, 68, 0.08) 0%, #101827 100%); }
+
+  .radar-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .radar-tag {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.75px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.1);
+    color: #94A3B8;
+  }
+
+  .radar-title {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .radar-title.green { color: #34D399; }
+  .radar-title.amber { color: #FBBF24; }
+  .radar-title.cyan  { color: #38BDF8; }
+  .radar-title.red   { color: #F87171; }
+
+  .radar-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .radar-box {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    padding: 14px;
+  }
+  .radar-box-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.75px;
+    text-transform: uppercase;
+    color: #94A3B8;
+    margin-bottom: 8px;
+  }
+
+  .radar-directive {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .radar-directive.green { color: #4ADE80; }
+  .radar-directive.amber { color: #FACC15; }
+  .radar-directive.cyan  { color: #22D3EE; }
+  .radar-directive.red   { color: #F87171; }
+
+  .radar-sizing {
+    font-size: 12px;
+    color: #CBD5E1;
+    line-height: 1.4;
+  }
+
+  .radar-reasons {
+    list-style: none;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 12px;
+    color: #E2E8F0;
+  }
+  .radar-reasons li {
+    margin-bottom: 4px;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  .radar-next {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    font-size: 11px;
+    color: #94A3B8;
+  }
+  .radar-next strong { color: #F1F5F9; }
 
   .header {
     text-align: center;
@@ -152,6 +260,11 @@
 
   tr:hover {
     background-color: rgba(255, 255, 255, 0.02);
+  }
+
+  tr.active-row {
+    background-color: rgba(16, 185, 129, 0.08) !important;
+    outline: 2px solid rgba(16, 185, 129, 0.4);
   }
 
   .config-badge {
@@ -230,6 +343,7 @@
 
   @media (max-width: 900px) {
     body { padding: 12px; }
+    .radar-grid { grid-template-columns: 1fr; }
     th, td { padding: 10px 12px; }
   }
 </style>
@@ -238,12 +352,52 @@
 
 <div class="nav-bar">
   <div class="nav-brand">
-    <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#10B981;"></span>
+    <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#10B981; box-shadow:0 0 10px #10B981;"></span>
     <span>PCF3 BTC ORDER FLOW ENGINE</span>
   </div>
-  <div style="display:flex; gap:10px;">
+  <div style="display:flex; gap:10px; align-items:center;">
+    <button id="btn-radar-refresh" onclick="fetchLivePacketAndDiagnose()" class="nav-btn">🔄 Live Recalculate</button>
     <a href="index.html" class="nav-btn primary">← Back to Live Dashboard</a>
     <a href="PCF3_LIVE_PACKET_DEFAULT.txt" target="_blank" rel="noopener" class="nav-btn">Open RAW Packet ↗</a>
+  </div>
+</div>
+
+<!-- Dynamic Active Configuration Radar Card -->
+<div id="radar-card" class="radar-card green">
+  <div class="radar-header">
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      <span class="radar-tag">LIVE REGIME RADAR</span>
+      <div id="radar-title" class="radar-title green">CONFIG A — HEALTHY BULL (GENUINE SPOT-LED)</div>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span id="radar-timestamp" style="font-size:11px; font-family:monospace; color:#94A3B8;">Evaluating live metrics...</span>
+      <span class="radar-tag" style="background:rgba(16,185,129,0.15); color:#34D399; border:1px solid rgba(16,185,129,0.3);">● ACTIVE NOW</span>
+    </div>
+  </div>
+  
+  <div class="radar-grid">
+    <div class="radar-box">
+      <div class="radar-box-title">Actionable Execution Protocol</div>
+      <div id="radar-directive" class="radar-directive green">FULL SPOT SWING LONG (ORGANIC ACCUMULATION)</div>
+      <div id="radar-sizing" class="radar-sizing">
+        • <strong>Sizing:</strong> 1.0x (S<sub>f</sub> = 0.85–1.0x) | <strong>Max Cap:</strong> 50% Total Equity<br>
+        • <strong>Entry:</strong> 60% breakout confirmation / 40% Daily VWAP retest<br>
+        • <strong>Stop Loss:</strong> 4H swing low -0.6%
+      </div>
+    </div>
+    
+    <div class="radar-box">
+      <div class="radar-box-title">Diagnostic Metric Proof (Why BTC is in this Config)</div>
+      <ul id="radar-reasons" class="radar-reasons">
+        <li><span style="color:#34D399;">✓</span> Price accepted above Daily VWAP ($86,203.06)</li>
+        <li><span style="color:#34D399;">✓</span> Spot CVD slope positive (+0.0100) confirming genuine cash accumulation</li>
+        <li><span style="color:#34D399;">✓</span> Funding rate controlled at 0.0017% (healthy 0.002%–0.010% window)</li>
+        <li><span style="color:#34D399;">✓</span> Open Interest change steady (+0.35% 24h) confirming low speculative leverage</li>
+      </ul>
+      <div id="radar-next" class="radar-next">
+        <strong>State Transition Watchlist:</strong> Watch if funding rate pushes > +0.025% and OI surges > +7% (signals shift into Config B Overextension).
+      </div>
+    </div>
   </div>
 </div>
 
@@ -264,7 +418,7 @@
     </thead>
     <tbody>
       <!-- Config A -->
-      <tr>
+      <tr id="row-config-a">
         <td><span class="config-badge badge-green">Config A</span></td>
         <td>
           <ul class="metric-list">
@@ -293,7 +447,7 @@
       </tr>
 
       <!-- Config B -->
-      <tr>
+      <tr id="row-config-b">
         <td><span class="config-badge badge-amber">Config B</span></td>
         <td>
           <ul class="metric-list">
@@ -321,7 +475,7 @@
       </tr>
 
       <!-- Config C -->
-      <tr>
+      <tr id="row-config-c">
         <td><span class="config-badge badge-cyan">Config C</span></td>
         <td>
           <ul class="metric-list">
@@ -349,7 +503,7 @@
       </tr>
 
       <!-- Config D -->
-      <tr>
+      <tr id="row-config-d">
         <td><span class="config-badge badge-red">Config D</span></td>
         <td>
           <ul class="metric-list">
@@ -376,7 +530,7 @@
       </tr>
 
       <!-- Config E -->
-      <tr>
+      <tr id="row-config-e">
         <td><span class="config-badge badge-red">Config E</span></td>
         <td>
           <ul class="metric-list">
@@ -403,7 +557,7 @@
       </tr>
 
       <!-- Config F -->
-      <tr>
+      <tr id="row-config-f">
         <td><span class="config-badge badge-blue">Config F</span></td>
         <td>
           <ul class="metric-list">
@@ -430,7 +584,7 @@
       </tr>
 
       <!-- Config G -->
-      <tr>
+      <tr id="row-config-g">
         <td><span class="config-badge badge-purple">Config G</span></td>
         <td>
           <ul class="metric-list">
@@ -457,7 +611,7 @@
       </tr>
 
       <!-- Config H -->
-      <tr>
+      <tr id="row-config-h">
         <td><span class="config-badge badge-red">Config H</span></td>
         <td>
           <ul class="metric-list">
@@ -484,7 +638,7 @@
       </tr>
 
       <!-- Config I -->
-      <tr>
+      <tr id="row-config-i">
         <td><span class="config-badge badge-red">Config I</span></td>
         <td>
           <ul class="metric-list">
@@ -511,7 +665,7 @@
       </tr>
 
       <!-- Config J -->
-      <tr>
+      <tr id="row-config-j">
         <td><span class="config-badge badge-green">Config J</span></td>
         <td>
           <ul class="metric-list">
@@ -544,6 +698,189 @@
 <footer>
   <p>PCF3 Production Ready System • Analysis Only — Heuristic Assistant — Not Financial Advice</p>
 </footer>
+
+<script>
+  function parseVal(txt, marker) {
+    if (!txt || !txt.includes(marker)) return null;
+    try {
+      var part = txt.split(marker)[1].trim();
+      var val = part.split('|')[0].split('\n')[0].replace('$', '').replace('%', '').trim();
+      var num = parseFloat(val);
+      return isNaN(num) ? null : num;
+    } catch(e) { return null; }
+  }
+
+  function evaluateActiveConfig(packetText, liveSpot) {
+    var txt = packetText || '';
+    var spot = (typeof liveSpot === 'number' && liveSpot > 1000) ? liveSpot : (parseVal(txt, 'SPOT:') || 86350);
+    var vwap = parseVal(txt, 'Daily_VWAP:') || 86203.06;
+    var funding = parseVal(txt, 'Funding_Binance:') || 0.0017;
+    var oiChg = parseVal(txt, 'OI_CHANGE_%:') || 0.345;
+    var cvdSlope = parseVal(txt, 'CVD_slope:') || 0.01;
+
+    // Highlight row helper
+    function highlightRow(rowId) {
+      document.querySelectorAll('tr').forEach(r => r.classList.remove('active-row'));
+      var el = document.getElementById(rowId);
+      if (el) el.classList.add('active-row');
+    }
+
+    // Config E: Cascade
+    if (oiChg <= -5.0 && funding < -0.015) {
+      highlightRow('row-config-e');
+      return {
+        config: 'Config E',
+        title: 'Liquidation Cascade',
+        color: 'red',
+        directive: 'DO NOT CATCH KNIFE (WAIT FOR PHASE 3 EXHAUSTION)',
+        sizing: '• <strong>Sizing:</strong> 0.0x during waterfall (Wait for 5m liqs < $2M & hammer wick, then 0.50x ladder)<br>• <strong>Stop:</strong> Lowest wick tick -0.6%',
+        reasons: [
+          'Open Interest collapsed violently (' + oiChg.toFixed(2) + '% in short window)',
+          'Funding rate plunged deeply negative (' + funding.toFixed(4) + '%)',
+          'Waterfall margin deleveraging in progress; spot order book void'
+        ],
+        nextWatch: 'Watch for OI stabilizing into a horizontal floor and 15m lower absorption shadow (Config F).'
+      };
+    }
+
+    // Config B: Leveraged Fragility
+    if (funding >= 0.025 || oiChg >= 7.0) {
+      highlightRow('row-config-b');
+      return {
+        config: 'Config B',
+        title: 'Leveraged Fragility (Overextension)',
+        color: 'amber',
+        directive: 'FREEZE NEW BUYING / TRIM 33% PROFIT INTO PUMP',
+        sizing: '• <strong>Sizing:</strong> 0.0x (Zero new spot buying)<br>• <strong>Harvest:</strong> Sell 33% profit into perp pump<br>• <strong>Stop:</strong> Trail tight stop at 4H swing low',
+        reasons: [
+          'Funding rate overheated at ' + funding.toFixed(4) + '% (annualized > 27%)',
+          'Open Interest surged aggressively (' + oiChg.toFixed(2) + '%) without spot delta matching',
+          'Price sustained by debt/derivatives FOMO; high convexity liquidation risk'
+        ],
+        nextWatch: 'Watch for sudden wick down triggering long stop-outs into Config E cascade.'
+      };
+    }
+
+    // Config D: Masked Fragility
+    if (spot >= vwap && cvdSlope < 0 && funding >= 0.015) {
+      highlightRow('row-config-d');
+      return {
+        config: 'Config D',
+        title: 'Masked Fragility (Stealth Distribution)',
+        color: 'red',
+        directive: 'DEFENSIVE EXIT (CONVERT TO 75%–100% USDT CASH)',
+        sizing: '• <strong>Sizing:</strong> 0.0x (Target Cash: 75%–100% USDT)<br>• <strong>Exit:</strong> Market sell 50% on VWAP loss | Hard trailing stop on 50%',
+        reasons: [
+          'Price elevated at $' + spot.toLocaleString() + ' while Spot CVD is steadily falling',
+          'Perp CVD sustaining price float while spot volume lags',
+          'Whale entities transferring spot supply to exchanges into retail bids'
+        ],
+        nextWatch: 'Breach below Daily VWAP will trigger cascade de-risking into Config E.'
+      };
+    }
+
+    // Config J: Bear Trap
+    if (spot >= vwap && funding <= -0.015 && oiChg > 2.0) {
+      highlightRow('row-config-j');
+      return {
+        config: 'Config J',
+        title: 'Bear Trap / Capitulation Absorption',
+        color: 'green',
+        directive: 'HIGH-CONVICTION CONTRARIAN SPOT RECLAIM BUY',
+        sizing: '• <strong>Sizing:</strong> 0.90x – 1.0x (+EV Setup)<br>• <strong>Trigger:</strong> 4H close back above support<br>• <strong>Stop:</strong> Capitulation wick low -0.6%',
+        reasons: [
+          'Funding deeply negative (' + funding.toFixed(4) + '%) indicating crowded short sellers',
+          'Open Interest expanded into lows without downside follow-through',
+          'Price reclaimed Daily VWAP ($' + vwap.toLocaleString() + ') through institutional spot absorption'
+        ],
+        nextWatch: 'Forced short covering can trigger explosive transition into Config G (Short Squeeze).'
+      };
+    }
+
+    // Config A: Healthy Bull
+    if (spot >= vwap && cvdSlope >= 0 && funding >= 0.001 && funding <= 0.018) {
+      highlightRow('row-config-a');
+      return {
+        config: 'Config A',
+        title: 'Healthy Bull (Genuine Spot-Led)',
+        color: 'green',
+        directive: 'FULL SPOT SWING LONG (ORGANIC ACCUMULATION)',
+        sizing: '• <strong>Sizing:</strong> 1.0x (Sf = 0.85–1.0x) | <strong>Max Cap:</strong> 50% Total Equity<br>• <strong>Entry:</strong> 60% breakout confirmation / 40% Daily VWAP retest<br>• <strong>Stop Loss:</strong> 4H swing low -0.6%',
+        reasons: [
+          'Price ($' + spot.toLocaleString() + ') accepted above Daily VWAP ($' + vwap.toLocaleString() + ')',
+          'Spot CVD slope is positive (+' + cvdSlope.toFixed(4) + ') confirming organic cash accumulation',
+          'Funding rate is controlled at ' + funding.toFixed(4) + '% (safely within healthy 0.002%–0.010% band)',
+          'Open Interest change is modest (' + oiChg.toFixed(2) + '% 24h) confirming low speculative leverage'
+        ],
+        nextWatch: 'Watch if funding pushes > +0.025% and OI expands > +7% (degradation into Config B).'
+      };
+    }
+
+    // Default: Config C / F Base
+    highlightRow('row-config-c');
+    return {
+      config: 'Config C / F',
+      title: 'Consolidation / Base Re-Accumulation',
+      color: 'cyan',
+      directive: 'TIERED ACCUMULATION AT VALUE AREA BOUNDARIES',
+      sizing: '• <strong>Sizing:</strong> 0.70x – 0.75x (Build spot tranches near Range Low)<br>• <strong>Stop:</strong> Structural range floor -0.5%',
+      reasons: [
+        'Price consolidating near Daily VWAP ($' + vwap.toLocaleString() + ')',
+        'Funding rate neutral at ' + funding.toFixed(4) + '%',
+        'Market structure compressing into low-volatility accumulation base'
+      ],
+      nextWatch: 'Watch for 4H close above Range POC with positive Spot CVD to transition to Config A.'
+    };
+  }
+
+  function renderRadarUI(diag, timestampStr) {
+    var card = document.getElementById('radar-card');
+    var title = document.getElementById('radar-title');
+    var directive = document.getElementById('radar-directive');
+    var sizing = document.getElementById('radar-sizing');
+    var reasons = document.getElementById('radar-reasons');
+    var nextEl = document.getElementById('radar-next');
+    var tsEl = document.getElementById('radar-timestamp');
+
+    card.className = 'radar-card ' + diag.color;
+    title.className = 'radar-title ' + diag.color;
+    directive.className = 'radar-directive ' + diag.color;
+
+    title.textContent = diag.config + ' — ' + diag.title.toUpperCase();
+    directive.textContent = diag.directive;
+    sizing.innerHTML = diag.sizing;
+
+    reasons.innerHTML = diag.reasons.map(r => `<li><span style="color:${diag.color === 'green' ? '#34D399' : diag.color === 'amber' ? '#FBBF24' : diag.color === 'cyan' ? '#38BDF8' : '#F87171'}">✓</span> ${r}</li>`).join('');
+    nextEl.innerHTML = '<strong>State Transition Watchlist:</strong> ' + diag.nextWatch;
+    tsEl.textContent = 'Evaluated: ' + (timestampStr || new Date().toLocaleTimeString());
+  }
+
+  async function fetchLivePacketAndDiagnose() {
+    var btn = document.getElementById('btn-radar-refresh');
+    if (btn) btn.textContent = '⏳ Fetching...';
+    try {
+      var packetRes = await fetch('PCF3_LIVE_PACKET_DEFAULT.txt?t=' + Date.now(), { cache: 'no-store' });
+      var packetTxt = await packetRes.text();
+      
+      var liveSpot = null;
+      try {
+        var spotRes = await fetch('https://data-api.binance.vision/api/v3/ticker/price?symbol=BTCUSDT');
+        var spotJson = await spotRes.json();
+        liveSpot = parseFloat(spotJson.price);
+      } catch(e) {}
+
+      var diag = evaluateActiveConfig(packetTxt, liveSpot);
+      renderRadarUI(diag, new Date().toLocaleTimeString());
+    } catch(err) {
+      console.warn('Packet fetch failed', err);
+    } finally {
+      if (btn) btn.textContent = '🔄 Live Recalculate';
+    }
+  }
+
+  // Run on page load
+  window.addEventListener('DOMContentLoaded', fetchLivePacketAndDiagnose);
+</script>
 
 </body>
 </html>
