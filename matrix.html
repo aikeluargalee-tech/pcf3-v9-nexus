@@ -375,27 +375,37 @@
     </div>
   </div>
   
-  <div class="radar-grid">
+  <!-- Plain English Summary Banner for Beginners -->
+  <div id="radar-summary-box" style="margin-top:14px; padding:14px 18px; border-radius:10px; background:rgba(0,0,0,0.45); border:1px solid rgba(255,255,255,0.08); display:flex; flex-direction:column; gap:6px;">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span style="font-size:16px;">💡</span>
+      <span style="font-size:11px; font-weight:800; letter-spacing:0.75px; text-transform:uppercase; color:#94A3B8;">PLAIN ENGLISH MARKET TRANSLATION</span>
+    </div>
+    <div id="radar-summary-text" style="font-size:14px; font-weight:600; color:#F1F5F9; line-height:1.5;">
+      Bitcoin is currently in a quiet, stable zone. The big gamblers have stopped borrowing money, and smart buyers are quietly building positions without driving up the price.
+    </div>
+  </div>
+
+  <div class="radar-grid" style="margin-top:14px;">
     <div class="radar-box">
-      <div class="radar-box-title">Actionable Execution Protocol</div>
-      <div id="radar-directive" class="radar-directive green">FULL SPOT SWING LONG (ORGANIC ACCUMULATION)</div>
-      <div id="radar-sizing" class="radar-sizing">
-        • <strong>Sizing:</strong> 1.0x (S<sub>f</sub> = 0.85–1.0x) | <strong>Max Cap:</strong> 50% Total Equity<br>
-        • <strong>Entry:</strong> 60% breakout confirmation / 40% Daily VWAP retest<br>
-        • <strong>Stop Loss:</strong> 4H swing low -0.6%
+      <div class="radar-box-title">🎯 WHAT SHOULD YOU DO? (ACTIONABLE PROTOCOL)</div>
+      <div id="radar-directive" class="radar-directive green" style="font-size:15px; margin-bottom:8px;">BUY IN SMALL PORTIONS NEAR THE FLOOR</div>
+      <div id="radar-sizing" class="radar-sizing" style="font-size:13px; line-height:1.6;">
+        • <strong>Recommended Action:</strong> Buy in 2-3 small chunks near range support.<br>
+        • <strong>Position Sizing:</strong> Keep it controlled (about 70% of standard trade size).<br>
+        • <strong>Safety Net (Stop Loss):</strong> Exit trade if price breaks 0.5% below the floor.
       </div>
     </div>
     
     <div class="radar-box">
-      <div class="radar-box-title">Diagnostic Metric Proof (Why BTC is in this Config)</div>
-      <ul id="radar-reasons" class="radar-reasons">
-        <li><span style="color:#34D399;">✓</span> Price accepted above Daily VWAP ($86,203.06)</li>
-        <li><span style="color:#34D399;">✓</span> Spot CVD slope positive (+0.0100) confirming genuine cash accumulation</li>
-        <li><span style="color:#34D399;">✓</span> Funding rate controlled at 0.0017% (healthy 0.002%–0.010% window)</li>
-        <li><span style="color:#34D399;">✓</span> Open Interest change steady (+0.35% 24h) confirming low speculative leverage</li>
+      <div class="radar-box-title">🔍 WHY IS BITCOIN IN THIS STATE? (EASY FACTS)</div>
+      <ul id="radar-reasons" class="radar-reasons" style="font-size:13px; line-height:1.6;">
+        <li><span style="color:#34D399;">✓</span> Price is resting right around the fair average price ($86,203).</li>
+        <li><span style="color:#34D399;">✓</span> Interest fees (Funding) are near zero (0.0017%), meaning nobody is over-leveraging.</li>
+        <li><span style="color:#34D399;">✓</span> The wild swings have cooled down into a quiet accumulation floor.</li>
       </ul>
-      <div id="radar-next" class="radar-next">
-        <strong>State Transition Watchlist:</strong> Watch if funding rate pushes > +0.025% and OI surges > +7% (signals shift into Config B Overextension).
+      <div id="radar-next" class="radar-next" style="font-size:12px; line-height:1.5;">
+        <strong>👀 What To Watch Next:</strong> If price breaks out above the ceiling with strong spot cash buying, we upgrade immediately to 🟢 <strong>Healthy Bull (Full Buy)</strong>.
       </div>
     </div>
   </div>
@@ -718,7 +728,6 @@
     var oiChg = parseVal(txt, 'OI_CHANGE_%:') || 0.345;
     var cvdSlope = parseVal(txt, 'CVD_slope:') || 0.01;
 
-    // Highlight row helper
     function highlightRow(rowId) {
       document.querySelectorAll('tr').forEach(r => r.classList.remove('active-row'));
       var el = document.getElementById(rowId);
@@ -730,16 +739,17 @@
       highlightRow('row-config-e');
       return {
         config: 'Config E',
-        title: 'Liquidation Cascade',
+        title: 'Active Crash / Waterfall Dump',
         color: 'red',
-        directive: 'DO NOT CATCH KNIFE (WAIT FOR PHASE 3 EXHAUSTION)',
-        sizing: '• <strong>Sizing:</strong> 0.0x during waterfall (Wait for 5m liqs < $2M & hammer wick, then 0.50x ladder)<br>• <strong>Stop:</strong> Lowest wick tick -0.6%',
+        plainSummary: 'Bitcoin is experiencing an aggressive flash crash. Borrowed money trades are getting liquidated in domino fashion. There is no floor yet.',
+        directive: 'DO NOT CATCH THE FALLING KNIFE (WAIT)',
+        sizing: '• <strong>Action:</strong> Sit on your hands and hold cash.<br>• <strong>When to enter:</strong> Wait for forced liquidations to drop under $2M and a long lower wick to form.<br>• <strong>Size:</strong> Small cautious entry (0.50x) only after dust settles.',
         reasons: [
           'Open Interest collapsed violently (' + oiChg.toFixed(2) + '% in short window)',
           'Funding rate plunged deeply negative (' + funding.toFixed(4) + '%)',
-          'Waterfall margin deleveraging in progress; spot order book void'
+          'Forced margin liquidations active; spot order book void'
         ],
-        nextWatch: 'Watch for OI stabilizing into a horizontal floor and 15m lower absorption shadow (Config F).'
+        nextWatch: 'Watch for price stabilizing into a horizontal floor and buyers absorbing the bottom (Config F).'
       };
     }
 
@@ -748,16 +758,17 @@
       highlightRow('row-config-b');
       return {
         config: 'Config B',
-        title: 'Leveraged Fragility (Overextension)',
+        title: 'Overextended / Borrowed Money Bubble',
         color: 'amber',
-        directive: 'FREEZE NEW BUYING / TRIM 33% PROFIT INTO PUMP',
-        sizing: '• <strong>Sizing:</strong> 0.0x (Zero new spot buying)<br>• <strong>Harvest:</strong> Sell 33% profit into perp pump<br>• <strong>Stop:</strong> Trail tight stop at 4H swing low',
+        plainSummary: 'Price is pumping, but it is driven by debt and speculative leverage rather than genuine cash buyers. One sudden drop could wipe out greedy long positions.',
+        directive: 'DO NOT FOMO BUY — TAKE SOME PROFIT',
+        sizing: '• <strong>Action:</strong> Sell 33% of spot holdings to lock in gains.<br>• <strong>New Buys:</strong> 0.0x (Strictly zero new buying at these highs).<br>• <strong>Safety Net:</strong> Tighten stop losses just below the recent 4-hour low.',
         reasons: [
-          'Funding rate overheated at ' + funding.toFixed(4) + '% (annualized > 27%)',
-          'Open Interest surged aggressively (' + oiChg.toFixed(2) + '%) without spot delta matching',
-          'Price sustained by debt/derivatives FOMO; high convexity liquidation risk'
+          'Borrowing interest fee (Funding) is dangerously high at ' + funding.toFixed(4) + '% (>27% annualized)',
+          'Leveraged positions jumped +' + oiChg.toFixed(2) + '% without matching spot cash volume',
+          'Price is vulnerable to a sudden long squeeze flush'
         ],
-        nextWatch: 'Watch for sudden wick down triggering long stop-outs into Config E cascade.'
+        nextWatch: 'Watch for a sudden sharp rejection that wipes out greedy longs into a Config E cascade.'
       };
     }
 
@@ -766,16 +777,17 @@
       highlightRow('row-config-d');
       return {
         config: 'Config D',
-        title: 'Masked Fragility (Stealth Distribution)',
+        title: 'Sneaky Distribution (Whale Offloading)',
         color: 'red',
-        directive: 'DEFENSIVE EXIT (CONVERT TO 75%–100% USDT CASH)',
-        sizing: '• <strong>Sizing:</strong> 0.0x (Target Cash: 75%–100% USDT)<br>• <strong>Exit:</strong> Market sell 50% on VWAP loss | Hard trailing stop on 50%',
+        plainSummary: 'Price looks high on the surface, but big whale wallets are actively dumping coins onto excited retail buyers.',
+        directive: 'PROTECT CAPITAL — MOVE TO CASH (USDT)',
+        sizing: '• <strong>Action:</strong> Sell 50% into cash immediately if price drops below Daily VWAP.<br>• <strong>New Buys:</strong> 0.0x (Do not buy dips here).<br>• <strong>Target:</strong> Keep 75%–100% of portfolio in safe cash.',
         reasons: [
-          'Price elevated at $' + spot.toLocaleString() + ' while Spot CVD is steadily falling',
-          'Perp CVD sustaining price float while spot volume lags',
-          'Whale entities transferring spot supply to exchanges into retail bids'
+          'Price is high ($' + spot.toLocaleString() + ') but Spot Cash Volume (CVD) is steadily dropping',
+          'Derivatives are artificially holding price up while real coins leave wallets',
+          'High risk of a sudden structural rug-pull'
         ],
-        nextWatch: 'Breach below Daily VWAP will trigger cascade de-risking into Config E.'
+        nextWatch: 'A break below Daily VWAP will confirm distribution and trigger a sell-off.'
       };
     }
 
@@ -784,16 +796,17 @@
       highlightRow('row-config-j');
       return {
         config: 'Config J',
-        title: 'Bear Trap / Capitulation Absorption',
+        title: 'Bear Trap Reclaim (Squeezing Bears)',
         color: 'green',
-        directive: 'HIGH-CONVICTION CONTRARIAN SPOT RECLAIM BUY',
-        sizing: '• <strong>Sizing:</strong> 0.90x – 1.0x (+EV Setup)<br>• <strong>Trigger:</strong> 4H close back above support<br>• <strong>Stop:</strong> Capitulation wick low -0.6%',
+        plainSummary: 'Sellers tried to dump Bitcoin below major support on scary news, but buyers instantly stepped in and trapped the greedy short sellers.',
+        directive: 'STRONG HIGH-CONFIDENCE BUY',
+        sizing: '• <strong>Action:</strong> Enter aggressively (0.90x–1.0x size).<br>• <strong>Why:</strong> Trapped short sellers are forced to buy back, creating upward fuel.<br>• <strong>Safety Net:</strong> Exit if price drops 0.6% below the lowest wick.',
         reasons: [
-          'Funding deeply negative (' + funding.toFixed(4) + '%) indicating crowded short sellers',
-          'Open Interest expanded into lows without downside follow-through',
-          'Price reclaimed Daily VWAP ($' + vwap.toLocaleString() + ') through institutional spot absorption'
+          'Borrowing fees are deeply negative (' + funding.toFixed(4) + '%) — shorters are crowded and paying longs',
+          'Price snapped back above the Daily VWAP ($' + vwap.toLocaleString() + ')',
+          'Institutions absorbed all the panic selling'
         ],
-        nextWatch: 'Forced short covering can trigger explosive transition into Config G (Short Squeeze).'
+        nextWatch: 'Forced short covering can trigger an explosive short squeeze rally (Config G).'
       };
     }
 
@@ -802,17 +815,18 @@
       highlightRow('row-config-a');
       return {
         config: 'Config A',
-        title: 'Healthy Bull (Genuine Spot-Led)',
+        title: 'Healthy Bull (Real Cash Accumulation)',
         color: 'green',
-        directive: 'FULL SPOT SWING LONG (ORGANIC ACCUMULATION)',
-        sizing: '• <strong>Sizing:</strong> 1.0x (Sf = 0.85–1.0x) | <strong>Max Cap:</strong> 50% Total Equity<br>• <strong>Entry:</strong> 60% breakout confirmation / 40% Daily VWAP retest<br>• <strong>Stop Loss:</strong> 4H swing low -0.6%',
+        plainSummary: 'Bitcoin is rising because real investors and ETFs are buying coins with cash and withdrawing them. Leverage is low and the foundation is solid.',
+        directive: 'BUY WITH CONFIDENCE (FULL SWING POSITION)',
+        sizing: '• <strong>Action:</strong> Enter full spot swing position (1.0x size).<br>• <strong>Max Allocation:</strong> Up to 50% of your portfolio.<br>• <strong>Safety Net:</strong> Place stop loss 0.6% below the recent 4-hour low.',
         reasons: [
-          'Price ($' + spot.toLocaleString() + ') accepted above Daily VWAP ($' + vwap.toLocaleString() + ')',
-          'Spot CVD slope is positive (+' + cvdSlope.toFixed(4) + ') confirming organic cash accumulation',
-          'Funding rate is controlled at ' + funding.toFixed(4) + '% (safely within healthy 0.002%–0.010% band)',
-          'Open Interest change is modest (' + oiChg.toFixed(2) + '% 24h) confirming low speculative leverage'
+          'Price ($' + spot.toLocaleString() + ') is comfortably above the Daily Fair Price ($' + vwap.toLocaleString() + ')',
+          'Real spot cash buying (CVD) is actively climbing',
+          'Interest fees (Funding) are calm and healthy (' + funding.toFixed(4) + '%)',
+          'No dangerous speculative leverage bubble'
         ],
-        nextWatch: 'Watch if funding pushes > +0.025% and OI expands > +7% (degradation into Config B).'
+        nextWatch: 'Watch if interest fees heat up above 0.025% and leverage spikes above 7% (signals shift into Config B bubble).'
       };
     }
 
@@ -820,22 +834,24 @@
     highlightRow('row-config-c');
     return {
       config: 'Config C / F',
-      title: 'Consolidation / Base Re-Accumulation',
+      title: 'Healthy Base Building (Smart Money Accumulating)',
       color: 'cyan',
-      directive: 'TIERED ACCUMULATION AT VALUE AREA BOUNDARIES',
-      sizing: '• <strong>Sizing:</strong> 0.70x – 0.75x (Build spot tranches near Range Low)<br>• <strong>Stop:</strong> Structural range floor -0.5%',
+      plainSummary: 'Bitcoin is moving sideways in a calm, healthy floor. The gamblers have left, volatility has settled down, and smart institutions are quietly buying coins without driving the price up.',
+      directive: 'BUY IN CONTROLLED PORTIONS NEAR THE FLOOR',
+      sizing: '• <strong>Recommended Action:</strong> Buy in 2–3 small portions near range support (e.g. 70% of standard position size).<br>• <strong>What NOT to do:</strong> Do NOT FOMO buy the top of the box. Be patient.<br>• <strong>Safety Net:</strong> Cut trade if price breaks 0.5% below the structural range floor.',
       reasons: [
-        'Price consolidating near Daily VWAP ($' + vwap.toLocaleString() + ')',
-        'Funding rate neutral at ' + funding.toFixed(4) + '%',
-        'Market structure compressing into low-volatility accumulation base'
+        'Price is holding steady right around the Daily Average ($' + vwap.toLocaleString() + ')',
+        'Interest fees (Funding) are calm at ' + funding.toFixed(4) + '%, meaning no speculative bubble',
+        'Wild volatility has compressed into a quiet, solid foundation'
       ],
-      nextWatch: 'Watch for 4H close above Range POC with positive Spot CVD to transition to Config A.'
+      nextWatch: 'If price breaks out above the ceiling with strong spot cash volume, we upgrade immediately to 🟢 <strong>Healthy Bull (Full Buy)</strong>.'
     };
   }
 
   function renderRadarUI(diag, timestampStr) {
     var card = document.getElementById('radar-card');
     var title = document.getElementById('radar-title');
+    var summaryEl = document.getElementById('radar-summary-text');
     var directive = document.getElementById('radar-directive');
     var sizing = document.getElementById('radar-sizing');
     var reasons = document.getElementById('radar-reasons');
@@ -847,11 +863,12 @@
     directive.className = 'radar-directive ' + diag.color;
 
     title.textContent = diag.config + ' — ' + diag.title.toUpperCase();
+    if (summaryEl) summaryEl.textContent = diag.plainSummary;
     directive.textContent = diag.directive;
     sizing.innerHTML = diag.sizing;
 
     reasons.innerHTML = diag.reasons.map(r => `<li><span style="color:${diag.color === 'green' ? '#34D399' : diag.color === 'amber' ? '#FBBF24' : diag.color === 'cyan' ? '#38BDF8' : '#F87171'}">✓</span> ${r}</li>`).join('');
-    nextEl.innerHTML = '<strong>State Transition Watchlist:</strong> ' + diag.nextWatch;
+    nextEl.innerHTML = '<strong>👀 What To Watch Next:</strong> ' + diag.nextWatch;
     tsEl.textContent = 'Evaluated: ' + (timestampStr || new Date().toLocaleTimeString());
   }
 
