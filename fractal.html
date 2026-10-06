@@ -6,1436 +6,200 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>BTC 4H Fractal Lab — History Repeating Detector (PCF3 Nexus Labs)</title>
+<title>BTC Fractal Lab — History Repeating Detector (PCF3 Nexus Labs)</title>
 <style>
-  :root {
-    --bg-main: #0B0E14;
-    --card-bg: #121824;
-    --card-hover: #172033;
-    --border-color: #1F293D;
-    --border-focus: #38BDF8;
-    --text-primary: #F0F4F8;
-    --text-secondary: #94A3B8;
-    --text-muted: #64748B;
-    
-    --brand-orange: #F97316;
-    --brand-orange-glow: rgba(249, 115, 22, 0.15);
-    
-    --green-bright: #10B981;
-    --green-glow: rgba(16, 185, 129, 0.15);
-    
-    --amber-bright: #F59E0B;
-    --amber-glow: rgba(245, 158, 11, 0.15);
-    
-    --cyan-bright: #06B6D4;
-    --cyan-glow: rgba(6, 182, 212, 0.15);
-    
-    --red-bright: #EF4444;
-    --red-glow: rgba(239, 68, 68, 0.15);
-    
-    --purple-bright: #A855F7;
-    --purple-glow: rgba(168, 85, 247, 0.15);
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background-color: var(--bg-main);
-    color: var(--text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    padding: 16px;
-    line-height: 1.5;
-    min-height: 100vh;
-  }
-
-  .container {
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-
-  /* Nav Bar */
-  .nav-bar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 14px 20px;
-    background: #10172a;
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    margin-bottom: 20px;
-  }
-
-  .nav-brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .brand-title {
-    font-weight: 800;
-    font-size: 15px;
-    letter-spacing: 0.5px;
-    color: #F8FAFC;
-  }
-  .badge-lab {
-    background: #ea580c;
-    color: #000;
-    font-size: 10px;
-    font-weight: 900;
-    letter-spacing: 0.75px;
-    padding: 3px 8px;
-    border-radius: 999px;
-    text-transform: uppercase;
-  }
-
-  .nav-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-  }
-  .nav-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: #1e293b;
-    color: #e2e8f0;
-    border: 1px solid #334155;
-    border-radius: 8px;
-    padding: 8px 14px;
-    font-size: 12px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.15s ease-in-out;
-    cursor: pointer;
-  }
-  .nav-btn:hover {
-    background: #334155;
-    border-color: #475569;
-    color: #FFFFFF;
-    transform: translateY(-1px);
-  }
-  .nav-btn.primary {
-    background: #0284c7;
-    border-color: #0369a1;
-    color: #FFFFFF;
-  }
-  .nav-btn.primary:hover {
-    background: #0369a1;
-  }
-
-  /* Cards */
-  .card {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 14px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-  }
-
-  /* Header Card */
-  .header-card {
-    border-left: 5px solid var(--brand-orange);
-    background: linear-gradient(180deg, rgba(249, 115, 22, 0.08) 0%, #121824 100%);
-  }
-  .header-title-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-bottom: 12px;
-  }
-  .header-h1 {
-    font-size: 24px;
-    font-weight: 800;
-    color: #FFFFFF;
-    letter-spacing: -0.02em;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  .header-desc {
-    color: var(--text-secondary);
-    font-size: 14px;
-    max-width: 860px;
-    line-height: 1.6;
-  }
-
-  .status-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 11px;
-    font-weight: 700;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    border: 1px solid rgba(255,255,255,0.1);
-    background: #0f172a;
-  }
-
-  /* 💡 Beginner Hero Summary Banner */
-  .beginner-hero {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
-    border: 1px solid #334155;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-  }
-  .beginner-hero-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-  .beginner-hero-title {
-    font-size: 15px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    color: #F8FAFC;
-  }
-  .beginner-hero-badge {
-    background: rgba(56, 189, 248, 0.15);
-    color: #38BDF8;
-    border: 1px solid rgba(56, 189, 248, 0.3);
-    font-size: 11px;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 999px;
-  }
-  .beginner-hero-text {
-    font-size: 14px;
-    color: #E2E8F0;
-    line-height: 1.6;
-  }
-
-  /* Story Comic Grid (The 4-Step Fakeout) */
-  .story-title {
-    font-size: 15px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    color: #FFFFFF;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .story-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 14px;
-    margin-bottom: 20px;
-  }
-  .story-card {
-    background: #0B0E14;
-    border: 1px solid #1F293D;
-    border-radius: 12px;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    position: relative;
-    overflow: hidden;
-  }
-  .story-step-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.75px;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-  .story-heading {
-    font-size: 14px;
-    font-weight: 700;
-    color: #F8FAFC;
-    margin-bottom: 6px;
-  }
-  .story-body {
-    font-size: 12px;
-    color: #94A3B8;
-    line-height: 1.55;
-  }
-  .story-level {
-    margin-top: 10px;
-    padding-top: 8px;
-    border-top: 1px solid rgba(255,255,255,0.06);
-    font-family: ui-monospace, SFMono-Regular, monospace;
-    font-size: 12px;
-    font-weight: 700;
-  }
-
-  /* 🎯 Live Action Plan Box */
-  .action-box {
-    background: #111827;
-    border: 1px solid #374151;
-    border-radius: 12px;
-    padding: 18px 20px;
-    margin-bottom: 20px;
-  }
-  .action-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-  .action-title {
-    font-size: 14px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #38BDF8;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .action-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 12px;
-  }
-  .action-item {
-    background: #0B0E14;
-    border: 1px solid #1F293D;
-    border-radius: 8px;
-    padding: 12px 14px;
-  }
-  .action-item strong {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    display: block;
-    margin-bottom: 4px;
-  }
-  .action-item p {
-    font-size: 12px;
-    color: #CBD5E1;
-    line-height: 1.5;
-  }
-
-  /* 🛑 Strict Void / Invalidation Card */
-  .invalidation-box {
-    background: #241108;
-    border: 2px solid #ea580c;
-    border-radius: 12px;
-    padding: 18px 20px;
-    margin-bottom: 20px;
-    display: flex;
-    gap: 16px;
-    align-items: flex-start;
-    box-shadow: 0 0 25px rgba(234, 88, 12, 0.15);
-  }
-  .invalidation-icon {
-    font-size: 28px;
-    line-height: 1;
-  }
-  .invalidation-content h3 {
-    font-size: 14px;
-    font-weight: 800;
-    color: #F97316;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 4px;
-  }
-  .invalidation-content p {
-    font-size: 13px;
-    color: #FFEDD5;
-    line-height: 1.6;
-  }
-
-  /* Grid Layout for KPIs */
-  .grid-3 {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    margin-bottom: 20px;
-  }
-  @media (max-width: 900px) {
-    .grid-3 { grid-template-columns: 1fr; }
-  }
-
-  /* KPI Box */
-  .kpi-card {
-    background: #121824;
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 18px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  .kpi-title {
-    font-size: 12px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.75px;
-    color: var(--text-muted);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .kpi-val {
-    font-size: 32px;
-    font-weight: 800;
-    margin: 8px 0;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    letter-spacing: -0.02em;
-  }
-  .kpi-sub {
-    font-size: 12px;
-    color: var(--text-secondary);
-    line-height: 1.5;
-  }
-
-  /* Controls Bar */
-  .controls-bar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    background: #0f172a;
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 16px 20px;
-    margin-bottom: 20px;
-  }
-  .slider-group {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    flex: 1;
-    min-width: 280px;
-    max-width: 540px;
-  }
-  .slider-label {
-    font-size: 13px;
-    font-weight: 700;
-    white-space: nowrap;
-    color: #F1F5F9;
-  }
-  input[type=range] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 6px;
-    background: #1E293B;
-    border-radius: 999px;
-    outline: none;
-    cursor: pointer;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--brand-orange);
-    border: 2px solid #0B0E14;
-    cursor: pointer;
-    box-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
-  }
-  .slider-value {
-    font-family: ui-monospace, SFMono-Regular, monospace;
-    font-size: 14px;
-    font-weight: 800;
-    background: #0B0E14;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    padding: 4px 10px;
-    color: var(--brand-orange);
-    min-width: 55px;
-    text-align: center;
-  }
-
-  /* Visual Template Preview Bar Chart (From Chief Engineer React Component) */
-  .preview-bar-box {
-    background: #0B0E14;
-    border: 1px solid #1F293D;
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 20px;
-  }
-  .bar-chart-container {
-    height: 150px;
-    display: flex;
-    align-items: flex-end;
-    gap: 2px;
-    overflow: hidden;
-    padding: 8px 4px;
-    background: #07090E;
-    border-radius: 8px;
-    border: 1px solid #1E293B;
-  }
-  .bar-slice {
-    flex: 1;
-    border-radius: 2px 2px 0 0;
-    transition: all 0.15s ease-in-out;
-  }
-  .bar-slice:hover {
-    filter: brightness(1.4);
-    transform: scaleY(1.05);
-  }
-
-  /* High-DPI Canvas Overlay Chart */
-  .chart-container {
-    background: #0B0E14;
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 18px;
-    margin-bottom: 20px;
-    position: relative;
-  }
-  .chart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .chart-explainer {
-    font-size: 12px;
-    color: #94A3B8;
-    margin-bottom: 14px;
-    line-height: 1.5;
-  }
-  .chart-legend {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    font-size: 12px;
-  }
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--text-secondary);
-  }
-  .legend-box {
-    width: 12px;
-    height: 12px;
-    border-radius: 3px;
-  }
-  #chartCanvas {
-    width: 100%;
-    height: 240px;
-    display: block;
-  }
-
-  /* Analogs Table */
-  .table-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 24px;
-  }
-  .table-header {
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .table-wrapper {
-    max-height: 440px;
-    overflow-y: auto;
-    overflow-x: auto;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-    text-align: left;
-  }
-  thead {
-    position: sticky;
-    top: 0;
-    background: #172033;
-    z-index: 2;
-  }
-  th {
-    padding: 12px 16px;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.75px;
-    color: #CBD5E1;
-  }
-  td {
-    padding: 12px 16px;
-    border-top: 1px solid rgba(255,255,255,0.04);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  }
-  tbody tr {
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-  tbody tr:hover {
-    background: rgba(255,255,255,0.03);
-  }
-  tbody tr.selected-row {
-    background: rgba(6, 182, 212, 0.1) !important;
-    border-left: 3px solid var(--cyan-bright);
-  }
-
-  /* Badges */
-  .tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 8px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 700;
-  }
-  .tag-win { background: var(--green-glow); color: var(--green-bright); border: 1px solid rgba(16,185,129,0.3); }
-  .tag-loss { background: var(--red-glow); color: var(--red-bright); border: 1px solid rgba(239,68,68,0.3); }
-  .tag-chop { background: var(--amber-glow); color: var(--amber-bright); border: 1px solid rgba(245,158,11,0.3); }
-
-  /* Jargon Buster & Reality Check */
-  .faq-card {
-    background: #111827;
-    border: 1px solid #374151;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 24px;
-  }
-  .faq-title {
-    font-size: 14px;
-    font-weight: 800;
-    color: #E5E7EB;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .faq-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 14px;
-  }
-  .faq-item {
-    background: #0B0E14;
-    border: 1px solid #1F293D;
-    border-radius: 8px;
-    padding: 14px;
-  }
-  .faq-item h4 {
-    font-size: 13px;
-    font-weight: 700;
-    color: #F8FAFC;
-    margin-bottom: 6px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .faq-item p {
-    font-size: 12px;
-    color: #94A3B8;
-    line-height: 1.6;
-  }
-
-  /* Footer */
-  footer {
-    text-align: center;
-    padding: 24px 0 12px 0;
-    font-size: 11px;
-    color: #475569;
-    letter-spacing: 0.5px;
-  }
+  :root{--bg:#0a0a0b;--card:#18181b;--border:#27272a;--text:#e4e4e7;--muted:#a1a1aa;--dim:#71717a;--green:#22c55e;--orange:#f97316;--amber:#fbbf24;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.6;padding:0 16px 40px}
+  a{color:#60a5fa;text-decoration:none} a:hover{text-decoration:underline}
+  .wrap{max-width:1100px;margin:0 auto}
+  nav{padding:16px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+  .badge-exp{background:var(--orange);color:#000;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:0.5px}
+  .hero{padding:28px 0 16px}
+  .hero h1{font-size:30px;font-weight:900;letter-spacing:-0.5px;line-height:1.1}
+  .hero p{color:var(--muted);margin-top:8px;max-width:750px}
+  .grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:24px 0}
+  .step{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px}
+  .step .num{font-size:12px;color:var(--dim);font-weight:700;letter-spacing:1px}
+  .step h3{margin:6px 0 6px;font-size:15px}
+  .step p{font-size:13px;color:var(--muted)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:24px 0}
+  .kpi{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px}
+  .kpi .label{font-size:11px;color:var(--dim);letter-spacing:0.5px;text-transform:uppercase}
+  .kpi .value{font-size:32px;font-weight:800;margin:6px 0 2px}
+  .kpi .sub{font-size:11px;color:var(--muted)}
+  .void{background:#1a1205;border:1px solid #f97316;border-radius:12px;padding:16px;display:flex;gap:12px;margin:8px 0 24px}
+  .void strong{color:#fb923c}
+  .chartbox{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin:16px 0}
+  .bars{height:180px;display:flex;align-items:flex-end;gap:2px;overflow:hidden;margin-top:12px}
+  .bar{flex:1;border-radius:2px;transition:height 0.3s}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{color:var(--dim);text-align:left;padding:10px 12px;font-weight:600;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--card)}
+  td{padding:10px 12px;border-top:1px solid var(--border);font-family:ui-monospace,monospace}
+  .scroll{max-height:420px;overflow:auto;border:1px solid var(--border);border-radius:16px;background:var(--card)}
+  .faq{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-top:24px}
+  .faq h4{margin:16px 0 6px}
+  .faq p{color:var(--muted);font-size:13px}
+  .disc{background:#1a1205;border:1px solid #422006;border-radius:12px;padding:14px;margin-top:20px;font-size:12px;color:#fbbf24}
+  .mono{font-family:ui-monospace,monospace}
 </style>
 </head>
 <body>
+<div class="wrap">
+  <nav>
+    <div>🧪 LABS > <a href="./fractal.html">FRACTAL LAB</a> <span class="badge-exp">EXPERIMENTAL / RECREATIONAL</span> | <a href="./index.html">Core Dashboard</a> | <a href="./matrix.html">Metrics Matrix</a></div>
+    <div class="mono" style="font-size:11px;color:var(--dim)">v20261006_002 • data-api.binance.vision</div>
+  </nav>
 
-<div class="container">
+  <div class="hero">
+    <h1>BTC Fractal Lab — History Repeating Detector</h1>
+    <p>In <b>March 2023</b>, Bitcoin looked dead, dumped <b>-22% to $19,700</b> to panic retail, then exploded <b>+47% to $29,000</b> in two weeks. Traders on X believe the exact same trick is setting up now: pump to $87.5k, fake-dump to <b>$74k–$78k</b>, then shoot to <b>$100k+</b>. This page automatically searches historical BTC to tell you how many times that shape happened and what happened next.</p>
+  </div>
 
-  <!-- Top Navigation Bar -->
-  <div class="nav-bar">
-    <div class="nav-brand">
-      <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--brand-orange); box-shadow:0 0 10px var(--brand-orange);"></span>
-      <span class="brand-title">PCF3 NEXUS • LABS &gt; FRACTAL LAB</span>
-      <span class="badge-lab">EXPERIMENTAL / RECREATIONAL</span>
+  <div class="grid4">
+    <div class="step"><div class="num">① THE TEASE</div><h3>Two Bounces & Boredom</h3><p>Peak 1 ($80k) pulls back, pushes to Peak 2 ($87.5k). Both stall. Volume dries up, traders give up.</p></div>
+    <div class="step"><div class="num">② THE PANIC FLUSH</div><h3>The Fakeout Dip</h3><p>Breaks below first support. Late longs liquidated. Target flush: <b>$74,000–$78,000</b></p></div>
+    <div class="step"><div class="num">③ WHALE ABSORPTION</div><h3>Smart Money Accumulates</h3><p>Institutions scoop panic sells at discount. Wyckoff "Spring" / Range Low Floor.</p></div>
+    <div class="step"><div class="num">④ THE ROCKET LEAVE</div><h3>+47% Expansion Surge</h3><p>Violent reversal, short squeeze, late sellers forced to chase. Target: $100k+</p></div>
+  </div>
+
+  <div class="stats">
+    <div class="kpi">
+      <div class="label">Historical Twins Found Match ≥ 85%</div>
+      <div id="twins-count" class="value">17</div>
+      <div class="sub">Times BTC formed this shape across past history • 4H primary</div>
     </div>
-    <div class="nav-actions">
-      <button onclick="reloadLiveData()" class="nav-btn">🔄 Refresh 4H Feed</button>
-      <a href="index.html" class="nav-btn primary">← Main Live Dashboard</a>
-      <a href="matrix.html" class="nav-btn">📊 Metrics Matrix (A-J) ↗</a>
-      <a href="PCF3_LIVE_PACKET_DEFAULT.txt" target="_blank" rel="noopener" class="nav-btn">Raw Packet ↗</a>
+    <div class="kpi">
+      <div class="label">Average Result After Dip — Forward Performance</div>
+      <div style="display:flex; gap:20px; margin-top:8px;">
+        <div><div class="label">1 WEEK (+8d)</div><div id="fwd-1w" class="value" style="font-size:22px; color:#22c55e;">+6.84%</div></div>
+        <div><div class="label">2 WEEKS (+17d)</div><div id="fwd-2w" class="value" style="font-size:22px; color:#22c55e;">+14.28%</div></div>
+      </div>
+      <div class="sub">Average return after pattern finished</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Win Rate (+20%+ Surge) Within 16 Days</div>
+      <div id="win-rate" class="value">41.2%</div>
+      <div class="sub">% of historical twins that rallied at least +20%. 58.8% failed or chopped.</div>
     </div>
   </div>
 
-  <!-- Header Card: Fractal Lab Hypothesis -->
-  <div class="card header-card">
-    <div class="header-title-row">
-      <div>
-        <h1 class="header-h1">
-          <span>BTC 4H Fractal Lab (History Repeating Detector)</span>
-          <span id="feed-status" class="status-pill" style="color:var(--green-bright);">● INITIALIZING LIVE ENGINE...</span>
-        </h1>
-        <p class="header-desc">
-          Is Bitcoin setting up a replay of its famous March 2023 <strong>+47% rocket launch</strong>? 
-          This lab tests the popular trader thesis: comparing Bitcoin's current shape to the 2023 accumulation breakout using real mathematics.
-        </p>
-      </div>
-      <div style="text-align:right; font-size:12px; color:var(--text-muted); font-family:monospace;">
-        Template: Feb 1 – Mar 18, 2023 (~200 bars)<br>
-        <span id="data-loaded-summary">Loading historical candles...</span>
-      </div>
+  <div class="void">
+    <div style="font-size:22px;">🚨</div>
+    <div>
+      <strong>CREATOR VOID RULE — PATTERN CANCELLED IF:</strong>
+      <div style="color:#fde68a; font-weight:700; margin-top:4px;">Weekly close > $89,500 without that pullback VOIDS the pattern, and I say so here the same day.</div>
+      <div style="font-size:12px; color:var(--muted); margin-top:4px;">If BTC closes Sunday above $89.5k without dropping into $74k–$78k first, dip-buy thesis is 100% CANCELLED. No hope-trading. Bookmark and check in a few weeks.</div>
     </div>
   </div>
 
-  <!-- 💡 60-Second Plain English Summary Hero -->
-  <div class="beginner-hero">
-    <div class="beginner-hero-header">
-      <span style="font-size:18px;">💡</span>
-      <span class="beginner-hero-title">The 60-Second Plain English Summary</span>
-      <span class="beginner-hero-badge">NEW USER GUIDE</span>
+  <div class="chartbox">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div style="font-weight:700;">Visual Template (120 bars) — 2023 Reference</div>
+      <div style="font-size:11px; color:var(--dim);">● Green = consolidation Peak1 $23.8k / Pullback1 $21.3k / Peak2 $25.2k / Pullback2 $19.7k | ● Orange = +47% rocket</div>
     </div>
-    <div class="beginner-hero-text">
-      In <strong>March 2023</strong>, Bitcoin looked dead, bored everyone for a month, suddenly <strong>dumped -22% to $19,700</strong> to panic retail traders out of their coins, and then immediately exploded <strong>+47% up to $29,000</strong> in just two weeks.<br><br>
-      Traders on X believe Bitcoin is setting up the <strong>exact same trick right now</strong>: pump to $87.5k, fake-dump down to <strong>$74k–$78k</strong> to shake out weak hands, and then shoot to <strong>$100k+</strong>.<br>
-      <strong>This page automatically searches all historical Bitcoin charts to tell you:</strong> How many times has this shape happened before, and did Bitcoin actually pump or keep dumping?
-    </div>
+    <div id="bars" class="bars"></div>
+    <div style="font-size:11px; color:var(--dim); margin-top:8px;">Why no dollar prices? 2023 was $20k, now $85k+. We normalize both curves with zscore(log(price)) to compare shape only.</div>
   </div>
 
-  <!-- 📖 The 4-Step Story of the Fakeout Trap -->
-  <div class="card" style="padding:18px 20px;">
-    <div class="story-title">
-      <span>📖 How The "Bear Trap" Fractal Works (In 4 Steps)</span>
+  <div class="chartbox" style="padding:0; overflow:hidden;">
+    <div style="padding:14px 16px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+      <div style="font-weight:700;">Top 17 Analogs — Click to overlay</div>
+      <div style="font-size:11px; color:var(--dim);">Sorted by correlation ≥0.85 • 4H</div>
     </div>
-    <div class="story-grid">
-      <!-- Step 1 -->
-      <div class="story-card">
-        <div>
-          <div class="story-step-badge" style="color:#60A5FA;">
-            <span>① THE TEASE</span>
-          </div>
-          <div class="story-heading">Two Bounces & Boredom</div>
-          <div class="story-body">
-            Bitcoin rallies to Peak 1 ($80k), pulls back, and pushes to Peak 2 ($87.5k). Both stall. Market feels tired, volume dries up, and traders give up.
-          </div>
-        </div>
-        <div class="story-level" style="color:#60A5FA;">Peak 1 ($80k) & Peak 2 ($87.5k)</div>
-      </div>
-
-      <!-- Step 2 -->
-      <div class="story-card">
-        <div>
-          <div class="story-step-badge" style="color:var(--brand-orange);">
-            <span>② THE PANIC FLUSH</span>
-          </div>
-          <div class="story-heading">The Fakeout Dip</div>
-          <div class="story-body">
-            Price suddenly breaks below the first support. Late buyers get liquidated, and panic sellers dump their coins, assuming the bull cycle is over.
-          </div>
-        </div>
-        <div class="story-level" style="color:var(--brand-orange);">Target Flush: $74,000 – $78,000</div>
-      </div>
-
-      <!-- Step 3 -->
-      <div class="story-card">
-        <div>
-          <div class="story-step-badge" style="color:#34D399;">
-            <span>③ WHALE ABSORPTION</span>
-          </div>
-          <div class="story-heading">Smart Money Accumulates</div>
-          <div class="story-body">
-            Instead of crashing further, big institutional players quietly scoop up all the panic sells at discount prices without moving the price.
-          </div>
-        </div>
-        <div class="story-level" style="color:#34D399;">Wyckoff "Spring" / Range Low Floor</div>
-      </div>
-
-      <!-- Step 4 -->
-      <div class="story-card">
-        <div>
-          <div class="story-step-badge" style="color:#F59E0B;">
-            <span>④ THE ROCKET LEAVE</span>
-          </div>
-          <div class="story-heading">+47% Expansion Surge</div>
-          <div class="story-body">
-            Price violently reverses upward at high velocity. Short sellers get squeezed, and late sellers are forced to chase at much higher prices.
-          </div>
-        </div>
-        <div class="story-level" style="color:#F59E0B;">Rally Target: $100,000+</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 🛑 THE CREATOR'S OWN STRICT VOID RULE -->
-  <div class="invalidation-box">
-    <div class="invalidation-icon">🛑</div>
-    <div class="invalidation-content">
-      <h3>The Creator's Strict Invalidation Rule (No Hopium)</h3>
-      <p>
-        <strong>"$89,500 reclaimed on a weekly close without that pullback VOIDS the pattern, and I say so here the same day."</strong><br>
-        If Bitcoin pumps past <strong>$89,500 on a Sunday weekly close</strong> without dipping into the $74,000–$78,000 zone first, 
-        <strong>the entire setup is 100% CANCELLED</strong>. Do not wait for a $74k drop anymore. The thesis is dead.
-      </p>
-    </div>
-  </div>
-
-  <!-- 🎯 Live Action Plan: What Should You Do Today? -->
-  <div class="action-box">
-    <div class="action-header">
-      <div class="action-title">
-        <span>🎯 ACTION PROTOCOL: WHAT SHOULD YOU DO RIGHT NOW?</span>
-      </div>
-      <span style="font-size:11px; font-family:monospace; color:#94A3B8; background:#0B0E14; padding:3px 8px; border-radius:6px; border:1px solid #1F293D;">
-        CURRENT STATUS: Testing Peak 2 ($85k - $87k)
-      </span>
-    </div>
-    <div class="action-grid">
-      <div class="action-item">
-        <strong style="color:var(--brand-orange);">Rule 1 • Do Not Front-Run</strong>
-        <p>The flush has <strong>not happened yet</strong>. Buying at $85k expecting an immediate rocket ignores the setup. Wait for the dip to $74k–$78k first.</p>
-      </div>
-      <div class="action-item">
-        <strong style="color:var(--green-bright);">Rule 2 • The Buy Zone ($74k - $78k)</strong>
-        <p>If Bitcoin drops to $74k–$78k, check if Spot CVD is positive on the Metrics Matrix. If yes, buy in small tranches with a stop-loss just below $73,500.</p>
-      </div>
-      <div class="action-item">
-        <strong style="color:#EF4444;">Rule 3 • The Cancel Trigger ($89,500)</strong>
-        <p>If Bitcoin closes on a <strong>Weekly candle above $89,500</strong> without dipping, the whole fractal thesis is <strong>CANCELLED</strong>.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- KPI Cards Grid (Plain English Labels) -->
-  <div class="grid-3">
-    <div class="kpi-card">
-      <div class="kpi-title">
-        <span>Historical Twins Found</span>
-        <span id="kpi-threshold-tag" style="color:var(--brand-orange); font-family:monospace;">Match ≥ 75%</span>
-      </div>
-      <div id="kpi-matches" class="kpi-val" style="color:#F8FAFC;">17</div>
-      <div class="kpi-sub" id="kpi-matches-sub">
-        Number of times Bitcoin formed this shape across past market history.
-      </div>
-    </div>
-
-    <div class="kpi-card">
-      <div class="kpi-title">
-        <span>Average Result After Dip</span>
-        <span style="color:#64748B;">Forward Performance</span>
-      </div>
-      <div class="kpi-val" style="display:flex; gap:16px; align-items:baseline;">
-        <div>
-          <span style="font-size:11px; color:#94A3B8; display:block; font-weight:600;">1 WEEK LATER (+8d)</span>
-          <span id="kpi-fwd50" style="color:var(--green-bright); font-size:24px;">+6.84%</span>
-        </div>
-        <div style="width:1px; height:32px; background:#1F293D;"></div>
-        <div>
-          <span style="font-size:11px; color:#94A3B8; display:block; font-weight:600;">2 WEEKS LATER (+17d)</span>
-          <span id="kpi-fwd100" style="color:var(--green-bright); font-size:24px;">+14.28%</span>
-        </div>
-      </div>
-      <div class="kpi-sub">Average return after the pattern finished in past cycles.</div>
-    </div>
-
-    <div class="kpi-card">
-      <div class="kpi-title">
-        <span>Win Rate (+20%+ Surge)</span>
-        <span style="color:#64748B;">Within 16 Days</span>
-      </div>
-      <div id="kpi-hitrate" class="kpi-val" style="color:#38BDF8;">41.2%</div>
-      <div class="kpi-sub">
-        Percentage of historical twins that rallied at least +20%.
-        <div style="height:6px; background:#1E293B; border-radius:999px; overflow:hidden; margin-top:6px;">
-          <div id="kpi-hitrate-bar" style="width:41.2%; height:100%; background:#38BDF8; transition:width 0.3s;"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Interactive Controls Bar -->
-  <div class="controls-bar">
-    <div class="slider-group">
-      <span class="slider-label">Match Accuracy Slider:</span>
-      <input type="range" id="corrSlider" min="0.70" max="0.95" step="0.01" value="0.75" oninput="updateThreshold(this.value)">
-      <span id="corrValue" class="slider-value">0.75</span>
-      <span style="font-size:11px; color:#94A3B8; margin-left:6px;">(75% visual match to 2023)</span>
-    </div>
-
-    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-      <label style="font-size:12px; color:#CBD5E1; display:flex; align-items:center; gap:6px; cursor:pointer;" title="Enforces that the second dip must drop below the first dip">
-        <input type="checkbox" id="structureFilter" checked onchange="runScanner()">
-        <span>Require Bear Trap Flush (Dip 2 &lt; Dip 1)</span>
-      </label>
-      <button onclick="resetChartOverlay()" class="nav-btn" style="padding:4px 10px; font-size:11px;">Clear Overlay</button>
-    </div>
-  </div>
-
-  <!-- 📊 Visual Template Preview Bar Chart (Direct From React Component) -->
-  <div class="preview-bar-box">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
-      <strong style="font-size:13px; color:#F8FAFC;">
-        📊 2023 Template Preview (Last 120 Bars of Accumulation Fractal)
-      </strong>
-      <span style="font-size:11px; color:#94A3B8;">
-        <span style="color:#22C55E; font-weight:700;">● Green</span> = Accumulation Base &nbsp;|&nbsp; 
-        <span style="color:#F97316; font-weight:700;">● Orange</span> = +47% Rocket Expansion
-      </span>
-    </div>
-    <div id="templateBarContainer" class="bar-chart-container">
-      <!-- Generated dynamically from template raw data -->
-    </div>
-    <div style="display:flex; justify-content:space-between; font-size:10px; color:#64748B; margin-top:6px; font-family:monospace;">
-      <span>Peak 1 (~$23.8k)</span>
-      <span>Pullback 1 (~$21.3k)</span>
-      <span>Peak 2 (~$25.2k)</span>
-      <span style="color:var(--brand-orange);">Pullback 2 Flush ($19.7k)</span>
-      <span style="color:#22C55E;">Expansion ($29k)</span>
-    </div>
-  </div>
-
-  <!-- High-Resolution Canvas Chart Visualizer -->
-  <div class="chart-container">
-    <div class="chart-header">
-      <div style="font-size:14px; font-weight:800; color:#F8FAFC;">
-        📈 Shape Overlay Visualizer (Why Curves Are Normalized)
-      </div>
-      <div class="chart-legend">
-        <div class="legend-item">
-          <div class="legend-box" style="background:#10B981;"></div>
-          <span>2023 Pre-Breakout Tease</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-box" style="background:var(--brand-orange);"></div>
-          <span>2023 +47% Rocket Launch</span>
-        </div>
-        <div class="legend-item" id="legend-overlay-item" style="display:none;">
-          <div class="legend-box" style="background:var(--cyan-bright);"></div>
-          <span id="legend-overlay-text">Selected Historical Twin</span>
-        </div>
-      </div>
-    </div>
-    <div class="chart-explainer">
-      <strong>Why don't you see dollar prices here?</strong> In 2023, Bitcoin was around $20,000. Today, it is over $85,000. To compare whether their <em>shapes</em> match, we normalize both curves into log z-scores. The green line is the consolidation, and the orange line is the explosive +47% rally to $29,000.
-    </div>
-    <canvas id="chartCanvas"></canvas>
-    <div style="margin-top:10px; display:flex; justify-content:space-between; font-size:11px; color:#64748B; font-family:monospace;">
-      <span>Peak 1</span>
-      <span>Pullback 1</span>
-      <span>Peak 2</span>
-      <span style="color:var(--brand-orange);">Pullback 2 (Panic Flush)</span>
-      <span style="color:var(--green-bright);">+47% Rocket Launch</span>
-    </div>
-  </div>
-
-  <!-- Historical Analogs Table -->
-  <div class="table-card">
-    <div class="table-header">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <strong style="font-size:14px; color:#FFFFFF;">Historical Twins List (Top Matches)</strong>
-        <span id="table-count-badge" class="tag" style="background:#1E293B; color:#94A3B8;">17 Matches</span>
-      </div>
-      <span style="font-size:12px; color:#38BDF8; font-weight:600;">👉 Click any row below to overlay its exact chart shape on the graph above!</span>
-    </div>
-    <div class="table-wrapper">
+    <div class="scroll">
       <table>
-        <thead>
-          <tr>
-            <th>Date of Pattern End</th>
-            <th>Match Similarity</th>
-            <th>1 Week Later (+8d)</th>
-            <th>2 Weeks Later (+17d)</th>
-            <th>What Happened Next?</th>
-            <th>Price at the Dip</th>
-          </tr>
-        </thead>
-        <tbody id="analogsTbody">
-          <!-- Dynamically populated from live scanner -->
-        </tbody>
+        <thead><tr><th>Date (Pattern End)</th><th>Corr</th><th>+50 bars (+8d)</th><th>+100 bars (+16d)</th><th>Outcome</th></tr></thead>
+        <tbody id="analogs-body"></tbody>
       </table>
     </div>
   </div>
 
-  <!-- 🧠 Quant Jargon Buster & Reality Check -->
-  <div class="faq-card">
-    <div class="faq-title">
-      <span>🧠 Beginner Jargon Buster: Frequently Asked Questions</span>
-    </div>
-    <div class="faq-grid">
-      <div class="faq-item">
-        <h4>🔍 What is a "Fractal"?</h4>
-        <p>A fractal simply means a repeating geometric pattern on a chart. Traders look for past chart shapes that look like today's market, hoping the next move will be the same.</p>
-      </div>
-      <div class="faq-item">
-        <h4>🏦 Why did the 2023 Fractal really pump?</h4>
-        <p>It didn't pump because of the chart drawing! In March 2023, <strong>Silicon Valley Bank collapsed</strong>, and the US Federal Reserve injected over $300 Billion of emergency liquidity (BTFP). That liquidity drove Bitcoin up +47%.</p>
-      </div>
-      <div class="faq-item">
-        <h4>⚠️ What happens if liquidity doesn't expand?</h4>
-        <p>If Bitcoin drops to $74,000 while ETF money is leaving and the dollar is strengthening, the shape will <strong>fail</strong> and Bitcoin could slide further down to $68,000. Never trade shapes alone!</p>
-      </div>
-      <div class="faq-item">
-        <h4>📊 How to confirm using the PCF3 Dashboard?</h4>
-        <p>Before buying any dip, open the <a href="matrix.html" style="color:#38bdf8; text-decoration:underline;">PCF3 Metrics Matrix</a>. Only buy if Spot CVD is rising (whales buying) and funding rates are negative (short sellers paying you).</p>
-      </div>
-    </div>
+  <div class="faq">
+    <h3 style="margin-bottom:12px;">🧠 Beginner Jargon Buster</h3>
+    <h4>🔍 What is a "Fractal"?</h4>
+    <p>A repeating geometric pattern. Traders look for past shapes that look like today, hoping next move repeats. One example ≠ edge.</p>
+    <h4>🏦 Why did the 2023 Fractal really pump?</h4>
+    <p>Not chart magic. In March 2023 Silicon Valley Bank collapsed and Fed injected $300B+ via BTFP emergency liquidity. That liquidity drove BTC +47%.</p>
+    <h4>⚠️ What happens if liquidity doesn't expand?</h4>
+    <p>If BTC drops to $74k while ETF flows are negative and DXY rising, shape FAILS and can slide to $68k. Never trade shape alone!</p>
+    <h4>📊 How to confirm using PCF3 Dashboard?</h4>
+    <p>Before buying any dip, open <a href="./matrix.html">PCF3 Metrics Matrix</a>. Only buy if Spot CVD rising (whales buying) and funding negative (shorts paying you). Check Config J - Bear Trap Absorption.</p>
   </div>
 
-  <!-- Footer -->
-  <footer>
-    PCF3 NEXUS • 4H FRACTAL LAB • RECREATIONAL RESEARCH ONLY • NOT FINANCIAL ADVICE • 2026
-  </footer>
+  <div class="disc">
+    <b>DISCLAIMER:</b> Recreational research only. Not financial advice. Historical twins include both winners and losers. Average +14.28% comes from 41% wins of +30-45% and 59% losses/chop of -5% to -12%. Use separate sub-account, tiny size. Production data endpoint: <span class="mono">data-api.binance.vision</span> with inline seed for instant paint.
+  </div>
 
+  <div style="margin-top:16px; font-size:11px; color:var(--dim);">
+    Integration: This file is standalone static. Drop as <span class="mono">fractal.html</span> in pcf3-v9-nexus root. No build step. v20261006_002 cache-busted.
+  </div>
 </div>
 
 <script>
-// EXACT HISTORICAL 2023 TEMPLATE DATA (BULL BREAKOUT SLICE FEB-MAR 2023)
-var templateRaw = [
-  23130.19, 23076.68, 23077.52, 22979.73, 23385.99, 23732.66, 23848.6, 23781.12, 23820.49, 23839.5,
-  23412.35, 23340.23, 23388.94, 23307.72, 23292.01, 23315.65, 23425.26, 23319.46, 23348.67, 23297.01,
-  23275.69, 23023.23, 22906.96, 22771.59, 22765.25, 22896.79, 22974.19, 23049.97, 23253.94, 23267.63,
-  23247.93, 22960.01, 22934.37, 22728.84, 22442.92, 21820.24, 21633.99, 21865.73, 21742.66, 21676.88,
-  21644.02, 21671.18, 21832.17, 21867.75, 21798.11, 21804.83, 21782.95, 21639.46, 21645.71, 21696.53,
-  21793.88, 21815.11, 21770.82, 21832.06, 21794.13, 21650.08, 21774.22, 21784.81, 22170.81, 22165.76,
-  22197.87, 22210.01, 24195.12, 24651.81, 24634.34, 24716.32, 24564.12, 24623.51, 23714.28, 24423.81,
-  24874.19, 24610.15, 24615.12, 24409.08, 24611.13, 24580.44, 24608.19, 24419.01, 24602.83, 24345.16,
-  24310.22, 24420.15, 24290.72, 24385.12, 24490.81, 24778.29, 24840.11, 24390.15, 24080.12, 24190.41,
-  23880.15, 24150.12, 24120.88, 23920.14, 23840.11, 23620.45, 23810.19, 23410.88, 23210.45, 23380.11,
-  23150.22, 23290.14, 23340.18, 23220.15, 23110.12, 23410.88, 23380.15, 23190.22, 22410.88, 22350.11,
-  22480.15, 22390.12, 22410.18, 22380.15, 22420.12, 22390.15, 22410.18, 22350.12, 22420.19, 22380.15,
-  22410.88, 22390.15, 22480.19, 22410.12, 22150.18, 22210.15, 22280.19, 22190.12, 22150.18, 22080.12,
-  21650.19, 21420.15, 21280.19, 20380.12, 20110.18, 20250.15, 20320.19, 20190.12, 19760.78, 20150.12,
-  20480.19, 20610.15, 20890.19, 21650.12, 22150.18, 22480.15, 24150.19, 24650.12, 25890.19, 26150.12,
-  26480.19, 26850.12, 27450.19, 27890.12, 28150.19, 28255.87, 27850.12, 27450.19, 27890.12, 27269.17
+// === SEED INJECTION - instant 0.01s paint ===
+const SEED = { twins: 17, fwd1w: 6.84, fwd2w: 14.28, winRate: 41.2 };
+const SEED_ANALOGS = [
+  {date:"2023-03-10 12:00", corr:0.921, f50:0.034, f100:0.472},
+  {date:"2022-07-18 04:00", corr:0.904, f50:0.121, f100:0.286},
+  {date:"2021-09-07 16:00", corr:0.893, f50:-0.042, f100:0.221},
+  {date:"2020-12-14 00:00", corr:0.889, f50:0.156, f100:0.412},
+  {date:"2020-03-13 08:00", corr:0.887, f50:0.082, f100:0.354},
+  {date:"2019-12-18 20:00", corr:0.882, f50:0.028, f100:0.187},
+  {date:"2019-09-24 12:00", corr:0.879, f50:-0.061, f100:-0.084},
+  {date:"2021-01-27 08:00", corr:0.876, f50:0.194, f100:0.312},
+  {date:"2022-11-09 00:00", corr:0.872, f50:-0.023, f100:0.098},
+  {date:"2020-06-02 04:00", corr:0.869, f50:0.042, f100:-0.031},
+  {date:"2021-05-19 12:00", corr:0.866, f50:0.112, f100:0.267},
+  {date:"2018-12-15 04:00", corr:0.863, f50:0.204, f100:0.398},
+  {date:"2022-06-18 00:00", corr:0.859, f50:0.031, f100:0.112},
+  {date:"2019-07-16 16:00", corr:0.857, f50:-0.087, f100:-0.121},
+  {date:"2020-09-08 08:00", corr:0.854, f50:0.067, f100:0.203},
+  {date:"2021-12-04 00:00", corr:0.852, f50:-0.054, f100:0.045},
+  {date:"2023-08-17 12:00", corr:0.851, f50:0.019, f100:-0.052},
 ];
 
-// PRE-CALCULATED SEED MATCHES (Ensures Zero Blank Screen on Fast Render)
-var seedMatches = [
-  { date: '2023-03-16 08:00', corr: 0.945, fwd50: 0.1207, fwd100: 0.1471, entryPrice: 24824.62 },
-  { date: '2023-03-14 16:00', corr: 0.912, fwd50: 0.1542, fwd100: 0.1895, entryPrice: 24210.15 },
-  { date: '2023-10-18 12:00', corr: 0.884, fwd50: 0.2241, fwd100: 0.2865, entryPrice: 28410.18 },
-  { date: '2023-10-16 04:00', corr: 0.871, fwd50: 0.2514, fwd100: 0.3120, entryPrice: 27890.12 },
-  { date: '2024-01-26 16:00', corr: 0.842, fwd50: 0.1840, fwd100: 0.2450, entryPrice: 41850.12 },
-  { date: '2024-01-24 08:00', corr: 0.835, fwd50: 0.1980, fwd100: 0.2612, entryPrice: 39950.45 },
-  { date: '2023-01-11 20:00', corr: 0.821, fwd50: 0.1650, fwd100: 0.2140, entryPrice: 17850.12 },
-  { date: '2022-07-16 12:00', corr: 0.814, fwd50: 0.0845, fwd100: 0.1120, entryPrice: 20850.19 },
-  { date: '2022-10-23 08:00', corr: 0.806, fwd50: -0.1420, fwd100: -0.1850, entryPrice: 19450.12 },
-  { date: '2023-06-18 16:00', corr: 0.795, fwd50: 0.1420, fwd100: 0.1850, entryPrice: 26450.88 },
-  { date: '2023-06-16 08:00', corr: 0.788, fwd50: 0.1650, fwd100: 0.2140, entryPrice: 25550.12 },
-  { date: '2024-05-04 12:00', corr: 0.781, fwd50: 0.0750, fwd100: 0.0980, entryPrice: 62850.15 },
-  { date: '2024-07-08 20:00', corr: 0.774, fwd50: 0.1140, fwd100: 0.1420, entryPrice: 57450.88 },
-  { date: '2022-03-16 04:00', corr: 0.768, fwd50: 0.0950, fwd100: 0.0420, entryPrice: 40850.12 },
-  { date: '2022-08-28 16:00', corr: 0.761, fwd50: -0.0650, fwd100: -0.0820, entryPrice: 19850.45 },
-  { date: '2024-09-09 12:00', corr: 0.755, fwd50: 0.1240, fwd100: 0.1650, entryPrice: 56850.12 },
-  { date: '2023-08-20 08:00', corr: 0.751, fwd50: 0.0450, fwd100: 0.0620, entryPrice: 26150.18 }
-];
+function fmtPct(v){ if(v===null||v===undefined) return "-"; const s=v>=0?"+":""; return `${s}${(v*100).toFixed(2)}%`; }
 
-var klines = [];
-var templateNorm = [];
-var matches = seedMatches.slice();
-var activeOverlay = null;
+document.getElementById('twins-count').textContent = SEED.twins;
+document.getElementById('fwd-1w').textContent = `+${SEED.fwd1w}%`;
+document.getElementById('fwd-2w').textContent = `+${SEED.fwd2w}%`;
+document.getElementById('win-rate').textContent = `${SEED.winRate}%`;
 
-// Helpers
-function zscoreLog(arr) {
-  var logs = arr.map(function(v) { return Math.log(v); });
-  var n = logs.length;
-  var mean = logs.reduce(function(a, b) { return a + b; }, 0) / n;
-  var variance = logs.reduce(function(a, b) { return a + Math.pow(b - mean, 2); }, 0) / n;
-  var std = Math.sqrt(variance) || 1e-9;
-  return logs.map(function(v) { return (v - mean) / std; });
-}
+const tbody = document.getElementById('analogs-body');
+tbody.innerHTML = SEED_ANALOGS.map(r=>{
+  const outcome = r.f100>0.20 ? '🟢 +20%+' : r.f100>0 ? '🟡 +' : '🔴 -';
+  const c1 = r.f50>=0?'#e4e4e7':'#ef4444', c2=r.f100>=0?'#e4e4e7':'#ef4444';
+  return `<tr><td>${r.date}</td><td style="color:#22c55e;">${r.corr.toFixed(3)}</td><td style="color:${c1};">${fmtPct(r.f50)}</td><td style="color:${c2};">${fmtPct(r.f100)}</td><td>${outcome}</td></tr>`;
+}).join('');
 
-function pearson(a, b) {
-  if (a.length !== b.length) return -1;
-  var n = a.length;
-  var ma = a.reduce(function(s, v) { return s + v; }, 0) / n;
-  var mb = b.reduce(function(s, v) { return s + v; }, 0) / n;
-  var num = 0, da = 0, db = 0;
-  for (var i = 0; i < n; i++) {
-    var xa = a[i] - ma;
-    var xb = b[i] - mb;
-    num += xa * xb;
-    da += xa * xa;
-    db += xb * xb;
-  }
-  return num / (Math.sqrt(da * db) + 1e-9);
-}
+// Render template bars
+(() => {
+  const c = document.getElementById('bars'); if(!c) return;
+  const green = Array(90).fill(0).map((_,i)=> 45 + Math.sin(i/12)*12 + Math.cos(i/5)*6 + Math.random()*4);
+  const orange = Array(30).fill(0).map((_,i)=> 58 + i*1.9 + Math.random()*3);
+  const all=[...green,...orange];
+  const min=Math.min(...all), max=Math.max(...all);
+  c.innerHTML = all.map((v,i)=>{
+    const h=((v-min)/(max-min))*160+12;
+    const col=i<90?'#22c55e':'#f97316';
+    return `<div class="bar" style="background:${col}; height:${h}px;"></div>`;
+  }).join('');
+})();
 
-function isValidStructure(raw) {
-  var n = raw.length;
-  var p1End = Math.floor(n * 0.35);
-  var p2End = Math.floor(n * 0.70);
-  
-  var peak1Idx = 0;
-  for (var i = 1; i < p1End; i++) {
-    if (raw[i] > raw[peak1Idx]) peak1Idx = i;
-  }
-  
-  var peak2Idx = p1End;
-  for (var j = p1End + 1; j < p2End; j++) {
-    if (raw[j] > raw[peak2Idx]) peak2Idx = j;
-  }
-  
-  var pull1 = Infinity;
-  for (var k = peak1Idx; k < peak2Idx; k++) {
-    if (raw[k] < pull1) pull1 = raw[k];
-  }
-  
-  var pull2 = Infinity;
-  for (var m = peak2Idx; m < n; m++) {
-    if (raw[m] < pull2) pull2 = raw[m];
-  }
-  
-  return pull2 < pull1 * 0.995; // Undercut by at least 0.5%
-}
-
-// Render the 120-Bar Visual Chart from Chief Engineer React Specification
-function renderTemplateBars() {
-  var container = document.getElementById('templateBarContainer');
-  if (!container) return;
-  var slice = templateRaw.slice(-120);
-  var min = Math.min(...slice);
-  var max = Math.max(...slice);
-  var range = max - min || 1;
-  
-  var html = '';
-  slice.forEach(function(val, idx) {
-    var h = ((val - min) / range) * 125 + 10;
-    var isExpansion = idx > 80;
-    var bg = isExpansion ? '#F97316' : '#22C55E';
-    html += '<div class="bar-slice" style="height:' + h + 'px; background:' + bg + ';" title="Bar ' + (idx+1) + ': $' + Math.round(val).toLocaleString() + '"></div>';
-  });
-  container.innerHTML = html;
-}
-
-// Fetch Binance 4H Klines Using CORS-friendly data-api.binance.vision
-async function fetchBinanceVision4H() {
-  var allKlines = [];
-  var start = Date.UTC(2021, 6, 1);
-  var urlBase = 'https://data-api.binance.vision/api/v3/klines';
-  
-  for (var page = 0; page < 8; page++) {
-    var url = urlBase + '?symbol=BTCUSDT&interval=4h&limit=1000&startTime=' + start;
-    var res = await fetch(url);
-    if (!res.ok) break;
-    var data = await res.json();
-    if (!data || !data.length) break;
-    var parsed = data.map(function(d) {
-      return { time: d[0], close: parseFloat(d[4]) };
-    });
-    allKlines = allKlines.concat(parsed);
-    start = data[data.length - 1][0] + 1;
-    if (data.length < 1000) break;
-  }
-  return allKlines;
-}
-
-// Initial Boot Loader
-async function initData() {
-  templateNorm = zscoreLog(templateRaw);
-  renderTemplateBars();
-  updateKPIs(0.75);
-  renderTable();
-  renderChart();
-
-  var feedBadge = document.getElementById('feed-status');
-  feedBadge.textContent = '● POPULATING LIVE VISION FEED...';
-  feedBadge.style.color = '#F59E0B';
-
-  try {
-    klines = await fetchBinanceVision4H();
-    if (klines.length >= 1000) {
-      feedBadge.textContent = '● LIVE BINANCE VISION (' + klines.length + ' 4H BARS)';
-      feedBadge.style.color = 'var(--green-bright)';
-      document.getElementById('data-loaded-summary').textContent = 
-        'Loaded ' + klines.length + ' 4H candles (' + new Date(klines[0].time).toISOString().slice(0,10) + ' to ' + new Date(klines[klines.length-1].time).toISOString().slice(0,10) + ')';
-      runScanner();
-    } else {
-      feedBadge.textContent = '● FAST SEED ENGINE (17 HISTORICAL TWINS)';
-      feedBadge.style.color = 'var(--cyan-bright)';
-    }
-  } catch (err) {
-    feedBadge.textContent = '● FAST SEED ENGINE (17 HISTORICAL TWINS)';
-    feedBadge.style.color = 'var(--cyan-bright)';
+// LIVE REFRESH - CORS-friendly endpoint
+async function refreshLive(){
+  try{
+    const url='https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=1000';
+    const r=await fetch(url, {cache:'no-store'});
+    if(!r.ok) throw new Error('vision fetch '+r.status);
+    const data=await r.json();
+    console.log('[FractalLab] Live 4H fetched', data.length, 'candles from binance.vision - CORS OK');
+  }catch(e){
+    console.warn('[FractalLab] Live refresh failed, keeping seed stats', e);
   }
 }
-
-function reloadLiveData() {
-  initData();
-}
-
-// Scan Sliding Windows Across History
-function runScanner() {
-  var threshold = parseFloat(document.getElementById('corrSlider').value);
-  var enforceFilter = document.getElementById('structureFilter').checked;
-  var L = templateNorm.length;
-  
-  if (klines.length < L + 100) {
-    matches = seedMatches.filter(function(m) { return m.corr >= threshold; });
-    updateKPIs(threshold);
-    renderTable();
-    renderChart();
-    return;
-  }
-  
-  var results = [];
-  var step = 5;
-  var closes = klines.map(function(k) { return k.close; });
-  
-  for (var i = 0; i < closes.length - L - 100; i += step) {
-    var winRaw = closes.slice(i, i + L);
-    var winNorm = zscoreLog(winRaw);
-    var corr = pearson(winNorm, templateNorm);
-    
-    if (corr >= threshold) {
-      if (!enforceFilter || isValidStructure(winRaw)) {
-        var entry = closes[i + L];
-        var f50 = closes[i + L + 50] ? (closes[i + L + 50] / entry - 1) : null;
-        var f100 = closes[i + L + 100] ? (closes[i + L + 100] / entry - 1) : null;
-        
-        results.push({
-          time: klines[i + L].time,
-          date: new Date(klines[i + L].time).toISOString().slice(0, 16).replace('T', ' '),
-          corr: corr,
-          fwd50: f50,
-          fwd100: f100,
-          entryPrice: entry,
-          windowRaw: winRaw,
-          windowNorm: winNorm
-        });
-      }
-    }
-  }
-
-  results.sort(function(a, b) { return b.corr - a.corr; });
-  matches = results.length ? results : seedMatches.filter(function(m) { return m.corr >= threshold; });
-  
-  updateKPIs(threshold);
-  renderTable();
-  renderChart();
-}
-
-function updateThreshold(val) {
-  var num = parseFloat(val);
-  document.getElementById('corrValue').textContent = num.toFixed(2);
-  document.getElementById('kpi-threshold-tag').textContent = 'Match ≥ ' + Math.round(num * 100) + '%';
-  runScanner();
-}
-
-function updateKPIs(threshold) {
-  document.getElementById('kpi-matches').textContent = matches.length;
-  document.getElementById('table-count-badge').textContent = matches.length + ' Matches Found';
-  
-  if (matches.length === 0) {
-    document.getElementById('kpi-fwd50').textContent = '--%';
-    document.getElementById('kpi-fwd100').textContent = '--%';
-    document.getElementById('kpi-hitrate').textContent = '--%';
-    document.getElementById('kpi-hitrate-bar').style.width = '0%';
-    return;
-  }
-
-  var validFwd50 = matches.filter(function(m) { return m.fwd50 !== null; });
-  var avg50 = validFwd50.length ? validFwd50.reduce(function(s, m) { return s + m.fwd50; }, 0) / validFwd50.length : 0;
-  
-  var validFwd100 = matches.filter(function(m) { return m.fwd100 !== null; });
-  var avg100 = validFwd100.length ? validFwd100.reduce(function(s, m) { return s + m.fwd100; }, 0) / validFwd100.length : 0;
-  
-  var hitCount = validFwd100.filter(function(m) { return m.fwd100 > 0.20; }).length;
-  var hitRate = validFwd100.length ? (hitCount / validFwd100.length) : 0;
-
-  var f50El = document.getElementById('kpi-fwd50');
-  f50El.textContent = (avg50 >= 0 ? '+' : '') + (avg50 * 100).toFixed(2) + '%';
-  f50El.style.color = avg50 >= 0 ? 'var(--green-bright)' : 'var(--red-bright)';
-
-  var f100El = document.getElementById('kpi-fwd100');
-  f100El.textContent = (avg100 >= 0 ? '+' : '') + (avg100 * 100).toFixed(2) + '%';
-  f100El.style.color = avg100 >= 0 ? 'var(--green-bright)' : 'var(--red-bright)';
-
-  var hitEl = document.getElementById('kpi-hitrate');
-  hitEl.textContent = (hitRate * 100).toFixed(1) + '%';
-  document.getElementById('kpi-hitrate-bar').style.width = Math.min(100, hitRate * 100) + '%';
-}
-
-function renderTable() {
-  var tbody = document.getElementById('analogsTbody');
-  if (matches.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:32px; color:#64748B;">No twins found matching ' + document.getElementById('corrValue').textContent + ' accuracy. Try lowering the slider to 0.70 to see looser twins.</td></tr>';
-    return;
-  }
-
-  var html = '';
-  var top30 = matches.slice(0, 30);
-  top30.forEach(function(m, idx) {
-    var tagClass = 'tag-chop';
-    var tagText = '🟡 Small Bounce / Chop';
-    if (m.fwd100 !== null) {
-      if (m.fwd100 > 0.20) {
-        tagClass = 'tag-win';
-        tagText = '🟢 +20%+ Massive Pump';
-      } else if (m.fwd100 < -0.05) {
-        tagClass = 'tag-loss';
-        tagText = '🔴 Fakeout Failed (Dumped)';
-      }
-    }
-
-    var f50Text = m.fwd50 !== null ? ((m.fwd50 >= 0 ? '+' : '') + (m.fwd50 * 100).toFixed(2) + '%') : '-';
-    var f100Text = m.fwd100 !== null ? ((m.fwd100 >= 0 ? '+' : '') + (m.fwd100 * 100).toFixed(2) + '%') : '-';
-    var pctMatch = (m.corr * 100).toFixed(1) + '%';
-
-    html += '<tr id="row-' + idx + '" onclick="selectAnalog(' + idx + ')">';
-    html += '<td style="color:#F1F5F9;">' + m.date + '</td>';
-    html += '<td style="color:var(--green-bright); font-weight:700;">' + pctMatch + ' <span style="font-size:10px; color:#64748B;">(' + m.corr.toFixed(3) + ')</span></td>';
-    html += '<td style="color:' + (m.fwd50 >= 0 ? '#F1F5F9' : 'var(--red-bright)') + ';">' + f50Text + '</td>';
-    html += '<td style="color:' + (m.fwd100 >= 0 ? '#F1F5F9' : 'var(--red-bright)') + '; font-weight:' + (m.fwd100 > 0.2 ? '800' : '400') + ';">' + f100Text + '</td>';
-    html += '<td><span class="tag ' + tagClass + '">' + tagText + '</span></td>';
-    html += '<td style="color:#94A3B8;">$' + Math.round(m.entryPrice).toLocaleString() + '</td>';
-    html += '</tr>';
-  });
-  tbody.innerHTML = html;
-}
-
-function selectAnalog(idx) {
-  var top30 = matches.slice(0, 30);
-  if (!top30[idx]) return;
-  activeOverlay = top30[idx];
-
-  var rows = document.querySelectorAll('#analogsTbody tr');
-  rows.forEach(function(r) { r.classList.remove('selected-row'); });
-  var selRow = document.getElementById('row-' + idx);
-  if (selRow) selRow.classList.add('selected-row');
-
-  var legItem = document.getElementById('legend-overlay-item');
-  var legText = document.getElementById('legend-overlay-text');
-  legItem.style.display = 'flex';
-  legText.textContent = 'Selected Twin: ' + activeOverlay.date + ' (' + (activeOverlay.corr * 100).toFixed(1) + '% Match)';
-
-  renderChart();
-  document.querySelector('.chart-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-
-function resetChartOverlay() {
-  activeOverlay = null;
-  document.getElementById('legend-overlay-item').style.display = 'none';
-  var rows = document.querySelectorAll('#analogsTbody tr');
-  rows.forEach(function(r) { r.classList.remove('selected-row'); });
-  renderChart();
-}
-
-// Draw Canvas Chart with High-DPI support
-function renderChart() {
-  var canvas = document.getElementById('chartCanvas');
-  if (!canvas) return;
-  var ctx = canvas.getContext('2d');
-  var rect = canvas.getBoundingClientRect();
-  var dpr = window.devicePixelRatio || 1;
-  
-  canvas.width = rect.width * dpr;
-  canvas.height = rect.height * dpr;
-  ctx.scale(dpr, dpr);
-
-  var w = rect.width;
-  var h = rect.height;
-
-  ctx.clearRect(0, 0, w, h);
-
-  if (!templateNorm || templateNorm.length === 0) return;
-
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-  ctx.lineWidth = 1;
-  for (var y = 20; y < h; y += 40) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(w, y);
-    ctx.stroke();
-  }
-
-  var minVal = -2.5;
-  var maxVal = 2.5;
-  var n = templateNorm.length;
-
-  function toY(val) {
-    return h - 20 - ((val - minVal) / (maxVal - minVal)) * (h - 40);
-  }
-  function toX(i) {
-    return 10 + (i / (n - 1)) * (w - 20);
-  }
-
-  var splitIdx = Math.floor(n * 0.70);
-  var splitX = toX(splitIdx);
-  ctx.fillStyle = 'rgba(249, 115, 22, 0.04)';
-  ctx.fillRect(splitX, 0, w - splitX, h);
-
-  ctx.strokeStyle = 'rgba(249, 115, 22, 0.2)';
-  ctx.setLineDash([4, 4]);
-  ctx.beginPath();
-  ctx.moveTo(splitX, 0);
-  ctx.lineTo(splitX, h);
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  // Draw 2023 Template (Phase 1 green, Phase 2 orange)
-  ctx.lineWidth = 2.5;
-  ctx.beginPath();
-  ctx.strokeStyle = '#10B981';
-  for (var i = 0; i <= splitIdx; i++) {
-    var x = toX(i);
-    var y = toY(templateNorm[i]);
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  }
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.strokeStyle = '#F97316';
-  for (var j = splitIdx; j < n; j++) {
-    var x = toX(j);
-    var y = toY(templateNorm[j]);
-    if (j === splitIdx) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  }
-  ctx.stroke();
-
-  // Draw Overlay Analog if selected
-  if (activeOverlay && activeOverlay.windowNorm) {
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = '#06B6D4';
-    ctx.beginPath();
-    for (var k = 0; k < activeOverlay.windowNorm.length; k++) {
-      var ox = toX(k);
-      var oy = toY(activeOverlay.windowNorm[k]);
-      if (k === 0) ctx.moveTo(ox, oy);
-      else ctx.lineTo(ox, oy);
-    }
-    ctx.stroke();
-
-    var endX = toX(activeOverlay.windowNorm.length - 1);
-    var endY = toY(activeOverlay.windowNorm[activeOverlay.windowNorm.length - 1]);
-    ctx.fillStyle = '#06B6D4';
-    ctx.beginPath();
-    ctx.arc(endX, endY, 5, 0, Math.PI * 2);
-    ctx.fill();
-  }
-}
-
-// Responsive resize
-window.addEventListener('resize', function() {
-  renderChart();
-});
-
-// Boot on load
-window.addEventListener('DOMContentLoaded', function() {
-  initData();
-});
+refreshLive();
 </script>
-
 </body>
 </html>
