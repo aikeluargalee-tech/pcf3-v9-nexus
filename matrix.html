@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>PCF3 Order Flow — Exact Metric Facts Matrix (Configurations A to J)</title>
+<style>
+  :root {
+    --bg-main: #0B0E14;
+    --card-bg: #121824;
+    --border-color: #1F293D;
+    --text-primary: #F0F4F8;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    
+    --green-bright: #10B981;
+    --green-glow: rgba(16, 185, 129, 0.15);
+    
+    --amber-bright: #F59E0B;
+    --amber-glow: rgba(245, 158, 11, 0.15);
+    
+    --cyan-bright: #06B6D4;
+    --cyan-glow: rgba(6, 182, 212, 0.15);
+    
+    --red-bright: #EF4444;
+    --red-glow: rgba(239, 68, 68, 0.15);
+    
+    --purple-bright: #A855F7;
+    --purple-glow: rgba(168, 85, 247, 0.15);
+    
+    --blue-bright: #3B82F6;
+    --blue-glow: rgba(59, 130, 246, 0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 24px;
+    line-height: 1.5;
+  }
+
+  .nav-bar {
+    max-width: 1800px;
+    margin: 0 auto 24px auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 20px;
+    background: #10172a;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    color: #E2E8F0;
+  }
+
+  .nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #1e293b;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s ease-in-out;
+  }
+  .nav-btn:hover {
+    background: #334155;
+    border-color: #475569;
+    color: #FFFFFF;
+    transform: translateY(-1px);
+  }
+  .nav-btn.primary {
+    background: #8b5cf6;
+    border-color: #7c3aed;
+    color: #ffffff;
+  }
+  .nav-btn.primary:hover {
+    background: #7c3aed;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .header h1 {
+    font-size: 24px;
+    letter-spacing: 0.5px;
+    font-weight: 800;
+    color: #FFFFFF;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .header p {
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+
+  .table-container {
+    max-width: 1800px;
+    margin: 0 auto;
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card-bg);
+    font-size: 13px;
+    text-align: left;
+  }
+
+  th {
+    background: #172033;
+    padding: 14px 16px;
+    color: #CBD5E1;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.75px;
+    border-bottom: 2px solid var(--border-color);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: top;
+  }
+
+  tr:hover {
+    background-color: rgba(255, 255, 255, 0.02);
+  }
+
+  .config-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  .badge-green { background: var(--green-glow); color: var(--green-bright); border: 1px solid rgba(16, 185, 129, 0.3); }
+  .badge-amber { background: var(--amber-glow); color: var(--amber-bright); border: 1px solid rgba(245, 158, 11, 0.3); }
+  .badge-cyan { background: var(--cyan-glow); color: var(--cyan-bright); border: 1px solid rgba(6, 182, 212, 0.3); }
+  .badge-red { background: var(--red-glow); color: var(--red-bright); border: 1px solid rgba(239, 68, 68, 0.3); }
+  .badge-purple { background: var(--purple-glow); color: var(--purple-bright); border: 1px solid rgba(168, 85, 247, 0.3); }
+  .badge-blue { background: var(--blue-glow); color: var(--blue-bright); border: 1px solid rgba(59, 130, 246, 0.3); }
+
+  .metric-list {
+    list-style: none;
+  }
+  .metric-list li {
+    margin-bottom: 4px;
+    color: #E2E8F0;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 12px;
+  }
+  .metric-list li:last-child { margin-bottom: 0; }
+
+  .arrow-up { color: var(--green-bright); font-weight: bold; }
+  .arrow-down { color: var(--red-bright); font-weight: bold; }
+  .highlight-param { color: #38BDF8; font-weight: 600; }
+
+  .diagnosis-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: #FFFFFF;
+    margin-bottom: 2px;
+  }
+  .diagnosis-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .action-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 11px;
+    margin-bottom: 6px;
+  }
+
+  .protocol-details {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+  .protocol-details strong { color: #F1F5F9; }
+
+  footer {
+    max-width: 1800px;
+    margin: 30px auto 0 auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 900px) {
+    body { padding: 12px; }
+    th, td { padding: 10px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-bar">
+  <div class="nav-brand">
+    <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#10B981;"></span>
+    <span>PCF3 BTC ORDER FLOW ENGINE</span>
+  </div>
+  <div style="display:flex; gap:10px;">
+    <a href="index.html" class="nav-btn primary">← Back to Live Dashboard</a>
+    <a href="PCF3_LIVE_PACKET_DEFAULT.txt" target="_blank" rel="noopener" class="nav-btn">Open RAW Packet ↗</a>
+  </div>
+</div>
+
+<div class="header">
+  <h1>Bitcoin Order Flow: Exact Metric Facts Matrix</h1>
+  <p>Quantitative Microstructure Diagnostic &amp; Execution Protocols (Configurations A through J)</p>
+</div>
+
+<div class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 110px;">Config</th>
+        <th style="width: 340px;">IF YOU OBSERVE (EXACT METRIC FACTS)</th>
+        <th style="width: 220px;">THEN IT MEANS (MARKET DIAGNOSIS)</th>
+        <th>ACTIONABLE PROTOCOL (SIZING &amp; STOPS)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Config A -->
+      <tr>
+        <td><span class="config-badge badge-green">Config A</span></td>
+        <td>
+          <ul class="metric-list">
+            <li><span class="arrow-up">↑</span> Price rising above Daily &amp; Weekly VWAP</li>
+            <li><span class="arrow-up">↑</span> Spot volume &gt; <span class="highlight-param">1.35x</span> 20D MA</li>
+            <li><span class="arrow-up">↑</span> Spot CVD positive (<span class="highlight-param">Ratio ≥ 1.25</span>)</li>
+            <li><span class="arrow-up">↑</span> ETF flows &gt; <span class="highlight-param">+$150M</span> net daily</li>
+            <li><span class="arrow-up">↑</span> OI moderate (<span class="highlight-param">-1% to +4%</span> 24h)</li>
+            <li><span class="arrow-up">↑</span> Funding controlled (<span class="highlight-param">+0.002% to +0.010%</span>)</li>
+            <li>• Perp CVD positive but not dominant</li>
+            <li>• VWAP accepted on multiple 4H candles</li>
+          </ul>
+        </td>
+        <td>
+          <div class="diagnosis-title">Healthy Bull</div>
+          <div class="diagnosis-sub">Genuine Spot-Led Expansion</div>
+        </td>
+        <td>
+          <span class="action-badge badge-green">Full Spot Long (1.0x)</span>
+          <div class="protocol-details">
+            • <strong>Sizing:</strong> 1.0x (S<sub>f</sub> = 0.85–1.0x) | Max Cap: 50% equity<br>
+            • <strong>Entry:</strong> 60% breakout confirmation / 40% VWAP retest<br>
+            • <strong>Stop:</strong> 4H swing low <span class="highlight-param">-0.6%</span>
+          </div>
+        </td>
+      </tr>
+
+      <!-- Config B -->
+      <tr>
+        <td><span class="config-badge badge-amber">Config B</span></td>
+        <td>
+          <ul class="metric-list">
+            <li><span class="arrow-up">↑</span> Price rising rapid / vertical (&gt; <span class="highlight-param">2.5x ATR</span>)</li>
+            <li><span class="arrow-down">↓</span> Spot CVD flat or declining</li>
+            <li><span class="arrow-up">↑</span> Perp CVD aggressively pointing upward</li>
+            <li><span class="arrow-up">↑↑</span> OI surging (&gt; <span class="highlight-param">+7%</span> 24h / &gt; <span class="highlight-param">+15%</span> 3D)</li>
+            <li><span class="arrow-up">↑</span> Funding elevated (≥ <span class="highlight-param">+0.025%</span> / &gt;27% ann.)</li>
+            <li><span class="arrow-up">↑</span> Futures basis &gt; <span class="highlight-param">14%</span> annualized</li>
+            <li>• Spot volume lagging behind derivatives</li>
+          </ul>
+        </td>
+        <td>
+          <div class="diagnosis-title">Leveraged Bull</div>
+          <div class="diagnosis-sub">Fragile Overextension / Trap</div>
+        </td>
+        <td>
+          <span class="action-badge badge-amber">Trim / Stand Aside (0.0x)</span>
+          <div class="protocol-details">
+            • <strong>Sizing:</strong> 0.0x (Strictly zero new buying)<br>
+            • <strong>Harvest:</strong> Sell 33% profit directly into perp pump<br>
+            • <strong>Stop:</strong> Trail tight stop on 67% at 4H swing low
+          </div>
+        </td>
+      </tr>
+
+      <!-- Config C -->
+      <tr>
+        <td><span class="config-badge badge-cyan">Config C</span></td>
+        <td>
+          <ul class="metric-list">
+            <li>• Macro red / negative headline news</li>
+            <li>• Price testing major range low / 200D MA</li>
+            <li><span class="arrow-up">↑↑</span> Spot CVD surging (&gt; <span class="highlight-param">+2.0σ</span> div)</li>
+            <li><span class="arrow-down">↓</span> Perp CVD printing lower lows</li>
+            <li>• OI flat or dropping (no leverage chase)</li>
+            <li>• Funding neutral/negative (<span class="highlight-param">-0.008% to +0.002%</span>)</li>
+            <li>• Bids/Asks depth ratio ≥ <span class="highlight-param">1.40</span> at support</li>
+          </ul>
+        </td>
+        <td>
+          <div class="diagnosis-title">Bullish Absorption</div>
+          <div class="diagnosis-sub">Institutional Base Defense</div>
+        </td>
+        <td>
+          <span class="action-badge badge-cyan">Build Spot (0.75x)</span>
+          <div class="protocol-details">
+            • <strong>Sizing:</strong> 0.75x (S<sub>f</sub> = 0.70–0.90x)<br>
+            • <strong>Entry:</strong> 50% on 1H range reclaim / 50% limit at low<br>
+            • <strong>Stop:</strong> Sweep wick low <span class="highlight-param">-0.5%</span>
+          </div>
+        </td>
+      </tr>
+
+      <!-- Config D -->
+      <tr>
+        <td><span class="config-badge badge-red">Config D</span></td>
+        <td>
+          <ul class="metric-list">
+            <li><span class="arrow-up">↑</span> Price creeping higher or churning at top</li>
+            <li><span class="arrow-down">↓↓</span> Spot CVD strongly negative / falling</li>
+            <li><span class="arrow-up">↑↑</span> Whale Inflows &gt; <span class="highlight-param">0.85</span> / &gt;1k BTC lots</li>
+            <li><span class="arrow-up">↑</span> Perp CVD sustaining price float</li>
+            <li><span class="arrow-up">↑</span> OI expanding with funding positive (&gt;<span class="highlight-param">+0.015%</span>)</li>
+            <li><span class="arrow-down">↓</span> Daily VWAP tested &amp; breaking below</li>
+          </ul>
+        </td>
+        <td>
+          <div class="diagnosis-title">Masked Fragility</div>
+          <div class="diagnosis-sub">Stealth Distribution Top</div>
+        </td>
+        <td>
+          <span class="action-badge badge-red">Defensive Cash (100%)</span>
+          <div class="protocol-details">
+            • <strong>Sizing:</strong> 0.0x (Cash: <strong>75%–100% USDT</strong>)<br>
+            • <strong>Exit:</strong> Market sell 50% on 1H close below VWAP<br>
+            • <strong>Stop:</strong> Hard trailing stop on 50% at 24h low
+          </div>
+        </td>
+      </tr>
+
+      <!-- Config E -->
+      <tr>
+        <td><span class="config-badge badge-red">Config E</span></td>
+        <td>
+          <ul class="metric-list">
+            <li><span class="arrow-down">↓↓</span> Price drops &gt; <span class="highlight-param">4%–8%</span> within ≤ 1h</li>
+            <li><span class="arrow-up">↑↑</span> Long liqs &gt; <span class="highlight-param">$100M–$250M+</span> per hour</li>
+            <li><span class="arrow-down">↓↓</span> OI crashing ≤ <span class="highlight-param">-5%</span> 1h / ≤ <span class="highlight-param">-10%</span> 4h</li>
+            <li><span class="arrow-down">↓↓</span> Funding plunges into deeply negative</li>
+            <li>• Basis collapsing into backwardation</li>
+            <li>• Order book slippage on spot bids</li>
+          </ul>
+        </td>
+        <td>
+          <div class="diagnosis-title">Liquidation Cascade</div>
+          <div class="diagnosis-sub">Forced Waterfall Deleveraging</div>
+        </td>
+        <td>
+          <span class="action-badge badge-red">Wait for Phase 3 (0.0x)</span>
+          <div class="protocol-details">
+            • <strong>Sizing:</strong> 0.0x during waterfall (Do NOT catch knife)<br>
+            • <strong>Trigger:</strong> 5m liqs &lt; $2M, OI flat, 15m hammer wick<br>
+            • <strong>Deployment:</strong> 0.50x size ladder (30% / 40% / 30%)
+          </div>
+        </td>
+      </tr>
+
+      <!-- Config F -->
+      <tr>
+        <td><span class="config-badge badge-blue">Config F</span></td>
+        <td>
+          <ul class="metric-list">
+            <li>• ATR compresses &gt; <span class="highlight-param">40%</span> from cascade peak</li>
+            <li>• Tight base range &lt; <span class="highlight-param">2.5%</span> width over 24–72h</li>
+            <li>• OI flat (<span class="highlight-param">-1.5% to +2.0%</span> 24h baseline)</li>
+            <li>• Funding reset near zero (<span class="highlight-param">0.000% to +0.004%</span>)</li>
+            <li><span class="arrow-up">↑</span> Spot CVD stabilizing green / flat</li>
+            <li>• Whale exchange inflows dry up</li>
+          </ul>
+        </td>
+        <td>
+          <div class="diagnosis-title">Re-Accumulation</div>
+          <div class="diagnosis-sub">Post-Cascade Clean Base</div>
+        </td>
+        <td>
+          <span class="action-badge badge-blue">Re-Accumulate (0.75x)</span>
+          <div class="protocol-details">
+            • <strong>Sizing:</strong> 0.75x (S<sub>f</sub> = 0.75–0.90x)<br>
+            • <strong>Entry:</strong> 50% on 4H close above Base POC / 50% limit<br>
+            • <strong>Stop:</strong> Base consolidation floor <span class="highlight-param">-0.5%</span>
+          </div>
+        </td>
+      </tr>
+
+      <!-- Config G -->
+      <tr>
+        <td><span class="config-badge badge-purple">Config G</span></td>
+        <td>
+          <ul class="metric-list">
+            <li><span class="arrow-up">↑</span> Explosive price pump through resistance</li>
+            <li><span class="arrow-down">↓</span> Funding was deeply negative (≤ <span class="highlight-param">-0.015% to -0.05%</span>)</li>
+            <li><span class="arrow-down">↓↓</span> OI collapsing as price rises (≤ <span class="highlight-param">-3%</span> 1h)</li>
+            <li><span class="arrow-up">↑↑</span> Short liquidations &gt; <span class="highlight-param">$50M</span> in 2h</li>
+            <li><span class="arrow-up">↑</span> Perp CVD surging (forced short covering)</li>
+            <li>• Spot CVD lagging or completely absent</li>
+          </ul>
+        </td>
+        <td>
+          <div class="diagnosis-title">Short Squeeze</div>
+          <div class="diagnosis-sub">Mechanical Liquidation Run</div>
+        </td>
+        <td>
+          <span class="action-badge badge-purple">Harvest Gains (0.0x)</span>
+          <div class="protocol-details">
+            • <strong>Sizing:</strong> 0.0x (Never buy at squeeze peak)<br>
+            • <strong>Harvest:</strong> Scale out 50% spot profit into pump<br>
+            • <strong>Stop:</strong> Pre-squeeze 1H low <span class="highlight-param">-0.4%</span>
+          </div>
+        </td>
+      </tr>
+
+      <!-- Config H -->
+      <tr>
+        <td><span class="config-badge badge-red">Config H</span></td>
+        <td>
+          <ul class="metric-list">
+            <li>• Marginal new high or double top with upper wicks</li>
+            <li><span class="arrow-down">↓</span> Bearish Spot CVD divergence (Price HH, CVD LH)</li>
+            <li><span class="arrow-up">↑↑</span> Whale Inflow CDD multi-month high (&gt;1k BTC)</li>
+            <li><span class="arrow-up">↑</span> Funding elevated (&gt; <span class="highlight-param">+0.020%</span>)</li>
+            <li>• Basis contango abnormally wide</li>
+            <li><span class="arrow-down">↓</span> VWAP rejected on 4H close</li>
+          </ul>
+        </td>
+        <td>
+          <div class="diagnosis-title">Distribution Top</div>
+          <div class="diagnosis-sub">Topping Exhaustion Failure</div>
+        </td>
+        <td>
+          <span class="action-badge badge-red">Defensive Cash (100%)</span>
+          <div class="protocol-details">
+            • <strong>Sizing:</strong> 0.0x (Cash: <strong>85%–100% USDT</strong>)<br>
+            • <strong>Harvest:</strong> Market sell 70% spot on 4H rejection<br>
+            • <strong>Stop:</strong> Move stop to BE on remaining 30%
+          </div>
+        </td>
+      </tr>
+
+      <!-- Config I -->
+      <tr>
+        <td><span class="config-badge badge-red">Config I</span></td>
+        <td>
+          <ul class="metric-list">
+            <li><span class="arrow-down">↓</span> Price below 20D EMA, 50D EMA, &amp; Daily VWAP</li>
+            <li><span class="arrow-down">↓↓</span> Spot CVD persistent downward slope (7D, 14D)</li>
+            <li>• Spot volume light on bounces, heavy on breaks</li>
+            <li>• Funding neutral/positive (trapped longs paying)</li>
+            <li>• OI persistent without clearing overhang</li>
+            <li>• Basis compressed below <span class="highlight-param">3%</span> annualized</li>
+          </ul>
+        </td>
+        <td>
+          <div class="diagnosis-title">Bear Trend</div>
+          <div class="diagnosis-sub">Bearish Trend Continuation</div>
+        </td>
+        <td>
+          <span class="action-badge badge-red">Strict Cash (100%)</span>
+          <div class="protocol-details">
+            • <strong>Sizing:</strong> 0.0x (Target: <strong>100% USDT Cash</strong>)<br>
+            • <strong>Protocol:</strong> Treat every relief bounce as exit liquidity<br>
+            • <strong>Inval:</strong> 1D close &gt; 50D EMA with positive Spot CVD
+          </div>
+        </td>
+      </tr>
+
+      <!-- Config J -->
+      <tr>
+        <td><span class="config-badge badge-green">Config J</span></td>
+        <td>
+          <ul class="metric-list">
+            <li>• Breakdown below multi-month support on panic news</li>
+            <li><span class="arrow-down">↓↓</span> Funding deeply negative (≤ <span class="highlight-param">-0.020% to -0.060%</span>)</li>
+            <li><span class="arrow-up">↑↑</span> OI surging into lows (shorts crowding)</li>
+            <li><span class="arrow-up">↑</span> Spot CVD flat or rising (refusing to drop)</li>
+            <li>• Selling volume dries up at breakdown wick</li>
+            <li><span class="arrow-up">↑</span> Price sweeps lows &amp; VWAP/Support reclaimed</li>
+          </ul>
+        </td>
+        <td>
+          <div class="diagnosis-title">Bear Trap</div>
+          <div class="diagnosis-sub">Capitulation Absorption</div>
+        </td>
+        <td>
+          <span class="action-badge badge-green">Reclaim Buy (1.0x)</span>
+          <div class="protocol-details">
+            • <strong>Sizing:</strong> 0.90x–1.0x (Maximum +EV setup)<br>
+            • <strong>Trigger:</strong> 4H close decisively back above broken support<br>
+            • <strong>Stop:</strong> Capitulation wick low <span class="highlight-param">-0.6%</span>
+          </div>
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+</div>
+
+<footer>
+  <p>PCF3 Production Ready System • Analysis Only — Heuristic Assistant — Not Financial Advice</p>
+</footer>
+
+</body>
+</html>
