@@ -2173,11 +2173,30 @@
     }
   }
 
+  function initPortfolioInputs() {
+    try {
+      var savedQty = localStorage.getItem('pcf3_btc_qty');
+      var savedEntry = localStorage.getItem('pcf3_avg_entry');
+      var savedCash = localStorage.getItem('pcf3_usdt_cash');
+      if (savedQty !== null && document.getElementById('input-btc-qty')) document.getElementById('input-btc-qty').value = savedQty;
+      if (savedEntry !== null && document.getElementById('input-avg-entry')) document.getElementById('input-avg-entry').value = savedEntry;
+      if (savedCash !== null && document.getElementById('input-usdt-avail')) document.getElementById('input-usdt-avail').value = savedCash;
+    } catch(e) {}
+  }
+
   function recalculatePortfolioReconciliation() {
     var qtyEl = document.getElementById('input-btc-qty');
     var entryEl = document.getElementById('input-avg-entry');
     var usdtEl = document.getElementById('input-usdt-avail');
     var spotEl = document.getElementById('live-metric-spotPrice');
+
+    if (qtyEl && entryEl && usdtEl) {
+      try {
+        localStorage.setItem('pcf3_btc_qty', qtyEl.value);
+        localStorage.setItem('pcf3_avg_entry', entryEl.value);
+        localStorage.setItem('pcf3_usdt_cash', usdtEl.value);
+      } catch(e) {}
+    }
 
     var qty = qtyEl ? (parseFloat(qtyEl.value) || 0) : 0.50;
     var entry = entryEl ? (parseFloat(entryEl.value) || 0) : 86200;
@@ -2277,7 +2296,10 @@
   }
 
   // Run on page load
-  window.addEventListener('DOMContentLoaded', fetchLivePacketAndDiagnose);
+  window.addEventListener('DOMContentLoaded', function() {
+    initPortfolioInputs();
+    fetchLivePacketAndDiagnose();
+  });
 </script>
 
 </body>
