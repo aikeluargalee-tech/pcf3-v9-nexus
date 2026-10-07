@@ -766,12 +766,12 @@
               Arms the re-entry rungs.
             </td>
             <td>
-              <div><span class="telemetry-val-hl">Peak Close: $89,500.00</span></div>
-              <div style="font-size:11px; color:#38BDF8;">Drawdown: <strong id="tactical-drawdown-val">-3.52%</strong></div>
+              <div><span class="telemetry-val-hl">Peak Close: $86,530.00</span></div>
+              <div style="font-size:11px; color:#38BDF8;">Drawdown: <strong id="tactical-drawdown-val">-3.36%</strong></div>
             </td>
             <td>
-              <span class="telemetry-status-pill amber">⏳ RUNG 1 STANDBY</span>
-              <div style="font-size:10px; color:#94A3B8; margin-top:2px;">Rung 1 (-5.0% @ $85,025) near</div>
+              <span id="tactical-rung-status-pill" class="telemetry-status-pill amber">⏳ RUNG 1 STANDBY</span>
+              <div id="tactical-rung-status-note" style="font-size:10px; color:#94A3B8; margin-top:2px;">Rung 1 (-5.0% @ $82,204) near</div>
             </td>
           </tr>
 
@@ -1283,9 +1283,9 @@
               <div class="telemetry-name">Drawdown from Peak Rally Weekly Close</div>
               <div class="telemetry-sub">📐 Market Structure • Peak close drawdown tracker to arm systematic re-entry rungs</div>
             </td>
-            <td><span id="live-metric-drawdownPeak" class="telemetry-val-hl">-3.52%</span> <span class="telemetry-dim">(Peak Close: $89,500.00)</span></td>
-            <td><span class="telemetry-cond">Drawdown &lt; -5.0% Arms Dip Rung 1 ($85,025)</span></td>
-            <td><span class="telemetry-status-pill cyan">🎯 RUNG 1 NEAR (-5.0%)</span></td>
+            <td><span id="live-metric-drawdownPeak" class="telemetry-val-hl">-3.36%</span> <span class="telemetry-dim">(Peak Close: $86,530.00)</span></td>
+            <td><span class="telemetry-cond">Drawdown &lt; -5.0% Arms Dip Rung 1 ($82,204)</span></td>
+            <td><span id="telemetry-rung-status-pill" class="telemetry-status-pill cyan">🎯 RUNG 1 STANDBY (-5.0%)</span></td>
           </tr>
 
           <!-- Profile & Moving Averages (Renumbered 33 to 38) -->
@@ -2086,15 +2086,75 @@
     var elFg = document.getElementById('live-metric-fearGreed');
     if (elFg) elFg.textContent = fearGreed + ' / 100';
 
-    // 14. Drawdown from Peak Rally Close (Row 32 in Telemetry & Row 3 in Tactical)
-    var peakWeeklyClose = 89500.00;
+    // 14. Drawdown from Confirmed Peak Rally Weekly Close ($86,530.00 on Binance)
+    var peakWeeklyClose = 86530.00;
     var drawdownPeak = ((spot - peakWeeklyClose) / peakWeeklyClose * 100);
+    var rung1Price = peakWeeklyClose * 0.95; // $82,203.50
+    var rung2Price = peakWeeklyClose * 0.90; // $77,877.00
+    var rung3Price = peakWeeklyClose * 0.85; // $73,550.50
+
     var elDdPeak = document.getElementById('live-metric-drawdownPeak');
     if (elDdPeak) elDdPeak.textContent = (drawdownPeak >= 0 ? '+' : '') + drawdownPeak.toFixed(2) + '%';
     var elTacticalDd = document.getElementById('tactical-drawdown-val');
     if (elTacticalDd) elTacticalDd.textContent = (drawdownPeak >= 0 ? '+' : '') + drawdownPeak.toFixed(2) + '%';
     var elTacticalSpot = document.getElementById('tactical-spot-price');
     if (elTacticalSpot) elTacticalSpot.textContent = '$' + spot.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    // Dynamic Rung Status & Note updates (no hardcoded desynchronization)
+    var elTacticalStatusPill = document.getElementById('tactical-rung-status-pill');
+    var elTacticalStatusNote = document.getElementById('tactical-rung-status-note');
+    var elTelemetryStatusPill = document.getElementById('telemetry-rung-status-pill');
+
+    if (drawdownPeak > -5.0) {
+      var distToRung1 = spot - rung1Price;
+      if (elTacticalStatusPill) {
+        elTacticalStatusPill.className = 'telemetry-status-pill amber';
+        elTacticalStatusPill.textContent = '⏳ RUNG 1 STANDBY';
+      }
+      if (elTacticalStatusNote) {
+        elTacticalStatusNote.textContent = 'Rung 1 (-5.0% @ $' + rung1Price.toLocaleString(undefined, {maximumFractionDigits:0}) + ') is $' + Math.max(0, distToRung1).toFixed(0) + ' away';
+      }
+      if (elTelemetryStatusPill) {
+        elTelemetryStatusPill.className = 'telemetry-status-pill cyan';
+        elTelemetryStatusPill.textContent = '🎯 RUNG 1 STANDBY (-5.0%)';
+      }
+    } else if (drawdownPeak > -10.0) {
+      if (elTacticalStatusPill) {
+        elTacticalStatusPill.className = 'telemetry-status-pill green';
+        elTacticalStatusPill.textContent = '🟢 RUNG 1 ARMED / EXECUTED';
+      }
+      if (elTacticalStatusNote) {
+        elTacticalStatusNote.textContent = 'Sleeve 1 active; Rung 2 (-10.0% @ $' + rung2Price.toLocaleString(undefined, {maximumFractionDigits:0}) + ') standby';
+      }
+      if (elTelemetryStatusPill) {
+        elTelemetryStatusPill.className = 'telemetry-status-pill green';
+        elTelemetryStatusPill.textContent = '🟢 RUNG 1 ARMED';
+      }
+    } else if (drawdownPeak > -15.0) {
+      if (elTacticalStatusPill) {
+        elTacticalStatusPill.className = 'telemetry-status-pill green';
+        elTacticalStatusPill.textContent = '🟢 RUNG 2 ARMED (DEEP DIP)';
+      }
+      if (elTacticalStatusNote) {
+        elTacticalStatusNote.textContent = 'Sleeve 2 active; Rung 3 (-15.0% @ $' + rung3Price.toLocaleString(undefined, {maximumFractionDigits:0}) + ') standby';
+      }
+      if (elTelemetryStatusPill) {
+        elTelemetryStatusPill.className = 'telemetry-status-pill green';
+        elTelemetryStatusPill.textContent = '🟢 RUNG 2 ARMED';
+      }
+    } else {
+      if (elTacticalStatusPill) {
+        elTacticalStatusPill.className = 'telemetry-status-pill red';
+        elTacticalStatusPill.textContent = '🚨 RUNG 3 DEEP VALUE ACTIVE';
+      }
+      if (elTacticalStatusNote) {
+        elTacticalStatusNote.textContent = 'Deep value zone reached; check trend failure rule';
+      }
+      if (elTelemetryStatusPill) {
+        elTelemetryStatusPill.className = 'telemetry-status-pill red';
+        elTelemetryStatusPill.textContent = '🚨 RUNG 3 ACTIVE';
+      }
+    }
 
     // 15. Portfolio Reconciliation Cockpit
     recalculatePortfolioReconciliation();
