@@ -861,12 +861,12 @@
               Useful supporting evidence for breakouts and reclaims, but not a standalone signal.
             </td>
             <td>
-              <div><span class="telemetry-val-hl">24h Spot: 14,010.08 BTC</span></div>
-              <div style="font-size:11px; color:#94A3B8;">Baseline: &gt;10,000 BTC | Spot CVD: +0.59 BTC</div>
+              <div><span class="telemetry-val-hl">24h Spot: <span id="tactical-spot-vol">14,010.08 BTC</span></span></div>
+              <div style="font-size:11px; color:#94A3B8;">Baseline: &gt;10,000 BTC | Spot CVD: <span id="tactical-spot-cvd">+0.59 BTC</span></div>
             </td>
             <td>
-              <span class="telemetry-status-pill green">🟢 RECLAIM CONFIRMED</span>
-              <div style="font-size:10px; color:#94A3B8; margin-top:2px;">Volume supports absorption</div>
+              <span id="tactical-vol-status-pill" class="telemetry-status-pill green">🟢 RECLAIM CONFIRMED</span>
+              <div id="tactical-vol-status-note" style="font-size:10px; color:#94A3B8; margin-top:2px;">Volume supports absorption</div>
             </td>
           </tr>
 
@@ -1998,15 +1998,40 @@
       var packetTxt = await packetRes.text();
       
       var liveSpot = null;
+      var liveSpotVol = null;
+      var liveSpotQuoteVol = null;
+      var liveCvd = null;
       try {
-        var spotRes = await fetch('https://data-api.binance.vision/api/v3/ticker/price?symbol=BTCUSDT');
-        var spotJson = await spotRes.json();
-        liveSpot = parseFloat(spotJson.price);
-      } catch(e) {}
+        var tickerRes = await fetch('https://data-api.binance.vision/api/v3/ticker/24hr?symbol=BTCUSDT');
+        var tickerJson = await tickerRes.json();
+        liveSpot = parseFloat(tickerJson.lastPrice);
+        liveSpotVol = parseFloat(tickerJson.volume);
+        liveSpotQuoteVol = parseFloat(tickerJson.quoteVolume);
+      } catch(e) {
+        try {
+          var spotRes = await fetch('https://data-api.binance.vision/api/v3/ticker/price?symbol=BTCUSDT');
+          var spotJson = await spotRes.json();
+          liveSpot = parseFloat(spotJson.price);
+        } catch(e2) {}
+      }
+
+      try {
+        var aggRes = await fetch('https://data-api.binance.vision/api/v3/aggTrades?symbol=BTCUSDT&limit=1000');
+        var aggTrades = await aggRes.json();
+        if (Array.isArray(aggTrades) && aggTrades.length > 0) {
+          var bVol = 0, sVol = 0;
+          for (var i = 0; i < aggTrades.length; i++) {
+            var q = parseFloat(aggTrades[i].q) || 0;
+            if (aggTrades[i].m) sVol += q;
+            else bVol += q;
+          }
+          liveCvd = bVol - sVol;
+        }
+      } catch(e3) {}
 
       var diag = evaluateActiveConfig(packetTxt, liveSpot);
       renderRadarUI(diag, new Date().toLocaleTimeString());
-      updateTelemetryLiveValues(packetTxt, liveSpot);
+      updateTelemetryLiveValues(packetTxt, liveSpot, liveSpotVol, liveSpotQuoteVol, liveCvd);
     } catch(err) {
       console.warn('Packet fetch failed', err);
     } finally {
@@ -2014,14 +2039,14 @@
     }
   }
 
-  function updateTelemetryLiveValues(packetTxt, liveSpot) {
+  function updateTelemetryLiveValues(packetTxt, liveSpot, liveSpotVol, liveSpotQuoteVol, liveCvd) {
     var txt = packetTxt || '';
     var spot = (typeof liveSpot === 'number' && liveSpot > 1000) ? liveSpot : (parseVal(txt, 'SPOT:') || 86350.01);
     var vwap = parseVal(txt, 'Daily_VWAP:') || 86203.06;
     var funding = parseVal(txt, 'Funding_Binance:') || 0.0017;
     var oiCurrent = parseVal(txt, 'OI_current:') || 97176.24;
     var oiChg = parseVal(txt, 'OI_CHANGE_%:') || 0.345;
-    var cvdCurrent = parseVal(txt, 'CVD_current:') || 0.59;
+    var cvdCurrent = (typeof liveCvd === 'number') ? liveCvd : (parseVal(txt, 'CVD_current:') || 0.59);
     var cvdSlope = parseVal(txt, 'CVD_slope:') || 0.01;
     var sthCost = parseVal(txt, 'STH_COST_BASIS:') || 73019.37;
     var atr4h = parseVal(txt, 'ATR_4H:') || 714.52;
@@ -2059,15 +2084,52 @@
     var elOiChg = document.getElementById('live-metric-oiChange');
     if (elOiChg) elOiChg.textContent = (oiChg >= 0 ? '+' : '') + oiChg.toFixed(3) + '%';
 
-    // 8. CVD Current (Row 1)
+    // 8. CVD Current (Row 1) & Tactical Row 8
     var elCvd = document.getElementById('live-metric-cvdCurrent');
     if (elCvd) elCvd.textContent = (cvdCurrent >= 0 ? '+' : '') + cvdCurrent.toFixed(2) + ' BTC';
+    var elTacCvd = document.getElementById('tactical-spot-cvd');
+    if (elTacCvd) elTacCvd.textContent = (cvdCurrent >= 0 ? '+' : '') + cvdCurrent.toFixed(2) + ' BTC';
+
+    // 8b. Spot Volume 24h (Row 7) and Tactical Row 8
+    var spotVol = (typeof liveSpotVol === 'number' && liveSpotVol > 0) ? liveSpotVol : (parseVal(txt, 'Spot_volume_24h:') || 14010.08);
+    var spotQuoteVol = (typeof liveSpotQuoteVol === 'number' && liveSpotQuoteVol > 0) ? liveSpotQuoteVol : (spotVol * spot);
+    var elSpotVol = document.getElementById('live-metric-spotVol24h');
+    if (elSpotVol) {
+      elSpotVol.textContent = spotVol.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' BTC';
+      if (elSpotVol.nextElementSibling) {
+        var volBillion = (spotQuoteVol / 1e9).toFixed(2);
+        elSpotVol.nextElementSibling.textContent = '(~$' + volBillion + 'B USD)';
+      }
+    }
+    var elTacVol = document.getElementById('tactical-spot-vol');
+    if (elTacVol) {
+      elTacVol.textContent = spotVol.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' BTC';
+    }
+    var elTacVolPill = document.getElementById('tactical-vol-status-pill');
+    var elTacVolNote = document.getElementById('tactical-vol-status-note');
+    if (spotVol >= 10000) {
+      if (elTacVolPill) {
+        elTacVolPill.className = 'telemetry-status-pill green';
+        elTacVolPill.textContent = '🟢 RECLAIM CONFIRMED';
+      }
+      if (elTacVolNote) {
+        elTacVolNote.textContent = 'Volume (' + spotVol.toLocaleString(undefined, {maximumFractionDigits:0}) + ' BTC) > 10,000 baseline';
+      }
+    } else {
+      if (elTacVolPill) {
+        elTacVolPill.className = 'telemetry-status-pill amber';
+        elTacVolPill.textContent = '⚠️ THIN VOLUME';
+      }
+      if (elTacVolNote) {
+        elTacVolNote.textContent = 'Volume (' + spotVol.toLocaleString(undefined, {maximumFractionDigits:0}) + ' BTC) below baseline';
+      }
+    }
 
     // 9. CVD Slope (Row 2)
     var elSlope = document.getElementById('live-metric-cvdSlope');
     if (elSlope) elSlope.textContent = (cvdSlope >= 0 ? '+' : '') + cvdSlope.toFixed(3);
 
-    // 10. Distance vs STH Cost Basis % (Row 39)
+    // 10. Distance vs STH Cost Basis % (Row 44)
     var elSthDist = document.getElementById('live-metric-sthDistPct');
     if (elSthDist) {
       var distSth = ((spot - sthCost) / sthCost * 100);
