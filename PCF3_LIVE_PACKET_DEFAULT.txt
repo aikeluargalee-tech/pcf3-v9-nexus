@@ -868,13 +868,15 @@ Mode: Pure Quantitative Telemetry (No Advice / No Interpretations / No Confluenc
 - Confirmed Higher-Low Floor Verification: $74,967.97 > $57,800.19 -> TRUE (+$17,167.78 / +29.70%) | VERIFIED INTACT (Trend-Failure line: Weekly Close < $74,967.97)
 - 10-Week EMA: $77,785.35 | 2026-10-04T23:59:59Z | 10W Exponential Moving Average | CALCULATED
 - 20-Week EMA: $74,993.90 | 2026-10-04T23:59:59Z | 20W Exponential Moving Average | CALCULATED
+- 20-Week SMA: $71,286.65 | 2026-10-04T23:59:59Z | 20W Simple Moving Average | CALCULATED
 - Daily 20-Day EMA: $83,483.19 | 2026-10-06T23:59:59Z | 20D Exponential Moving Average | CALCULATED
 - Daily ATR(14): $2143.37 (2.57% of spot) | 2026-10-06T23:59:59Z | Wilder 14-period True Range | CALCULATED
 - Latest 24h Spot Volume: 19960.34 BTC | 2026-10-07T13:22:45Z | Binance 24hr Ticker | LIVE OBSERVED
 - 20-Day Avg Daily Spot Volume: 16312.95 BTC | 2026-10-06T23:59:59Z | 20-day mean of daily spot volume | CALCULATED
 
 2. DRAWDOWN REFERENCE & RE-ENTRY RUNGS (USER-CONFIGURED BASELINE BASIS)
-- Plan Baseline Start Date: 2026-08-03T00:00:00Z [User-Configurable Cycle Bottom Anchor]
+- Active Plan Baseline Start Date: 2026-08-03T00:00:00Z [User Configurable Setting]
+  * Baseline Notice: Set by user (default: 2026-08-03). This is a customizable starting boundary for the lookback window, NOT an objectively established "cycle bottom". Changing this baseline alters the lookback window, which recalculates the reproducible rally peak weekly close and all derived re-entry rung prices.
 - Completed Weekly Candles in Plan Scope: 9 weeks
 - Reproducible Rally Peak Weekly Close: $86,530.00 (Candle Closed: 2026-10-04T23:59:59Z)
 - Latest Completed Weekly Close: $86,530.00 (Candle Closed: 2026-10-04T23:59:59Z)
@@ -887,7 +889,30 @@ Mode: Pure Quantitative Telemetry (No Advice / No Interpretations / No Confluenc
   * -55% Rung: $38,938.50 | Status on Completed Weekly Close: UNREACHED | Distance from Live Spot: +114.13%
   * -65% Rung: $30,285.50 | Status on Completed Weekly Close: UNREACHED | Distance from Live Spot: +175.31%
 
-3. DAILY REVERSAL CONFIRMATION INPUTS (RAW OBSERVED)
+3. TREND-DEFENSE & STRUCTURAL INVALIDATION HIERARCHY (3 DISTINCT TIERS)
+*Rule: The three defensive levels are evaluated separately with their respective close rules:
+
+- Tier 1: Tactical Trend-Defense Trigger (Active Swing Sleeve Exit)
+  * Metric / Anchor: 10-Week EMA ($77,785.35) & Nearer Higher-Low Floors
+  * Evaluation Rule: Completed weekly close below 10-Week EMA (or confirmed breakdown of tactical support)
+  * Operational Role: De-risking and tactical stop execution for active swing positions. Does not require broad macro regime failure.
+  * Current Evaluation: DEFENDED / SAFE (Latest weekly close $86,530.00 is +11.24% above 10W EMA; Spot $83,380.01 is +7.19% above).
+
+- Tier 2: Intermediate Swing-Structure Invalidation (Pivot Higher-Low Floor)
+  * Latest Confirmed Weekly Pivot Low: $74,967.97 (Week Open: 2026-09-14T00:00:00Z; 2-bar pivot low)
+  * Prior Confirmed Weekly Pivot Low: $57,800.19 (Week Open: 2026-06-29T00:00:00Z; 2-bar pivot low)
+  * Higher-Low Proof: $74,967.97 > $57,800.19 -> TRUE (+$17,167.78 / +29.70%)
+  * Evaluation Rule: Completed weekly close below $74,967.97
+  * Operational Role: Invalidates the intermediate bull swing structure (market structure break from higher-low sequence). Distinct from tactical 10W EMA exit.
+  * Current Evaluation: CONFIRMED HIGHER-LOW FLOOR INTACT (Spot $83,380.01 defends +11.22% above $74,967.97).
+
+- Tier 3: Macro Bull Anchor & Regime Failure (Institutional Sleeve 3 Floor)
+  * Primary Metrics / Anchors: 20-Week EMA ($74,993.90) | 20-Week SMA ($71,286.65) | Cycle Base Floor ($57,800.19)
+  * Evaluation Rule: Completed weekly close below 20-Week EMA / 20-Week SMA
+  * Operational Role: Defines institutional macro bull regime health and serves as confirmation for final conservative re-entry sleeve (Sleeve 3). A break here signals macro regime failure / bear market transition.
+  * Current Evaluation: MACRO BULL REGIME INTACT (Latest weekly close $86,530.00 is +15.38% above 20W EMA, +21.38% above 20W SMA; Spot is +11.18% above 20W EMA, +16.96% above 20W SMA).
+
+4. DAILY REVERSAL CONFIRMATION INPUTS (RAW OBSERVED)
 - Benchmark Prior 5 Days (Days T-5 to T-1, Strictly Excluding Day T):
   * Day T-5 (2026-10-01): High $85,273.65 | Low $83,186.00 | Close $84,880.05
   * Day T-4 (2026-10-02): High $87,220.00 | Low $83,888.00 | Close $84,518.01
@@ -903,7 +928,7 @@ Mode: Pure Quantitative Telemetry (No Advice / No Interpretations / No Confluenc
   * Current Live Spot Level: $83,380.01 (BROKEN INTRADAY)
   * Plan Invalidation Note: Under daily-close rules, higher-low status is provisional until 23:59:59 UTC; under intraday rules, floor is breached.
 
-4. POTENTIAL SELL-ZONE REFERENCES & FIBONACCI PROJECTIONS
+5. POTENTIAL SELL-ZONE REFERENCES & FIBONACCI PROJECTIONS
 - Weekly Supply Zone [PROVISIONAL]: $87,395.67 – $92,000.00
   * Status: PROVISIONAL (Lower boundary derived from unconfirmed candidate pivot)
   * Lower Boundary ($87,395.67): Objectively derived from upper wick high of candidate weekly pivot (Candle 2026-09-21T00:00:00Z to 2026-09-27T23:59:59Z)
@@ -917,7 +942,7 @@ Mode: Pure Quantitative Telemetry (No Advice / No Interpretations / No Confluenc
   * Projections Status: PROVISIONAL (Pending 2nd right bar completion on 2026-10-11):
     - 1.272: $98,371.03 | 1.414: $100,135.77 | 1.618: $102,671.02 | 2.000: $107,418.40 | 2.272: $110,798.73 | 2.618: $115,098.62
 
-5. OPTIONAL CONTEXT (INDIVIDUALLY TIMESTAMPED & STATUSED)
+6. OPTIONAL CONTEXT (INDIVIDUALLY TIMESTAMPED & STATUSED)
 - Spot CVD Imbalance: -9.08 BTC (Sample: 1,000 trades, 120s window, 13.73 BTC vol) | 2026-10-07T13:22:45Z | Binance Spot | LIVE OBSERVED (Short-Window Flow Only)
 - Binance Perpetual Open Interest: 97,270.81 BTC | 2026-10-07T13:22:45Z | Binance USDT-M Futures API | LIVE OBSERVED
 - Binance Perpetual Funding Rate: -0.0009% per 8h | 2026-10-07T13:22:45Z | Binance Futures premiumIndex | LIVE OBSERVED

@@ -78,6 +78,15 @@ function calcEMA(candles, period) {
   return ema;
 }
 
+function calcSMA(candles, period) {
+  if (!candles || candles.length < period) return null;
+  var sum = 0;
+  for (var i = candles.length - period; i < candles.length; i++) {
+    sum += candles[i].close;
+  }
+  return sum / period;
+}
+
 function calcWilderATR14(candles) {
   if (!candles || candles.length < 15) return null;
   var trs = [];
@@ -241,9 +250,10 @@ async function copyData2ForManus() {
     var hlDiff = (latestConfirmedPivotL && priorConfirmedPivotL) ? (latestConfirmedPivotL.low - priorConfirmedPivotL.low) : 0;
     var hlDiffPct = (latestConfirmedPivotL && priorConfirmedPivotL) ? ((hlDiff / priorConfirmedPivotL.low) * 100).toFixed(2) : 'N/A';
 
-    // 6. Trend Measures (EMAs)
+    // 6. Trend Measures (EMAs & SMAs)
     var ema10w = calcEMA(completedWeekly, 10);
     var ema20w = calcEMA(completedWeekly, 20);
+    var sma20w = calcSMA(completedWeekly, 20);
     var ema20d = calcEMA(completedDaily, 20);
 
     // 7. Volatility & Participation
@@ -359,6 +369,7 @@ async function copyData2ForManus() {
     out.push('| **Weekly Confirmed Higher-Low Floor** | ' + (latestConfirmedPivotL ? fmtPrice(latestConfirmedPivotL.low) + ' (Week: ' + fmtDate(latestConfirmedPivotL.openTime).split('T')[0] + ')' : 'MISSING') + ' vs Prior: ' + (priorConfirmedPivotL ? fmtPrice(priorConfirmedPivotL.low) + ' (Week: ' + fmtDate(priorConfirmedPivotL.openTime).split('T')[0] + ')' : 'MISSING') + ' | Confirmed on 1w close | ' + (isConfirmedHigherLow ? 'Higher Low (+' + hlDiffPct + '%)' : 'Lower Low') + ' | CONFIRMED HIGHER-LOW FLOOR |');
     out.push('| **10-Week EMA** | ' + (ema10w ? fmtPrice(ema10w) : 'MISSING') + ' | ' + fmtDate(latestCompWeekly.closeTime) + ' | 10W Exponential Moving Average | CALCULATED |');
     out.push('| **20-Week EMA** | ' + (ema20w ? fmtPrice(ema20w) : 'MISSING') + ' | ' + fmtDate(latestCompWeekly.closeTime) + ' | 20W Exponential Moving Average | CALCULATED |');
+    out.push('| **20-Week SMA** | ' + (sma20w ? fmtPrice(sma20w) : 'MISSING') + ' | ' + fmtDate(latestCompWeekly.closeTime) + ' | 20W Simple Moving Average | CALCULATED |');
     out.push('| **Daily 20-Day EMA** | ' + (ema20d ? fmtPrice(ema20d) : 'MISSING') + ' | ' + fmtDate(latestCompDaily.closeTime) + ' | 20D Exponential Moving Average | CALCULATED |');
     out.push('| **Daily ATR(14)** | ' + (dailyATR14 ? '$' + dailyATR14.toFixed(2) + ' (' + (atrPct ? atrPct.toFixed(2) + '%' : 'N/A') + ' of spot)' : 'MISSING') + ' | ' + fmtDate(latestCompDaily.closeTime) + ' | Wilder 14-period True Range | CALCULATED |');
     out.push('| **Latest 24h Spot Volume** | ' + (spotVol24h ? spotVol24h.toFixed(2) + ' BTC' : 'MISSING') + ' | ' + genTimeUTC + ' | Binance 24hr Ticker | LIVE OBSERVED |');
@@ -367,7 +378,8 @@ async function copyData2ForManus() {
     out.push('---');
     out.push('### 2. DRAWDOWN REFERENCE & RE-ENTRY RUNGS (USER-CONFIGURED BASELINE)');
     out.push('*Rule: Official drawdown trigger is measured strictly from completed weekly closes since the user-configured plan baseline date. Live spot intra-week drawdown is reported separately for situational context.*\n');
-    out.push('- **Plan Baseline Start Date:** ' + PLAN_START_DATE + ' [User Configurable: Current Setting]');
+    out.push('- **Active Plan Baseline Start Date:** ' + PLAN_START_DATE + ' [User Configurable Setting]');
+    out.push('  - *Baseline Notice:* Set by user (default: 2026-08-03). This is a customizable starting boundary for the lookback window, NOT an objectively established "cycle bottom". Changing this baseline alters the lookback window, which recalculates the reproducible rally peak weekly close and all derived re-entry rung prices.');
     out.push('- **Completed Weekly Candles in Plan Scope:** ' + planWeeklyCandles.length + ' weeks');
     out.push('- **Reproducible Rally Peak Weekly Close:** ' + fmtPrice(rallyPeakClose) + ' (Candle Open: ' + fmtDate(rallyPeakCandle.openTime) + ', Closed: ' + fmtDate(rallyPeakCandle.closeTime) + ')');
     out.push('- **Latest Completed Weekly Close:** ' + fmtPrice(latestCompWeekly.close) + ' (Candle Closed: ' + fmtDate(latestCompWeekly.closeTime) + ')');
@@ -385,17 +397,40 @@ async function copyData2ForManus() {
     out.push('*Macro 52-Week Cycle Peak Reference: ' + fmtPrice(cyclePeakClose) + ' (Closed ' + fmtDate(cyclePeakCandle.closeTime) + '). 52W Completed Close Drawdown: ' + (cycleDdCompleted * 100).toFixed(2) + '%, Live Spot Drawdown: ' + (cycleDdLive !== null ? (cycleDdLive * 100).toFixed(2) + '%' : 'N/A') + '.*\n');
 
     out.push('---');
-    out.push('### 3. WEEKLY MARKET STRUCTURE & HIGHER-LOW FLOOR VERIFICATION');
-    out.push('*Rule: The tactical trend-failure rule requires a confirmed weekly higher-low floor. Below is the explicit verification comparing the two most recent confirmed 2-bar pivot lows:*\n');
+    out.push('### 3. TREND-DEFENSE & STRUCTURAL INVALIDATION HIERARCHY (3 DISTINCT TIERS)');
+    out.push('*Rule: To prevent conflating tactical stops, swing structure, and macro regime, the three defensive levels are evaluated separately with their respective close rules:*\n');
+
+    // Tier 1: Tactical Trend-Defense Trigger
+    out.push('#### Tier 1: Tactical Trend-Defense Trigger (Active Swing Sleeve Exit)');
+    out.push('- **Primary Metric / Anchor:** 10-Week EMA (' + (ema10w ? fmtPrice(ema10w) : 'MISSING') + ') & Nearer Higher-Low Floors');
+    out.push('- **Evaluation Rule:** Completed weekly close below 10-Week EMA (or confirmed breakdown of immediate tactical support).');
+    out.push('- **Operational Role:** De-risking and tactical stop execution for active swing positions. Does not require broad macro regime failure.');
+    var t1Safe = ema10w && (latestCompWeekly.close >= ema10w);
+    var t1Dist = ema10w ? (((spotPrice - ema10w) / ema10w) * 100).toFixed(2) : 'N/A';
+    out.push('- **Current Evaluation:** ' + (t1Safe ? 'DEFENDED / SAFE' : 'TRIGGERED / AT RISK') + ' (Latest completed weekly close ' + fmtPrice(latestCompWeekly.close) + ' is ' + (t1Safe ? '+' : '') + (((latestCompWeekly.close - ema10w)/ema10w)*100).toFixed(2) + '% vs 10W EMA; Live spot is ' + (parseFloat(t1Dist) >= 0 ? '+' : '') + t1Dist + '%).\n');
+
+    // Tier 2: Intermediate Swing-Structure Invalidation
+    out.push('#### Tier 2: Intermediate Swing-Structure Invalidation (Pivot Higher-Low Floor)');
     if (latestConfirmedPivotL && priorConfirmedPivotL) {
-      out.push('- **Latest Confirmed Pivot Low Floor:** ' + fmtPrice(latestConfirmedPivotL.low) + ' (Week Open: ' + fmtDate(latestConfirmedPivotL.openTime) + ', Closed: ' + fmtDate(latestConfirmedPivotL.closeTime) + ')');
-      out.push('- **Prior Confirmed Pivot Low Floor:** ' + fmtPrice(priorConfirmedPivotL.low) + ' (Week Open: ' + fmtDate(priorConfirmedPivotL.openTime) + ', Closed: ' + fmtDate(priorConfirmedPivotL.closeTime) + ')');
-      out.push('- **Higher-Low Comparison:** ' + fmtPrice(latestConfirmedPivotL.low) + ' > ' + fmtPrice(priorConfirmedPivotL.low) + ' -> ' + (isConfirmedHigherLow ? 'TRUE' : 'FALSE') + ' (Difference: +' + fmtPrice(hlDiff) + ' / +' + hlDiffPct + '%)');
-      out.push('- **Structural Status:** ' + (isConfirmedHigherLow ? 'CONFIRMED HIGHER-LOW FLOOR INTACT' : 'HIGHER-LOW BROKEN'));
-      out.push('- **Macro Trend-Failure Line:** Completed weekly close below ' + fmtPrice(latestConfirmedPivotL.low) + ' is required to invalidate the macro bull structure.\n');
+      out.push('- **Latest Confirmed Weekly Pivot Low:** ' + fmtPrice(latestConfirmedPivotL.low) + ' (Week Open: ' + fmtDate(latestConfirmedPivotL.openTime) + ', Closed: ' + fmtDate(latestConfirmedPivotL.closeTime) + '; 2-bar pivot low)');
+      out.push('- **Prior Confirmed Weekly Pivot Low:** ' + fmtPrice(priorConfirmedPivotL.low) + ' (Week Open: ' + fmtDate(priorConfirmedPivotL.openTime) + ', Closed: ' + fmtDate(priorConfirmedPivotL.closeTime) + '; 2-bar pivot low)');
+      out.push('- **Higher-Low Proof:** ' + fmtPrice(latestConfirmedPivotL.low) + ' > ' + fmtPrice(priorConfirmedPivotL.low) + ' -> ' + (isConfirmedHigherLow ? 'TRUE' : 'FALSE') + ' (Difference: +' + fmtPrice(hlDiff) + ' / +' + hlDiffPct + '%)');
+      out.push('- **Evaluation Rule:** Completed weekly close below ' + fmtPrice(latestConfirmedPivotL.low) + '.');
+      out.push('- **Operational Role:** Invalidates the intermediate bull swing structure (market structure break from higher-low sequence). Distinct from tactical 10W EMA exit.');
+      var t2Dist = (((spotPrice - latestConfirmedPivotL.low) / latestConfirmedPivotL.low) * 100).toFixed(2);
+      out.push('- **Current Evaluation:** ' + (isConfirmedHigherLow ? 'CONFIRMED HIGHER-LOW FLOOR INTACT' : 'HIGHER-LOW BROKEN') + ' (Live spot defends +' + t2Dist + '% above ' + fmtPrice(latestConfirmedPivotL.low) + ').\n');
     } else {
-      out.push('- **Structural Status:** INSUFFICIENT CONFIRMED PIVOTS IN LOOKBACK\n');
+      out.push('- **Current Evaluation:** INSUFFICIENT CONFIRMED PIVOTS IN LOOKBACK\n');
     }
+
+    // Tier 3: Macro Bull Anchor & Regime Failure
+    out.push('#### Tier 3: Macro Bull Anchor & Regime Failure (Institutional Sleeve 3 Floor)');
+    out.push('- **Primary Metrics / Anchors:** 20-Week EMA (' + (ema20w ? fmtPrice(ema20w) : 'MISSING') + ') | 20-Week SMA (' + (sma20w ? fmtPrice(sma20w) : 'MISSING') + ') | Cycle Base Floor (' + (priorConfirmedPivotL ? fmtPrice(priorConfirmedPivotL.low) : '$57,800.19') + ')');
+    out.push('- **Evaluation Rule:** Completed weekly close below 20-Week EMA / 20-Week SMA.');
+    out.push('- **Operational Role:** Defines institutional macro bull regime health and serves as confirmation for final conservative re-entry sleeve (Sleeve 3). A break here signals macro regime failure / bear market transition.');
+    var t3Safe = ema20w && (latestCompWeekly.close >= ema20w);
+    var t3Dist = ema20w ? (((spotPrice - ema20w) / ema20w) * 100).toFixed(2) : 'N/A';
+    out.push('- **Current Evaluation:** ' + (t3Safe ? 'MACRO BULL REGIME INTACT' : 'MACRO REGIME THREATENED') + ' (Latest completed weekly close ' + fmtPrice(latestCompWeekly.close) + ' is +' + (((latestCompWeekly.close - ema20w)/ema20w)*100).toFixed(2) + '% vs 20W EMA; Live spot is ' + (parseFloat(t3Dist) >= 0 ? '+' : '') + t3Dist + '%).\n');
 
     out.push('---');
     out.push('### 4. DAILY REVERSAL CONFIRMATION INPUTS (RAW OBSERVED)');
