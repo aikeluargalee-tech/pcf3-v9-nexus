@@ -205,6 +205,79 @@
   }
   .radar-next strong { color: #F1F5F9; }
 
+  /* Tactical Execution Section */
+  .tactical-execution-section {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .tactical-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .tactical-heading {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #F1F5F9;
+    text-transform: uppercase;
+  }
+  .tactical-subheading {
+    font-size: 11px;
+    color: #94A3B8;
+    margin-top: 2px;
+  }
+  .tactical-table-wrapper {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(11, 17, 32, 0.7);
+  }
+  .tactical-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    text-align: left;
+  }
+  .tactical-table th {
+    background: #0F172A;
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    white-space: nowrap;
+  }
+  .tactical-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    vertical-align: middle;
+  }
+  .tactical-table tr:hover {
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .tactical-input {
+    background: #0F172A;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+  .tactical-input:focus {
+    border-color: var(--green-bright);
+    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.3);
+  }
+
   /* Telemetry Section Styles inside Radar Card */
   .radar-telemetry-section {
     margin-top: 20px;
@@ -613,24 +686,249 @@
     </div>
   </div>
 
-  <!-- 📊 ASSOCIATED INDICATORS & LIVE METRIC PROOF (COMPLETE 50-INDICATOR TELEMETRY) -->
+  <!-- 🎯 TACTICAL EXECUTION & RE-ENTRY SLEEVE MATRIX (THE 9 OPERATIONAL METRICS) -->
+  <div id="radar-tactical-section" class="tactical-execution-section">
+    <div class="tactical-header">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <span style="font-size:20px;">🎯</span>
+        <div>
+          <div class="tactical-heading">
+            TACTICAL EXECUTION &amp; RE-ENTRY SLEEVE MATRIX (THE 9 OPERATIONAL METRICS)
+          </div>
+          <div class="tactical-subheading">
+            Quantitative rules governing planned sell orders, re-entry rungs, tactical trend-failure stops, and portfolio reconciliation.
+          </div>
+        </div>
+      </div>
+      
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <span class="telemetry-badge green">● ALL 9 EXECUTION RULES ACTIVE</span>
+        <button id="btn-toggle-tactical" class="telemetry-btn" onclick="toggleTacticalView()">▼ Minimize Tactical Matrix</button>
+      </div>
+    </div>
+
+    <div id="tactical-table-wrapper" class="tactical-table-wrapper">
+      <table class="tactical-table">
+        <thead>
+          <tr>
+            <th style="width: 250px;">OPERATIONAL METRIC</th>
+            <th style="width: 330px;">ROLE IN THE PLAN</th>
+            <th style="width: 260px;">LIVE OBSERVED VALUE</th>
+            <th style="width: 220px;">TACTICAL STATUS &amp; THRESHOLD</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- 1. Weekly close and confirmed weekly swing highs/lows -->
+          <tr>
+            <td>
+              <div style="font-weight:700; color:#F8FAFC;">Weekly close &amp; confirmed weekly swing highs/lows</div>
+              <div style="font-size:10px; color:#94A3B8;">Macro Market Structure Anchor</div>
+            </td>
+            <td style="color:#CBD5E1;">
+              Defines the market structure and the key higher-low used in the trend-failure rule.
+            </td>
+            <td>
+              <div><span class="telemetry-val-hl">Spot: <span id="tactical-spot-price">$86,350.01</span></span></div>
+              <div style="font-size:11px; color:#94A3B8;">Swing High: <strong>$86,490</strong> | Key HL Floor: <strong>$79,500</strong></div>
+            </td>
+            <td>
+              <span class="telemetry-status-pill green">🟢 STRUCTURE INTACT</span>
+              <div style="font-size:10px; color:#94A3B8; margin-top:2px;">Safely above $79.5k floor</div>
+            </td>
+          </tr>
+
+          <!-- 2. Pre-mapped weekly supply, prior highs and optional Fibonacci zones -->
+          <tr>
+            <td>
+              <div style="font-weight:700; color:#F8FAFC;">Pre-mapped weekly supply, prior highs and optional Fibonacci zones</div>
+              <div style="font-size:10px; color:#94A3B8;">Planned Sell Order Target Map</div>
+            </td>
+            <td style="color:#CBD5E1;">
+              Provides areas for planned sell orders—not predictions of reversals.
+            </td>
+            <td>
+              <div><span class="telemetry-val-hl">4H High: $86,490</span></div>
+              <div style="font-size:11px; color:#94A3B8;">Supply: <strong>$88.5k–$92k</strong> | Fib 0.618: <strong>$74,800</strong></div>
+            </td>
+            <td>
+              <span class="telemetry-status-pill cyan">🎯 TAKE-PROFIT LADDER</span>
+              <div style="font-size:10px; color:#94A3B8; margin-top:2px;">Rung 1 armed at $88.5k–$89.5k</div>
+            </td>
+          </tr>
+
+          <!-- 3. Highest weekly close since the rally peak and current drawdown from it -->
+          <tr>
+            <td>
+              <div style="font-weight:700; color:#F8FAFC;">Highest weekly close since the rally peak and current drawdown from it</div>
+              <div style="font-size:10px; color:#94A3B8;">Dip-Buying Trigger Architecture</div>
+            </td>
+            <td style="color:#CBD5E1;">
+              Arms the re-entry rungs.
+            </td>
+            <td>
+              <div><span class="telemetry-val-hl">Peak Close: $89,500.00</span></div>
+              <div style="font-size:11px; color:#38BDF8;">Drawdown: <strong id="tactical-drawdown-val">-3.52%</strong></div>
+            </td>
+            <td>
+              <span class="telemetry-status-pill amber">⏳ RUNG 1 STANDBY</span>
+              <div style="font-size:10px; color:#94A3B8; margin-top:2px;">Rung 1 (-5.0% @ $85,025) near</div>
+            </td>
+          </tr>
+
+          <!-- 4. 10-week EMA -->
+          <tr>
+            <td>
+              <div style="font-weight:700; color:#F8FAFC;">10-week EMA</div>
+              <div style="font-size:10px; color:#94A3B8;">Tactical Trend-Failure Line</div>
+            </td>
+            <td style="color:#CBD5E1;">
+              Used with the weekly higher-low for the tactical trend-failure rule.
+            </td>
+            <td>
+              <div><span class="telemetry-val-hl">10W EMA: $78,450.00</span></div>
+              <div style="font-size:11px; color:#34D399;">Spot is <strong>+10.07%</strong> above 10W EMA</div>
+            </td>
+            <td>
+              <span class="telemetry-status-pill green">🟢 TREND DEFENSE SAFE</span>
+              <div style="font-size:10px; color:#94A3B8; margin-top:2px;">Close &lt; $78.4k required to fail</div>
+            </td>
+          </tr>
+
+          <!-- 5. 20-week EMA -->
+          <tr>
+            <td>
+              <div style="font-weight:700; color:#F8FAFC;">20-week EMA</div>
+              <div style="font-size:10px; color:#94A3B8;">Conservative Sleeve Anchor</div>
+            </td>
+            <td style="color:#CBD5E1;">
+              One possible confirmation for the final, more conservative re-entry sleeve.
+            </td>
+            <td>
+              <div><span class="telemetry-val-hl">20W EMA: $76,001.00</span></div>
+              <div style="font-size:11px; color:#94A3B8;">20W SMA: $71,286.65 (Spot +13.6% above)</div>
+            </td>
+            <td>
+              <span class="telemetry-status-pill green">🟢 MACRO BULL ANCHOR</span>
+              <div style="font-size:10px; color:#94A3B8; margin-top:2px;">Sleeve 3 institutional floor</div>
+            </td>
+          </tr>
+
+          <!-- 6. Daily higher-low and reclaim confirmation -->
+          <tr>
+            <td>
+              <div style="font-weight:700; color:#F8FAFC;">Daily higher-low and reclaim confirmation</div>
+              <div style="font-size:10px; color:#94A3B8;">Execution Authorization Gate</div>
+            </td>
+            <td style="color:#CBD5E1;">
+              Helps decide whether an armed re-entry sleeve is authorized.
+            </td>
+            <td>
+              <div><span class="telemetry-val-hl">Daily Low: $85,812.00 (Defended)</span></div>
+              <div style="font-size:11px; color:#34D399;">Daily VWAP: $86,203.06 (Reclaimed +0.17%)</div>
+            </td>
+            <td>
+              <span class="telemetry-status-pill green">🟢 RE-ENTRY AUTHORIZED</span>
+              <div style="font-size:10px; color:#94A3B8; margin-top:2px;">VWAP fair value reclaimed</div>
+            </td>
+          </tr>
+
+          <!-- 7. Daily ATR(14) -->
+          <tr>
+            <td>
+              <div style="font-weight:700; color:#F8FAFC;">Daily ATR(14)</div>
+              <div style="font-size:10px; color:#94A3B8;">Dynamic Stop &amp; Sizing Scaler</div>
+            </td>
+            <td style="color:#CBD5E1;">
+              Helps scale order spacing to recent volatility; it does not indicate direction.
+            </td>
+            <td>
+              <div><span class="telemetry-val-hl">Daily ATR: $2,152.16 (2.492%)</span></div>
+              <div style="font-size:11px; color:#94A3B8;">50D Avg ATR: $2,230.84 | ATR Ratio: 0.965</div>
+            </td>
+            <td>
+              <span class="telemetry-status-pill cyan">📏 SPACING: $3,228–$4,304</span>
+              <div style="font-size:10px; color:#94A3B8; margin-top:2px;">1.5x–2.0x ATR buffer below entry</div>
+            </td>
+          </tr>
+
+          <!-- 8. Spot volume versus its recent baseline -->
+          <tr>
+            <td>
+              <div style="font-weight:700; color:#F8FAFC;">Spot volume versus its recent baseline</div>
+              <div style="font-size:10px; color:#94A3B8;">Breakout / Reclaim Validator</div>
+            </td>
+            <td style="color:#CBD5E1;">
+              Useful supporting evidence for breakouts and reclaims, but not a standalone signal.
+            </td>
+            <td>
+              <div><span class="telemetry-val-hl">24h Spot: 14,010.08 BTC</span></div>
+              <div style="font-size:11px; color:#94A3B8;">Baseline: &gt;10,000 BTC | Spot CVD: +0.59 BTC</div>
+            </td>
+            <td>
+              <span class="telemetry-status-pill green">🟢 RECLAIM CONFIRMED</span>
+              <div style="font-size:10px; color:#94A3B8; margin-top:2px;">Volume supports absorption</div>
+            </td>
+          </tr>
+
+          <!-- 9. BTC quantity, order fills and available USDT -->
+          <tr>
+            <td>
+              <div style="font-weight:700; color:#F8FAFC;">BTC quantity, order fills and available USDT</div>
+              <div style="font-size:10px; color:#38BDF8;">⚡ Interactive Portfolio &amp; Reconciliation Cockpit</div>
+            </td>
+            <td style="color:#CBD5E1;">
+              Keeps the actual position and remaining orders reconciled. These are operational inputs, not market indicators.
+            </td>
+            <td colspan="2">
+              <div style="background:rgba(0,0,0,0.5); padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+                <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span style="color:#94A3B8; font-size:11px; font-weight:700;">BTC Qty:</span>
+                    <input type="number" id="input-btc-qty" class="tactical-input" value="0.50" step="0.05" min="0" oninput="recalculatePortfolioReconciliation()" style="width:70px; color:#38BDF8;">
+                  </div>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span style="color:#94A3B8; font-size:11px; font-weight:700;">Avg Fill ($):</span>
+                    <input type="number" id="input-avg-entry" class="tactical-input" value="86200" step="100" min="0" oninput="recalculatePortfolioReconciliation()" style="width:85px; color:#34D399;">
+                  </div>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span style="color:#94A3B8; font-size:11px; font-weight:700;">USDT Cash:</span>
+                    <input type="number" id="input-usdt-avail" class="tactical-input" value="25000" step="500" min="0" oninput="recalculatePortfolioReconciliation()" style="width:85px; color:#FBBF24;">
+                  </div>
+                </div>
+
+                <div style="display:flex; flex-wrap:wrap; gap:14px; margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.06); font-size:11px; font-family:ui-monospace, monospace;">
+                  <div><span style="color:#64748B;">Position Value:</span> <strong id="recon-pos-val" style="color:#F8FAFC;">$43,175.00</strong></div>
+                  <div><span style="color:#64748B;">Total Portfolio:</span> <strong id="recon-equity" style="color:#38BDF8;">$68,175.00</strong></div>
+                  <div><span style="color:#64748B;">Allocation:</span> <strong id="recon-alloc" style="color:#34D399;">63.3% Spot / 36.7% Cash</strong></div>
+                  <div><span style="color:#64748B;">1.5x ATR Stop:</span> <strong id="recon-stop" style="color:#F87171;">$83,121.77</strong></div>
+                  <div><span style="color:#64748B;">Max Account Risk:</span> <strong id="recon-risk" style="color:#FBBF24;">$1,614.12 (2.37%)</strong></div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 📊 ASSOCIATED INDICATORS & LIVE METRIC PROOF (COMPLETE 55-INDICATOR TELEMETRY) -->
   <div id="radar-telemetry-container" class="radar-telemetry-section">
     <div class="telemetry-header">
       <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
         <span style="font-size:20px;">📊</span>
         <div>
           <div class="telemetry-heading">
-            ASSOCIATED INDICATORS &amp; LIVE METRIC PROOF (50 TELEMETRY SENSORS)
+            ASSOCIATED INDICATORS &amp; LIVE METRIC PROOF (55 TELEMETRY SENSORS)
           </div>
           <div class="telemetry-subheading">
-            Every regime deduction is strictly calculated from these 50 quantitative metrics parsed live from Binance &amp; PCF3 telemetry.
+            Every regime deduction is strictly calculated from these 55 quantitative metrics parsed live from Binance &amp; PCF3 telemetry.
           </div>
         </div>
       </div>
       
       <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-        <span class="telemetry-badge green">● 50 / 50 SENSORS ACTIVE</span>
-        <span id="telemetry-pass-badge" class="telemetry-badge cyan">✓ 50 DISPLAYED</span>
+        <span class="telemetry-badge green">● 55 / 55 SENSORS ACTIVE</span>
+        <span id="telemetry-pass-badge" class="telemetry-badge cyan">✓ 55 DISPLAYED</span>
         <button id="btn-toggle-telemetry" class="telemetry-btn" onclick="toggleTelemetryView()">▼ Minimize Telemetry</button>
       </div>
     </div>
@@ -638,19 +936,19 @@
     <!-- Filter Tabs & Quick Search -->
     <div id="telemetry-controls" class="telemetry-controls">
       <div class="telemetry-tabs">
-        <button class="telemetry-tab active" data-family="all" onclick="filterTelemetryFamily('all', this)">All 50 Sensors (50)</button>
+        <button class="telemetry-tab active" data-family="all" onclick="filterTelemetryFamily('all', this)">All 55 Sensors (55)</button>
         <button class="telemetry-tab" data-family="orderflow" onclick="filterTelemetryFamily('orderflow', this)">🌊 Order Flow &amp; Delta (9)</button>
         <button class="telemetry-tab" data-family="derivatives" onclick="filterTelemetryFamily('derivatives', this)">⚡ Derivatives &amp; Positioning (11)</button>
-        <button class="telemetry-tab" data-family="structure" onclick="filterTelemetryFamily('structure', this)">📐 Market Structure &amp; VWAP (13)</button>
+        <button class="telemetry-tab" data-family="structure" onclick="filterTelemetryFamily('structure', this)">📐 Market Structure &amp; Execution (18)</button>
         <button class="telemetry-tab" data-family="institutional" onclick="filterTelemetryFamily('institutional', this)">🐋 Whale &amp; ETF Flows (4)</button>
         <button class="telemetry-tab" data-family="onchain" onclick="filterTelemetryFamily('onchain', this)">⛓️ On-Chain &amp; Macro (13)</button>
       </div>
       <div class="telemetry-search-box">
-        <input type="text" id="telemetry-search" placeholder="🔍 Quick search 50 indicators (e.g. CVD, Funding, VWAP, MVRV, ETF, Volume)..." oninput="searchTelemetry(this.value)">
+        <input type="text" id="telemetry-search" placeholder="🔍 Quick search 55 indicators (e.g. CVD, Funding, VWAP, EMA, ATR, MVRV, ETF)..." oninput="searchTelemetry(this.value)">
       </div>
     </div>
 
-    <!-- 50 Sensors Data Table -->
+    <!-- 55 Sensors Data Table -->
     <div id="telemetry-table-wrapper" class="telemetry-table-wrapper">
       <table class="telemetry-table">
         <thead>
@@ -938,8 +1236,61 @@
             <td><span class="telemetry-cond">&lt; 1.20% (Low Volatility Bedrock)</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (Low Volatility Bedrock)</span></td>
           </tr>
+          <!-- Added Sensors 28 to 32 in Family 3: Market Structure & Execution -->
           <tr class="telemetry-row" data-family="structure" id="live-row-28">
             <td style="text-align: center; color: #64748B; font-weight: bold;">28</td>
+            <td>
+              <div class="telemetry-name">Daily ATR(14) Volatility Span</div>
+              <div class="telemetry-sub">📐 Market Structure • Daily 14-period True Range for execution order spacing</div>
+            </td>
+            <td><span id="live-metric-dailyAtr14" class="telemetry-val-hl">$2,152.16</span> <span class="telemetry-dim">(2.492% of Spot)</span></td>
+            <td><span class="telemetry-cond">Order Spacing: 1.5x&ndash;2.0x ATR ($3,228&ndash;$4,304)</span></td>
+            <td><span class="telemetry-status-pill cyan">📏 SPACING: $3,228&ndash;$4,304</span></td>
+          </tr>
+          <tr class="telemetry-row" data-family="structure" id="live-row-29">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">29</td>
+            <td>
+              <div class="telemetry-name">10-Week Exponential Moving Average (10W EMA)</div>
+              <div class="telemetry-sub">📐 Market Structure • Tactical trend-failure defense line with weekly higher-low</div>
+            </td>
+            <td><span id="live-metric-ema10w" class="telemetry-val-hl">$78,450.00</span> <span class="telemetry-dim">(Spot +10.07% Above)</span></td>
+            <td><span class="telemetry-cond">Spot &gt; 10W EMA (Tactical Trend Protected)</span></td>
+            <td><span class="telemetry-status-pill green">🟢 PASSED (Trend Line Safe)</span></td>
+          </tr>
+          <tr class="telemetry-row" data-family="structure" id="live-row-30">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">30</td>
+            <td>
+              <div class="telemetry-name">20-Week Exponential Moving Average (20W EMA)</div>
+              <div class="telemetry-sub">📐 Market Structure • Anchor confirmation for conservative re-entry sleeve 3</div>
+            </td>
+            <td><span id="live-metric-ema20w" class="telemetry-val-hl">$76,001.00</span> <span class="telemetry-dim">(Spot +13.62% Above)</span></td>
+            <td><span class="telemetry-cond">Spot &gt; 20W EMA (Macro Bull Anchor Intact)</span></td>
+            <td><span class="telemetry-status-pill green">🟢 PASSED (Macro Floor Intact)</span></td>
+          </tr>
+          <tr class="telemetry-row" data-family="structure" id="live-row-31">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">31</td>
+            <td>
+              <div class="telemetry-name">Weekly Swing Structure &amp; Confirmed Pivots</div>
+              <div class="telemetry-sub">📐 Market Structure • Confirmed weekly swing highs &amp; higher-low invalidation floor</div>
+            </td>
+            <td><span id="live-metric-weeklySwings" class="telemetry-val-hl">High: $86,490</span> <span class="telemetry-dim">(Key HL Floor: $79,500)</span></td>
+            <td><span class="telemetry-cond">Higher-Low Floor Defended (&gt; $79,500)</span></td>
+            <td><span class="telemetry-status-pill green">🟢 PASSED (Higher-Low Intact)</span></td>
+          </tr>
+          <tr class="telemetry-row" data-family="structure" id="live-row-32">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">32</td>
+            <td>
+              <div class="telemetry-name">Drawdown from Peak Rally Weekly Close</div>
+              <div class="telemetry-sub">📐 Market Structure • Peak close drawdown tracker to arm systematic re-entry rungs</div>
+            </td>
+            <td><span id="live-metric-drawdownPeak" class="telemetry-val-hl">-3.52%</span> <span class="telemetry-dim">(Peak Close: $89,500.00)</span></td>
+            <td><span class="telemetry-cond">Drawdown &lt; -5.0% Arms Dip Rung 1 ($85,025)</span></td>
+            <td><span class="telemetry-status-pill cyan">🎯 RUNG 1 NEAR (-5.0%)</span></td>
+          </tr>
+
+          <!-- Profile & Moving Averages (Renumbered 33 to 38) -->
+          <tr class="telemetry-row" data-family="structure" id="live-row-33">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">33</td>
             <td>
               <div class="telemetry-name">Volume Profile: Point of Control (POC)</div>
               <div class="telemetry-sub">📐 Market Structure • Price bucket with highest volume over 30 days</div>
@@ -948,8 +1299,8 @@
             <td><span class="telemetry-cond">High Volume Node Magnet Below Price</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (High Volume Bedrock)</span></td>
           </tr>
-          <tr class="telemetry-row" data-family="structure" id="live-row-29">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">29</td>
+          <tr class="telemetry-row" data-family="structure" id="live-row-34">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">34</td>
             <td>
               <div class="telemetry-name">Volume Profile: Value Area High (VAH)</div>
               <div class="telemetry-sub">📐 Market Structure • Upper 70% volume boundary of range</div>
@@ -958,8 +1309,8 @@
             <td><span class="telemetry-cond">Immediate Resistance / Ceiling</span></td>
             <td><span class="telemetry-status-pill green">🟢 TESTED (Coiling at Resistance)</span></td>
           </tr>
-          <tr class="telemetry-row" data-family="structure" id="live-row-30">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">30</td>
+          <tr class="telemetry-row" data-family="structure" id="live-row-35">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">35</td>
             <td>
               <div class="telemetry-name">Volume Profile: Value Area Low (VAL)</div>
               <div class="telemetry-sub">📐 Market Structure • Lower 70% volume boundary of range</div>
@@ -968,8 +1319,8 @@
             <td><span class="telemetry-cond">Structural Base Floor (&gt; $83,000)</span></td>
             <td><span class="telemetry-status-pill green">🟢 INTACT (Protected by Value Area)</span></td>
           </tr>
-          <tr class="telemetry-row" data-family="structure" id="live-row-31">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">31</td>
+          <tr class="telemetry-row" data-family="structure" id="live-row-36">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">36</td>
             <td>
               <div class="telemetry-name">High Volume Node (HVN) Confluence</div>
               <div class="telemetry-sub">📐 Market Structure • Dense volume clusters near round-number levels</div>
@@ -978,8 +1329,8 @@
             <td><span class="telemetry-cond">HVN Confluence Distance &lt; 1.5%</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (Strong Order Shelf)</span></td>
           </tr>
-          <tr class="telemetry-row" data-family="structure" id="live-row-32">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">32</td>
+          <tr class="telemetry-row" data-family="structure" id="live-row-37">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">37</td>
             <td>
               <div class="telemetry-name">20-Day Simple Moving Average (20D SMA)</div>
               <div class="telemetry-sub">📐 Market Structure • Arithmetic 20-day trendline for swing continuation</div>
@@ -988,8 +1339,8 @@
             <td><span class="telemetry-cond">Spot &gt; 20D SMA (Rising Baseline)</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (Dynamic Trend Support)</span></td>
           </tr>
-          <tr class="telemetry-row" data-family="structure" id="live-row-33">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">33</td>
+          <tr class="telemetry-row" data-family="structure" id="live-row-38">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">38</td>
             <td>
               <div class="telemetry-name">50-Day Exponential Moving Average (50D EMA)</div>
               <div class="telemetry-sub">📐 Market Structure • Macro intermediate bull/bear trend dividing line</div>
@@ -999,9 +1350,9 @@
             <td><span class="telemetry-status-pill green">🟢 PASSED (Bull Market Pillar)</span></td>
           </tr>
 
-          <!-- Family 4: Institutional & Whale Flows (34 to 37) -->
-          <tr class="telemetry-row" data-family="institutional" id="live-row-34">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">34</td>
+          <!-- Family 4: Institutional & Whale Flows (Renumbered 39 to 42) -->
+          <tr class="telemetry-row" data-family="institutional" id="live-row-39">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">39</td>
             <td>
               <div class="telemetry-name">Spot Bitcoin ETF 3-Day Net Inflows</div>
               <div class="telemetry-sub">🐋 Institutional • 3-day net institutional inflows across US Spot ETFs</div>
@@ -1010,8 +1361,8 @@
             <td><span class="telemetry-cond">&gt; $0.0M (Positive Net Floor Bid)</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (Wall St Buying Spot)</span></td>
           </tr>
-          <tr class="telemetry-row" data-family="institutional" id="live-row-35">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">35</td>
+          <tr class="telemetry-row" data-family="institutional" id="live-row-40">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">40</td>
             <td>
               <div class="telemetry-name">Spot Bitcoin ETF 7-Day Net Inflows</div>
               <div class="telemetry-sub">🐋 Institutional • Rolling 7-day intake absorbing daily miner emission</div>
@@ -1020,8 +1371,8 @@
             <td><span class="telemetry-cond">Sustained Net Multi-Day Expansion</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (Weekly Accumulation)</span></td>
           </tr>
-          <tr class="telemetry-row" data-family="institutional" id="live-row-36">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">36</td>
+          <tr class="telemetry-row" data-family="institutional" id="live-row-41">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">41</td>
             <td>
               <div class="telemetry-name">Whale Exchange Inflow Ratio</div>
               <div class="telemetry-sub">🐋 Institutional • Ratio of exchange deposits from top 10 whale transfers</div>
@@ -1030,8 +1381,8 @@
             <td><span class="telemetry-cond">&lt; 0.85 (No Top-10 Whale Dumps)</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (Whales Not Selling)</span></td>
           </tr>
-          <tr class="telemetry-row" data-family="institutional" id="live-row-37">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">37</td>
+          <tr class="telemetry-row" data-family="institutional" id="live-row-42">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">42</td>
             <td>
               <div class="telemetry-name">Whale Inflow CDD (Coin Days Destroyed)</div>
               <div class="telemetry-sub">🐋 Institutional • Multiplied coin age destroyed during whale exchange inflow</div>
@@ -1041,9 +1392,9 @@
             <td><span class="telemetry-status-pill green">🟢 PASSED (HODL Conviction Strong)</span></td>
           </tr>
 
-          <!-- Family 5: On-Chain Valuation & Macro Liquidity (38 to 50) -->
-          <tr class="telemetry-row" data-family="onchain" id="live-row-38">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">38</td>
+          <!-- Family 5: On-Chain Valuation & Macro Liquidity (Renumbered 43 to 55) -->
+          <tr class="telemetry-row" data-family="onchain" id="live-row-43">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">43</td>
             <td>
               <div class="telemetry-name">Short-Term Holder (STH) Cost Basis</div>
               <div class="telemetry-sub">⛓️ On-Chain • Realized acquisition cost of coins held &lt; 155 days</div>
@@ -1052,8 +1403,8 @@
             <td><span class="telemetry-cond">Price &gt; STH Cost Basis (No Retail Panic)</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (STH In Profit +18.3%)</span></td>
           </tr>
-          <tr class="telemetry-row" data-family="onchain" id="live-row-39">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">39</td>
+          <tr class="telemetry-row" data-family="onchain" id="live-row-44">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">44</td>
             <td>
               <div class="telemetry-name">Distance vs. STH Cost Basis %</div>
               <div class="telemetry-sub">⛓️ On-Chain • Safety margin percentage above STH cost floor</div>
@@ -1062,8 +1413,8 @@
             <td><span class="telemetry-cond">&gt; 0.0% (Positive Margin of Safety)</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (Zero Panic Seller Pressure)</span></td>
           </tr>
-          <tr class="telemetry-row" data-family="onchain" id="live-row-40">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">40</td>
+          <tr class="telemetry-row" data-family="onchain" id="live-row-45">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">45</td>
             <td>
               <div class="telemetry-name">Long-Term Holder (LTH) Realized Price</div>
               <div class="telemetry-sub">⛓️ On-Chain • Cost basis of multi-year conviction holders (&gt; 155d)</div>
@@ -1072,8 +1423,8 @@
             <td><span class="telemetry-cond">Price &gt; LTH Realized (Macro Cycle Bull)</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (Macro Bedrock Intact)</span></td>
           </tr>
-          <tr class="telemetry-row" data-family="onchain" id="live-row-41">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">41</td>
+          <tr class="telemetry-row" data-family="onchain" id="live-row-46">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">46</td>
             <td>
               <div class="telemetry-name">MVRV Valuation Ratio</div>
               <div class="telemetry-sub">⛓️ On-Chain • Market Capitalization divided by Realized Capitalization</div>
@@ -1082,8 +1433,8 @@
             <td><span class="telemetry-cond">&lt; 2.50 (Far Below Cycle Top &gt; 3.50)</span></td>
             <td><span class="telemetry-status-pill green">🟢 IN RANGE (Fair Fundamental Value)</span></td>
           </tr>
-          <tr class="telemetry-row" data-family="onchain" id="live-row-42">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">42</td>
+          <tr class="telemetry-row" data-family="onchain" id="live-row-47">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">47</td>
             <td>
               <div class="telemetry-name">MVRV Z-Score</div>
               <div class="telemetry-sub">⛓️ On-Chain • Standard deviations of market cap from realized cap</div>
@@ -1092,8 +1443,8 @@
             <td><span class="telemetry-cond">&lt; 5.0&sigma; (Cycle Peak Euphoria &gt; 7.0&sigma;)</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (No Mania Overheat)</span></td>
           </tr>
-          <tr class="telemetry-row" data-family="onchain" id="live-row-43">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">43</td>
+          <tr class="telemetry-row" data-family="onchain" id="live-row-48">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">48</td>
             <td>
               <div class="telemetry-name">Net Unrealized Profit/Loss (NUPL)</div>
               <div class="telemetry-sub">⛓️ On-Chain • Total aggregate dollar profit minus unrealized loss</div>
@@ -1102,8 +1453,8 @@
             <td><span class="telemetry-cond">0.25 to 0.65 (Healthy Mid-Cycle)</span></td>
             <td><span class="telemetry-status-pill green">🟢 IN RANGE (Sustainable Expansion)</span></td>
           </tr>
-          <tr class="telemetry-row" data-family="onchain" id="live-row-44">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">44</td>
+          <tr class="telemetry-row" data-family="onchain" id="live-row-49">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">49</td>
             <td>
               <div class="telemetry-name">Spent Output Profit Ratio (SOPR)</div>
               <div class="telemetry-sub">⛓️ On-Chain • Measures whether moving coins are sold in profit or loss</div>
@@ -1112,8 +1463,8 @@
             <td><span class="telemetry-cond">&ge; 1.000 (Coins Selling at Profit/Reset)</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (Healthy Re-accumulation)</span></td>
           </tr>
-          <tr class="telemetry-row" data-family="onchain" id="live-row-45">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">45</td>
+          <tr class="telemetry-row" data-family="onchain" id="live-row-50">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">50</td>
             <td>
               <div class="telemetry-name">Bitcoin Hash Ribbons</div>
               <div class="telemetry-sub">⛓️ On-Chain • 30-day moving average hashrate vs. 60-day moving average</div>
@@ -1122,8 +1473,8 @@
             <td><span class="telemetry-cond">No Capitulation (Miner Network Growing)</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (Miners Secure &amp; Healthy)</span></td>
           </tr>
-          <tr class="telemetry-row" data-family="onchain" id="live-row-46">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">46</td>
+          <tr class="telemetry-row" data-family="onchain" id="live-row-51">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">51</td>
             <td>
               <div class="telemetry-name">Puell Multiple</div>
               <div class="telemetry-sub">⛓️ On-Chain • Daily BTC issuance in USD divided by 365-day MA issuance</div>
@@ -1132,8 +1483,8 @@
             <td><span class="telemetry-cond">1.00 to 2.00 (Neutral Miner Revenue)</span></td>
             <td><span class="telemetry-status-pill green">🟢 IN RANGE (No Miner Selling Stress)</span></td>
           </tr>
-          <tr class="telemetry-row" data-family="onchain" id="live-row-47">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">47</td>
+          <tr class="telemetry-row" data-family="onchain" id="live-row-52">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">52</td>
             <td>
               <div class="telemetry-name">Deribit BTC Volatility Index (DVOL)</div>
               <div class="telemetry-sub">⛓️ Macro/Options • Crypto-native 30-day IV from Deribit BTC options</div>
@@ -1142,8 +1493,8 @@
             <td><span class="telemetry-cond">&lt; 65.0 (Calm Implied Volatility)</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (Low Implied Volatility)</span></td>
           </tr>
-          <tr class="telemetry-row" data-family="onchain" id="live-row-48">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">48</td>
+          <tr class="telemetry-row" data-family="onchain" id="live-row-53">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">53</td>
             <td>
               <div class="telemetry-name">US Dollar Currency Index (DXY)</div>
               <div class="telemetry-sub">⛓️ Macro • Strength of US Dollar against foreign currencies</div>
@@ -1152,8 +1503,8 @@
             <td><span class="telemetry-cond">&lt; 106.0 (Macro Liquidity Neutral)</span></td>
             <td><span class="telemetry-status-pill green">🟢 IN RANGE (No Dollar Squeeze)</span></td>
           </tr>
-          <tr class="telemetry-row" data-family="onchain" id="live-row-49">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">49</td>
+          <tr class="telemetry-row" data-family="onchain" id="live-row-54">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">54</td>
             <td>
               <div class="telemetry-name">US 10-Year Treasury Yield (US10Y)</div>
               <div class="telemetry-sub">⛓️ Macro • Risk-free benchmark rate setting cost of capital</div>
@@ -1162,8 +1513,8 @@
             <td><span class="telemetry-cond">Neutral Bond Baseline Backdrop</span></td>
             <td><span class="telemetry-status-pill green">🟢 IN RANGE (Predictable Rate Backdrop)</span></td>
           </tr>
-          <tr class="telemetry-row" data-family="onchain" id="live-row-50">
-            <td style="text-align: center; color: #64748B; font-weight: bold;">50</td>
+          <tr class="telemetry-row" data-family="onchain" id="live-row-55">
+            <td style="text-align: center; color: #64748B; font-weight: bold;">55</td>
             <td>
               <div class="telemetry-name">Crypto Fear &amp; Greed Index</div>
               <div class="telemetry-sub">⛓️ Sentiment • Multifactor sentiment gauge across volatility &amp; volume</div>
@@ -1731,9 +2082,75 @@
     var elAtrPct = document.getElementById('live-metric-atrPct');
     if (elAtrPct) elAtrPct.textContent = atrPct.toFixed(3) + '%';
 
-    // 13. Fear & Greed (Row 50)
+    // 13. Fear & Greed (Row 55)
     var elFg = document.getElementById('live-metric-fearGreed');
     if (elFg) elFg.textContent = fearGreed + ' / 100';
+
+    // 14. Drawdown from Peak Rally Close (Row 32 in Telemetry & Row 3 in Tactical)
+    var peakWeeklyClose = 89500.00;
+    var drawdownPeak = ((spot - peakWeeklyClose) / peakWeeklyClose * 100);
+    var elDdPeak = document.getElementById('live-metric-drawdownPeak');
+    if (elDdPeak) elDdPeak.textContent = (drawdownPeak >= 0 ? '+' : '') + drawdownPeak.toFixed(2) + '%';
+    var elTacticalDd = document.getElementById('tactical-drawdown-val');
+    if (elTacticalDd) elTacticalDd.textContent = (drawdownPeak >= 0 ? '+' : '') + drawdownPeak.toFixed(2) + '%';
+    var elTacticalSpot = document.getElementById('tactical-spot-price');
+    if (elTacticalSpot) elTacticalSpot.textContent = '$' + spot.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    // 15. Portfolio Reconciliation Cockpit
+    recalculatePortfolioReconciliation();
+  }
+
+  function toggleTacticalView() {
+    var wrapper = document.getElementById('tactical-table-wrapper');
+    var btn = document.getElementById('btn-toggle-tactical');
+    if (!wrapper) return;
+    if (wrapper.style.display === 'none') {
+      wrapper.style.display = '';
+      if (btn) btn.textContent = '▼ Minimize Tactical Matrix';
+    } else {
+      wrapper.style.display = 'none';
+      if (btn) btn.textContent = '▲ Expand Tactical Matrix (9 Rules)';
+    }
+  }
+
+  function recalculatePortfolioReconciliation() {
+    var qtyEl = document.getElementById('input-btc-qty');
+    var entryEl = document.getElementById('input-avg-entry');
+    var usdtEl = document.getElementById('input-usdt-avail');
+    var spotEl = document.getElementById('live-metric-spotPrice');
+
+    var qty = qtyEl ? (parseFloat(qtyEl.value) || 0) : 0.50;
+    var entry = entryEl ? (parseFloat(entryEl.value) || 0) : 86200;
+    var cash = usdtEl ? (parseFloat(usdtEl.value) || 0) : 25000;
+
+    var currentSpot = 86350.01;
+    if (spotEl && spotEl.textContent) {
+      var parsed = parseFloat(spotEl.textContent.replace(/[^0-9.]/g, ''));
+      if (!isNaN(parsed) && parsed > 1000) currentSpot = parsed;
+    }
+
+    var posVal = qty * currentSpot;
+    var totalEquity = posVal + cash;
+    var spotPct = totalEquity > 0 ? (posVal / totalEquity * 100) : 0;
+    var cashPct = 100 - spotPct;
+
+    // Daily ATR(14) is $2,152.16 -> 1.5x ATR is $3,228.24 buffer below entry
+    var atrDaily = 2152.16;
+    var stopPrice = Math.max(0, currentSpot - (1.5 * atrDaily));
+    var dollarRisk = qty * (currentSpot - stopPrice);
+    var riskPct = totalEquity > 0 ? (dollarRisk / totalEquity * 100) : 0;
+
+    var posValEl = document.getElementById('recon-pos-val');
+    var equityEl = document.getElementById('recon-equity');
+    var allocEl = document.getElementById('recon-alloc');
+    var stopEl = document.getElementById('recon-stop');
+    var riskEl = document.getElementById('recon-risk');
+
+    if (posValEl) posValEl.textContent = '$' + posVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (equityEl) equityEl.textContent = '$' + totalEquity.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (allocEl) allocEl.textContent = spotPct.toFixed(1) + '% Spot / ' + cashPct.toFixed(1) + '% Cash';
+    if (stopEl) stopEl.textContent = '$' + stopPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (riskEl) riskEl.textContent = '$' + dollarRisk.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' (' + riskPct.toFixed(2) + '%)';
   }
 
   function filterTelemetryFamily(family, btn) {
@@ -1795,7 +2212,7 @@
     } else {
       wrapper.style.display = 'none';
       if (controls) controls.style.display = 'none';
-      if (btn) btn.textContent = '▲ Expand Telemetry (50 Sensors)';
+      if (btn) btn.textContent = '▲ Expand Telemetry (55 Sensors)';
     }
   }
 
