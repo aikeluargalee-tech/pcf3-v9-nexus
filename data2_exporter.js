@@ -1,8 +1,8 @@
 /**
- * PCF3 DATA-ONLY COMPACT EXPORT ENGINE FOR MANUS AI (V2 - REFINED)
+ * PCF3 DATA-ONLY COMPACT EXPORT ENGINE FOR MANUS AI (V3 - FINAL)
  * Pure quantitative telemetry with strict provenance, candle validation,
- * reproducible plan start date, strict 2-bar pivot confirmation checks,
- * corrected daily reclaim benchmarks, and interpretable short-window flow.
+ * user-configurable plan baseline date, verified weekly higher-low floor comparison,
+ * provisional supply zone tagging, and high-precision spread representation.
  */
 
 function showToastNotification(msg, type) {
@@ -27,6 +27,25 @@ function showToastNotification(msg, type) {
     toast.style.opacity = '0';
     setTimeout(function() { toast.remove(); }, 300);
   }, 4000);
+}
+
+function getPlanBaselineDate() {
+  try {
+    var stored = localStorage.getItem('pcf3_plan_baseline_date');
+    if (stored && /^\d{4}-\d{2}-\d{2}/.test(stored)) return stored;
+  } catch(e) {}
+  return '2026-08-03';
+}
+
+function updatePlanBaselineDate(val) {
+  if (val && /^\d{4}-\d{2}-\d{2}/.test(val)) {
+    try {
+      localStorage.setItem('pcf3_plan_baseline_date', val);
+      var inputs = document.querySelectorAll('#input-plan-baseline, .input-plan-baseline');
+      inputs.forEach(function(inp) { inp.value = val; });
+      showToastNotification('📅 Plan Baseline updated to ' + val + ' (UTC)', 'ok');
+    } catch(e) {}
+  }
 }
 
 function validateCandle(k) {
@@ -88,7 +107,7 @@ async function copyData2ForManus() {
     var nowMs = Date.now();
 
     // 1. Fetch live Binance Spot ticker & bookTicker
-    var spotPrice = null, bidPrice = null, askPrice = null, spread = null, spreadPct = null, spotVol24h = null;
+    var spotPrice = null, bidPrice = null, askPrice = null, spread = null, spreadPct = null, spreadBps = null, spotVol24h = null;
     var tickerRes = await fetch('https://data-api.binance.vision/api/v3/ticker/24hr?symbol=BTCUSDT');
     if (tickerRes.ok) {
       var tJson = await tickerRes.json();
@@ -103,6 +122,7 @@ async function copyData2ForManus() {
       if (bidPrice > 0 && askPrice > 0 && spotPrice > 0) {
         spread = askPrice - bidPrice;
         spreadPct = (spread / spotPrice) * 100;
+        spreadBps = spreadPct * 100;
       }
     }
 
@@ -137,8 +157,9 @@ async function copyData2ForManus() {
     var latestCompWeekly = completedWeekly[completedWeekly.length - 1];
     var latestCompDaily = completedDaily[completedDaily.length - 1];
 
-    // 4. Reproducible Plan Start Date & High-Water Mark Peak Weekly Close
-    var PLAN_START_DATE = '2026-08-03T00:00:00Z'; // Defined start of the current rally swing cycle
+    // 4. User-Configured Plan Baseline Date & High-Water Mark Peak Weekly Close
+    var userBaselineDate = getPlanBaselineDate();
+    var PLAN_START_DATE = userBaselineDate + 'T00:00:00Z';
     var planStartMs = new Date(PLAN_START_DATE).getTime();
     var planWeeklyCandles = completedWeekly.filter(function(c) { return c.openTime >= planStartMs; });
     if (planWeeklyCandles.length === 0) planWeeklyCandles = completedWeekly.slice(-12);
@@ -156,7 +177,7 @@ async function copyData2ForManus() {
     var rallyDdCompleted = (latestCompWeekly.close / rallyPeakClose) - 1.0;
     var rallyDdLive = spotPrice ? ((spotPrice / rallyPeakClose) - 1.0) : null;
 
-    // Macro 52-week Cycle High-Water Mark
+    // Macro 52-week Cycle High-Water Mark Reference
     var cyclePeakClose = -1;
     var cyclePeakCandle = null;
     for (var i = 0; i < completedWeekly.length; i++) {
@@ -182,7 +203,7 @@ async function copyData2ForManus() {
       };
     });
 
-    // 5. Weekly Structure & Strict 2-Bar Pivot Confirmation Check
+    // 5. Weekly Structure, 2-Bar Pivot Confirmation & Explicit Confirmed Higher-Low Comparison
     var confirmedPivotH = null;
     var candidatePivotH = null;
     for (var i = 2; i < completedWeekly.length; i++) {
@@ -202,19 +223,23 @@ async function copyData2ForManus() {
       }
     }
 
-    var confirmedPivotL = null;
-    for (var i = 2; i < completedWeekly.length; i++) {
+    // Collect all confirmed pivot lows (2 bars left & 2 bars right)
+    var confirmedPivotsL = [];
+    for (var i = 2; i < completedWeekly.length - 2; i++) {
       var cW = completedWeekly[i];
       var isLeftLow = (cW.low < completedWeekly[i-1].low) && (cW.low < completedWeekly[i-2].low);
       if (isLeftLow) {
-        var barsToRight = completedWeekly.length - 1 - i;
-        if (barsToRight >= 2) {
-          if (cW.low < completedWeekly[i+1].low && cW.low < completedWeekly[i+2].low) {
-            confirmedPivotL = cW;
-          }
+        if (cW.low < completedWeekly[i+1].low && cW.low < completedWeekly[i+2].low) {
+          confirmedPivotsL.push(cW);
         }
       }
     }
+
+    var latestConfirmedPivotL = confirmedPivotsL.length > 0 ? confirmedPivotsL[confirmedPivotsL.length - 1] : null;
+    var priorConfirmedPivotL = confirmedPivotsL.length > 1 ? confirmedPivotsL[confirmedPivotsL.length - 2] : null;
+    var isConfirmedHigherLow = (latestConfirmedPivotL && priorConfirmedPivotL) ? (latestConfirmedPivotL.low > priorConfirmedPivotL.low) : false;
+    var hlDiff = (latestConfirmedPivotL && priorConfirmedPivotL) ? (latestConfirmedPivotL.low - priorConfirmedPivotL.low) : 0;
+    var hlDiffPct = (latestConfirmedPivotL && priorConfirmedPivotL) ? ((hlDiff / priorConfirmedPivotL.low) * 100).toFixed(2) : 'N/A';
 
     // 6. Trend Measures (EMAs)
     var ema10w = calcEMA(completedWeekly, 10);
@@ -231,8 +256,6 @@ async function copyData2ForManus() {
     var avgDailyVol20d = daily20dVolSum / last20Daily.length;
 
     // 8. Daily Reclaim Comparison (EXCLUDING Test Candle Day T)
-    // Day T is latestCompDaily (d_comp[length - 1])
-    // Prior 5 benchmark candles are Days T-5 to T-1 (d_comp[length - 6] to d_comp[length - 2])
     var prior5Benchmarks = completedDaily.slice(-6, -1);
     var benchHighs = prior5Benchmarks.map(function(d) { return d.high; });
     var maxBenchHigh = Math.max.apply(null, benchHighs);
@@ -306,6 +329,11 @@ async function copyData2ForManus() {
     function fmtDate(ms) { return new Date(ms).toISOString(); }
     function fmtPrice(p) { return p !== null && !isNaN(p) ? '$' + p.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 'MISSING'; }
 
+    var spreadText = 'MISSING';
+    if (spread !== null) {
+      spreadText = '$' + spread.toFixed(2) + ' (' + spreadPct.toFixed(6) + '% | ' + spreadBps.toFixed(4) + ' bps)';
+    }
+
     var out = [];
     out.push('# BTCUSDT SPOT SWING-TRADING DATA PACKET [DATA-ONLY]');
     out.push('Packet Generation Time: ' + genTimeUTC + ' (UTC)');
@@ -317,7 +345,7 @@ async function copyData2ForManus() {
     out.push('| :--- | :--- | :--- | :--- | :--- |');
     out.push('| **BTC Spot Price** | ' + fmtPrice(spotPrice) + ' | ' + genTimeUTC + ' | Binance BTCUSDT Live REST | LIVE OBSERVED |');
     out.push('| **Best Bid / Best Ask** | ' + (bidPrice ? fmtPrice(bidPrice) : 'MISSING') + ' / ' + (askPrice ? fmtPrice(askPrice) : 'MISSING') + ' | ' + genTimeUTC + ' | Binance bookTicker | LIVE OBSERVED |');
-    out.push('| **Bid-Ask Spread** | ' + (spread !== null ? '$' + spread.toFixed(2) + ' (' + spreadPct.toFixed(4) + '%)' : 'MISSING') + ' | ' + genTimeUTC + ' | (Ask - Bid) / Spot | CALCULATED |');
+    out.push('| **Bid-Ask Spread** | ' + spreadText + ' | ' + genTimeUTC + ' | (Ask - Bid) / Spot | CALCULATED |');
     out.push('| **Latest Completed Daily Candle (Day T)** | O: ' + fmtPrice(latestCompDaily.open) + ' H: ' + fmtPrice(latestCompDaily.high) + ' L: ' + fmtPrice(latestCompDaily.low) + ' C: ' + fmtPrice(latestCompDaily.close) + ' V: ' + latestCompDaily.volume.toFixed(2) + ' BTC | Close: ' + fmtDate(latestCompDaily.closeTime) + ' | Binance 1d Kline (Completed) | OBSERVED |');
     if (liveDaily) {
       out.push('| **Current Incomplete Daily Candle** | O: ' + fmtPrice(liveDaily.open) + ' H: ' + fmtPrice(liveDaily.high) + ' L: ' + fmtPrice(liveDaily.low) + ' C: ' + fmtPrice(liveDaily.close) + ' V: ' + liveDaily.volume.toFixed(2) + ' BTC | Live (open: ' + fmtDate(liveDaily.openTime) + ') | Binance 1d Kline (Incomplete) | LIVE OBSERVED |');
@@ -328,7 +356,7 @@ async function copyData2ForManus() {
     }
     out.push('| **Active Candidate Weekly Pivot High** | ' + (candidatePivotH ? fmtPrice(candidatePivotH.high) + ' (Candle Open: ' + fmtDate(candidatePivotH.openTime) + ')' : 'NONE') + ' | Week closed ' + (candidatePivotH ? fmtDate(candidatePivotH.closeTime) : 'N/A') + ' | 2-bar left, 1-bar right on 1w | CANDIDATE / UNCONFIRMED (2nd right bar completes 2026-10-11) |');
     out.push('| **Latest Fully Confirmed Weekly Pivot High** | ' + (confirmedPivotH ? fmtPrice(confirmedPivotH.high) + ' (Candle Open: ' + fmtDate(confirmedPivotH.openTime) + ')' : 'MISSING') + ' | Confirmed on 1w close | 2-bar left, 2-bar right on 1w | CONFIRMED |');
-    out.push('| **Latest Confirmed Weekly Pivot Low** | ' + (confirmedPivotL ? fmtPrice(confirmedPivotL.low) + ' (Candle Open: ' + fmtDate(confirmedPivotL.openTime) + ')' : 'MISSING') + ' | Confirmed on 1w close | 2-bar left, 2-bar right on 1w | CONFIRMED |');
+    out.push('| **Weekly Confirmed Higher-Low Floor** | ' + (latestConfirmedPivotL ? fmtPrice(latestConfirmedPivotL.low) + ' (Week: ' + fmtDate(latestConfirmedPivotL.openTime).split('T')[0] + ')' : 'MISSING') + ' vs Prior: ' + (priorConfirmedPivotL ? fmtPrice(priorConfirmedPivotL.low) + ' (Week: ' + fmtDate(priorConfirmedPivotL.openTime).split('T')[0] + ')' : 'MISSING') + ' | Confirmed on 1w close | ' + (isConfirmedHigherLow ? 'Higher Low (+' + hlDiffPct + '%)' : 'Lower Low') + ' | CONFIRMED HIGHER-LOW FLOOR |');
     out.push('| **10-Week EMA** | ' + (ema10w ? fmtPrice(ema10w) : 'MISSING') + ' | ' + fmtDate(latestCompWeekly.closeTime) + ' | 10W Exponential Moving Average | CALCULATED |');
     out.push('| **20-Week EMA** | ' + (ema20w ? fmtPrice(ema20w) : 'MISSING') + ' | ' + fmtDate(latestCompWeekly.closeTime) + ' | 20W Exponential Moving Average | CALCULATED |');
     out.push('| **Daily 20-Day EMA** | ' + (ema20d ? fmtPrice(ema20d) : 'MISSING') + ' | ' + fmtDate(latestCompDaily.closeTime) + ' | 20D Exponential Moving Average | CALCULATED |');
@@ -337,10 +365,10 @@ async function copyData2ForManus() {
     out.push('| **20-Day Avg Daily Spot Volume** | ' + avgDailyVol20d.toFixed(2) + ' BTC | ' + fmtDate(latestCompDaily.closeTime) + ' | 20-day mean of completed daily volume | CALCULATED |\n');
 
     out.push('---');
-    out.push('### 2. DRAWDOWN REFERENCE & RE-ENTRY RUNGS (REPRODUCIBLE COMPLETED WEEKLY BASIS)');
-    out.push('*Rule: Official drawdown trigger is measured strictly from completed weekly closes since the defined plan start date. Live spot intra-week drawdown is reported separately for situational context.*\n');
-    out.push('- **Plan Baseline Start Date:** ' + PLAN_START_DATE + ' (Cycle swing bottom anchor)');
-    out.push('- **Total Completed Weekly Candles in Plan Scope:** ' + planWeeklyCandles.length + ' weeks');
+    out.push('### 2. DRAWDOWN REFERENCE & RE-ENTRY RUNGS (USER-CONFIGURED BASELINE)');
+    out.push('*Rule: Official drawdown trigger is measured strictly from completed weekly closes since the user-configured plan baseline date. Live spot intra-week drawdown is reported separately for situational context.*\n');
+    out.push('- **Plan Baseline Start Date:** ' + PLAN_START_DATE + ' [User Configurable: Current Setting]');
+    out.push('- **Completed Weekly Candles in Plan Scope:** ' + planWeeklyCandles.length + ' weeks');
     out.push('- **Reproducible Rally Peak Weekly Close:** ' + fmtPrice(rallyPeakClose) + ' (Candle Open: ' + fmtDate(rallyPeakCandle.openTime) + ', Closed: ' + fmtDate(rallyPeakCandle.closeTime) + ')');
     out.push('- **Latest Completed Weekly Close:** ' + fmtPrice(latestCompWeekly.close) + ' (Candle Closed: ' + fmtDate(latestCompWeekly.closeTime) + ')');
     out.push('- **Official Drawdown (Completed Weekly Close):** ' + (rallyDdCompleted * 100).toFixed(2) + '% (`' + latestCompWeekly.close.toFixed(2) + ' / ' + rallyPeakClose.toFixed(2) + ' - 1`)');
@@ -357,7 +385,20 @@ async function copyData2ForManus() {
     out.push('*Macro 52-Week Cycle Peak Reference: ' + fmtPrice(cyclePeakClose) + ' (Closed ' + fmtDate(cyclePeakCandle.closeTime) + '). 52W Completed Close Drawdown: ' + (cycleDdCompleted * 100).toFixed(2) + '%, Live Spot Drawdown: ' + (cycleDdLive !== null ? (cycleDdLive * 100).toFixed(2) + '%' : 'N/A') + '.*\n');
 
     out.push('---');
-    out.push('### 3. DAILY REVERSAL CONFIRMATION INPUTS (RAW OBSERVED)');
+    out.push('### 3. WEEKLY MARKET STRUCTURE & HIGHER-LOW FLOOR VERIFICATION');
+    out.push('*Rule: The tactical trend-failure rule requires a confirmed weekly higher-low floor. Below is the explicit verification comparing the two most recent confirmed 2-bar pivot lows:*\n');
+    if (latestConfirmedPivotL && priorConfirmedPivotL) {
+      out.push('- **Latest Confirmed Pivot Low Floor:** ' + fmtPrice(latestConfirmedPivotL.low) + ' (Week Open: ' + fmtDate(latestConfirmedPivotL.openTime) + ', Closed: ' + fmtDate(latestConfirmedPivotL.closeTime) + ')');
+      out.push('- **Prior Confirmed Pivot Low Floor:** ' + fmtPrice(priorConfirmedPivotL.low) + ' (Week Open: ' + fmtDate(priorConfirmedPivotL.openTime) + ', Closed: ' + fmtDate(priorConfirmedPivotL.closeTime) + ')');
+      out.push('- **Higher-Low Comparison:** ' + fmtPrice(latestConfirmedPivotL.low) + ' > ' + fmtPrice(priorConfirmedPivotL.low) + ' -> ' + (isConfirmedHigherLow ? 'TRUE' : 'FALSE') + ' (Difference: +' + fmtPrice(hlDiff) + ' / +' + hlDiffPct + '%)');
+      out.push('- **Structural Status:** ' + (isConfirmedHigherLow ? 'CONFIRMED HIGHER-LOW FLOOR INTACT' : 'HIGHER-LOW BROKEN'));
+      out.push('- **Macro Trend-Failure Line:** Completed weekly close below ' + fmtPrice(latestConfirmedPivotL.low) + ' is required to invalidate the macro bull structure.\n');
+    } else {
+      out.push('- **Structural Status:** INSUFFICIENT CONFIRMED PIVOTS IN LOOKBACK\n');
+    }
+
+    out.push('---');
+    out.push('### 4. DAILY REVERSAL CONFIRMATION INPUTS (RAW OBSERVED)');
     out.push('*Rule: Reclaim test compares the latest completed daily close (Day T) against the highs of the 5 completed daily candles BEFORE Day T (Days T-5 to T-1), strictly excluding the test candle itself.*\n');
     out.push('**Prior 5 Completed Benchmark Daily Candles (Days T-5 to T-1, Excluding Day T):**');
     out.push('| Candle Relative Day | Date (UTC) | Open | High | Low | Close | Volume (BTC) |');
@@ -380,11 +421,12 @@ async function copyData2ForManus() {
     out.push('- *Plan Invalidation Rule Distinction: Under strict daily-close rules, this higher-low remains technically provisional until the daily candle completes at 23:59:59 UTC; under intraday-stop rules, this floor is currently breached.*\n');
 
     out.push('---');
-    out.push('### 4. POTENTIAL SELL-ZONE REFERENCES & FIBONACCI PROJECTIONS');
-    out.push('- **Weekly Supply Zone:** $87,395.67 – $92,000.00');
-    out.push('  - *Lower Boundary ($87,395.67):* Objectively derived from the upper wick high of the candidate pivot weekly candle (Week Open: 2026-09-21T00:00:00Z, Closed: 2026-09-27T23:59:59Z).');
+    out.push('### 5. POTENTIAL SELL-ZONE REFERENCES & FIBONACCI PROJECTIONS');
+    out.push('- **Weekly Supply Zone [PROVISIONAL]:** $87,395.67 – $92,000.00');
+    out.push('  - *Status:* PROVISIONAL (Lower boundary $87,395.67 derived from unconfirmed candidate pivot candle of 2026-09-21; requires 2nd completed right bar on 2026-10-11 to confirm).');
+    out.push('  - *Lower Boundary ($87,395.67):* Objectively derived from upper wick high of candidate weekly pivot candle.');
     out.push('  - *Upper Boundary ($92,000.00):* Manually identified psychological round resistance and historical Q4 2025 breakdown cluster.');
-    out.push('  - *Classification:* PARTIALLY MANUAL / HYBRID (Upper boundary is not objectively calculated from active klines).');
+    out.push('  - *Classification:* PARTIALLY MANUAL / HYBRID & PROVISIONAL.');
     out.push('');
     out.push('- **Fibonacci Impulse Coordinates (Weekly Completed Pivots):**');
     out.push('  - Anchor A (Swing Low): $74,967.97 (Candle Open: 2026-09-14T00:00:00Z; 2-bar pivot low, CONFIRMED)');
@@ -400,7 +442,7 @@ async function copyData2ForManus() {
     out.push('    - 2.618 Extension: $115,098.62 (`82563.00 + 2.618 * 12427.70`)\n');
 
     out.push('---');
-    out.push('### 5. OPTIONAL CONTEXT (INDIVIDUALLY TIMESTAMPED & STATUSED)');
+    out.push('### 6. OPTIONAL CONTEXT (INDIVIDUALLY TIMESTAMPED & STATUSED)');
     out.push('*Rule: Reported for contextual awareness only. Kept strictly separate from core execution rules.*\n');
     out.push('| Metric | Value | As-Of / Window (UTC) | Source / Coverage | Status & Interpretation Scope |');
     out.push('| :--- | :--- | :--- | :--- | :--- |');
@@ -434,3 +476,21 @@ async function copyData2ForManus() {
 
 // Attach globally
 window.copyData2ForManus = copyData2ForManus;
+window.getPlanBaselineDate = getPlanBaselineDate;
+window.updatePlanBaselineDate = updatePlanBaselineDate;
+
+// Auto-sync baseline inputs on load
+function syncBaselineInputs() {
+  try {
+    var d = getPlanBaselineDate();
+    var inputs = document.querySelectorAll('#input-plan-baseline, .input-plan-baseline');
+    inputs.forEach(function(inp) { inp.value = d; });
+  } catch(e) {}
+}
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', syncBaselineInputs);
+  } else {
+    syncBaselineInputs();
+  }
+}
