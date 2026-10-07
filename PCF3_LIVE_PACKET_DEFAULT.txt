@@ -847,7 +847,7 @@ MISSING: 0
 EXAMPLE: 0 <- must be 0 in production
 
 ================================================================================
-SECTION 33: COMPACT DATA-ONLY SWING-TRADING PACKET (MANUS AI PROVENANCE EXPORT)
+SECTION 33: COMPACT DATA-ONLY SWING-TRADING PACKET (QUANTITATIVE PROVENANCE EXPORT)
 ================================================================================
 Packet Generation Time: 2026-10-07T13:22:45Z (UTC)
 Primary Exchange Venue: Binance Spot (BTCUSDT)
