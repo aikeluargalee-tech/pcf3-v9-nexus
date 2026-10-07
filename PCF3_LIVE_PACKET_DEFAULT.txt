@@ -900,8 +900,8 @@ Re-Entry Drawdown Rungs (Derived Dynamically from Rally Peak Close $86,530.00):
 *Rule: To prevent conflating tactical stops, swing structure, and macro regime, the three defensive levels are evaluated separately with their respective close rules:*
 
 - Tier 1: Tactical Trend-Defense Trigger (Active Swing Sleeve Exit)
-  * Metric / Anchor: 10-Week EMA ($77,785.35) & Nearer Higher-Low Floors
-  * Evaluation Rule: Completed weekly close below 10-Week EMA (or confirmed breakdown of tactical support)
+  * Metric / Anchor: 10-Week EMA ($77,785.35) [Sole Objective Tier 1 Anchor]
+  * Evaluation Rule: Completed weekly close below 10-Week EMA ($77,785.35). (Sole condition; no secondary discretionary triggers)
   * Operational Role: De-risking and tactical stop execution for active swing positions. Does not require broad macro regime failure.
   * Current Evaluation: DEFENDED / SAFE (Latest weekly close $86,530.00 is +11.24% above 10W EMA; Spot $83,380.01 is +7.19% above).
 
@@ -921,9 +921,9 @@ Re-Entry Drawdown Rungs (Derived Dynamically from Rally Peak Close $86,530.00):
     - Current Evaluation: DEFENDED / INTACT (Latest weekly close $86,530.00 is +15.38% above 20W EMA; Spot is +11.18% above).
   * 3B. Institutional Macro Bull Floor (20-Week SMA: $70,820.54):
     - Trigger Rule: Completed weekly close below 20-Week SMA.
-    - Operational Role: Final institutional bull market anchor and Sleeve 3 authorization floor. A completed weekly close below the 20W SMA signals definitive macro regime breakdown into a bear market.
+    - Operational Role: Final institutional bull market anchor and Sleeve 3 authorization floor. Under plan rules, a completed weekly close below the 20W SMA triggers the plan's macro bull floor invalidation and revokes Sleeve 3 authorization (rule-based system trigger; not an assertion of absolute macroeconomic certainty).
     - Current Evaluation: DEFENDED / INTACT (Latest weekly close $86,530.00 is +22.18% above 20W SMA; Spot is +17.73% above).
-  * Macro Invalidation Logical Operator: Separate observations. Loss of 3A (20W EMA) acts as an early dynamic warning / caution filter; loss of 3B (20W SMA) constitutes full institutional macro bull regime failure.
+  * Macro Invalidation Logical Operator: Separate observations. Loss of 3A (20W EMA) acts as an early dynamic warning / caution filter; loss of 3B (20W SMA) triggers the plan's institutional macro bull floor invalidation.
 
 4. DAILY REVERSAL CONFIRMATION INPUTS (RAW OBSERVED)
 - Benchmark Prior 5 Days (Days T-5 to T-1, Strictly Excluding Day T):

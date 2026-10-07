@@ -112,7 +112,7 @@ async function copyData2ForManus() {
   btns.forEach(function(b) { b.textContent = '⏳ Fetching & Verifying...'; });
 
   try {
-    var genTimeUTC = new Date().toISOString();
+    var collectionStartTime = new Date().toISOString();
     var nowMs = Date.now();
 
     // 1. Fetch live Binance Spot ticker & bookTicker
@@ -352,6 +352,8 @@ async function copyData2ForManus() {
     var etfStatus = 'CACHED (Vendor Proxy: Farside / Tree News Aggregate)';
 
     // 14. Format Output
+    var collectionEndTime = new Date().toISOString();
+    var genTimeUTC = collectionEndTime;
     function fmtDate(ms) { return new Date(ms).toISOString(); }
     function fmtPrice(p) { return p !== null && !isNaN(p) ? '$' + p.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 'MISSING'; }
 
@@ -421,8 +423,8 @@ async function copyData2ForManus() {
 
     // Tier 1: Tactical Trend-Defense Trigger
     out.push('#### Tier 1: Tactical Trend-Defense Trigger (Active Swing Sleeve Exit)');
-    out.push('- **Primary Metric / Anchor:** 10-Week EMA (' + (ema10w ? fmtPrice(ema10w) : 'MISSING') + ') & Nearer Higher-Low Floors');
-    out.push('- **Evaluation Rule:** Completed weekly close below 10-Week EMA (or confirmed breakdown of immediate tactical support).');
+    out.push('- **Primary Metric / Anchor:** 10-Week EMA (' + (ema10w ? fmtPrice(ema10w) : 'MISSING') + ') [Sole Objective Tier 1 Anchor]');
+    out.push('- **Evaluation Rule:** Completed weekly close below 10-Week EMA (' + (ema10w ? fmtPrice(ema10w) : 'MISSING') + '). (Sole condition; no secondary discretionary triggers).');
     out.push('- **Operational Role:** De-risking and tactical stop execution for active swing positions. Does not require broad macro regime failure.');
     var t1Safe = ema10w && (latestCompWeekly.close >= ema10w);
     var t1Dist = ema10w ? (((spotPrice - ema10w) / ema10w) * 100).toFixed(2) : 'N/A';
@@ -455,12 +457,12 @@ async function copyData2ForManus() {
     out.push('');
     out.push('- **3B. Institutional Macro Bull Floor (20-Week SMA: ' + (sma20w ? fmtPrice(sma20w) : 'MISSING') + '):**');
     out.push('  - *Trigger Rule:* Completed weekly close below 20-Week SMA.');
-    out.push('  - *Operational Role:* Final institutional bull market anchor and Sleeve 3 authorization floor. A completed weekly close below the 20W SMA signals definitive macro regime breakdown into a bear market.');
+    out.push('  - *Operational Role:* Final institutional bull market anchor and Sleeve 3 authorization floor. Under plan rules, a completed weekly close below the 20W SMA triggers the plan\'s macro bull floor invalidation and revokes Sleeve 3 authorization (rule-based system trigger; not an assertion of absolute macroeconomic certainty).');
     var t3bSafe = sma20w && (latestCompWeekly.close >= sma20w);
     var t3bDist = sma20w ? (((spotPrice - sma20w) / sma20w) * 100).toFixed(2) : 'N/A';
     out.push('  - *Current Evaluation:* ' + (t3bSafe ? 'DEFENDED / INTACT' : 'TRIGGERED / AT RISK') + ' (Latest weekly close ' + fmtPrice(latestCompWeekly.close) + ' is +' + (((latestCompWeekly.close - sma20w)/sma20w)*100).toFixed(2) + '% above; Live spot is ' + (parseFloat(t3bDist) >= 0 ? '+' : '') + t3bDist + '%).');
     out.push('');
-    out.push('- **Macro Invalidation Logical Operator:** Separate observations. Loss of 3A (20W EMA) acts as an early dynamic warning / caution filter; loss of 3B (20W SMA) constitutes full institutional macro bull regime failure.\n');
+    out.push('- **Macro Invalidation Logical Operator:** Separate observations. Loss of 3A (20W EMA) acts as an early dynamic warning / caution filter; loss of 3B (20W SMA) triggers the plan\'s institutional macro bull floor invalidation.\n');
 
     out.push('---');
     out.push('### 4. DAILY REVERSAL CONFIRMATION INPUTS (RAW OBSERVED)');
