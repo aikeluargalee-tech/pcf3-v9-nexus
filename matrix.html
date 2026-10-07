@@ -729,11 +729,11 @@
             </td>
             <td>
               <div><span class="telemetry-val-hl">Spot: <span id="tactical-spot-price">$86,350.01</span></span></div>
-              <div style="font-size:11px; color:#94A3B8;">Swing High: <strong>$86,490</strong> | Key HL Floor: <strong>$79,500</strong></div>
+              <div style="font-size:11px; color:#94A3B8;">Swing High: <strong>$86,490</strong> | Key HL Floor: <strong>$79,500</strong> (<span id="tactical-struct-diff">+8.6%</span>)</div>
             </td>
             <td>
-              <span class="telemetry-status-pill green">🟢 STRUCTURE INTACT</span>
-              <div style="font-size:10px; color:#94A3B8; margin-top:2px;">Safely above $79.5k floor</div>
+              <span id="tactical-struct-pill" class="telemetry-status-pill green">🟢 STRUCTURE INTACT</span>
+              <div id="tactical-struct-note" style="font-size:10px; color:#94A3B8; margin-top:2px;">Safely above $79.5k floor</div>
             </td>
           </tr>
 
@@ -786,11 +786,11 @@
             </td>
             <td>
               <div><span class="telemetry-val-hl">10W EMA: $78,450.00</span></div>
-              <div style="font-size:11px; color:#34D399;">Spot is <strong>+10.07%</strong> above 10W EMA</div>
+              <div style="font-size:11px;" id="tactical-ema10w-diff">Spot is <strong>+10.07%</strong> above 10W EMA</div>
             </td>
             <td>
-              <span class="telemetry-status-pill green">🟢 TREND DEFENSE SAFE</span>
-              <div style="font-size:10px; color:#94A3B8; margin-top:2px;">Close &lt; $78.4k required to fail</div>
+              <span id="tactical-ema10w-pill" class="telemetry-status-pill green">🟢 TREND DEFENSE SAFE</span>
+              <div id="tactical-ema10w-note" style="font-size:10px; color:#94A3B8; margin-top:2px;">Close &lt; $78.4k required to fail</div>
             </td>
           </tr>
 
@@ -805,11 +805,11 @@
             </td>
             <td>
               <div><span class="telemetry-val-hl">20W EMA: $76,001.00</span></div>
-              <div style="font-size:11px; color:#94A3B8;">20W SMA: $71,286.65 (Spot +13.6% above)</div>
+              <div style="font-size:11px; color:#94A3B8;" id="tactical-ema20w-diff">20W SMA: $71,286.65 (Spot +13.6% above)</div>
             </td>
             <td>
-              <span class="telemetry-status-pill green">🟢 MACRO BULL ANCHOR</span>
-              <div style="font-size:10px; color:#94A3B8; margin-top:2px;">Sleeve 3 institutional floor</div>
+              <span id="tactical-ema20w-pill" class="telemetry-status-pill green">🟢 MACRO BULL ANCHOR</span>
+              <div id="tactical-ema20w-note" style="font-size:10px; color:#94A3B8; margin-top:2px;">Sleeve 3 institutional floor</div>
             </td>
           </tr>
 
@@ -823,12 +823,12 @@
               Helps decide whether an armed re-entry sleeve is authorized.
             </td>
             <td>
-              <div><span class="telemetry-val-hl">Daily Low: $85,812.00 (Defended)</span></div>
-              <div style="font-size:11px; color:#34D399;">Daily VWAP: $86,203.06 (Reclaimed +0.17%)</div>
+              <div><span class="telemetry-val-hl" id="tactical-daily-low-text">Daily Low: $85,812.00 (Defended)</span></div>
+              <div style="font-size:11px;" id="tactical-daily-vwap-text">Daily VWAP: $86,203.06 (Reclaimed +0.17%)</div>
             </td>
             <td>
-              <span class="telemetry-status-pill green">🟢 RE-ENTRY AUTHORIZED</span>
-              <div style="font-size:10px; color:#94A3B8; margin-top:2px;">VWAP fair value reclaimed</div>
+              <span id="tactical-reclaim-pill" class="telemetry-status-pill green">🟢 RE-ENTRY AUTHORIZED</span>
+              <div id="tactical-reclaim-note" style="font-size:10px; color:#94A3B8; margin-top:2px;">VWAP fair value reclaimed</div>
             </td>
           </tr>
 
@@ -842,12 +842,12 @@
               Helps scale order spacing to recent volatility; it does not indicate direction.
             </td>
             <td>
-              <div><span class="telemetry-val-hl">Daily ATR: $2,152.16 (2.492%)</span></div>
+              <div><span class="telemetry-val-hl" id="tactical-atr-text">Daily ATR: $2,152.16 (2.492%)</span></div>
               <div style="font-size:11px; color:#94A3B8;">50D Avg ATR: $2,230.84 | ATR Ratio: 0.965</div>
             </td>
             <td>
-              <span class="telemetry-status-pill cyan">📏 SPACING: $3,228–$4,304</span>
-              <div style="font-size:10px; color:#94A3B8; margin-top:2px;">1.5x–2.0x ATR buffer below entry</div>
+              <span id="tactical-atr-pill" class="telemetry-status-pill cyan">📏 SPACING: $3,228–$4,304</span>
+              <div id="tactical-atr-note" style="font-size:10px; color:#94A3B8; margin-top:2px;">1.5x–2.0x ATR buffer below entry</div>
             </td>
           </tr>
 
@@ -1174,7 +1174,7 @@
             </td>
             <td><span id="live-metric-spotPrice" class="telemetry-val-hl">$86,350.01</span> <span class="telemetry-dim">(Live Feed)</span></td>
             <td><span class="telemetry-cond">&ge; Daily VWAP ($86,203.06)</span></td>
-            <td><span class="telemetry-status-pill green">🟢 PASSED (Holding Fair Value)</span></td>
+            <td><span id="live-metric-spotPrice-pill" class="telemetry-status-pill green">🟢 PASSED (Holding Fair Value)</span></td>
           </tr>
           <tr class="telemetry-row" data-family="structure" id="live-row-22">
             <td style="text-align: center; color: #64748B; font-weight: bold;">22</td>
@@ -1202,9 +1202,9 @@
               <div class="telemetry-name">Monthly VWAP (1st 00:00 UTC)</div>
               <div class="telemetry-sub">📐 Market Structure • Volume-weighted price from month 1st 00:00 UTC</div>
             </td>
-            <td><span id="live-metric-monthlyVwap" class="telemetry-val-hl">$85,182.44</span> <span class="telemetry-dim">(+$1,167.57 Buffer)</span></td>
+            <td><span id="live-metric-monthlyVwap" class="telemetry-val-hl">$85,182.44</span> <span id="live-metric-monthlyVwap-dim" class="telemetry-dim">(+$1,167.57 Buffer)</span></td>
             <td><span class="telemetry-cond">Spot &gt; Monthly VWAP (Month Bull)</span></td>
-            <td><span class="telemetry-status-pill green">🟢 PASSED (Month Uptrend Intact)</span></td>
+            <td><span id="live-metric-monthlyVwap-pill" class="telemetry-status-pill green">🟢 PASSED (Month Uptrend Intact)</span></td>
           </tr>
           <tr class="telemetry-row" data-family="structure" id="live-row-25">
             <td style="text-align: center; color: #64748B; font-weight: bold;">25</td>
@@ -1212,9 +1212,9 @@
               <div class="telemetry-name">Price vs. Daily VWAP % Distance</div>
               <div class="telemetry-sub">📐 Market Structure • Percentage distance from Daily VWAP</div>
             </td>
-            <td><span id="live-metric-priceVsVwapPct" class="telemetry-val-hl">+0.170%</span> <span class="telemetry-dim">(In Acceptance Zone)</span></td>
+            <td><span id="live-metric-priceVsVwapPct" class="telemetry-val-hl">+0.170%</span> <span id="live-metric-priceVsVwapPct-dim" class="telemetry-dim">(In Acceptance Zone)</span></td>
             <td><span class="telemetry-cond">Fair Value Zone: -0.50% to +1.00%</span></td>
-            <td><span class="telemetry-status-pill green">🟢 IN RANGE (Perfect Value Zone)</span></td>
+            <td><span id="live-metric-priceVsVwapPct-pill" class="telemetry-status-pill green">🟢 IN RANGE (Perfect Value Zone)</span></td>
           </tr>
           <tr class="telemetry-row" data-family="structure" id="live-row-26">
             <td style="text-align: center; color: #64748B; font-weight: bold;">26</td>
@@ -1243,7 +1243,7 @@
               <div class="telemetry-name">Daily ATR(14) Volatility Span</div>
               <div class="telemetry-sub">📐 Market Structure • Daily 14-period True Range for execution order spacing</div>
             </td>
-            <td><span id="live-metric-dailyAtr14" class="telemetry-val-hl">$2,152.16</span> <span class="telemetry-dim">(2.492% of Spot)</span></td>
+            <td><span id="live-metric-dailyAtr14" class="telemetry-val-hl">$2,152.16</span> <span id="live-metric-dailyAtr14-dim" class="telemetry-dim">(2.492% of Spot)</span></td>
             <td><span class="telemetry-cond">Order Spacing: 1.5x&ndash;2.0x ATR ($3,228&ndash;$4,304)</span></td>
             <td><span class="telemetry-status-pill cyan">📏 SPACING: $3,228&ndash;$4,304</span></td>
           </tr>
@@ -1253,9 +1253,9 @@
               <div class="telemetry-name">10-Week Exponential Moving Average (10W EMA)</div>
               <div class="telemetry-sub">📐 Market Structure • Tactical trend-failure defense line with weekly higher-low</div>
             </td>
-            <td><span id="live-metric-ema10w" class="telemetry-val-hl">$78,450.00</span> <span class="telemetry-dim">(Spot +10.07% Above)</span></td>
+            <td><span id="live-metric-ema10w" class="telemetry-val-hl">$78,450.00</span> <span id="live-metric-ema10w-dim" class="telemetry-dim">(Spot +10.07% Above)</span></td>
             <td><span class="telemetry-cond">Spot &gt; 10W EMA (Tactical Trend Protected)</span></td>
-            <td><span class="telemetry-status-pill green">🟢 PASSED (Trend Line Safe)</span></td>
+            <td><span id="live-metric-ema10w-pill" class="telemetry-status-pill green">🟢 PASSED (Trend Line Safe)</span></td>
           </tr>
           <tr class="telemetry-row" data-family="structure" id="live-row-30">
             <td style="text-align: center; color: #64748B; font-weight: bold;">30</td>
@@ -1263,9 +1263,9 @@
               <div class="telemetry-name">20-Week Exponential Moving Average (20W EMA)</div>
               <div class="telemetry-sub">📐 Market Structure • Anchor confirmation for conservative re-entry sleeve 3</div>
             </td>
-            <td><span id="live-metric-ema20w" class="telemetry-val-hl">$76,001.00</span> <span class="telemetry-dim">(Spot +13.62% Above)</span></td>
+            <td><span id="live-metric-ema20w" class="telemetry-val-hl">$76,001.00</span> <span id="live-metric-ema20w-dim" class="telemetry-dim">(Spot +13.62% Above)</span></td>
             <td><span class="telemetry-cond">Spot &gt; 20W EMA (Macro Bull Anchor Intact)</span></td>
-            <td><span class="telemetry-status-pill green">🟢 PASSED (Macro Floor Intact)</span></td>
+            <td><span id="live-metric-ema20w-pill" class="telemetry-status-pill green">🟢 PASSED (Macro Floor Intact)</span></td>
           </tr>
           <tr class="telemetry-row" data-family="structure" id="live-row-31">
             <td style="text-align: center; color: #64748B; font-weight: bold;">31</td>
@@ -1273,9 +1273,9 @@
               <div class="telemetry-name">Weekly Swing Structure &amp; Confirmed Pivots</div>
               <div class="telemetry-sub">📐 Market Structure • Confirmed weekly swing highs &amp; higher-low invalidation floor</div>
             </td>
-            <td><span id="live-metric-weeklySwings" class="telemetry-val-hl">High: $86,490</span> <span class="telemetry-dim">(Key HL Floor: $79,500)</span></td>
+            <td><span id="live-metric-weeklySwings" class="telemetry-val-hl">High: $86,490</span> <span id="live-metric-weeklySwings-dim" class="telemetry-dim">(Key HL Floor: $79,500)</span></td>
             <td><span class="telemetry-cond">Higher-Low Floor Defended (&gt; $79,500)</span></td>
-            <td><span class="telemetry-status-pill green">🟢 PASSED (Higher-Low Intact)</span></td>
+            <td><span id="live-metric-weeklySwings-pill" class="telemetry-status-pill green">🟢 PASSED (Higher-Low Intact)</span></td>
           </tr>
           <tr class="telemetry-row" data-family="structure" id="live-row-32">
             <td style="text-align: center; color: #64748B; font-weight: bold;">32</td>
@@ -1401,7 +1401,7 @@
             </td>
             <td><span id="live-metric-sthCostBasis" class="telemetry-val-hl">$73,019.37</span> <span class="telemetry-dim">(Psychological Floor)</span></td>
             <td><span class="telemetry-cond">Price &gt; STH Cost Basis (No Retail Panic)</span></td>
-            <td><span class="telemetry-status-pill green">🟢 PASSED (STH In Profit +18.3%)</span></td>
+            <td><span id="live-metric-sthCostBasis-pill" class="telemetry-status-pill green">🟢 PASSED (STH In Profit +18.3%)</span></td>
           </tr>
           <tr class="telemetry-row" data-family="onchain" id="live-row-44">
             <td style="text-align: center; color: #64748B; font-weight: bold;">44</td>
@@ -2000,6 +2000,8 @@
       var liveSpot = null;
       var liveSpotVol = null;
       var liveSpotQuoteVol = null;
+      var liveSpotLow = null;
+      var liveSpotHigh = null;
       var liveCvd = null;
       try {
         var tickerRes = await fetch('https://data-api.binance.vision/api/v3/ticker/24hr?symbol=BTCUSDT');
@@ -2007,6 +2009,8 @@
         liveSpot = parseFloat(tickerJson.lastPrice);
         liveSpotVol = parseFloat(tickerJson.volume);
         liveSpotQuoteVol = parseFloat(tickerJson.quoteVolume);
+        liveSpotLow = parseFloat(tickerJson.lowPrice);
+        liveSpotHigh = parseFloat(tickerJson.highPrice);
       } catch(e) {
         try {
           var spotRes = await fetch('https://data-api.binance.vision/api/v3/ticker/price?symbol=BTCUSDT');
@@ -2031,7 +2035,7 @@
 
       var diag = evaluateActiveConfig(packetTxt, liveSpot);
       renderRadarUI(diag, new Date().toLocaleTimeString());
-      updateTelemetryLiveValues(packetTxt, liveSpot, liveSpotVol, liveSpotQuoteVol, liveCvd);
+      updateTelemetryLiveValues(packetTxt, liveSpot, liveSpotVol, liveSpotQuoteVol, liveCvd, liveSpotLow, liveSpotHigh);
     } catch(err) {
       console.warn('Packet fetch failed', err);
     } finally {
@@ -2039,10 +2043,12 @@
     }
   }
 
-  function updateTelemetryLiveValues(packetTxt, liveSpot, liveSpotVol, liveSpotQuoteVol, liveCvd) {
+  function updateTelemetryLiveValues(packetTxt, liveSpot, liveSpotVol, liveSpotQuoteVol, liveCvd, liveSpotLow, liveSpotHigh) {
     var txt = packetTxt || '';
     var spot = (typeof liveSpot === 'number' && liveSpot > 1000) ? liveSpot : (parseVal(txt, 'SPOT:') || 86350.01);
     var vwap = parseVal(txt, 'Daily_VWAP:') || 86203.06;
+    var monthlyVwap = parseVal(txt, 'Monthly_VWAP:') || 85182.44;
+    var dailyLow = (typeof liveSpotLow === 'number' && liveSpotLow > 0) ? liveSpotLow : (parseVal(txt, 'Daily_Low:') || 83442.00);
     var funding = parseVal(txt, 'Funding_Binance:') || 0.0017;
     var oiCurrent = parseVal(txt, 'OI_current:') || 97176.24;
     var oiChg = parseVal(txt, 'OI_CHANGE_%:') || 0.345;
@@ -2051,46 +2057,91 @@
     var sthCost = parseVal(txt, 'STH_COST_BASIS:') || 73019.37;
     var atr4h = parseVal(txt, 'ATR_4H:') || 714.52;
     var atrPct = parseVal(txt, 'ATR_%:') || 0.827;
+    var dailyAtr = parseVal(txt, 'ATR_Daily:') || 2152.16;
     var fearGreed = parseVal(txt, 'Fear_Greed:') || 70;
 
-    // 1. Spot Price (Row 21)
+    // 1. Spot Price (Row 21) & Status Pill
     var elSpot = document.getElementById('live-metric-spotPrice');
     if (elSpot) elSpot.textContent = '$' + spot.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    var elSpotPill = document.getElementById('live-metric-spotPrice-pill');
+    if (elSpotPill) {
+      if (spot >= vwap) {
+        elSpotPill.className = 'telemetry-status-pill green';
+        elSpotPill.textContent = '🟢 PASSED (Holding Fair Value)';
+      } else {
+        elSpotPill.className = 'telemetry-status-pill amber';
+        elSpotPill.textContent = '⚠️ BELOW VWAP (Testing Discount)';
+      }
+    }
 
     // 2. Daily VWAP (Row 22)
     var elVwap = document.getElementById('live-metric-dailyVwap');
     if (elVwap) elVwap.textContent = '$' + vwap.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     // 3. Price vs VWAP % (Row 25)
+    var distVwap = ((spot - vwap) / vwap * 100);
     var elVwapDist = document.getElementById('live-metric-priceVsVwapPct');
     if (elVwapDist) {
-      var distVwap = ((spot - vwap) / vwap * 100);
       elVwapDist.textContent = (distVwap >= 0 ? '+' : '') + distVwap.toFixed(3) + '%';
     }
+    var elVwapDistPill = document.getElementById('live-metric-priceVsVwapPct-pill');
+    var elVwapDistDim = document.getElementById('live-metric-priceVsVwapPct-dim');
+    if (distVwap >= -0.50 && distVwap <= 1.00) {
+      if (elVwapDistPill) {
+        elVwapDistPill.className = 'telemetry-status-pill green';
+        elVwapDistPill.textContent = '🟢 IN RANGE (Fair Value Zone)';
+      }
+      if (elVwapDistDim) elVwapDistDim.textContent = '(In Acceptance Zone)';
+    } else if (distVwap < -0.50) {
+      if (elVwapDistPill) {
+        elVwapDistPill.className = 'telemetry-status-pill amber';
+        elVwapDistPill.textContent = '⚠️ BELOW VWAP (Discount / Weakness)';
+      }
+      if (elVwapDistDim) elVwapDistDim.textContent = '(Below Fair Value Zone)';
+    } else {
+      if (elVwapDistPill) {
+        elVwapDistPill.className = 'telemetry-status-pill cyan';
+        elVwapDistPill.textContent = '🚀 EXTENDED (Trading at Premium)';
+      }
+      if (elVwapDistDim) elVwapDistDim.textContent = '(Above Fair Value Zone)';
+    }
 
-    // 4. Funding Rate (Row 10)
+    // 4. Monthly VWAP (Row 24)
+    var distMonthlyVwap = spot - monthlyVwap;
+    var elMonthlyDim = document.getElementById('live-metric-monthlyVwap-dim');
+    var elMonthlyPill = document.getElementById('live-metric-monthlyVwap-pill');
+    if (elMonthlyDim) {
+      elMonthlyDim.textContent = '(' + (distMonthlyVwap >= 0 ? '+$' : '-$') + Math.abs(distMonthlyVwap).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + (distMonthlyVwap >= 0 ? ' Buffer' : ' Deficit') + ')';
+    }
+    if (elMonthlyPill) {
+      if (spot >= monthlyVwap) {
+        elMonthlyPill.className = 'telemetry-status-pill green';
+        elMonthlyPill.textContent = '🟢 PASSED (Month Uptrend Intact)';
+      } else {
+        elMonthlyPill.className = 'telemetry-status-pill amber';
+        elMonthlyPill.textContent = '⚠️ TESTED (Below Monthly VWAP)';
+      }
+    }
+
+    // 5. Funding Rate (Row 10) & Annualized (Row 11)
     var elFunding = document.getElementById('live-metric-fundingRate');
     if (elFunding) elFunding.textContent = (funding >= 0 ? '+' : '') + funding.toFixed(4) + '%';
-
-    // 5. Funding Annual (Row 11)
     var elFundingAnn = document.getElementById('live-metric-fundingAnnual');
     if (elFundingAnn) elFundingAnn.textContent = '+' + (funding * 3 * 365).toFixed(2) + '% ann.';
 
-    // 6. OI Current (Row 12)
+    // 6. OI Current (Row 12) & Change (Row 13)
     var elOi = document.getElementById('live-metric-oiCurrent');
     if (elOi) elOi.textContent = oiCurrent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' BTC';
-
-    // 7. OI Change % (Row 13)
     var elOiChg = document.getElementById('live-metric-oiChange');
     if (elOiChg) elOiChg.textContent = (oiChg >= 0 ? '+' : '') + oiChg.toFixed(3) + '%';
 
-    // 8. CVD Current (Row 1) & Tactical Row 8
+    // 7. CVD Current (Row 1) & Tactical Row 8
     var elCvd = document.getElementById('live-metric-cvdCurrent');
     if (elCvd) elCvd.textContent = (cvdCurrent >= 0 ? '+' : '') + cvdCurrent.toFixed(2) + ' BTC';
     var elTacCvd = document.getElementById('tactical-spot-cvd');
     if (elTacCvd) elTacCvd.textContent = (cvdCurrent >= 0 ? '+' : '') + cvdCurrent.toFixed(2) + ' BTC';
 
-    // 8b. Spot Volume 24h (Row 7) and Tactical Row 8
+    // 8. Spot Volume 24h (Row 7) and Tactical Row 8
     var spotVol = (typeof liveSpotVol === 'number' && liveSpotVol > 0) ? liveSpotVol : (parseVal(txt, 'Spot_volume_24h:') || 14010.08);
     var spotQuoteVol = (typeof liveSpotQuoteVol === 'number' && liveSpotQuoteVol > 0) ? liveSpotQuoteVol : (spotVol * spot);
     var elSpotVol = document.getElementById('live-metric-spotVol24h');
@@ -2129,26 +2180,34 @@
     var elSlope = document.getElementById('live-metric-cvdSlope');
     if (elSlope) elSlope.textContent = (cvdSlope >= 0 ? '+' : '') + cvdSlope.toFixed(3);
 
-    // 10. Distance vs STH Cost Basis % (Row 44)
+    // 10. Distance vs STH Cost Basis % (Row 44) & Row 43 Pill
+    var distSth = ((spot - sthCost) / sthCost * 100);
     var elSthDist = document.getElementById('live-metric-sthDistPct');
     if (elSthDist) {
-      var distSth = ((spot - sthCost) / sthCost * 100);
       elSthDist.textContent = (distSth >= 0 ? '+' : '') + distSth.toFixed(2) + '% Above';
     }
+    var elSthPill = document.getElementById('live-metric-sthCostBasis-pill');
+    if (elSthPill) {
+      if (distSth >= 0) {
+        elSthPill.className = 'telemetry-status-pill green';
+        elSthPill.textContent = '🟢 PASSED (STH In Profit +' + distSth.toFixed(1) + '%)';
+      } else {
+        elSthPill.className = 'telemetry-status-pill red';
+        elSthPill.textContent = '🚨 FAILED (STH In Loss ' + distSth.toFixed(1) + '%)';
+      }
+    }
 
-    // 11. ATR 4H (Row 26)
+    // 11. ATR 4H (Row 26) & ATR % (Row 27)
     var elAtr = document.getElementById('live-metric-atr4h');
     if (elAtr) elAtr.textContent = '$' + atr4h.toFixed(2);
-
-    // 12. ATR % (Row 27)
     var elAtrPct = document.getElementById('live-metric-atrPct');
     if (elAtrPct) elAtrPct.textContent = atrPct.toFixed(3) + '%';
 
-    // 13. Fear & Greed (Row 55)
+    // 12. Fear & Greed (Row 55)
     var elFg = document.getElementById('live-metric-fearGreed');
     if (elFg) elFg.textContent = fearGreed + ' / 100';
 
-    // 14. Drawdown from Confirmed Peak Rally Weekly Close ($86,530.00 on Binance)
+    // 13. Drawdown from Confirmed Peak Rally Weekly Close ($86,530.00 on Binance)
     var peakWeeklyClose = 86530.00;
     var drawdownPeak = ((spot - peakWeeklyClose) / peakWeeklyClose * 100);
     var rung1Price = peakWeeklyClose * 0.95; // $82,203.50
@@ -2159,10 +2218,8 @@
     if (elDdPeak) elDdPeak.textContent = (drawdownPeak >= 0 ? '+' : '') + drawdownPeak.toFixed(2) + '%';
     var elTacticalDd = document.getElementById('tactical-drawdown-val');
     if (elTacticalDd) elTacticalDd.textContent = (drawdownPeak >= 0 ? '+' : '') + drawdownPeak.toFixed(2) + '%';
-    var elTacticalSpot = document.getElementById('tactical-spot-price');
-    if (elTacticalSpot) elTacticalSpot.textContent = '$' + spot.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    // Dynamic Rung Status & Note updates (no hardcoded desynchronization)
+    // Dynamic Rung Status & Note updates
     var elTacticalStatusPill = document.getElementById('tactical-rung-status-pill');
     var elTacticalStatusNote = document.getElementById('tactical-rung-status-note');
     var elTelemetryStatusPill = document.getElementById('telemetry-rung-status-pill');
@@ -2217,6 +2274,162 @@
         elTelemetryStatusPill.textContent = '🚨 RUNG 3 ACTIVE';
       }
     }
+
+    // === TACTICAL EXECUTION MATRIX (THE 9 OPERATIONAL METRICS) ===
+    // Tactical Row 1: Weekly Swing Structure & Higher-Low Floor ($79,500.00)
+    var hlFloor = 79500.00;
+    var distFloor = ((spot - hlFloor) / hlFloor * 100);
+    var elTacSpot = document.getElementById('tactical-spot-price');
+    if (elTacSpot) elTacSpot.textContent = '$' + spot.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    var elTacStructDiff = document.getElementById('tactical-struct-diff');
+    if (elTacStructDiff) elTacStructDiff.textContent = (distFloor >= 0 ? '+' : '') + distFloor.toFixed(1) + '%';
+    var elTacStructPill = document.getElementById('tactical-struct-pill');
+    var elTacStructNote = document.getElementById('tactical-struct-note');
+    if (spot >= hlFloor) {
+      if (elTacStructPill) {
+        elTacStructPill.className = 'telemetry-status-pill green';
+        elTacStructPill.textContent = '🟢 STRUCTURE INTACT';
+      }
+      if (elTacStructNote) elTacStructNote.textContent = 'Safely +' + distFloor.toFixed(1) + '% above $79.5k floor';
+    } else {
+      if (elTacStructPill) {
+        elTacStructPill.className = 'telemetry-status-pill red';
+        elTacStructPill.textContent = '🚨 STRUCTURE BROKEN';
+      }
+      if (elTacStructNote) elTacStructNote.textContent = 'Spot is ' + Math.abs(distFloor).toFixed(1) + '% below $79.5k floor (Trend Alert)';
+    }
+    // Also sync Telemetry Table Row 31
+    var elSwingsDim = document.getElementById('live-metric-weeklySwings-dim');
+    var elSwingsPill = document.getElementById('live-metric-weeklySwings-pill');
+    if (elSwingsDim) elSwingsDim.textContent = '(Key HL Floor: $79,500 | ' + (distFloor >= 0 ? '+' : '') + distFloor.toFixed(1) + '%)';
+    if (elSwingsPill) {
+      if (spot >= hlFloor) {
+        elSwingsPill.className = 'telemetry-status-pill green';
+        elSwingsPill.textContent = '🟢 PASSED (Higher-Low Intact)';
+      } else {
+        elSwingsPill.className = 'telemetry-status-pill red';
+        elSwingsPill.textContent = '🚨 FAILED (Floor Breached)';
+      }
+    }
+
+    // Tactical Row 4: 10-Week EMA ($78,450.00)
+    var ema10w = 78450.00;
+    var dist10w = ((spot - ema10w) / ema10w * 100);
+    var elTacEma10Diff = document.getElementById('tactical-ema10w-diff');
+    if (elTacEma10Diff) {
+      elTacEma10Diff.innerHTML = 'Spot is <strong style="color:' + (dist10w >= 0 ? '#34D399' : '#F87171') + '">' + (dist10w >= 0 ? '+' : '') + dist10w.toFixed(2) + '%</strong> ' + (dist10w >= 0 ? 'above' : 'below') + ' 10W EMA';
+    }
+    var elTacEma10Pill = document.getElementById('tactical-ema10w-pill');
+    var elTacEma10Note = document.getElementById('tactical-ema10w-note');
+    if (spot >= ema10w) {
+      if (elTacEma10Pill) {
+        elTacEma10Pill.className = 'telemetry-status-pill green';
+        elTacEma10Pill.textContent = '🟢 TREND DEFENSE SAFE';
+      }
+      if (elTacEma10Note) elTacEma10Note.textContent = 'Close < $78.4k required to fail (+' + dist10w.toFixed(1) + '% buffer)';
+    } else {
+      if (elTacEma10Pill) {
+        elTacEma10Pill.className = 'telemetry-status-pill red';
+        elTacEma10Pill.textContent = '🚨 10W EMA BREACHED';
+      }
+      if (elTacEma10Note) elTacEma10Note.textContent = 'Tactical trend defense violated (' + dist10w.toFixed(1) + '%)';
+    }
+    // Also sync Telemetry Table Row 29
+    var elEma10wDim = document.getElementById('live-metric-ema10w-dim');
+    var elEma10wPill = document.getElementById('live-metric-ema10w-pill');
+    if (elEma10wDim) elEma10wDim.textContent = '(Spot ' + (dist10w >= 0 ? '+' : '') + dist10w.toFixed(2) + '% ' + (dist10w >= 0 ? 'Above' : 'Below') + ')';
+    if (elEma10wPill) {
+      if (spot >= ema10w) {
+        elEma10wPill.className = 'telemetry-status-pill green';
+        elEma10wPill.textContent = '🟢 PASSED (Trend Line Safe)';
+      } else {
+        elEma10wPill.className = 'telemetry-status-pill red';
+        elEma10wPill.textContent = '🚨 FAILED (10W EMA Breached)';
+      }
+    }
+
+    // Tactical Row 5: 20-Week EMA ($76,001.00) & 20W SMA ($71,286.65)
+    var ema20w = 76001.00;
+    var sma20w = 71286.65;
+    var dist20wEma = ((spot - ema20w) / ema20w * 100);
+    var dist20wSma = ((spot - sma20w) / sma20w * 100);
+    var elTacEma20Diff = document.getElementById('tactical-ema20w-diff');
+    if (elTacEma20Diff) {
+      elTacEma20Diff.innerHTML = '20W SMA: $71,286.65 (Spot <strong style="color:' + (dist20wSma >= 0 ? '#34D399' : '#F87171') + '">' + (dist20wSma >= 0 ? '+' : '') + dist20wSma.toFixed(1) + '%</strong> above)';
+    }
+    var elTacEma20Pill = document.getElementById('tactical-ema20w-pill');
+    var elTacEma20Note = document.getElementById('tactical-ema20w-note');
+    if (spot >= ema20w) {
+      if (elTacEma20Pill) {
+        elTacEma20Pill.className = 'telemetry-status-pill green';
+        elTacEma20Pill.textContent = '🟢 MACRO BULL ANCHOR';
+      }
+      if (elTacEma20Note) elTacEma20Note.textContent = 'Sleeve 3 institutional floor (+' + dist20wEma.toFixed(1) + '% buffer)';
+    } else {
+      if (elTacEma20Pill) {
+        elTacEma20Pill.className = 'telemetry-status-pill red';
+        elTacEma20Pill.textContent = '⚠️ 20W EMA AT RISK';
+      }
+      if (elTacEma20Note) elTacEma20Note.textContent = 'Trading below 20W EMA; conservative sleeve watchful';
+    }
+    // Also sync Telemetry Table Row 30
+    var elEma20wDim = document.getElementById('live-metric-ema20w-dim');
+    var elEma20wPill = document.getElementById('live-metric-ema20w-pill');
+    if (elEma20wDim) elEma20wDim.textContent = '(Spot ' + (dist20wEma >= 0 ? '+' : '') + dist20wEma.toFixed(2) + '% ' + (dist20wEma >= 0 ? 'Above' : 'Below') + ')';
+    if (elEma20wPill) {
+      if (spot >= ema20w) {
+        elEma20wPill.className = 'telemetry-status-pill green';
+        elEma20wPill.textContent = '🟢 PASSED (Macro Floor Intact)';
+      } else {
+        elEma20wPill.className = 'telemetry-status-pill red';
+        elEma20wPill.textContent = '🚨 FAILED (20W EMA Breached)';
+      }
+    }
+
+    // Tactical Row 6: Daily higher-low and reclaim confirmation
+    var elTacDailyLow = document.getElementById('tactical-daily-low-text');
+    var elTacDailyVwap = document.getElementById('tactical-daily-vwap-text');
+    var elTacReclaimPill = document.getElementById('tactical-reclaim-pill');
+    var elTacReclaimNote = document.getElementById('tactical-reclaim-note');
+    if (elTacDailyLow) {
+      elTacDailyLow.textContent = 'Daily Low: $' + dailyLow.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' (' + (spot >= dailyLow ? 'Defended' : 'Breached') + ')';
+    }
+    if (elTacDailyVwap) {
+      elTacDailyVwap.innerHTML = 'Daily VWAP: $' + vwap.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' (<span style="color:' + (distVwap >= 0 ? '#34D399' : '#F87171') + '">' + (distVwap >= 0 ? 'Reclaimed +' : 'Below ') + distVwap.toFixed(2) + '%</span>)';
+    }
+    if (distVwap >= 0) {
+      if (elTacReclaimPill) {
+        elTacReclaimPill.className = 'telemetry-status-pill green';
+        elTacReclaimPill.textContent = '🟢 RE-ENTRY AUTHORIZED';
+      }
+      if (elTacReclaimNote) {
+        elTacReclaimNote.textContent = 'VWAP fair value reclaimed (+' + distVwap.toFixed(2) + '%)';
+      }
+    } else {
+      if (elTacReclaimPill) {
+        elTacReclaimPill.className = 'telemetry-status-pill amber';
+        elTacReclaimPill.textContent = '⏳ RE-ENTRY PAUSED';
+      }
+      if (elTacReclaimNote) {
+        elTacReclaimNote.textContent = 'Spot under VWAP by ' + Math.abs(distVwap).toFixed(2) + '% — wait for reclaim';
+      }
+    }
+
+    // Tactical Row 7: Daily ATR(14) Volatility Span & Order Spacing
+    var atrPctLive = (dailyAtr / spot * 100);
+    var elTacAtr = document.getElementById('tactical-atr-text');
+    if (elTacAtr) {
+      elTacAtr.textContent = 'Daily ATR: $' + dailyAtr.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' (' + atrPctLive.toFixed(3) + '%)';
+    }
+    var spacing15 = (dailyAtr * 1.5).toLocaleString(undefined, { maximumFractionDigits: 0 });
+    var spacing20 = (dailyAtr * 2.0).toLocaleString(undefined, { maximumFractionDigits: 0 });
+    var elTacAtrPill = document.getElementById('tactical-atr-pill');
+    var elTacAtrNote = document.getElementById('tactical-atr-note');
+    if (elTacAtrPill) elTacAtrPill.textContent = '📏 SPACING: $' + spacing15 + '–$' + spacing20;
+    if (elTacAtrNote) elTacAtrNote.textContent = '1.5x–2.0x ATR buffer below entry';
+    // Also sync Telemetry Table Row 28
+    var elAtr14Dim = document.getElementById('live-metric-dailyAtr14-dim');
+    if (elAtr14Dim) elAtr14Dim.textContent = '(' + atrPctLive.toFixed(3) + '% of Spot)';
 
     // 15. Portfolio Reconciliation Cockpit
     recalculatePortfolioReconciliation();
