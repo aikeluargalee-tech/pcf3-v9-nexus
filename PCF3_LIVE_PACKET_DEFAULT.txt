@@ -846,6 +846,77 @@ MANUAL_REAL_BPLP: 10 (Psych Support, Volume Profile POC/HVNs, STH $81,842, sweep
 MISSING: 0
 EXAMPLE: 0 <- must be 0 in production
 
+
+================================================================================
+SECTION 33: COMPACT DATA-ONLY SWING-TRADING PACKET (MANUS AI PROVENANCE EXPORT)
+================================================================================
+Packet Generation Time: 2026-10-07T13:02:27Z (UTC)
+Primary Exchange Venue: Binance Spot (BTCUSDT)
+Mode: Pure Quantitative Telemetry (No Advice / No Interpretations / No Confluence Scores)
+
+1. CORE MARKET DATA (PROVENANCE TABLE)
+- BTC Spot Price: $83,430.00 | 2026-10-07T13:02:27Z | Binance BTCUSDT Live REST | LIVE OBSERVED
+- Best Bid / Best Ask: $83,346.26 / $83,346.27 | 2026-10-07T13:02:27Z | Binance bookTicker | LIVE OBSERVED
+- Bid-Ask Spread: $0.01 (0.0000%) | 2026-10-07T13:02:27Z | (Ask - Bid) / Spot | CALCULATED
+- Latest Completed Daily Candle: O: $85,766.87 H: $86,698.99 L: $85,136.11 C: $85,549.93 V: 12614.48 BTC | Close: 2026-10-06T23:59:59Z | Binance 1d Kline | OBSERVED
+- Current Incomplete Daily Candle: O: $85,549.94 H: $85,598.22 L: $83,422.00 C: $83,430.00 V: 13487.33 BTC | Live (in progress) | Binance 1d Kline | LIVE OBSERVED
+- Latest Completed Weekly Candle: O: $84,472.01 H: $87,220.00 L: $82,563.00 C: $86,530.00 V: 111091.82 BTC | Close: 2026-10-04T23:59:59Z | Binance 1w Kline | OBSERVED
+- Current Incomplete Weekly Candle: O: $86,530.00 H: $86,999.11 L: $83,422.00 C: $83,430.00 V: 42288.63 BTC | Live (in progress) | Binance 1w Kline | LIVE OBSERVED
+- Weekly Confirmed Swing High: $87,395.67 (Candle Open: 2026-09-21T00:00:00Z) | 2026-09-27T23:59:59Z | 2-bar pivot high | OBSERVED
+- Weekly Confirmed Swing Low: $74,967.97 (Candle Open: 2026-09-14T00:00:00Z) | 2026-09-20T23:59:59Z | 2-bar pivot low | OBSERVED
+- 10-Week EMA: $77,785.35 | 2026-10-04T23:59:59Z | 10W Exponential Moving Average | CALCULATED
+- 20-Week EMA: $74,993.90 | 2026-10-04T23:59:59Z | 20W Exponential Moving Average | CALCULATED
+- Daily 20-Day EMA: $83,483.19 | 2026-10-06T23:59:59Z | 20D Exponential Moving Average | CALCULATED
+- Daily ATR(14): $2143.37 (2.57% of spot) | 2026-10-06T23:59:59Z | Wilder 14-period True Range | CALCULATED
+- Latest 24h Spot Volume: 19730.04 BTC | 2026-10-07T13:02:27Z | Binance 24hr Ticker | LIVE OBSERVED
+- 20-Day Avg Daily Spot Volume: 16312.95 BTC | 2026-10-06T23:59:59Z | 20-day mean of daily spot volume | CALCULATED
+
+2. DRAWDOWN REFERENCE & RE-ENTRY RUNGS (COMPLETED WEEKLY BASIS)
+- Intermediate Rally Peak Weekly Close: $86,530.00 (Candle Closed: 2026-10-04T23:59:59Z)
+- Latest Completed Weekly Close: $86,530.00 (Candle Closed: 2026-10-04T23:59:59Z)
+- Official Drawdown (Completed Weekly Close): 0.00% (86530.00 / 86530.00 - 1)
+- Live Spot Intra-Week Drawdown: -3.58% (83430.00 / 86530.00 - 1)
+- Drawdown Rungs from Rally Peak Close ($86,530.00):
+  * -25% Rung: $64,897.50 | Status on Completed Weekly Close: UNREACHED | Distance from Live Spot: +28.56%
+  * -35% Rung: $56,244.50 | Status on Completed Weekly Close: UNREACHED | Distance from Live Spot: +48.33%
+  * -45% Rung: $47,591.50 | Status on Completed Weekly Close: UNREACHED | Distance from Live Spot: +75.30%
+  * -55% Rung: $38,938.50 | Status on Completed Weekly Close: UNREACHED | Distance from Live Spot: +114.26%
+  * -65% Rung: $30,285.50 | Status on Completed Weekly Close: UNREACHED | Distance from Live Spot: +175.48%
+
+3. DAILY REVERSAL CONFIRMATION INPUTS (RAW OBSERVED)
+- Prior 5 Completed Daily Candles (UTC):
+  * 2026-10-02: O: $84,880.05 H: $87,220.00 L: $83,888.00 C: $84,518.01 V: 26497.92 BTC | COMPLETED
+  * 2026-10-03: O: $84,518.00 H: $85,037.63 L: $84,456.02 C: $84,753.56 V: 6889.64 BTC | COMPLETED
+  * 2026-10-04: O: $84,753.57 H: $86,800.00 L: $84,719.99 C: $86,530.00 V: 7993.11 BTC | COMPLETED
+  * 2026-10-05: O: $86,530.00 H: $86,999.11 L: $84,972.01 C: $85,766.87 V: 16186.78 BTC | COMPLETED
+  * 2026-10-06: O: $85,766.87 H: $86,698.99 L: $85,136.11 C: $85,549.93 V: 12614.48 BTC | COMPLETED
+- Highest High of Prior 5 Completed Days: $87,220.00
+- Latest Completed Daily Close: $85,549.93 (Date: 2026-10-06)
+- Reclaimed Prior 5 Highs (Completed Daily Close Basis): FALSE (Remains below $87,220.00)
+- Latest Completed Daily Low: $85,136.11 vs Previous Daily Low: $84,972.01
+- Daily Higher Low Formed: TRUE (Defended above $84,972.01)
+
+4. POTENTIAL SELL-ZONE REFERENCES & FIBONACCI PROJECTIONS
+- Prior Weekly Supply Zone: $87,395.67 - $92,000.00 (Method: Manually identified zone based on highest completed weekly upper wicks and breakdown cluster)
+- Fibonacci Impulse Coordinates (Weekly Completed Pivots):
+  * Anchor A (Swing Low): $74,967.97 (Candle Open: 2026-09-14T00:00:00Z, 2-bar pivot low)
+  * Anchor B (Swing High): $87,395.67 (Candle Open: 2026-09-21T00:00:00Z, 2-bar pivot high)
+  * Anchor C (Pullback Low): $82,563.00 (Candle Open: 2026-09-28T00:00:00Z, lowest low before peak close)
+  * Impulse Height (B - A): $12,427.70
+  * Extensions (C + ratio * (B - A)):
+    - 1.272 Extension: $98,371.03
+    - 1.414 Extension: $100,135.77
+    - 1.618 Extension: $102,671.02
+    - 2.000 Extension: $107,418.40
+    - 2.272 Extension: $110,798.73
+    - 2.618 Extension: $115,098.62
+
+5. OPTIONAL CONTEXT (INDIVIDUALLY TIMESTAMPED & STATUSED)
+- Spot CVD Imbalance: +0.59 BTC | 2026-10-07T13:02:27Z | Binance Spot AggTrades (1,000 trades) | LIVE OBSERVED
+- Binance Perpetual Open Interest: 97,270.81 BTC | 2026-10-07T13:02:27Z | Binance USDT-M Futures API | LIVE OBSERVED
+- Binance Perpetual Funding Rate: -0.0009% per 8h | 2026-10-07T13:02:27Z | Binance Futures premiumIndex | LIVE OBSERVED
+- US Spot ETF Net Inflow: +$218.4M Net Inflow | 2026-10-06 (Previous Trading Day) | Farside / Tree News Aggregate | CACHED (Vendor Proxy)
+
 --- END PACKET - PCF3 PRODUCTION READY FINAL ---
 META AI reports what market is doing. PCF3 decides what it means.
 RAW -> VALIDATION -> ANALYSIS -> REGIME -> STATE
