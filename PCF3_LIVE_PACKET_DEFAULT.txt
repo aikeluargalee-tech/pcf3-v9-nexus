@@ -882,15 +882,22 @@ Mode: Pure Quantitative Telemetry (No Advice / No Interpretations / No Confluenc
 - Latest Completed Weekly Close: $86,530.00 (Candle Closed: 2026-10-04T23:59:59Z)
 - Official Drawdown (Completed Weekly Close): 0.00% (86530.00 / 86530.00 - 1)
 - Live Spot Intra-Week Drawdown: -3.64% (83380.01 / 86530.00 - 1)
-- Drawdown Rungs from Rally Peak Close ($86,530.00):
-  * -25% Rung: $64,897.50 | Status on Completed Weekly Close: UNREACHED | Distance from Live Spot: +28.48%
-  * -35% Rung: $56,244.50 | Status on Completed Weekly Close: UNREACHED | Distance from Live Spot: +48.25%
-  * -45% Rung: $47,591.50 | Status on Completed Weekly Close: UNREACHED | Distance from Live Spot: +75.20%
-  * -55% Rung: $38,938.50 | Status on Completed Weekly Close: UNREACHED | Distance from Live Spot: +114.13%
-  * -65% Rung: $30,285.50 | Status on Completed Weekly Close: UNREACHED | Distance from Live Spot: +175.31%
+
+Re-Entry Drawdown Rungs (Derived Dynamically from Rally Peak Close $86,530.00):
+| Rung Level | Target Price | Status on Completed Weekly Close | Required Spot Move to Target Rung: ((Target / Spot) - 1) |
+| :--- | :--- | :--- | :--- |
+| **-25% Rung** | $64,897.50 | UNREACHED | -22.17% |
+| **-35% Rung** | $56,244.50 | UNREACHED | -32.55% |
+| **-45% Rung** | $47,591.50 | UNREACHED | -42.92% |
+| **-55% Rung** | $38,938.50 | UNREACHED | -53.30% |
+| **-65% Rung** | $30,285.50 | UNREACHED | -63.68% |
+
+*Rung Distance Formula: Defined explicitly as ((Target Price ÷ Live Spot) - 1). Negative percentage indicates live spot must drop by that amount to reach the target rung.*
+*Rolling 52-Week Peak Reference: $114,958.80 (Week Open: 2025-10-06, Closed: 2025-10-12T23:59:59Z; exactly within 52 completed weeks). 52W Completed Close Drawdown: -24.73%, Live Spot Drawdown: -27.48% (at snapshot).*
+*Macro Historical Cycle ATH Close Reference: $123,482.31 (Closed 2025-10-05T23:59:59Z; 53+ weeks ago). ATH Completed Close Drawdown: -29.93%, Live Spot Drawdown: -32.48% (or -32.77% at $83,022).*
 
 3. TREND-DEFENSE & STRUCTURAL INVALIDATION HIERARCHY (3 DISTINCT TIERS)
-*Rule: The three defensive levels are evaluated separately with their respective close rules:
+*Rule: To prevent conflating tactical stops, swing structure, and macro regime, the three defensive levels are evaluated separately with their respective close rules:*
 
 - Tier 1: Tactical Trend-Defense Trigger (Active Swing Sleeve Exit)
   * Metric / Anchor: 10-Week EMA ($77,785.35) & Nearer Higher-Low Floors
@@ -907,10 +914,16 @@ Mode: Pure Quantitative Telemetry (No Advice / No Interpretations / No Confluenc
   * Current Evaluation: CONFIRMED HIGHER-LOW FLOOR INTACT (Spot $83,380.01 defends +11.22% above $74,967.97).
 
 - Tier 3: Macro Bull Anchor & Regime Failure (Institutional Sleeve 3 Floor)
-  * Primary Metrics / Anchors: 20-Week EMA ($74,993.90) | 20-Week SMA ($71,286.65) | Cycle Base Floor ($57,800.19)
-  * Evaluation Rule: Completed weekly close below 20-Week EMA / 20-Week SMA
-  * Operational Role: Defines institutional macro bull regime health and serves as confirmation for final conservative re-entry sleeve (Sleeve 3). A break here signals macro regime failure / bear market transition.
-  * Current Evaluation: MACRO BULL REGIME INTACT (Latest weekly close $86,530.00 is +15.38% above 20W EMA, +21.38% above 20W SMA; Spot is +11.18% above 20W EMA, +16.96% above 20W SMA).
+  * Evaluation Structure: Evaluated as two separate, distinct observations with explicit individual triggers:
+  * 3A. Dynamic Medium-Term Bull Filter (20-Week EMA: $74,993.90):
+    - Trigger Rule: Completed weekly close below 20-Week EMA.
+    - Operational Role: Early trend-exhaustion warning. (Note: The 20W EMA forms a tight structural cluster with the Tier 2 swing-low floor at $74,967.97).
+    - Current Evaluation: DEFENDED / INTACT (Latest weekly close $86,530.00 is +15.38% above 20W EMA; Spot is +11.18% above).
+  * 3B. Institutional Macro Bull Floor (20-Week SMA: $70,820.54):
+    - Trigger Rule: Completed weekly close below 20-Week SMA.
+    - Operational Role: Final institutional bull market anchor and Sleeve 3 authorization floor. A completed weekly close below the 20W SMA signals definitive macro regime breakdown into a bear market.
+    - Current Evaluation: DEFENDED / INTACT (Latest weekly close $86,530.00 is +22.18% above 20W SMA; Spot is +17.73% above).
+  * Macro Invalidation Logical Operator: Separate observations. Loss of 3A (20W EMA) acts as an early dynamic warning / caution filter; loss of 3B (20W SMA) constitutes full institutional macro bull regime failure.
 
 4. DAILY REVERSAL CONFIRMATION INPUTS (RAW OBSERVED)
 - Benchmark Prior 5 Days (Days T-5 to T-1, Strictly Excluding Day T):

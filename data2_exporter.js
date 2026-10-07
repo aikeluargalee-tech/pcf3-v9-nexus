@@ -186,29 +186,43 @@ async function copyData2ForManus() {
     var rallyDdCompleted = (latestCompWeekly.close / rallyPeakClose) - 1.0;
     var rallyDdLive = spotPrice ? ((spotPrice / rallyPeakClose) - 1.0) : null;
 
-    // Macro 52-week Cycle High-Water Mark Reference
-    var cyclePeakClose = -1;
-    var cyclePeakCandle = null;
-    for (var i = 0; i < completedWeekly.length; i++) {
-      if (completedWeekly[i].close > cyclePeakClose) {
-        cyclePeakClose = completedWeekly[i].close;
-        cyclePeakCandle = completedWeekly[i];
+    // Strict Rolling 52-Week Peak Close (Last 52 completed weekly candles)
+    var rolling52wCandles = completedWeekly.slice(-52);
+    var rolling52wPeakClose = -1;
+    var rolling52wPeakCandle = null;
+    for (var i = 0; i < rolling52wCandles.length; i++) {
+      if (rolling52wCandles[i].close > rolling52wPeakClose) {
+        rolling52wPeakClose = rolling52wCandles[i].close;
+        rolling52wPeakCandle = rolling52wCandles[i];
       }
     }
-    var cycleDdCompleted = (latestCompWeekly.close / cyclePeakClose) - 1.0;
-    var cycleDdLive = spotPrice ? ((spotPrice / cyclePeakClose) - 1.0) : null;
+    var rolling52wDdCompleted = (latestCompWeekly.close / rolling52wPeakClose) - 1.0;
+    var rolling52wDdLive = spotPrice ? ((spotPrice / rolling52wPeakClose) - 1.0) : null;
+
+    // Macro Historical Cycle Peak Close Reference (All-Time High Weekly Close in Full Dataset)
+    var cycleAthClose = -1;
+    var cycleAthCandle = null;
+    for (var i = 0; i < completedWeekly.length; i++) {
+      if (completedWeekly[i].close > cycleAthClose) {
+        cycleAthClose = completedWeekly[i].close;
+        cycleAthCandle = completedWeekly[i];
+      }
+    }
+    var cycleAthDdCompleted = (latestCompWeekly.close / cycleAthClose) - 1.0;
+    var cycleAthDdLive = spotPrice ? ((spotPrice / cycleAthClose) - 1.0) : null;
 
     // Drawdown Rungs from Verified Rally Peak Close
     var rungPercentages = [-0.25, -0.35, -0.45, -0.55, -0.65];
     var rallyRungs = rungPercentages.map(function(pct) {
       var price = rallyPeakClose * (1.0 + pct);
       var reached = latestCompWeekly.close <= price;
-      var liveDist = spotPrice ? ((spotPrice - price) / price * 100).toFixed(2) : 'N/A';
+      // Required spot move to reach target rung: ((price / spotPrice) - 1.0)
+      var movePct = spotPrice ? (((price / spotPrice) - 1.0) * 100).toFixed(2) : 'N/A';
       return {
         pctLabel: (pct * 100).toFixed(0) + '%',
         price: price,
         reachedCompleted: reached,
-        liveDistance: liveDist
+        requiredMove: movePct
       };
     });
 
@@ -293,9 +307,11 @@ async function copyData2ForManus() {
           }
           spotCvd = (bVol - sVol).toFixed(2);
           cvdSampleVol = (bVol + sVol).toFixed(2);
-          cvdTimeStart = new Date(aggTrades[0].T).toISOString();
-          cvdTimeEnd = new Date(aggTrades[aggTrades.length - 1].T).toISOString();
-          cvdDurationSec = ((aggTrades[aggTrades.length - 1].T - aggTrades[0].T) / 1000).toFixed(0);
+          var tStartSec = Math.floor(aggTrades[0].T / 1000);
+          var tEndSec = Math.floor(aggTrades[aggTrades.length - 1].T / 1000);
+          cvdTimeStart = new Date(tStartSec * 1000).toISOString();
+          cvdTimeEnd = new Date(tEndSec * 1000).toISOString();
+          cvdDurationSec = (tEndSec - tStartSec);
           cvdStatus = 'LIVE OBSERVED (Short-Window Sample: 1,000 trades, Binance Spot)';
         }
       }
@@ -387,14 +403,17 @@ async function copyData2ForManus() {
     out.push('- **Live Spot Intra-Week Drawdown:** ' + (rallyDdLive !== null ? (rallyDdLive * 100).toFixed(2) + '% (`' + spotPrice.toFixed(2) + ' / ' + rallyPeakClose.toFixed(2) + ' - 1`)' : 'MISSING') + '\n');
 
     out.push('**Re-Entry Drawdown Rungs (Derived Dynamically from Rally Peak Close ' + fmtPrice(rallyPeakClose) + '):**');
-    out.push('| Rung Level | Target Price | Status on Completed Weekly Close | Current Distance from Live Spot |');
+    out.push('| Rung Level | Target Price | Status on Completed Weekly Close | Required Spot Move to Target Rung: ((Target / Spot) - 1) |');
     out.push('| :--- | :--- | :--- | :--- |');
     for (var i = 0; i < rallyRungs.length; i++) {
       var r = rallyRungs[i];
-      out.push('| **' + r.pctLabel + ' Rung** | ' + fmtPrice(r.price) + ' | ' + (r.reachedCompleted ? 'REACHED' : 'UNREACHED') + ' | ' + (r.liveDistance >= 0 ? '+' : '') + r.liveDistance + '% |');
+      out.push('| **' + r.pctLabel + ' Rung** | ' + fmtPrice(r.price) + ' | ' + (r.reachedCompleted ? 'REACHED' : 'UNREACHED') + ' | ' + (parseFloat(r.requiredMove) >= 0 ? '+' : '') + r.requiredMove + '% |');
     }
     out.push('');
-    out.push('*Macro 52-Week Cycle Peak Reference: ' + fmtPrice(cyclePeakClose) + ' (Closed ' + fmtDate(cyclePeakCandle.closeTime) + '). 52W Completed Close Drawdown: ' + (cycleDdCompleted * 100).toFixed(2) + '%, Live Spot Drawdown: ' + (cycleDdLive !== null ? (cycleDdLive * 100).toFixed(2) + '%' : 'N/A') + '.*\n');
+    out.push('*Rung Distance Formula: Defined explicitly as ((Target Price ÷ Live Spot) - 1). Negative percentage indicates live spot must drop by that amount to reach the target rung.*');
+    out.push('');
+    out.push('*Rolling 52-Week Peak Reference: ' + fmtPrice(rolling52wPeakClose) + ' (Week Open: ' + fmtDate(rolling52wPeakCandle.openTime).split('T')[0] + ', Closed: ' + fmtDate(rolling52wPeakCandle.closeTime) + '; exactly within 52 completed weeks). 52W Completed Close Drawdown: ' + (rolling52wDdCompleted * 100).toFixed(2) + '%, Live Spot Drawdown: ' + (rolling52wDdLive !== null ? (rolling52wDdLive * 100).toFixed(2) + '%' : 'N/A') + '.*');
+    out.push('*Macro Historical Cycle ATH Close Reference: ' + fmtPrice(cycleAthClose) + ' (Closed ' + fmtDate(cycleAthCandle.closeTime) + '; 53+ weeks ago). ATH Completed Close Drawdown: ' + (cycleAthDdCompleted * 100).toFixed(2) + '%, Live Spot Drawdown: ' + (cycleAthDdLive !== null ? (cycleAthDdLive * 100).toFixed(2) + '%' : 'N/A') + '.*\n');
 
     out.push('---');
     out.push('### 3. TREND-DEFENSE & STRUCTURAL INVALIDATION HIERARCHY (3 DISTINCT TIERS)');
@@ -425,12 +444,23 @@ async function copyData2ForManus() {
 
     // Tier 3: Macro Bull Anchor & Regime Failure
     out.push('#### Tier 3: Macro Bull Anchor & Regime Failure (Institutional Sleeve 3 Floor)');
-    out.push('- **Primary Metrics / Anchors:** 20-Week EMA (' + (ema20w ? fmtPrice(ema20w) : 'MISSING') + ') | 20-Week SMA (' + (sma20w ? fmtPrice(sma20w) : 'MISSING') + ') | Cycle Base Floor (' + (priorConfirmedPivotL ? fmtPrice(priorConfirmedPivotL.low) : '$57,800.19') + ')');
-    out.push('- **Evaluation Rule:** Completed weekly close below 20-Week EMA / 20-Week SMA.');
-    out.push('- **Operational Role:** Defines institutional macro bull regime health and serves as confirmation for final conservative re-entry sleeve (Sleeve 3). A break here signals macro regime failure / bear market transition.');
-    var t3Safe = ema20w && (latestCompWeekly.close >= ema20w);
-    var t3Dist = ema20w ? (((spotPrice - ema20w) / ema20w) * 100).toFixed(2) : 'N/A';
-    out.push('- **Current Evaluation:** ' + (t3Safe ? 'MACRO BULL REGIME INTACT' : 'MACRO REGIME THREATENED') + ' (Latest completed weekly close ' + fmtPrice(latestCompWeekly.close) + ' is +' + (((latestCompWeekly.close - ema20w)/ema20w)*100).toFixed(2) + '% vs 20W EMA; Live spot is ' + (parseFloat(t3Dist) >= 0 ? '+' : '') + t3Dist + '%).\n');
+    out.push('*Evaluation Structure: Evaluated as two separate, distinct observations with explicit individual triggers:*');
+    out.push('');
+    out.push('- **3A. Dynamic Medium-Term Bull Filter (20-Week EMA: ' + (ema20w ? fmtPrice(ema20w) : 'MISSING') + '):**');
+    out.push('  - *Trigger Rule:* Completed weekly close below 20-Week EMA.');
+    out.push('  - *Operational Role:* Early trend-exhaustion warning. (Note: The 20W EMA forms a tight structural cluster with the Tier 2 swing-low floor at ' + (latestConfirmedPivotL ? fmtPrice(latestConfirmedPivotL.low) : '$74.9k') + ').');
+    var t3aSafe = ema20w && (latestCompWeekly.close >= ema20w);
+    var t3aDist = ema20w ? (((spotPrice - ema20w) / ema20w) * 100).toFixed(2) : 'N/A';
+    out.push('  - *Current Evaluation:* ' + (t3aSafe ? 'DEFENDED / INTACT' : 'TRIGGERED / AT RISK') + ' (Latest weekly close ' + fmtPrice(latestCompWeekly.close) + ' is +' + (((latestCompWeekly.close - ema20w)/ema20w)*100).toFixed(2) + '% above; Live spot is ' + (parseFloat(t3aDist) >= 0 ? '+' : '') + t3aDist + '%).');
+    out.push('');
+    out.push('- **3B. Institutional Macro Bull Floor (20-Week SMA: ' + (sma20w ? fmtPrice(sma20w) : 'MISSING') + '):**');
+    out.push('  - *Trigger Rule:* Completed weekly close below 20-Week SMA.');
+    out.push('  - *Operational Role:* Final institutional bull market anchor and Sleeve 3 authorization floor. A completed weekly close below the 20W SMA signals definitive macro regime breakdown into a bear market.');
+    var t3bSafe = sma20w && (latestCompWeekly.close >= sma20w);
+    var t3bDist = sma20w ? (((spotPrice - sma20w) / sma20w) * 100).toFixed(2) : 'N/A';
+    out.push('  - *Current Evaluation:* ' + (t3bSafe ? 'DEFENDED / INTACT' : 'TRIGGERED / AT RISK') + ' (Latest weekly close ' + fmtPrice(latestCompWeekly.close) + ' is +' + (((latestCompWeekly.close - sma20w)/sma20w)*100).toFixed(2) + '% above; Live spot is ' + (parseFloat(t3bDist) >= 0 ? '+' : '') + t3bDist + '%).');
+    out.push('');
+    out.push('- **Macro Invalidation Logical Operator:** Separate observations. Loss of 3A (20W EMA) acts as an early dynamic warning / caution filter; loss of 3B (20W SMA) constitutes full institutional macro bull regime failure.\n');
 
     out.push('---');
     out.push('### 4. DAILY REVERSAL CONFIRMATION INPUTS (RAW OBSERVED)');
