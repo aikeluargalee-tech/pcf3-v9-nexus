@@ -1,5 +1,7 @@
 name: PCF3 Collector
 on:
+  schedule:
+    - cron: '0 * * * *'
   workflow_dispatch:
 jobs:
   collect:
@@ -15,4 +17,4 @@ jobs:
           git config user.name "pcf3-bot"
           git config user.email "bot@pcf3.local"
           git add PCF3_LIVE_PACKET_DEFAULT.txt
-          git diff --staged --quiet || (git commit -m "manual: packet $(date -u +%Y-%m-%dT%H:%M:%SZ)" && git push)
+          git diff --staged --quiet || (git commit -m "auto: packet $(date -u +%Y-%m-%dT%H:%M:%SZ)" && git push)
