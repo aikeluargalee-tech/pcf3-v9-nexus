@@ -559,7 +559,7 @@
         </div>
       </div>
       <div class="rule-logic-box">
-        <b>RULE 1:</b> IF Close &gt; SMA200 AND SMA200[today] &gt; SMA200[20d ago] =&gt; <span style="color:var(--green-bright); font-weight:700;">TRADE ALLOWED</span> else <span style="color:var(--red-bright); font-weight:700;">FLAT 100% USDT</span>.
+        <b>RULE 1:</b> IF Close &gt; SMA200 AND SMA200[today] &gt; SMA200[20d ago] =&gt; <span style="color:var(--green-bright); font-weight:700;">REGIME EXPANDING</span> else <span style="color:var(--red-bright); font-weight:700;">DEFENSIVE BASELINE</span>.
         <div id="comment-regime" style="margin-top:6px; color:#cbd5e1;">Evaluating market regime...</div>
       </div>
     </div>
@@ -660,7 +660,7 @@
     <div class="consensus-grid">
       <!-- Sub-Box 1: Consensus Checklist & Master Signal -->
       <div class="consensus-box">
-        <div class="consensus-box-title">Objective 3-Rule Arbitration</div>
+        <div class="consensus-box-title">Objective 3-Factor Confluence Arbitration</div>
         <div class="checklist">
           <div class="check-item" id="check-r1">R1: Regime Filter (Manus)</div>
           <div class="check-item" id="check-r2">R2: Controlled Dip (Grok)</div>
@@ -668,7 +668,7 @@
         </div>
 
         <div class="master-signal-banner wait" id="master-signal-banner">
-          <div style="font-size:10px; font-weight:800; letter-spacing:1px; color:var(--text-muted); text-transform:uppercase; margin-bottom:2px;">USSM v1.0 MASTER SIGNAL</div>
+          <div style="font-size:10px; font-weight:800; letter-spacing:1px; color:var(--text-muted); text-transform:uppercase; margin-bottom:2px;">USSM v1.0 REGIME CONFLUENCE STATE</div>
           <div class="master-signal-text" id="master-signal-text">EVALUATING...</div>
         </div>
       </div>
@@ -999,13 +999,13 @@ function updateUI() {
 
   const badgeRegime = document.getElementById('badge-regime');
   if (quantData.r1) {
-    badgeRegime.textContent = '🟢 TRADE ALLOWED';
+    badgeRegime.textContent = '🟢 REGIME EXPANDING';
     badgeRegime.className = 'rule-badge green';
     document.getElementById('comment-regime').innerHTML = '✅ Bitcoin is above rising 200 SMA (+' + distSma + '). Macro bull trend is validated.';
   } else {
-    badgeRegime.textContent = '🔴 FLAT (100% USDT)';
+    badgeRegime.textContent = '🔴 REGIME DEFENSIVE';
     badgeRegime.className = 'rule-badge red';
-    document.getElementById('comment-regime').innerHTML = '⚠️ Regime condition failed. Maintain 100% cash allocation. No swing buys allowed.';
+    document.getElementById('comment-regime').innerHTML = '⚠️ Regime condition failed. Telemetry indicates macro defensive phase. Trend criteria unfulfilled.';
   }
 
   // Card B: Setup
@@ -1050,11 +1050,11 @@ function updateUI() {
   if (quantData.r3) {
     badgeLocation.textContent = '🟢 LOCATION GOOD';
     badgeLocation.className = 'rule-badge green';
-    document.getElementById('comment-location').innerHTML = '✅ Price is at/below 30-day POC (' + fmt(poc) + '). Swing entry is located in the discount half of value.';
+    document.getElementById('comment-location').innerHTML = '✅ Price is at/below 30-day POC (' + fmt(poc) + '). Observed price is located in the discount half of the 30-day volume profile.';
   } else {
     badgeLocation.textContent = '⏳ ABOVE VALUE';
     badgeLocation.className = 'rule-badge amber';
-    document.getElementById('comment-location').innerHTML = '⏳ Price is above 30-day POC (' + fmt(poc) + '). Swing entry is in the premium half of value.';
+    document.getElementById('comment-location').innerHTML = '⏳ Price is above 30-day POC (' + fmt(poc) + '). Observed price is located in the premium half of the 30-day volume profile.';
   }
 
   // Checklist
@@ -1075,11 +1075,11 @@ function updateUI() {
   const masterText = document.getElementById('master-signal-text');
   if (quantData.signal) {
     masterBanner.className = 'master-signal-banner ready';
-    masterText.textContent = '🚀 READY TO ENTER (AT NEXT DAY OPEN)';
+    masterText.textContent = '🟢 3-FACTOR CONFLUENCE ALIGNED';
     masterText.style.color = 'var(--green-bright)';
   } else {
     masterBanner.className = 'master-signal-banner wait';
-    masterText.textContent = '✋ NO TRADE / STAND ASIDE';
+    masterText.textContent = '⚪ NEUTRAL BASELINE / DISPERSED';
     masterText.style.color = '#94a3b8';
   }
 
@@ -1168,7 +1168,7 @@ async function copyDataPacket3() {
     "### 2. Rule 1 — Regime Filter (Manus Architecture)",
     "- Filter out bear markets and structural downtrends. Trade only when macro tide is rising.",
     "- Condition: (Daily Close > SMA200) AND (SMA200[today] > SMA200[today-20]).",
-    "- Verdict: IF both conditions true => TRADE ALLOWED. ELSE => FLAT 100% USDT (Non-negotiable).",
+    "- Verdict: IF both conditions true => REGIME EXPANDING. ELSE => REGIME DEFENSIVE.",
     "",
     "### 3. Rule 2 — Setup Dip (Grok Architecture)",
     "- Detect a controlled mean-reversion pullback into the 21 EMA baseline without momentum breakdown.",
@@ -1183,8 +1183,8 @@ async function copyDataPacket3() {
     "### 5. Master Signal Arbitration",
     "- Confluence Requirement: Rule 1 (Regime) == PASS AND Rule 2 (Setup) == PASS AND Rule 3 (Location) == PASS.",
     "- Composite Decision:",
-    "  • IF ALL 3 PASS => READY TO ENTER AT NEXT DAY OPEN.",
-    "  • IF ANY FAILS  => NO TRADE / STAND ASIDE (100% USDT).",
+    "  • IF ALL 3 PASS => 3-FACTOR CONFLUENCE ALIGNED (EXPANSION REGIME).",
+    "  • IF ANY FAILS  => CONFLUENCE DISPERSED / NEUTRAL BASELINE.",
     "",
     "### 6. Quantitative Risk & Systematic Exit Reference (DeepSeek + Grok Hybrid)",
     "- Reference Entry: Next day open estimate (current daily close).",
@@ -1202,7 +1202,7 @@ async function copyDataPacket3() {
     "   - Setup: Close distance to 21 EMA (±2% band) and 14-day RSI level.",
     "   - Location: Close vs 30-Day Volume Profile POC.",
     "4. **Quantitative Risk & Invalidation Levels:** Exact numerical stop, trail trigger, and failsafe price points.",
-    "5. **Clear Operational Action for Human Trader:** Definite statement: 'ENTER AT NEXT DAY OPEN' or 'STAND ASIDE IN 100% USDT'.",
+    "5. **Educational Confluence State Summary:** Objective assessment: '3-FACTOR CONFLUENCE ALIGNED' or 'NEUTRAL DEFENSIVE BASELINE'.",
     "================================================================================",
     "",
     "================================================================================",
@@ -1232,7 +1232,7 @@ async function copyDataPacket3() {
     "• SMA200 20-Day Delta:       " + (smaDelta >= 0 ? '+' : '') + "$" + smaDelta.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " (" + smaSlopeText + ")",
     "• Distance vs 200-Day SMA:   " + (smaDist >= 0 ? '+' : '') + smaDist.toFixed(2) + "%",
     "• Rule 1 Condition:          (Close > SMA200) AND (SMA200[today] > SMA200[today-20])",
-    "• Rule 1 Verdict:            " + (quantData.r1 ? 'TRADE ALLOWED (Pass: Spot is above rising 200 SMA)' : 'FLAT 100% USDT (Fail: Below SMA or SMA declining)'),
+    "• Rule 1 Verdict:            " + (quantData.r1 ? 'REGIME EXPANDING (Pass: Spot is above rising 200 SMA)' : 'REGIME DEFENSIVE (Fail: Below SMA or SMA declining)'),
     "",
     "[3] CARD B — RULE 2: SETUP DIP (GROK ARCHITECTURE)",
     "--------------------------------------------------------------------------------",
@@ -1260,7 +1260,7 @@ async function copyDataPacket3() {
     "• Rule 1 (Regime Filter - Manus):      [" + (quantData.r1 ? 'PASS' : 'FAIL') + "] " + (quantData.r1 ? 'TRADE ALLOWED' : 'FLAT'),
     "• Rule 2 (Controlled Dip - Grok):      [" + (quantData.r2 ? 'PASS' : 'FAIL') + "] " + (quantData.r2 ? 'SETUP READY' : 'WAIT'),
     "• Rule 3 (Value Location - Gemini):    [" + (quantData.r3 ? 'PASS' : 'FAIL') + "] " + (quantData.r3 ? 'LOCATION GOOD' : 'ABOVE VALUE'),
-    "• COMPOSITE MASTER SIGNAL:             >>> " + (quantData.signal ? 'READY TO ENTER AT NEXT DAY OPEN' : 'NO TRADE / STAND ASIDE') + " <<<",
+    "• COMPOSITE CONFLUENCE STATE:             >>> " + (quantData.signal ? '3-FACTOR CONFLUENCE ALIGNED' : 'CONFLUENCE DISPERSED / NEUTRAL BASELINE') + " <<<",
     "",
     "[6] QUANTITATIVE RISK & INVALIDATION BOUNDS (MATHEMATICAL REFERENCE)",
     "--------------------------------------------------------------------------------",
