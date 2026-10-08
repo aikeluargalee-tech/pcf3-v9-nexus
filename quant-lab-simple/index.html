@@ -897,14 +897,14 @@ async function fetchAndCompute() {
   if (refreshBtn) refreshBtn.textContent = '⏳ Fetching...';
   
   try {
-    // Primary Binance public API, with fallback to Binance Vision for CORS
+    // Primary Binance Vision API (CORS-enabled globally), with fallback to Binance Direct
     let res;
     try {
-      res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250');
+      res = await fetch('https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250', { cache: 'no-store' });
       if (!res.ok) throw new Error('Status ' + res.status);
-    } catch(errDirect) {
-      console.warn('Direct api.binance.com failed, falling back to data-api.binance.vision:', errDirect);
-      res = await fetch('https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250');
+    } catch(errVision) {
+      console.warn('data-api.binance.vision failed, falling back to api.binance.com:', errVision);
+      res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250', { cache: 'no-store' });
     }
 
     const raw = await res.json();
@@ -934,8 +934,8 @@ async function fetchAndCompute() {
     evaluateRules();
 
     // Render UI & Chart
-    updateUI();
-    renderChart();
+    try { updateUI(); } catch (errUI) { console.error('UI update error:', errUI); }
+    try { renderChart(); } catch (errChart) { console.error('Chart render error:', errChart); }
 
     document.getElementById('last-updated-text').textContent = 'UTC: ' + new Date().toISOString().replace('T',' ').slice(0,19);
     showToast('✅ Live market data & indicators refreshed successfully');
@@ -1116,7 +1116,7 @@ function updateUI() {
 
   // Card A: Regime
   document.getElementById('val-sma200').textContent = fmt(sma);
-  document.getElementById('val-sma200-20d').textContent = fmt(sma200_20dAgo);
+  document.getElementById('val-sma200-20d').textContent = fmt(sma20dAgo);
   const slopePositive = sma > sma20dAgo;
   const slopeText = slopePositive ? '▲ Positive (Rising)' : '▼ Negative (Declining)';
   const slopeEl = document.getElementById('val-sma200-slope');
@@ -1296,20 +1296,26 @@ function renderChart() {
 
   const rect = container.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
-  canvas.width = rect.width * dpr;
-  canvas.height = rect.height * dpr;
+  const w = rect.width || 800;
+  const h = rect.height || 380;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
-
-  const w = rect.width;
-  const h = rect.height;
 
   ctx.fillStyle = '#06090f';
   ctx.fillRect(0, 0, w, h);
 
   const total = quantData.candles.length;
   const sliceCount = 90;
-  if (total < sliceCount) return;
+  if (total < sliceCount) {
+    ctx.fillStyle = '#64748b';
+    ctx.font = '13px ui-monospace, monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('⏳ Fetching 90-Day Bitcoin Market Data...', w / 2, h / 2);
+    return;
+  }
 
   const startIdx = total - sliceCount;
   const chartCandles = quantData.candles.slice(startIdx);
@@ -1474,7 +1480,7 @@ function renderChart() {
           <div>Close: <b>$${c.close.toLocaleString()}</b></div>
           <div>SMA200: <b style="color:#f59e0b;">$${chartSma[idx] ? Math.round(chartSma[idx]).toLocaleString() : 'N/A'}</b></div>
           <div>EMA21: <b style="color:#06b6d4;">$${chartEma[idx] ? Math.round(chartEma[idx]).toLocaleString() : 'N/A'}</b></div>
-          <div>30D POC: <b style="color:#a855f7;">$${Math.round(poc).toLocaleString()}</b></div>
+          <div>30D POC: <b style="color:#a855f7;">$${poc ? Math.round(poc).toLocaleString() : 'N/A'}</b></div>
         `;
       }
     }
