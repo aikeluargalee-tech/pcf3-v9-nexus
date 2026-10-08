@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Core Terminal & Dashboard -->
+  <url>
+    <loc>https://aikeluargalee-tech.github.io/pcf3-v9-nexus/</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <!-- Triple Radar Suite -->
+  <url>
+    <loc>https://aikeluargalee-tech.github.io/pcf3-v9-nexus/matrix.html</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://aikeluargalee-tech.github.io/pcf3-v9-nexus/quant-radar.html</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://aikeluargalee-tech.github.io/pcf3-v9-nexus/liquidity-radar.html</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://aikeluargalee-tech.github.io/pcf3-v9-nexus/fractal.html</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <!-- Educational & Methodology Hub -->
+  <url>
+    <loc>https://aikeluargalee-tech.github.io/pcf3-v9-nexus/methodology.html</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <!-- Information & E-E-A-T Trust Pages -->
+  <url>
+    <loc>https://aikeluargalee-tech.github.io/pcf3-v9-nexus/about.html</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://aikeluargalee-tech.github.io/pcf3-v9-nexus/contact.html</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <!-- Legal & AdSense Compliance Pages -->
+  <url>
+    <loc>https://aikeluargalee-tech.github.io/pcf3-v9-nexus/disclaimer.html</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://aikeluargalee-tech.github.io/pcf3-v9-nexus/privacy-policy.html</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://aikeluargalee-tech.github.io/pcf3-v9-nexus/terms.html</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+</urlset>

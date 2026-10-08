@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://aikeluargalee-tech.github.io/pcf3-v9-nexus/sitemap.xml
