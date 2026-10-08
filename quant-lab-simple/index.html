@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Quant Lab — One Model [USSM v1.0] | PCF3 Nexus</title>
+<style>
+  :root {
+    --bg-page: #080c14;
+    --bg-card: #0f172a;
+    --bg-card-sub: #162036;
+    --border-color: #1e293b;
+    --border-highlight: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --green-bright: #10b981;
+    --green-glow: rgba(16, 185, 129, 0.16);
+    --red-bright: #ef4444;
+    --red-glow: rgba(239, 68, 68, 0.16);
+    --amber-bright: #f59e0b;
+    --amber-glow: rgba(245, 158, 11, 0.16);
+    --cyan-bright: #06b6d4;
+    --purple-bright: #a855f7;
+    --blue-bright: #38bdf8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    padding: 0 16px 60px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1400px; margin: 0 auto; }
+  
+  /* Disclaimer bar */
+  .disclaimer-bar {
+    background: #181206;
+    border-bottom: 1px solid #451a03;
+    padding: 6px 16px;
+    font-size: 11px;
+    color: #fbbf24;
+    text-align: center;
+    font-weight: 500;
+    margin: 0 -16px 12px;
+  }
+
+  /* Navigation */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px 20px;
+    background: #0f172a;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    color: #f1f5f9;
+  }
+  .nav-brand span.tag {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--green-bright);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #1e293b;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+  .nav-btn:hover {
+    background: #334155;
+    border-color: #475569;
+    color: #ffffff;
+    text-decoration: none;
+  }
+  .nav-btn.primary {
+    background: #0284c7;
+    border-color: #38bdf8;
+    color: #ffffff;
+  }
+  .nav-btn.refresh-btn {
+    background: #10b981;
+    border-color: #34d399;
+    color: #ffffff;
+  }
+
+  /* Header hero */
+  .hero {
+    background: linear-gradient(180deg, #0f172a 0%, #090d16 100%);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--green-bright);
+    border-radius: 14px;
+    padding: 22px 26px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .hero-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .hero h1 {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+  }
+  .hero p {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-top: 6px;
+    max-width: 880px;
+    line-height: 1.6;
+  }
+  .hero-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+  }
+  .model-pill {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    color: #cbd5e1;
+  }
+  .model-pill b { color: #38bdf8; }
+
+  /* 4 Grid Cards Layout */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 960px) {
+    .cards-grid { grid-template-columns: 1fr; }
+  }
+
+  .rule-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .rule-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .rule-title {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .rule-badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .rule-badge.green {
+    background: var(--green-glow);
+    color: var(--green-bright);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+  }
+  .rule-badge.red {
+    background: var(--red-glow);
+    color: var(--red-bright);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+  }
+  .rule-badge.amber {
+    background: var(--amber-glow);
+    color: var(--amber-bright);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+  }
+
+  /* Metric rows inside cards */
+  .metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 13px;
+  }
+  .metric-row:last-child { border-bottom: none; }
+  .metric-label { color: var(--text-secondary); }
+  .metric-val {
+    font-family: ui-monospace, monospace;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .metric-val.green { color: var(--green-bright); }
+  .metric-val.red { color: var(--red-bright); }
+  .metric-val.amber { color: var(--amber-bright); }
+  .metric-val.cyan { color: var(--cyan-bright); }
+  .metric-val.purple { color: var(--purple-bright); }
+
+  /* Explanation / Code Box */
+  .rule-logic-box {
+    background: #090d16;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-top: 14px;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    color: #94a3b8;
+    line-height: 1.5;
+  }
+  .rule-logic-box b { color: #f1f5f9; }
+
+  /* Confluence checklist */
+  .checklist {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 14px;
+  }
+  @media (max-width: 600px) {
+    .checklist { grid-template-columns: 1fr; }
+  }
+  .check-item {
+    background: #090d16;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 8px 10px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .check-item.passed {
+    border-color: rgba(16, 185, 129, 0.4);
+    background: rgba(16, 185, 129, 0.08);
+    color: var(--green-bright);
+  }
+  .check-item.failed {
+    border-color: rgba(239, 68, 68, 0.4);
+    background: rgba(239, 68, 68, 0.08);
+    color: var(--red-bright);
+  }
+
+  /* Master Signal Banner */
+  .master-signal-banner {
+    background: #090d16;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    margin-top: 16px;
+    transition: all 0.2s;
+  }
+  .master-signal-banner.ready {
+    border-color: var(--green-bright);
+    background: rgba(16, 185, 129, 0.08);
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.15);
+  }
+  .master-signal-banner.wait {
+    border-color: #334155;
+    background: rgba(15, 23, 42, 0.6);
+  }
+  .master-signal-text {
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* Card D inputs */
+  .risk-inputs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .input-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .input-control {
+    width: 100%;
+    background: #090d16;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: #ffffff;
+    font-family: ui-monospace, monospace;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .input-control:focus {
+    outline: none;
+    border-color: #0284c7;
+  }
+
+  /* Exit Rules Table inside Card D */
+  .exit-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-top: 12px;
+  }
+  .exit-table th {
+    text-align: left;
+    color: var(--text-muted);
+    padding: 6px 4px;
+    font-size: 11px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .exit-table td {
+    padding: 6px 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-family: ui-monospace, monospace;
+  }
+
+  /* Card E - Chart */
+  .chart-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .chart-title {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .chart-legend {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+    font-family: ui-monospace, monospace;
+    flex-wrap: wrap;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+  
+  #canvas-container {
+    width: 100%;
+    height: 380px;
+    position: relative;
+    background: #06090f;
+    border: 1px solid #1a2234;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  #quantChart {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: crosshair;
+  }
+  #chart-tooltip {
+    position: absolute;
+    display: none;
+    pointer-events: none;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    color: #f8fafc;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    z-index: 10;
+  }
+
+  /* Journal Section */
+  .journal-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+  .journal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .journal-title {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #f1f5f9;
+  }
+  .journal-stats {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .stat-badge {
+    background: #162036;
+    border: 1px solid #23314d;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+  }
+  .stat-badge b { color: #38bdf8; }
+
+  .table-responsive {
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+  }
+  .journal-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    text-align: left;
+  }
+  .journal-table th {
+    background: #090d16;
+    color: var(--text-secondary);
+    padding: 10px 12px;
+    font-weight: 700;
+    font-size: 11px;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .journal-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-family: ui-monospace, monospace;
+  }
+  .journal-table tr:hover { background: rgba(255,255,255,0.02); }
+  
+  .btn-sm {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+  .btn-sm.danger { background: #7f1d1d; color: #fca5a5; }
+  .btn-sm.danger:hover { background: #991b1b; }
+  .btn-sm.success { background: #064e3b; color: #6ee7b7; }
+  .btn-sm.success:hover { background: #065f46; }
+
+  /* Toast Notification */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #0f172a;
+    border: 1px solid #10b981;
+    color: #e2e8f0;
+    padding: 12px 18px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 100;
+    display: none;
+    animation: fadeIn 0.2s ease-out;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="disclaimer-bar">
+  ⚠️ Educational tool only, not financial advice. No model outruns outcome. Past performance does not guarantee future results.
+</div>
+
+<div class="wrap">
+  <!-- Nav bar -->
+  <nav>
+    <div class="nav-brand">
+      <span>🧪</span>
+      <span>QUANT LAB — ONE MODEL</span>
+      <span class="tag">USSM v1.0</span>
+    </div>
+    <div class="nav-links">
+      <a href="./index.html" class="nav-btn" id="link-dashboard">← Core Dashboard</a>
+      <a href="./matrix.html" class="nav-btn" id="link-matrix">📊 Metrics Matrix</a>
+      <a href="./fractal.html" class="nav-btn" id="link-fractal">🧪 4H Fractal Lab</a>
+      <button class="nav-btn refresh-btn" onclick="fetchAndCompute()" id="btn-refresh">🔄 Refresh Live</button>
+    </div>
+  </nav>
+
+  <!-- Hero Banner -->
+  <div class="hero">
+    <div class="hero-top">
+      <div>
+        <h1>PCF3 Unified Simple Swing Model (USSM v1.0)</h1>
+        <p>
+          The mathematically minimal, non-overfitted intersection of 4 audited frontier AI architectures (Manus + Grok + Gemini + DeepSeek).
+          Evaluates <b>5 objective rules</b> computed exclusively from <b>daily spot klines</b>. Zero perpetual leverage, zero CVD/OI fragility, zero discretionary overfitting.
+        </p>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: 11px; color: var(--text-muted); font-family: ui-monospace, monospace;">Binance Spot BTCUSDT (1D)</div>
+        <div id="live-price-header" style="font-size: 26px; font-weight: 900; font-family: ui-monospace, monospace; color: #38bdf8;">Loading...</div>
+        <div id="last-updated-text" style="font-size: 11px; color: var(--text-secondary); font-family: ui-monospace, monospace;">Connecting to Binance...</div>
+      </div>
+    </div>
+    <div class="hero-badges">
+      <span class="model-pill"><b>Manus:</b> 200SMA + 20D Slope Filter</span>
+      <span class="model-pill"><b>Grok:</b> 21 EMA ±2% Dip + RSI 40-60</span>
+      <span class="model-pill"><b>Gemini:</b> 30D Volume Profile POC Location</span>
+      <span class="model-pill"><b>DeepSeek:</b> 2.5x ATR20 Volatility Sizing (Max 30% Cap)</span>
+      <span class="model-pill"><b>Hybrid Exit:</b> +2x ATR Trail + 20D Low Failsafe + 20D Time Stop</span>
+    </div>
+  </div>
+
+  <!-- Cards Grid (A, B, C, D) -->
+  <div class="cards-grid">
+    
+    <!-- CARD A: REGIME (Manus) -->
+    <div class="rule-card" id="card-regime">
+      <div>
+        <div class="rule-card-header">
+          <div class="rule-title">
+            <span>🛡️</span>
+            <span>Card A — Rule 1: Regime Filter (Manus)</span>
+          </div>
+          <span class="rule-badge" id="badge-regime">Evaluating...</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Current BTC Daily Close</span>
+          <span class="metric-val" id="val-close">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">200-Day SMA (Current)</span>
+          <span class="metric-val" id="val-sma200">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">200-Day SMA (20 Days Ago)</span>
+          <span class="metric-val" id="val-sma200-20d">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">SMA200 Slope Status</span>
+          <span class="metric-val" id="val-sma200-slope">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Distance vs 200 SMA</span>
+          <span class="metric-val" id="val-sma200-dist">-</span>
+        </div>
+      </div>
+      <div class="rule-logic-box">
+        <b>RULE 1:</b> IF Close &gt; SMA200 AND SMA200[today] &gt; SMA200[20d ago] =&gt; <span style="color:var(--green-bright); font-weight:700;">TRADE ALLOWED</span> else <span style="color:var(--red-bright); font-weight:700;">FLAT 100% USDT</span>.
+        <div id="comment-regime" style="margin-top:6px; color:#cbd5e1;">Evaluating market regime...</div>
+      </div>
+    </div>
+
+    <!-- CARD B: SETUP (Grok) -->
+    <div class="rule-card" id="card-setup">
+      <div>
+        <div class="rule-card-header">
+          <div class="rule-title">
+            <span>🎯</span>
+            <span>Card B — Rule 2: Setup Dip (Grok)</span>
+          </div>
+          <span class="rule-badge" id="badge-setup">Evaluating...</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">21-Day EMA</span>
+          <span class="metric-val cyan" id="val-ema21">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Close Distance to 21 EMA</span>
+          <span class="metric-val" id="val-ema21-dist">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Target Dip Band (±2% of EMA21)</span>
+          <span class="metric-val" id="val-ema21-band">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">14-Day Wilder RSI</span>
+          <span class="metric-val" id="val-rsi14">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">20-Day Wilder ATR</span>
+          <span class="metric-val" id="val-atr20">-</span>
+        </div>
+      </div>
+      <div class="rule-logic-box">
+        <b>RULE 2:</b> IF Close is between 0.98*EMA21 and 1.02*EMA21 AND RSI14 between 40 and 60 =&gt; <span style="color:var(--green-bright); font-weight:700;">SETUP READY</span> else <span style="color:var(--amber-bright); font-weight:700;">WAIT</span>.
+        <div id="comment-setup" style="margin-top:6px; color:#cbd5e1;">Evaluating pullback depth and momentum...</div>
+      </div>
+    </div>
+
+    <!-- CARD C: LOCATION & SIGNAL (Gemini) -->
+    <div class="rule-card" id="card-location">
+      <div>
+        <div class="rule-card-header">
+          <div class="rule-title">
+            <span>📍</span>
+            <span>Card C — Rule 3: Value Location &amp; Signal</span>
+          </div>
+          <span class="rule-badge" id="badge-location">Evaluating...</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">30-Day Volume Profile POC</span>
+          <span class="metric-val purple" id="val-poc30d">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Close vs 30D POC</span>
+          <span class="metric-val" id="val-poc-dist">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Value Zone Assessment</span>
+          <span class="metric-val" id="val-poc-status">-</span>
+        </div>
+        
+        <!-- Checklist -->
+        <div class="checklist">
+          <div class="check-item" id="check-r1">R1: Regime Filter</div>
+          <div class="check-item" id="check-r2">R2: Controlled Dip</div>
+          <div class="check-item" id="check-r3">R3: Value Location</div>
+        </div>
+
+        <!-- Master Signal Banner -->
+        <div class="master-signal-banner wait" id="master-signal-banner">
+          <div style="font-size:10px; font-weight:800; letter-spacing:1px; color:var(--text-muted); text-transform:uppercase; margin-bottom:2px;">USSM v1.0 MASTER SIGNAL</div>
+          <div class="master-signal-text" id="master-signal-text">EVALUATING...</div>
+        </div>
+      </div>
+      <div class="rule-logic-box">
+        <b>RULE 3:</b> IF Close &lt;= POC_30D =&gt; <span style="color:var(--green-bright); font-weight:700;">LOCATION GOOD</span> (Buying in lower half of 30D value).
+        <div><b>SIGNAL:</b> Rule 1 AND Rule 2 AND Rule 3 =&gt; <span style="color:var(--green-bright); font-weight:700;">READY TO ENTER at next day open</span>.</div>
+      </div>
+    </div>
+
+    <!-- CARD D: RISK & EXECUTION (DeepSeek + Hybrid) -->
+    <div class="rule-card" id="card-risk">
+      <div>
+        <div class="rule-card-header">
+          <div class="rule-title">
+            <span>📐</span>
+            <span>Card D — Rule 4 &amp; 5: Risk &amp; Exit Protocol</span>
+          </div>
+          <span class="rule-badge green">ACTIVE PROTOCOL</span>
+        </div>
+
+        <div class="risk-inputs-grid">
+          <div class="input-group">
+            <label>Trading Equity (USDT)</label>
+            <input type="number" id="input-equity" class="input-control" value="10000" min="100" step="100" onchange="recalculateRisk()">
+          </div>
+          <div class="input-group">
+            <label>Risk Per Trade: <span id="label-risk-pct" style="color:#38bdf8;">1.0%</span></label>
+            <input type="range" id="input-risk" min="0.5" max="2.0" step="0.1" value="1.0" style="width:100%; margin-top:8px; cursor:pointer;" oninput="updateRiskPct(this.value)">
+          </div>
+        </div>
+
+        <div class="metric-row">
+          <span class="metric-label">Estimated Entry (Next Open)</span>
+          <span class="metric-val" id="val-risk-entry">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Initial Stop (Entry - 2.5x ATR20)</span>
+          <span class="metric-val red" id="val-risk-stop">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Stop Distance</span>
+          <span class="metric-val" id="val-risk-dist">-</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Position Size BTC / USDT</span>
+          <span class="metric-val green" id="val-risk-size">-</span>
+        </div>
+        <div class="metric-row" id="row-cap-warning" style="display:none;">
+          <span class="metric-label" style="color:var(--amber-bright);">Cap Constraint</span>
+          <span class="metric-val amber" id="val-cap-warning">Capped at 30% Max Equity</span>
+        </div>
+
+        <table class="exit-table">
+          <thead>
+            <tr>
+              <th>Rule 5 Exit Protocol</th>
+              <th>Trigger Condition</th>
+              <th>Execution Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1. Initial Stop</td>
+              <td>Entry - 2.5 * ATR20</td>
+              <td id="table-init-stop">-</td>
+            </tr>
+            <tr>
+              <td>2. Profit Trail Stop</td>
+              <td>Once price hits +2.0x ATR profit</td>
+              <td id="table-trail-stop">-</td>
+            </tr>
+            <tr>
+              <td>3. Failsafe Breakdown</td>
+              <td>Daily Close &lt; 20-Day Low</td>
+              <td id="table-failsafe-stop">-</td>
+            </tr>
+            <tr>
+              <td>4. Time Stop</td>
+              <td>Hold reaches 20 calendar days</td>
+              <td>Exit next day open</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="rule-logic-box">
+        <b>RULE 4 &amp; 5:</b> Max 30% of equity per trade, Max 60% total BTC exposure. No leverage, no averaging down.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CARD E: CHART -->
+  <div class="chart-section">
+    <div class="chart-header">
+      <div class="chart-title">
+        <span>📈</span>
+        <span>Card E — 90-Day Spot Price Action &amp; Model Overlay</span>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#ffffff;"></div><span>BTC Close</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--amber-bright);"></div><span>200 SMA</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--cyan-bright);"></div><span>21 EMA</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--purple-bright);"></div><span>30D POC</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--green-bright); border-radius:50%;"></div><span>Entry Signal</span></div>
+      </div>
+    </div>
+    <div id="canvas-container">
+      <canvas id="quantChart"></canvas>
+      <div id="chart-tooltip"></div>
+    </div>
+  </div>
+
+  <!-- JOURNAL SECTION -->
+  <div class="journal-section">
+    <div class="journal-header">
+      <div>
+        <div class="journal-title">📓 Trade Execution Journal &amp; HODL Benchmark</div>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Logged trades are persisted in browser localStorage (pcf3_quant_journal).</div>
+      </div>
+      <div class="journal-stats">
+        <div class="stat-badge">Logged Trades: <b id="stat-count">0</b></div>
+        <div class="stat-badge">Win Rate: <b id="stat-winrate">0%</b></div>
+        <div class="stat-badge">Strategy PnL: <b id="stat-pnl">0.00%</b></div>
+        <div class="stat-badge">vs BTC HODL: <b id="stat-hodl">0.00%</b></div>
+        <button class="nav-btn primary" onclick="logCurrentSignal()" id="btn-log-signal">➕ Log Signal to Journal</button>
+        <button class="nav-btn" onclick="clearJournal()" style="background:#331414; border-color:#7f1d1d; color:#fca5a5;">🗑️ Reset</button>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="journal-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Signal</th>
+            <th>Entry Price</th>
+            <th>Initial Stop</th>
+            <th>Exit Price</th>
+            <th>Strategy PnL</th>
+            <th>vs HODL</th>
+            <th>Status</th>
+            <th>Notes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="journal-tbody">
+          <tr>
+            <td colspan="10" style="text-align:center; color:var(--text-muted); padding:20px;">No trades recorded in journal yet. Click "Log Signal to Journal" to record an entry.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast">✅ Notification</div>
+
+<script>
+// Relative Path Normalization for Subfolder vs Root
+(function setupRelativeNav() {
+  const isSubfolder = window.location.pathname.includes('/quant-lab-simple/');
+  const prefix = isSubfolder ? '../' : './';
+  const linkDash = document.getElementById('link-dashboard');
+  const linkMat = document.getElementById('link-matrix');
+  const linkFrac = document.getElementById('link-fractal');
+  if (linkDash) linkDash.href = prefix + 'index.html';
+  if (linkMat) linkMat.href = prefix + 'matrix.html';
+  if (linkFrac) linkFrac.href = prefix + 'fractal.html';
+})();
+
+// Global Quant State
+let quantData = {
+  candles: [],
+  sma200: [],
+  ema21: [],
+  rsi14: [],
+  atr20: [],
+  poc30d: null,
+  currentPrice: null,
+  r1: false,
+  r2: false,
+  r3: false,
+  signal: false,
+  failsafeStop: null,
+  initialStop: null,
+  trailActivation: null
+};
+
+// Toast helper
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 3200);
+}
+
+// 1. Fetch Binance Daily Klines (250 limit)
+async function fetchAndCompute() {
+  const refreshBtn = document.getElementById('btn-refresh');
+  if (refreshBtn) refreshBtn.textContent = '⏳ Fetching...';
+  
+  try {
+    // Primary Binance public API, with fallback to Binance Vision for CORS
+    let res;
+    try {
+      res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250');
+      if (!res.ok) throw new Error('Status ' + res.status);
+    } catch(errDirect) {
+      console.warn('Direct api.binance.com failed, falling back to data-api.binance.vision:', errDirect);
+      res = await fetch('https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250');
+    }
+
+    const raw = await res.json();
+    if (!Array.isArray(raw) || raw.length < 200) {
+      throw new Error('Received insufficient kline bars from Binance.');
+    }
+
+    // Parse Candles
+    quantData.candles = raw.map(k => ({
+      openTime: parseInt(k[0]),
+      open: parseFloat(k[1]),
+      high: parseFloat(k[2]),
+      low: parseFloat(k[3]),
+      close: parseFloat(k[4]),
+      volume: parseFloat(k[5]),
+      closeTime: parseInt(k[6])
+    }));
+
+    const closes = quantData.candles.map(c => c.close);
+    const N = closes.length;
+    quantData.currentPrice = closes[N - 1];
+
+    // Compute Indicators
+    computeIndicators(quantData.candles);
+
+    // Evaluate Rules
+    evaluateRules();
+
+    // Render UI & Chart
+    updateUI();
+    renderChart();
+
+    document.getElementById('last-updated-text').textContent = 'UTC: ' + new Date().toISOString().replace('T',' ').slice(0,19);
+    showToast('✅ Live market data & indicators refreshed successfully');
+  } catch (e) {
+    console.error('Fetch error:', e);
+    showToast('⚠️ Error fetching live data: ' + e.message);
+    document.getElementById('last-updated-text').textContent = 'Fetch failed: ' + e.message;
+  } finally {
+    if (refreshBtn) refreshBtn.textContent = '🔄 Refresh Live';
+  }
+}
+
+// 2. Pure JavaScript Indicator Calculations
+function computeIndicators(candles) {
+  const closes = candles.map(c => c.close);
+  const N = closes.length;
+
+  // 1. SMA 200
+  quantData.sma200 = new Array(N).fill(null);
+  for (let i = 199; i < N; i++) {
+    let sum = 0;
+    for (let j = i - 199; j <= i; j++) sum += closes[j];
+    quantData.sma200[i] = sum / 200;
+  }
+
+  // 2. EMA 21 (Wilder Seed)
+  const kEma = 2.0 / (21 + 1.0);
+  quantData.ema21 = new Array(N).fill(null);
+  let initialEmaSum = 0;
+  for (let i = 0; i < 21; i++) initialEmaSum += closes[i];
+  let currEma = initialEmaSum / 21;
+  quantData.ema21[20] = currEma;
+  for (let i = 21; i < N; i++) {
+    currEma = (closes[i] * kEma) + (currEma * (1.0 - kEma));
+    quantData.ema21[i] = currEma;
+  }
+
+  // 3. RSI 14 (Wilder's Smoothing)
+  quantData.rsi14 = new Array(N).fill(null);
+  const gains = [], losses = [];
+  for (let i = 1; i < N; i++) {
+    const diff = closes[i] - closes[i - 1];
+    gains.push(diff > 0 ? diff : 0);
+    losses.push(diff < 0 ? -diff : 0);
+  }
+  let avgGain = 0, avgLoss = 0;
+  for (let i = 0; i < 14; i++) {
+    avgGain += gains[i];
+    avgLoss += losses[i];
+  }
+  avgGain /= 14;
+  avgLoss /= 14;
+  let rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
+  quantData.rsi14[14] = 100 - (100 / (1 + rs));
+
+  for (let i = 14; i < gains.length; i++) {
+    avgGain = (avgGain * 13 + gains[i]) / 14;
+    avgLoss = (avgLoss * 13 + losses[i]) / 14;
+    rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
+    quantData.rsi14[i + 1] = 100 - (100 / (1 + rs));
+  }
+
+  // 4. ATR 20 (Wilder's Smoothing)
+  quantData.atr20 = new Array(N).fill(null);
+  const trs = [];
+  for (let i = 1; i < N; i++) {
+    const h = candles[i].high, l = candles[i].low, pc = candles[i - 1].close;
+    trs.push(Math.max(h - l, Math.abs(h - pc), Math.abs(l - pc)));
+  }
+  let initialAtrSum = 0;
+  for (let i = 0; i < 20; i++) initialAtrSum += trs[i];
+  let currAtr = initialAtrSum / 20;
+  quantData.atr20[20] = currAtr;
+  for (let i = 20; i < trs.length; i++) {
+    currAtr = (currAtr * 19 + trs[i]) / 20;
+    quantData.atr20[i + 1] = currAtr;
+  }
+
+  // 5. POC_30D (Volume Profile over last 30 daily candles)
+  const last30 = candles.slice(-30);
+  let minLow = Infinity, maxHigh = -Infinity;
+  last30.forEach(c => {
+    if (c.low < minLow) minLow = c.low;
+    if (c.high > maxHigh) maxHigh = c.high;
+  });
+
+  const numBins = 50;
+  const binWidth = (maxHigh - minLow) / numBins;
+  const binVolumes = new Array(numBins).fill(0);
+
+  last30.forEach(c => {
+    const h = c.high, l = c.low, v = c.volume;
+    if (h <= l) {
+      const idx = Math.min(numBins - 1, Math.max(0, Math.floor((l - minLow) / binWidth)));
+      binVolumes[idx] += v;
+    } else {
+      const startBin = Math.min(numBins - 1, Math.max(0, Math.floor((l - minLow) / binWidth)));
+      const endBin = Math.min(numBins - 1, Math.max(0, Math.floor((h - minLow) / binWidth)));
+      const count = Math.max(1, endBin - startBin + 1);
+      const volPerBin = v / count;
+      for (let b = startBin; b <= endBin; b++) {
+        binVolumes[b] += volPerBin;
+      }
+    }
+  });
+
+  let maxVol = -1, maxBinIndex = 0;
+  for (let b = 0; b < numBins; b++) {
+    if (binVolumes[b] > maxVol) {
+      maxVol = binVolumes[b];
+      maxBinIndex = b;
+    }
+  }
+  quantData.poc30d = minLow + (maxBinIndex + 0.5) * binWidth;
+
+  // 6. Failsafe Stop: 20-Day lowest low
+  const last20 = candles.slice(-20);
+  let lowestLow20 = Infinity;
+  last20.forEach(c => { if (c.low < lowestLow20) lowestLow20 = c.low; });
+  quantData.failsafeStop = lowestLow20;
+}
+
+// 3. Evaluate 5 Rules
+function evaluateRules() {
+  const N = quantData.candles.length;
+  const close = quantData.currentPrice;
+  const sma = quantData.sma200[N - 1];
+  const sma20dAgo = quantData.sma200[N - 21];
+  const ema = quantData.ema21[N - 1];
+  const rsi = quantData.rsi14[N - 1];
+  const atr = quantData.atr20[N - 1];
+  const poc = quantData.poc30d;
+
+  // Rule 1: Regime Filter
+  // Close > SMA200 AND SMA200[today] > SMA200[20d ago]
+  const smaSlopeUp = (sma !== null && sma20dAgo !== null && sma > sma20dAgo);
+  quantData.r1 = (sma !== null && close > sma && smaSlopeUp);
+
+  // Rule 2: Setup Dip
+  // Close within 0.98 * EMA21 and 1.02 * EMA21 AND RSI between 40 and 60
+  const emaWithinBand = (ema !== null && close >= 0.98 * ema && close <= 1.02 * ema);
+  const rsiWithinBand = (rsi !== null && rsi >= 40 && rsi <= 60);
+  quantData.r2 = (emaWithinBand && rsiWithinBand);
+
+  // Rule 3: Value Location
+  // Close <= POC_30D
+  quantData.r3 = (poc !== null && close <= poc);
+
+  // Master Signal Trigger: R1 AND R2 AND R3
+  quantData.signal = (quantData.r1 && quantData.r2 && quantData.r3);
+
+  // Rule 5: Initial stop & trail activation
+  if (atr !== null) {
+    quantData.initialStop = close - (2.5 * atr);
+    quantData.trailActivation = close + (2.0 * atr);
+  }
+}
+
+// Format numbers
+function fmt(num, decimals = 2) {
+  if (num === null || num === undefined || isNaN(num)) return 'N/A';
+  return '$' + num.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+
+// 4. Update UI Components
+function updateUI() {
+  const N = quantData.candles.length;
+  const close = quantData.currentPrice;
+  const sma = quantData.sma200[N - 1];
+  const sma20dAgo = quantData.sma200[N - 21];
+  const ema = quantData.ema21[N - 1];
+  const rsi = quantData.rsi14[N - 1];
+  const atr = quantData.atr20[N - 1];
+  const poc = quantData.poc30d;
+
+  document.getElementById('live-price-header').textContent = fmt(close);
+  document.getElementById('val-close').textContent = fmt(close);
+
+  // Card A: Regime
+  document.getElementById('val-sma200').textContent = fmt(sma);
+  document.getElementById('val-sma200-20d').textContent = fmt(sma200_20dAgo);
+  const slopePositive = sma > sma20dAgo;
+  const slopeText = slopePositive ? '▲ Positive (Rising)' : '▼ Negative (Declining)';
+  const slopeEl = document.getElementById('val-sma200-slope');
+  slopeEl.textContent = slopeText;
+  slopeEl.className = 'metric-val ' + (slopePositive ? 'green' : 'red');
+
+  const distSma = sma ? (((close - sma) / sma) * 100).toFixed(2) + '%' : 'N/A';
+  const distSmaEl = document.getElementById('val-sma200-dist');
+  distSmaEl.textContent = (close > sma ? '+' : '') + distSma;
+  distSmaEl.className = 'metric-val ' + (close > sma ? 'green' : 'red');
+
+  const badgeRegime = document.getElementById('badge-regime');
+  if (quantData.r1) {
+    badgeRegime.textContent = '🟢 TRADE ALLOWED';
+    badgeRegime.className = 'rule-badge green';
+    document.getElementById('comment-regime').innerHTML = '✅ Bitcoin is above rising 200 SMA (+' + distSma + '). Macro bull trend is validated.';
+  } else {
+    badgeRegime.textContent = '🔴 FLAT (100% USDT)';
+    badgeRegime.className = 'rule-badge red';
+    document.getElementById('comment-regime').innerHTML = '⚠️ Regime condition failed. Maintain 100% cash allocation. No swing buys allowed.';
+  }
+
+  // Card B: Setup
+  document.getElementById('val-ema21').textContent = fmt(ema);
+  const distEma = ema ? (((close - ema) / ema) * 100).toFixed(2) + '%' : 'N/A';
+  const distEmaEl = document.getElementById('val-ema21-dist');
+  distEmaEl.textContent = (close > ema ? '+' : '') + distEma;
+  distEmaEl.className = 'metric-val ' + (Math.abs((close - ema)/ema) <= 0.02 ? 'green' : 'amber');
+
+  document.getElementById('val-ema21-band').textContent = fmt(0.98 * ema) + ' – ' + fmt(1.02 * ema);
+  
+  const rsiEl = document.getElementById('val-rsi14');
+  rsiEl.textContent = rsi ? rsi.toFixed(1) : 'N/A';
+  rsiEl.className = 'metric-val ' + (rsi >= 40 && rsi <= 60 ? 'green' : 'amber');
+
+  const atrEl = document.getElementById('val-atr20');
+  atrEl.textContent = fmt(atr) + ' (' + (atr && close ? ((atr / close) * 100).toFixed(2) + '%' : '') + ')';
+
+  const badgeSetup = document.getElementById('badge-setup');
+  if (quantData.r2) {
+    badgeSetup.textContent = '🟢 SETUP READY';
+    badgeSetup.className = 'rule-badge green';
+    document.getElementById('comment-setup').innerHTML = '✅ Pullback controlled: Spot is within ±2% of 21 EMA (' + distEma + ') and RSI (' + rsi.toFixed(1) + ') is reset between 40-60.';
+  } else {
+    badgeSetup.textContent = '⏳ WAIT';
+    badgeSetup.className = 'rule-badge amber';
+    document.getElementById('comment-setup').innerHTML = '⏳ Setup not primed. Either price is extended from 21 EMA (>2%) or RSI is outside 40-60 neutral consolidation band.';
+  }
+
+  // Card C: Location & Signal
+  document.getElementById('val-poc30d').textContent = fmt(poc);
+  const pocDist = poc ? (((close - poc) / poc) * 100).toFixed(2) + '%' : 'N/A';
+  const pocDistEl = document.getElementById('val-poc-dist');
+  pocDistEl.textContent = (close > poc ? '+' : '') + pocDist;
+  pocDistEl.className = 'metric-val ' + (close <= poc ? 'green' : 'amber');
+
+  const pocStatusEl = document.getElementById('val-poc-status');
+  pocStatusEl.textContent = close <= poc ? 'Below 30D POC (Discount Zone)' : 'Above 30D POC (Premium Zone)';
+  pocStatusEl.className = 'metric-val ' + (close <= poc ? 'green' : 'amber');
+
+  const badgeLocation = document.getElementById('badge-location');
+  if (quantData.r3) {
+    badgeLocation.textContent = '🟢 LOCATION GOOD';
+    badgeLocation.className = 'rule-badge green';
+  } else {
+    badgeLocation.textContent = '⏳ ABOVE VALUE';
+    badgeLocation.className = 'rule-badge amber';
+  }
+
+  // Checklist
+  const c1 = document.getElementById('check-r1');
+  c1.className = 'check-item ' + (quantData.r1 ? 'passed' : 'failed');
+  c1.textContent = (quantData.r1 ? '✓ ' : '✕ ') + 'R1: Regime Filter';
+
+  const c2 = document.getElementById('check-r2');
+  c2.className = 'check-item ' + (quantData.r2 ? 'passed' : 'failed');
+  c2.textContent = (quantData.r2 ? '✓ ' : '✕ ') + 'R2: Controlled Dip';
+
+  const c3 = document.getElementById('check-r3');
+  c3.className = 'check-item ' + (quantData.r3 ? 'passed' : 'failed');
+  c3.textContent = (quantData.r3 ? '✓ ' : '✕ ') + 'R3: Value Location';
+
+  // Master Banner
+  const masterBanner = document.getElementById('master-signal-banner');
+  const masterText = document.getElementById('master-signal-text');
+  if (quantData.signal) {
+    masterBanner.className = 'master-signal-banner ready';
+    masterText.textContent = '🚀 READY TO ENTER (AT NEXT DAY OPEN)';
+    masterText.style.color = 'var(--green-bright)';
+  } else {
+    masterBanner.className = 'master-signal-banner wait';
+    masterText.textContent = '✋ NO TRADE / STAND ASIDE';
+    masterText.style.color = '#94a3b8';
+  }
+
+  // Card D: Recalculate Risk
+  recalculateRisk();
+}
+
+// 5. Risk & Position Sizing Calculator (DeepSeek + Hybrid Exit)
+function updateRiskPct(val) {
+  document.getElementById('label-risk-pct').textContent = parseFloat(val).toFixed(1) + '%';
+  try { localStorage.setItem('pcf3_quant_risk', val); } catch(e){}
+  recalculateRisk();
+}
+
+function recalculateRisk() {
+  const equityInput = document.getElementById('input-equity');
+  const riskInput = document.getElementById('input-risk');
+  
+  let equity = parseFloat(equityInput.value) || 10000;
+  let riskPct = parseFloat(riskInput.value) || 1.0;
+
+  try { localStorage.setItem('pcf3_quant_equity', equity.toString()); } catch(e){}
+
+  const close = quantData.currentPrice;
+  const atr = quantData.atr20[quantData.atr20.length - 1];
+
+  if (!close || !atr) return;
+
+  const entry = close;
+  const stopDistance = 2.5 * atr;
+  const stopPrice = entry - stopDistance;
+  const dollarRisk = equity * (riskPct / 100.0);
+
+  let posBtc = dollarRisk / stopDistance;
+  let posUsdt = posBtc * entry;
+
+  // Rule 4 Caps:
+  // Max 30% of equity per trade, Max 60% total BTC exposure
+  const maxTradeNotional = equity * 0.30;
+  let isCapped = false;
+  if (posUsdt > maxTradeNotional) {
+    posUsdt = maxTradeNotional;
+    posBtc = posUsdt / entry;
+    isCapped = true;
+  }
+
+  document.getElementById('val-risk-entry').textContent = fmt(entry);
+  document.getElementById('val-risk-stop').textContent = fmt(stopPrice);
+  document.getElementById('val-risk-dist').textContent = fmt(stopDistance) + ' (-' + ((stopDistance / entry) * 100).toFixed(2) + '%)';
+  document.getElementById('val-risk-size').textContent = posBtc.toFixed(4) + ' BTC (' + fmt(posUsdt) + ' | ' + ((posUsdt / equity) * 100).toFixed(1) + '% equity)';
+
+  const rowCap = document.getElementById('row-cap-warning');
+  if (isCapped) {
+    rowCap.style.display = 'flex';
+    document.getElementById('val-cap-warning').textContent = '⚠️ Clamped to ' + fmt(maxTradeNotional) + ' (30% Max Equity Cap)';
+  } else {
+    rowCap.style.display = 'none';
+  }
+
+  // Rule 5 Exit Table
+  document.getElementById('table-init-stop').textContent = fmt(stopPrice);
+  document.getElementById('table-trail-stop').textContent = 'Trigger: ' + fmt(entry + (2.0 * atr)) + ' (+2 ATR)';
+  document.getElementById('table-failsafe-stop').textContent = fmt(quantData.failsafeStop) + ' (20D Low)';
+}
+
+// Load saved inputs from localStorage
+(function loadSavedSettings() {
+  try {
+    const savedEquity = localStorage.getItem('pcf3_quant_equity');
+    if (savedEquity) document.getElementById('input-equity').value = savedEquity;
+    
+    const savedRisk = localStorage.getItem('pcf3_quant_risk');
+    if (savedRisk) {
+      document.getElementById('input-risk').value = savedRisk;
+      document.getElementById('label-risk-pct').textContent = parseFloat(savedRisk).toFixed(1) + '%';
+    }
+  } catch(e){}
+})();
+
+// 6. Interactive 90-Day Canvas Chart (Zero Dependencies)
+function renderChart() {
+  const canvas = document.getElementById('quantChart');
+  const container = document.getElementById('canvas-container');
+  if (!canvas || !container) return;
+
+  const rect = container.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const w = rect.width;
+  const h = rect.height;
+
+  ctx.fillStyle = '#06090f';
+  ctx.fillRect(0, 0, w, h);
+
+  const total = quantData.candles.length;
+  const sliceCount = 90;
+  if (total < sliceCount) return;
+
+  const startIdx = total - sliceCount;
+  const chartCandles = quantData.candles.slice(startIdx);
+  const chartSma = quantData.sma200.slice(startIdx);
+  const chartEma = quantData.ema21.slice(startIdx);
+  const poc = quantData.poc30d;
+
+  // Determine min and max price for y-scale
+  let minP = Infinity, maxP = -Infinity;
+  chartCandles.forEach((c, idx) => {
+    if (c.low < minP) minP = c.low;
+    if (c.high > maxP) maxP = c.high;
+    const s = chartSma[idx];
+    if (s && s < minP) minP = s;
+    if (s && s > maxP) maxP = s;
+    const e = chartEma[idx];
+    if (e && e < minP) minP = e;
+    if (e && e > maxP) maxP = e;
+  });
+  if (poc) {
+    if (poc < minP) minP = poc;
+    if (poc > maxP) maxP = poc;
+  }
+
+  const padP = (maxP - minP) * 0.08;
+  minP -= padP;
+  maxP += padP;
+
+  const padLeft = 16, padRight = 65, padTop = 20, padBottom = 28;
+  const chartW = w - padLeft - padRight;
+  const chartH = h - padTop - padBottom;
+
+  const getX = i => padLeft + (i / (sliceCount - 1)) * chartW;
+  const getY = p => padTop + chartH - ((p - minP) / (maxP - minP)) * chartH;
+
+  // Grid lines
+  ctx.strokeStyle = '#141c2c';
+  ctx.lineWidth = 1;
+  const gridSteps = 5;
+  ctx.fillStyle = '#64748b';
+  ctx.font = '10px ui-monospace, monospace';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+
+  for (let s = 0; s <= gridSteps; s++) {
+    const p = minP + (s / gridSteps) * (maxP - minP);
+    const y = getY(p);
+    ctx.beginPath();
+    ctx.moveTo(padLeft, y);
+    ctx.lineTo(w - padRight, y);
+    ctx.stroke();
+    ctx.fillText('$' + Math.round(p).toLocaleString(), w - 8, y);
+  }
+
+  // Draw 30D POC Horizontal Dashed Line
+  if (poc) {
+    const pocY = getY(poc);
+    ctx.strokeStyle = '#a855f7';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(padLeft, pocY);
+    ctx.lineTo(w - padRight, pocY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#c084fc';
+    ctx.fillText('POC', w - 8, pocY - 8);
+  }
+
+  // Draw 200 SMA Line
+  ctx.strokeStyle = '#f59e0b';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  let startedSma = false;
+  chartSma.forEach((val, i) => {
+    if (val !== null) {
+      const x = getX(i), y = getY(val);
+      if (!startedSma) { ctx.moveTo(x, y); startedSma = true; }
+      else { ctx.lineTo(x, y); }
+    }
+  });
+  ctx.stroke();
+
+  // Draw 21 EMA Line
+  ctx.strokeStyle = '#06b6d4';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  let startedEma = false;
+  chartEma.forEach((val, i) => {
+    if (val !== null) {
+      const x = getX(i), y = getY(val);
+      if (!startedEma) { ctx.moveTo(x, y); startedEma = true; }
+      else { ctx.lineTo(x, y); }
+    }
+  });
+  ctx.stroke();
+
+  // Draw Candlesticks or Price Line
+  const candleW = Math.max(2, (chartW / sliceCount) * 0.65);
+  chartCandles.forEach((c, i) => {
+    const x = getX(i);
+    const isUp = c.close >= c.open;
+    ctx.strokeStyle = isUp ? '#10b981' : '#ef4444';
+    ctx.fillStyle = isUp ? '#10b981' : '#ef4444';
+    ctx.lineWidth = 1;
+
+    // Wick
+    ctx.beginPath();
+    ctx.moveTo(x, getY(c.high));
+    ctx.lineTo(x, getY(c.low));
+    ctx.stroke();
+
+    // Body
+    const yOpen = getY(c.open);
+    const yClose = getY(c.close);
+    const bodyTop = Math.min(yOpen, yClose);
+    const bodyH = Math.max(1, Math.abs(yClose - yOpen));
+    ctx.fillRect(x - candleW / 2, bodyTop, candleW, bodyH);
+
+    // Historical Signals: Check if Rule 1, 2, 3 were met on this historical candle
+    const histIdx = startIdx + i;
+    const hClose = quantData.candles[histIdx].close;
+    const hSma = quantData.sma200[histIdx];
+    const hSma20Ago = quantData.sma200[histIdx - 20];
+    const hEma = quantData.ema21[histIdx];
+    const hRsi = quantData.rsi14[histIdx];
+    
+    if (hSma && hSma20Ago && hEma && hRsi && poc) {
+      const hr1 = (hClose > hSma && hSma > hSma20Ago);
+      const hr2 = (hClose >= 0.98 * hEma && hClose <= 1.02 * hEma && hRsi >= 40 && hRsi <= 60);
+      const hr3 = (hClose <= poc);
+      if (hr1 && hr2 && hr3) {
+        // Draw Entry Beacon Dot / Triangle below low
+        const beaconY = getY(c.low) + 12;
+        ctx.fillStyle = '#10b981';
+        ctx.beginPath();
+        ctx.arc(x, beaconY, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+  });
+
+  // Crosshair & Tooltip interaction
+  container.onmousemove = function(e) {
+    const mRect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - mRect.left;
+    const relX = mouseX - padLeft;
+    if (relX >= 0 && relX <= chartW) {
+      const idx = Math.round((relX / chartW) * (sliceCount - 1));
+      if (idx >= 0 && idx < sliceCount) {
+        const c = chartCandles[idx];
+        const tt = document.getElementById('chart-tooltip');
+        tt.style.display = 'block';
+        tt.style.left = (mouseX + 12) + 'px';
+        tt.style.top = '20px';
+        const dStr = new Date(c.openTime).toISOString().split('T')[0];
+        tt.innerHTML = `
+          <div style="font-weight:700; color:#38bdf8; margin-bottom:4px;">${dStr}</div>
+          <div>Close: <b>$${c.close.toLocaleString()}</b></div>
+          <div>SMA200: <b style="color:#f59e0b;">$${chartSma[idx] ? Math.round(chartSma[idx]).toLocaleString() : 'N/A'}</b></div>
+          <div>EMA21: <b style="color:#06b6d4;">$${chartEma[idx] ? Math.round(chartEma[idx]).toLocaleString() : 'N/A'}</b></div>
+          <div>30D POC: <b style="color:#a855f7;">$${Math.round(poc).toLocaleString()}</b></div>
+        `;
+      }
+    }
+  };
+  container.onmouseleave = function() {
+    document.getElementById('chart-tooltip').style.display = 'none';
+  };
+}
+
+// 7. Journal Management (LocalStorage pcf3_quant_journal)
+function getJournal() {
+  try {
+    const raw = localStorage.getItem('pcf3_quant_journal');
+    return raw ? JSON.parse(raw) : [];
+  } catch(e) { return []; }
+}
+
+function saveJournal(items) {
+  try {
+    localStorage.setItem('pcf3_quant_journal', JSON.stringify(items));
+  } catch(e) {}
+  renderJournal();
+}
+
+function logCurrentSignal() {
+  const close = quantData.currentPrice;
+  const stop = quantData.initialStop;
+  if (!close || !stop) {
+    showToast('⚠️ No active market data to log.');
+    return;
+  }
+
+  const journal = getJournal();
+  const now = new Date();
+  const dateStr = now.toISOString().split('T')[0];
+
+  const trade = {
+    id: Date.now(),
+    date: dateStr,
+    signal: quantData.signal ? 'READY TO ENTER' : 'MANUAL WATCH',
+    entry: close,
+    stop: stop,
+    exit: null,
+    status: 'OPEN',
+    notes: quantData.signal ? 'USSM v1.0 confluence entry triggered at 00:00 UTC open' : 'Logged from dashboard snapshot'
+  };
+
+  journal.unshift(trade);
+  saveJournal(journal);
+  showToast('✅ Trade entry logged to journal!');
+}
+
+function closeTrade(id) {
+  const journal = getJournal();
+  const trade = journal.find(t => t.id === id);
+  if (!trade) return;
+
+  const exitPriceStr = prompt('Enter Exit Price (USDT):', quantData.currentPrice.toFixed(2));
+  if (!exitPriceStr) return;
+  const exitPrice = parseFloat(exitPriceStr);
+  if (isNaN(exitPrice)) return;
+
+  trade.exit = exitPrice;
+  trade.status = 'CLOSED';
+  saveJournal(journal);
+  showToast('✅ Trade closed at ' + fmt(exitPrice));
+}
+
+function deleteTrade(id) {
+  if (!confirm('Delete this journal entry?')) return;
+  let journal = getJournal();
+  journal = journal.filter(t => t.id !== id);
+  saveJournal(journal);
+  showToast('Entry deleted.');
+}
+
+function clearJournal() {
+  if (!confirm('Clear all journal entries?')) return;
+  saveJournal([]);
+  showToast('Journal reset.');
+}
+
+function renderJournal() {
+  const journal = getJournal();
+  const tbody = document.getElementById('journal-tbody');
+  
+  if (journal.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:var(--text-muted); padding:20px;">No trades recorded in journal yet. Click "Log Signal to Journal" to record an entry.</td></tr>';
+    document.getElementById('stat-count').textContent = '0';
+    document.getElementById('stat-winrate').textContent = '0%';
+    document.getElementById('stat-pnl').textContent = '0.00%';
+    document.getElementById('stat-hodl').textContent = '0.00%';
+    return;
+  }
+
+  let totalClosed = 0, winCount = 0, totalPnl = 0, totalHodl = 0;
+
+  tbody.innerHTML = journal.map(t => {
+    let pnlText = 'OPEN';
+    let hodlText = '-';
+    let pnlClass = '';
+
+    if (t.exit && t.entry) {
+      totalClosed++;
+      const pnl = ((t.exit - t.entry) / t.entry) * 100;
+      totalPnl += pnl;
+      if (pnl > 0) winCount++;
+      pnlClass = pnl >= 0 ? 'color:var(--green-bright);' : 'color:var(--red-bright);';
+      pnlText = (pnl >= 0 ? '+' : '') + pnl.toFixed(2) + '%';
+      
+      const hodlReturn = quantData.currentPrice ? (((quantData.currentPrice - t.entry) / t.entry) * 100) : 0;
+      totalHodl += hodlReturn;
+      hodlText = (hodlReturn >= 0 ? '+' : '') + hodlReturn.toFixed(2) + '%';
+    }
+
+    return `
+      <tr>
+        <td>${t.date}</td>
+        <td><span style="color:${t.signal.includes('READY') ? 'var(--green-bright)' : '#94a3b8'}; font-weight:700;">${t.signal}</span></td>
+        <td>${fmt(t.entry)}</td>
+        <td style="color:var(--red-bright);">${fmt(t.stop)}</td>
+        <td>${t.exit ? fmt(t.exit) : '<span style="color:var(--amber-bright);">ACTIVE</span>'}</td>
+        <td style="${pnlClass} font-weight:700;">${pnlText}</td>
+        <td style="color:#94a3b8;">${hodlText}</td>
+        <td><span class="rule-badge ${t.status === 'OPEN' ? 'amber' : 'green'}" style="padding:2px 6px; font-size:10px;">${t.status}</span></td>
+        <td style="color:#cbd5e1; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${t.notes || '-'}</td>
+        <td>
+          ${t.status === 'OPEN' ? `<button class="btn-sm success" onclick="closeTrade(${t.id})">Close</button>` : ''}
+          <button class="btn-sm danger" onclick="deleteTrade(${t.id})">Del</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  document.getElementById('stat-count').textContent = journal.length;
+  document.getElementById('stat-winrate').textContent = totalClosed > 0 ? ((winCount / totalClosed) * 100).toFixed(0) + '%' : '0%';
+  document.getElementById('stat-pnl').textContent = (totalPnl >= 0 ? '+' : '') + totalPnl.toFixed(2) + '%';
+  document.getElementById('stat-hodl').textContent = (totalHodl >= 0 ? '+' : '') + totalHodl.toFixed(2) + '%';
+}
+
+// Initial Boot
+document.addEventListener('DOMContentLoaded', () => {
+  renderJournal();
+  fetchAndCompute();
+});
+window.addEventListener('resize', renderChart);
+</script>
+</body>
+</html>
