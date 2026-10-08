@@ -648,14 +648,14 @@
       </div>
     </div>
 
-    <!-- 5 Core Cards (F to J) -->
+    <!-- 5 Core Cards (A to E) -->
     <div class="cards-grid">
 
-      <!-- CARD F: REGIME ENHANCED (ENGINE A) -->
-      <div class="card" id="card-f">
+      <!-- CARD A: REGIME ENHANCED (ENGINE A) -->
+      <div class="card" id="card-a">
         <div>
           <div class="card-header">
-            <span class="card-title">🌐 Card F — Regime Enhanced</span>
+            <span class="card-title">🌐 Card A — Regime Enhanced</span>
             <span class="card-tag">ENGINE A</span>
           </div>
           <div class="card-body">
@@ -683,11 +683,11 @@
         <div class="status-badge wait" id="f-badge">ANALYZING REGIME</div>
       </div>
 
-      <!-- CARD G: ZONES & LIQUIDATION (ENGINE B) -->
-      <div class="card" id="card-g">
+      <!-- CARD B: ZONES & LIQUIDATION (ENGINE B) -->
+      <div class="card" id="card-b">
         <div>
           <div class="card-header">
-            <span class="card-title">🎯 Card G — Zones &amp; Liquidation</span>
+            <span class="card-title">🎯 Card B — Zones &amp; Liquidation</span>
             <span class="card-tag">ENGINE B</span>
           </div>
           <div class="card-body">
@@ -719,11 +719,11 @@
         <div class="status-badge wait" id="g-badge">ZONES MAPPED</div>
       </div>
 
-      <!-- CARD H: 4H TRIGGER & DERIVATIVES (ENGINE C & D) -->
-      <div class="card" id="card-h">
+      <!-- CARD C: 4H TRIGGER & DERIVATIVES (ENGINE C & D) -->
+      <div class="card" id="card-c">
         <div>
           <div class="card-header">
-            <span class="card-title">⚡ Card H — 4H Trigger &amp; Derivatives</span>
+            <span class="card-title">⚡ Card C — 4H Trigger &amp; Derivatives</span>
             <span class="card-tag">ENGINE C &amp; D</span>
           </div>
           <div class="card-body">
@@ -755,11 +755,11 @@
         <div class="status-badge wait" id="h-badge">MONITORING TRIGGER</div>
       </div>
 
-      <!-- CARD I: SCORING & PROTOCOL STATE -->
-      <div class="card" id="card-i">
+      <!-- CARD D: SCORING & PROTOCOL STATE -->
+      <div class="card" id="card-d">
         <div>
           <div class="card-header">
-            <span class="card-title">📊 Card I — Scoring (0–6) &amp; States</span>
+            <span class="card-title">📊 Card D — Scoring (0–6) &amp; States</span>
             <span class="card-tag">PROTOCOL ARBITRATION</span>
           </div>
           <div class="card-body">
@@ -795,11 +795,11 @@
         <div class="status-badge wait" id="i-badge">CALCULATING SCORE</div>
       </div>
 
-      <!-- CARD J: NO-STOP 3-BUCKET CAPITAL ARCHITECTURE -->
-      <div class="card" id="card-j">
+      <!-- CARD E: NO-STOP 3-BUCKET CAPITAL ARCHITECTURE -->
+      <div class="card" id="card-e">
         <div>
           <div class="card-header">
-            <span class="card-title">🛡️ Card J — No-Stop 3-Bucket Risk</span>
+            <span class="card-title">🛡️ Card E — No-Stop 3-Bucket Risk</span>
             <span class="card-tag">CAPITAL SURVIVAL</span>
           </div>
           <div class="card-body">
@@ -1518,7 +1518,7 @@ async function copyDataPacket4() {
     "• Data Provenance:             Binance Public API (1D, 1W, 4H Completed Bars)",
     "• Freshness:                   Live bar close snapshot",
     "",
-    "[2] ENGINE A — REGIME FILTER (SLOW)",
+    "[2] CARD A — ENGINE A: REGIME FILTER (SLOW)",
     "--------------------------------------------------------------------------------",
     "• 50-Week MA (Weekly Anchor):  " + (protocolData.sma50w ? "$" + protocolData.sma50w.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 'N/A'),
     "• Spot vs 50-Week MA:          " + (protocolData.sma50w ? (((spot - protocolData.sma50w) / protocolData.sma50w) * 100).toFixed(2) + "%" : 'N/A'),
@@ -1528,7 +1528,7 @@ async function copyDataPacket4() {
     "• ETF 7-Day Net Flow:          +$" + protocolData.etfFlow7d + "M (Institutional Accumulation)",
     "• Engine A Regime Verdict:     " + (document.getElementById('f-badge').textContent),
     "",
-    "[3] ENGINE B — ZONES & LIQUIDATION (MEDIUM)",
+    "[3] CARD B — ENGINE B: ZONES & LIQUIDATION (MEDIUM)",
     "--------------------------------------------------------------------------------",
     "• 30-Day Volume Profile POC:   " + (protocolData.poc30d ? "$" + protocolData.poc30d.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 'N/A'),
     "• 30-Day Value Area (VAL-VAH): " + (protocolData.val30d ? "$" + protocolData.val30d.toFixed(2) + " – $" + protocolData.vah30d.toFixed(2) : 'N/A'),
@@ -1536,7 +1536,7 @@ async function copyDataPacket4() {
     "• Active Psychological Support:" + document.getElementById('g-support-val').textContent,
     "• Active Take Profit Magnet:   " + document.getElementById('g-resist-val').textContent,
     "",
-    "[4] ENGINE C & D — TRIGGER & DERIVATIVES (FAST)",
+    "[4] CARD C — ENGINE C & D: TRIGGER & DERIVATIVES (FAST)",
     "--------------------------------------------------------------------------------",
     "• 4H Market Structure:         " + (protocolData.structure4h || 'N/A'),
     "• Liquidation Sweep Status:    " + (protocolData.sweepDetected ? 'DETECTED (Bullish Liquidity Grab)' : 'NONE OBSERVED'),
@@ -1544,13 +1544,13 @@ async function copyDataPacket4() {
     "• Futures Open Interest:       " + (protocolData.openInterest ? protocolData.openInterest.toLocaleString() + " BTC" : 'N/A'),
     "• 14-Day Wilder RSI:           " + (protocolData.rsi14d ? protocolData.rsi14d.toFixed(2) : 'N/A'),
     "",
-    "[5] PROTOCOL SCORING & COMPOSITE STATE",
+    "[5] CARD D — PROTOCOL SCORING & COMPOSITE STATE",
     "--------------------------------------------------------------------------------",
     "• Protocol Score:              " + protocolData.score + " / 6",
     "• Active Protocol State:       " + protocolData.state,
     "• Setup Classification:        " + (protocolData.score >= 5 ? 'A+ SETUP (Deploy T1+T2 30%)' : (protocolData.score === 4 ? 'A SETUP (Deploy T1 15%)' : (protocolData.score === 3 ? 'WAIT (100% Stable Reserve)' : 'DEFENSIVE (Hold Reserve)'))),
     "",
-    "[6] 3-BUCKET NO-STOP RISK ALLOCATION REFERENCE",
+    "[6] CARD E — 3-BUCKET NO-STOP RISK ALLOCATION REFERENCE",
     "--------------------------------------------------------------------------------",
     "• Bucket 1 (Core Holdings):    45% Allocation (Cold storage, untouchable)",
     "• Bucket 2 (Active Swing):     " + (protocolData.score >= 5 ? '30% Deployed (T1 15% + T2 15%)' : (protocolData.score === 4 ? '15% Deployed (T1 15%)' : '0% Deployed (Flat)')) ,
