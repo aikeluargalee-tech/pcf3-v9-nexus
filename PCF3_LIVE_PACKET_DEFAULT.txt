@@ -387,7 +387,7 @@ DERIVATIVES REGIME EDGE (Kimi Layer 3) | ENHANCEMENTS #4  — Long/Short + OI/mc
   Funding: 0.0022% avg 0.007% agg | DATA_STATUS: MANUAL_REAL_V33 | SOURCE: V3.3 + Coinglass | METHOD: Persistently positive + price flat = longs overcrowded distribution risk Deeply negative + price holding = bearishness not confirmed bottoming range Neutral/mild in trend = healthy | NOTE: Funding rates perpetual swaps
   OI: Price flat + OI climbing = leverage building inside range → breakout violent New price high + OI falling = short-cover rally not new longs weaker trend OI + price both making highs = trend confirmation | DATA_STATUS: LIVE_API via fapi openInterest when on laptop + history file | METHOD: OI trend vs price
   OI ÷ market cap ratio: 2.800% | OI_BTC 45000 BTC OI_USD $3.72B MarketCap $1.639T Supply 19.8M | DATA_STATUS: MANUAL_REAL_V33 | SOURCE: Binance fapi openInterest + markPrice + supply 19.8M cached real | METHOD: OI $ / Market Cap $ *100 Elevated + flat = fragility >3% fragility | TIMESTAMP: 2026-10-09T14:06:43.696460Z | NOTE: Enhancement #4 FIXES OI/mcap MISSING - LIVE_AUTO via Binance + supply 19.8M >3% elevated fragility <1% healthy
-  Liquidation clusters: Long ${v33_real.get('liq_long_price', 'MISSING')} 1.4% Short 82k-86k dense 4.79B | DATA_STATUS: MANUAL_REAL_V33 | SOURCE: Coinglass liquidation heatmap | METHOD: Clusters = where price gets pulled sweep targets fresh large spike = often local exhaustion
+  Liquidation clusters: Long $79,200-$80,400 1.4% Short 82k-86k dense 4.79B | DATA_STATUS: MANUAL_REAL_V33 | SOURCE: Coinglass liquidation heatmap | METHOD: Clusters = where price gets pulled sweep targets fresh large spike = often local exhaustion
   Long/short account ratio: Global 0.000 Long MISSING% Short MISSING% Top 0.000 Position 0.000 Taker 0.000 | DATA_STATUS: LIVE_API | SOURCE: fapi.binance.com/futures/data/globalLongShortAccountRatio + top + position + taker | METHOD: Long/Short Account Ratio >2 extreme long >3 extreme retail positioning fade-with-trend confirmation at range edges Retail long extreme = contrarian short signal in range Top traders ratio vs retail divergence = smart money signal | TIMESTAMP: 2026-10-09T14:06:53.146881Z | NOTE: Enhancement #4 FIXES Long/short MISSING - LIVE_API via Binance futures data Top traders vs retail divergence = smart money signal
 
 MACRO / LIQUIDITY CONTEXT (Kimi Layer 4 + Grok Context) | ENHANCEMENTS #2 #3 #5  — ETF via AllOrigins + Yahoo via AllOrigins + Global Net Liquidity FRED ---
@@ -455,7 +455,7 @@ STRUCTURAL LEVELS (Kimi Layer 5 where regimes live and die):
   20-day / 90-day high & low: Range edges regime flip happens on confirmed break + failed retest | DATA_STATUS: LIVE_AUTO from daily klines when on laptop | METHOD: Mark 20d/90d high-low prior week high/low last swing points
   Prior week high/low: In trends holds as support/resistance in ranges both sides get swept repeatedly | DATA_STATUS: LIVE_AUTO weekly klines
   Weekly swing points: Levels that define higher timeframe regime | DATA_STATUS: LIVE_AUTO
-  Liquidation clusters: Where sweep-and-reclaim setups form Long ${v33_real.get('liq_long_price', 'MISSING')} Short 82k-86k dense | DATA_STATUS: MANUAL_REAL_V33
+  Liquidation clusters: Where sweep-and-reclaim setups form Long $79,200-$80,400 Short 82k-86k dense | DATA_STATUS: MANUAL_REAL_V33
   Psych levels: Support $81k-$82k Resistance $85.5k $86.5k $89k $90k $100k nearest $500 rounds whole number bias order clustering | DATA_STATUS: LIVE_AUTO BPLP | METHOD: $500 rounds
 
 EXECUTION DATA (Kimi Layer 6 regime → position math):
@@ -476,7 +476,7 @@ DAILY REGIME WORKFLOW 5-10 min (Kimi) + 3-5 min (Grok) — ORDER MATTERS:
   2. Daily: ADX level and direction? ATR percentile? BBWidth percentile? Check MA structure bull braid/bear braid/flat mess | Grok Step 2 Daily Chart Confirmation Structure + 50/200-day MA + MACD/RSI
   3. 4H: MA structure bull braid/bear braid/flat mess? | Kimi
   4. Structure: Mark 20d/90d high-low prior week high/low last swing points psych $80k/$90k/$100k HVN $80,500 STH $81,842 | Kimi Layer 5 + Grok + BPLP
-  5. Derivatives: Funding reading extreme? OI rising into boundary? Any liquidation clusters nearby? Long ${v33_real.get('liq_long_price', 'MISSING')} Short 82k-86k dense | Kimi Layer 3
+  5. Derivatives: Funding reading extreme? OI rising into boundary? Any liquidation clusters nearby? Long $79,200-$80,400 Short 82k-86k dense | Kimi Layer 3
   6. Macro: DXY direction Net Liquidity trend any major events this week? ETF flow streak 433.0M | Kimi Layer 4 + Grok Context
   7. Verdict: One sentence state current regime e.g. Low-vol bull trend with first signs range formation at highs funding hot → tighten stops no new longs at market wait for pullback to 50 EMA or confirmed breakout-retest | Grok Assign one label Constructive/Transitional/Corrective + Kimi 6 cells
   8. Only then: Pick strategy that belongs to that regime Trending Ride don't predict pullback to rising 20/50 EMA 4H breakout-retest Ranging Fade edges respect middle High-Vol Chop Stand aside or tiny 25% | Kimi Strategy Mapping + Grok Decision Rule Only actively hunt long swings in Constructive Stay light Transitional Prefer cash hedges selective shorts Corrective
