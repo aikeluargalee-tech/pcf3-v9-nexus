@@ -213,22 +213,23 @@ function parseCards(raw) {
   if (!raw) return cards;
   var secRegex = /---\s*(?:(\d+)\.\s*)?([^|\n\r\-]+)(?:\|[^\n\r]+)?---([\s\S]*?)(?=(?:---\s*(?:\d+\.\s*)?[^|\n\r\-]+|\Z))/g;
   var match;
-  while ((match = secRegex.exec(raw)) !== null) {
+  while ((match = secRegex.exec(raw)) !== null && cards.length < 58) {
     var num = match[1] || (cards.length + 1);
     var title = match[2].trim().split('/')[0].trim();
     if (!title) continue;
-    var bodyLines = match[3].trim().split('\n').map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 10; });
+    var bodyLines = match[3].trim().split('\n').map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 10 && !s.startsWith('---'); });
     for (var i = 0; i < Math.min(bodyLines.length, 3); i++) {
       var tLower = title.toLowerCase();
       var cat = (tLower.indexOf("macro") !== -1 || tLower.indexOf("etf") !== -1 || tLower.indexOf("sentiment") !== -1) ? "macro" :
-                (tLower.indexOf("psych") !== -1 || tLower.indexOf("level") !== -1) ? "psych" :
-                (tLower.indexOf("market") !== -1 || tLower.indexOf("structure") !== -1 || tLower.indexOf("value") !== -1 || tLower.indexOf("vwap") !== -1) ? "regime" : "enh";
+                (tLower.indexOf("psych") !== -1 || tLower.indexOf("level") !== -1 || tLower.indexOf("depth") !== -1) ? "psych" :
+                (tLower.indexOf("market") !== -1 || tLower.indexOf("structure") !== -1 || tLower.indexOf("value") !== -1 || tLower.indexOf("vwap") !== -1 || tLower.indexOf("msnr") !== -1 || tLower.indexOf("sma") !== -1) ? "regime" : "enh";
       cards.push({
         id: "c" + num + "_" + (i + 1),
         cat: cat,
         title: "SEC " + num + " — " + title,
         body: bodyLines[i].slice(0, 220)
       });
+      if (cards.length >= 58) break;
     }
   }
   if (cards.length === 0) {
