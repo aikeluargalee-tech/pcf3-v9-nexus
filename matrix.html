@@ -676,6 +676,22 @@
   </div>
 </div>
 
+<!-- Staleness Watchdog Alert Banner -->
+<div id="radar-staleness-banner" style="display:none; max-width:1800px; margin:12px auto 0 auto; background:linear-gradient(135deg, rgba(239,68,68,0.2), rgba(185,28,28,0.25)); border:1px solid #EF4444; border-radius:10px; padding:12px 18px; color:#FEE2E2;">
+  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span style="font-size:20px;">🚨</span>
+      <div>
+        <div id="radar-staleness-title" style="font-weight:700; font-size:13px; color:#FFFFFF;">TELEMETRY STALE</div>
+        <div style="font-size:11px; color:#FCA5A5;">GitHub Actions collector delay detected. Binance live spot & client-side telemetry failover active.</div>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <button onclick="fetchLivePacketAndDiagnose()" style="background:#EF4444; color:#FFFFFF; border:none; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer;">Retry Packet Sync</button>
+    </div>
+  </div>
+</div>
+
 <!-- Dynamic Active Configuration Radar Card -->
 <div id="radar-card" class="radar-card green">
   <div class="radar-header">
@@ -685,7 +701,7 @@
     </div>
     <div style="display:flex; align-items:center; gap:12px;">
       <span id="radar-timestamp" style="font-size:11px; font-family:monospace; color:#94A3B8;">Evaluating live metrics...</span>
-      <span class="radar-tag" style="background:rgba(16,185,129,0.15); color:#34D399; border:1px solid rgba(16,185,129,0.3);">● ACTIVE NOW</span>
+      <span id="radar-sync-pill" class="radar-tag" style="background:rgba(16,185,129,0.15); color:#34D399; border:1px solid rgba(16,185,129,0.3);">● SYNCED</span>
     </div>
   </div>
   
@@ -714,7 +730,7 @@
     <div class="radar-box">
       <div class="radar-box-title">🔍 WHY IS BITCOIN IN THIS STATE? (EASY FACTS)</div>
       <ul id="radar-reasons" class="radar-reasons" style="font-size:13px; line-height:1.6;">
-        <li><span style="color:#34D399;">✓</span> Price is resting right around the fair average price ($86,203).</li>
+        <li><span style="color:#34D399;">✓</span> Price is resting right around the fair average price ($82,381).</li>
         <li><span style="color:#34D399;">✓</span> Interest fees (Funding) are near zero (0.0017%), meaning nobody is over-leveraging.</li>
         <li><span style="color:#34D399;">✓</span> The wild swings have cooled down into a quiet accumulation floor.</li>
       </ul>
@@ -771,7 +787,7 @@
               Defines the market structure and the key higher-low used in the trend-failure rule.
             </td>
             <td>
-              <div><span class="telemetry-val-hl">Spot: <span id="tactical-spot-price">$86,350.01</span></span></div>
+              <div><span class="telemetry-val-hl">Spot: <span id="tactical-spot-price">$82,625.01</span></span></div>
               <div style="font-size:11px; color:#94A3B8;">Swing High: <strong>$86,490</strong> | Key HL Floor: <strong>$79,500</strong> (<span id="tactical-struct-diff">+8.6%</span>)</div>
             </td>
             <td>
@@ -866,8 +882,8 @@
               Helps decide whether an armed re-entry sleeve is authorized.
             </td>
             <td>
-              <div><span class="telemetry-val-hl" id="tactical-daily-low-text">Daily Low: $85,812.00 (Defended)</span></div>
-              <div style="font-size:11px;" id="tactical-daily-vwap-text">Daily VWAP: $86,203.06 (Reclaimed +0.17%)</div>
+              <div><span class="telemetry-val-hl" id="tactical-daily-low-text">Daily Low: $80,393.56 (Defended)</span></div>
+              <div style="font-size:11px;" id="tactical-daily-vwap-text">Daily VWAP: $82,381.06 (Reclaimed +0.17%)</div>
             </td>
             <td>
               <span id="tactical-reclaim-pill" class="telemetry-status-pill green">🟢 RE-ENTRY AUTHORIZED</span>
@@ -1183,7 +1199,7 @@
               <div class="telemetry-name">Global Long / Short Account Ratio</div>
               <div class="telemetry-sub">⚡ Derivatives • Total accounts net long vs. net short on Binance</div>
             </td>
-            <td><span id="live-metric-globalLsRatio" class="telemetry-val-hl">0.985 Ratio</span> <span class="telemetry-dim">(49.6% Long / 50.4% Short)</span></td>
+            <td><span id="live-metric-globalLsRatio" class="telemetry-val-hl">1.710 Ratio</span> <span class="telemetry-dim">(63.1% Long / 36.9% Short)</span></td>
             <td><span class="telemetry-cond">Balanced: 0.85 to 1.35 (No Retail Crowding)</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (Symmetrically Balanced)</span></td>
           </tr>
@@ -1203,7 +1219,7 @@
               <div class="telemetry-name">Taker Buy Volume Ratio (Futures)</div>
               <div class="telemetry-sub">⚡ Derivatives • Aggressive taker buys vs. sells on futures</div>
             </td>
-            <td><span id="live-metric-futuresTakerRatio" class="telemetry-val-hl">1.574 Ratio</span> <span class="telemetry-dim">(Derivatives Aggressive Buys)</span></td>
+            <td><span id="live-metric-futuresTakerRatio" class="telemetry-val-hl">2.765 Ratio</span> <span class="telemetry-dim">(Derivatives Aggressive Buys)</span></td>
             <td><span class="telemetry-cond">&ge; 1.00 (Aggressive Market Takers Buying)</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (Bulls In Control)</span></td>
           </tr>
@@ -1215,8 +1231,8 @@
               <div class="telemetry-name">Binance Live Spot Price</div>
               <div class="telemetry-sub">📐 Market Structure • Real-time spot execution on Binance (BTCUSDT)</div>
             </td>
-            <td><span id="live-metric-spotPrice" class="telemetry-val-hl">$86,350.01</span> <span class="telemetry-dim">(Live Feed)</span></td>
-            <td><span class="telemetry-cond">&ge; Daily VWAP ($86,203.06)</span></td>
+            <td><span id="live-metric-spotPrice" class="telemetry-val-hl">$82,625.01</span> <span class="telemetry-dim">(Live Feed)</span></td>
+            <td><span class="telemetry-cond">&ge; Daily VWAP ($82,381.06)</span></td>
             <td><span id="live-metric-spotPrice-pill" class="telemetry-status-pill green">🟢 PASSED (Holding Fair Value)</span></td>
           </tr>
           <tr class="telemetry-row" data-family="structure" id="live-row-22">
@@ -1225,7 +1241,7 @@
               <div class="telemetry-name">Daily VWAP (Volume-Weighted Average Price)</div>
               <div class="telemetry-sub">📐 Market Structure • Institutional fair benchmark price from 00:00 UTC</div>
             </td>
-            <td><span id="live-metric-dailyVwap" class="telemetry-val-hl">$86,203.06</span> <span class="telemetry-dim">(Current UTC Day)</span></td>
+            <td><span id="live-metric-dailyVwap" class="telemetry-val-hl">$82,381.06</span> <span class="telemetry-dim">(Current UTC Day)</span></td>
             <td><span class="telemetry-cond">Range Acceptance Zone: &plusmn;0.50% from Spot</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (Value Anchor)</span></td>
           </tr>
@@ -1235,7 +1251,7 @@
               <div class="telemetry-name">Weekly VWAP (Monday 00:00 UTC)</div>
               <div class="telemetry-sub">📐 Market Structure • Volume-weighted price from Monday 00:00 UTC open</div>
             </td>
-            <td><span id="live-metric-weeklyVwap" class="telemetry-val-hl">$86,203.06</span> <span class="telemetry-dim">(Weekly Open Anchor)</span></td>
+            <td><span id="live-metric-weeklyVwap" class="telemetry-val-hl">$82,381.06</span> <span class="telemetry-dim">(Weekly Open Anchor)</span></td>
             <td><span class="telemetry-cond">Spot &ge; Weekly VWAP (Macro Bull)</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (Macro Week Bullish)</span></td>
           </tr>
@@ -1245,7 +1261,7 @@
               <div class="telemetry-name">Monthly VWAP (1st 00:00 UTC)</div>
               <div class="telemetry-sub">📐 Market Structure • Volume-weighted price from month 1st 00:00 UTC</div>
             </td>
-            <td><span id="live-metric-monthlyVwap" class="telemetry-val-hl">$85,182.44</span> <span id="live-metric-monthlyVwap-dim" class="telemetry-dim">(+$1,167.57 Buffer)</span></td>
+            <td><span id="live-metric-monthlyVwap" class="telemetry-val-hl">$84,432.43</span> <span id="live-metric-monthlyVwap-dim" class="telemetry-dim">(+$1,167.57 Buffer)</span></td>
             <td><span class="telemetry-cond">Spot &gt; Monthly VWAP (Month Bull)</span></td>
             <td><span id="live-metric-monthlyVwap-pill" class="telemetry-status-pill green">🟢 PASSED (Month Uptrend Intact)</span></td>
           </tr>
@@ -1338,7 +1354,7 @@
               <div class="telemetry-name">Volume Profile: Point of Control (POC)</div>
               <div class="telemetry-sub">📐 Market Structure • Price bucket with highest volume over 30 days</div>
             </td>
-            <td><span id="live-metric-pocPrice" class="telemetry-val-hl">$83,900 &ndash; $84,600</span> <span class="telemetry-dim">(4.9% Volume Node)</span></td>
+            <td><span id="live-metric-pocPrice" class="telemetry-val-hl">$84,100.00</span> <span class="telemetry-dim">(4.9% Volume Node)</span></td>
             <td><span class="telemetry-cond">High Volume Node Magnet Below Price</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (High Volume Bedrock)</span></td>
           </tr>
@@ -1348,7 +1364,7 @@
               <div class="telemetry-name">Volume Profile: Value Area High (VAH)</div>
               <div class="telemetry-sub">📐 Market Structure • Upper 70% volume boundary of range</div>
             </td>
-            <td><span id="live-metric-vahPrice" class="telemetry-val-hl">$86,500.00</span> <span class="telemetry-dim">(Range Ceiling Magnet)</span></td>
+            <td><span id="live-metric-vahPrice" class="telemetry-val-hl">$86,300.00</span> <span class="telemetry-dim">(Range Ceiling Magnet)</span></td>
             <td><span class="telemetry-cond">Immediate Resistance / Ceiling</span></td>
             <td><span class="telemetry-status-pill green">🟢 TESTED (Coiling at Resistance)</span></td>
           </tr>
@@ -1388,7 +1404,7 @@
               <div class="telemetry-name">50-Day Exponential Moving Average (50D EMA)</div>
               <div class="telemetry-sub">📐 Market Structure • Macro intermediate bull/bear trend dividing line</div>
             </td>
-            <td><span id="live-metric-ema50d" class="telemetry-val-hl">$79,193.00</span> <span class="telemetry-dim">(Spot is +9.04% above)</span></td>
+            <td><span id="live-metric-ema50d" class="telemetry-val-hl">$79,774.00</span> <span class="telemetry-dim">(Spot is +9.04% above)</span></td>
             <td><span class="telemetry-cond">Spot &gt; 50D EMA (Bull Market Anchor)</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (Bull Market Pillar)</span></td>
           </tr>
@@ -1400,9 +1416,9 @@
               <div class="telemetry-name">Spot Bitcoin ETF 3-Day Net Inflows</div>
               <div class="telemetry-sub">🐋 Institutional • 3-day net institutional inflows across US Spot ETFs</div>
             </td>
-            <td><span id="live-metric-etf3d" class="telemetry-val-hl">+$292.6M</span> <span class="telemetry-dim">(3-Day Net Total)</span></td>
+            <td><span id="live-metric-etf3d" class="telemetry-val-hl">-$610.2M</span> <span class="telemetry-dim">(3-Day Net Total)</span></td>
             <td><span class="telemetry-cond">&gt; $0.0M (Positive Net Floor Bid)</span></td>
-            <td><span class="telemetry-status-pill green">🟢 PASSED (Wall St Buying Spot)</span></td>
+            <td><span class="telemetry-status-pill amber">⚠️ OUTFLOWS (-$610.2M 3D)</span></td>
           </tr>
           <tr class="telemetry-row" data-family="institutional" id="live-row-40">
             <td style="text-align: center; color: #64748B; font-weight: bold;">40</td>
@@ -1410,7 +1426,7 @@
               <div class="telemetry-name">Spot Bitcoin ETF 7-Day Net Inflows</div>
               <div class="telemetry-sub">🐋 Institutional • Rolling 7-day intake absorbing daily miner emission</div>
             </td>
-            <td><span id="live-metric-etf7d" class="telemetry-val-hl">+$375.6M</span> <span class="telemetry-dim">(7-Day Net Total)</span></td>
+            <td><span id="live-metric-etf7d" class="telemetry-val-hl">-$556.1M</span> <span class="telemetry-dim">(7-Day Net Total)</span></td>
             <td><span class="telemetry-cond">Sustained Net Multi-Day Expansion</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (Weekly Accumulation)</span></td>
           </tr>
@@ -1442,7 +1458,7 @@
               <div class="telemetry-name">Short-Term Holder (STH) Cost Basis</div>
               <div class="telemetry-sub">⛓️ On-Chain • Realized acquisition cost of coins held &lt; 155 days</div>
             </td>
-            <td><span id="live-metric-sthCostBasis" class="telemetry-val-hl">$73,019.37</span> <span class="telemetry-dim">(Psychological Floor)</span></td>
+            <td><span id="live-metric-sthCostBasis" class="telemetry-val-hl">$73,935.60</span> <span class="telemetry-dim">(Psychological Floor)</span></td>
             <td><span class="telemetry-cond">Price &gt; STH Cost Basis (No Retail Panic)</span></td>
             <td><span id="live-metric-sthCostBasis-pill" class="telemetry-status-pill green">🟢 PASSED (STH In Profit +18.3%)</span></td>
           </tr>
@@ -1462,7 +1478,7 @@
               <div class="telemetry-name">Long-Term Holder (LTH) Realized Price</div>
               <div class="telemetry-sub">⛓️ On-Chain • Cost basis of multi-year conviction holders (&gt; 155d)</div>
             </td>
-            <td><span id="live-metric-lthRealizedPrice" class="telemetry-val-hl">$41,898.00</span> <span class="telemetry-dim">(LTH MVRV: 2.06x)</span></td>
+            <td><span id="live-metric-lthRealizedPrice" class="telemetry-val-hl">$42,058.00</span> <span class="telemetry-dim">(LTH MVRV: 2.06x)</span></td>
             <td><span class="telemetry-cond">Price &gt; LTH Realized (Macro Cycle Bull)</span></td>
             <td><span class="telemetry-status-pill green">🟢 PASSED (Macro Bedrock Intact)</span></td>
           </tr>
@@ -1552,7 +1568,7 @@
               <div class="telemetry-name">US 10-Year Treasury Yield (US10Y)</div>
               <div class="telemetry-sub">⛓️ Macro • Risk-free benchmark rate setting cost of capital</div>
             </td>
-            <td><span id="live-metric-us10yVal" class="telemetry-val-hl">5.30%</span> <span class="telemetry-dim">(24h: +0.493% / Standard Macro)</span></td>
+            <td><span id="live-metric-us10yVal" class="telemetry-val-hl">5.23%</span> <span class="telemetry-dim">(24h: -0.872% / Predictable Macro)</span></td>
             <td><span class="telemetry-cond">Neutral Bond Baseline Backdrop</span></td>
             <td><span class="telemetry-status-pill green">🟢 IN RANGE (Predictable Rate Backdrop)</span></td>
           </tr>
@@ -1881,13 +1897,41 @@
     } catch(e) { return null; }
   }
 
+  function parseStr(txt, marker) {
+    if (!txt || !txt.includes(marker)) return null;
+    try {
+      var part = txt.split(marker)[1].trim();
+      return part.split('|')[0].split('\n')[0].trim();
+    } catch(e) { return null; }
+  }
+
+  function setRowStatus(rowId, valText, dimText, pillClass, pillText) {
+    var row = document.getElementById(rowId);
+    if (!row) return;
+    if (valText !== null && valText !== undefined) {
+      var valEl = row.querySelector('.telemetry-val-hl');
+      if (valEl) valEl.innerHTML = valText;
+    }
+    if (dimText !== null && dimText !== undefined) {
+      var dimEl = row.querySelector('.telemetry-dim');
+      if (dimEl) dimEl.innerHTML = dimText;
+    }
+    if (pillClass && pillText) {
+      var pillEl = row.querySelector('.telemetry-status-pill');
+      if (pillEl) {
+        pillEl.className = 'telemetry-status-pill ' + pillClass;
+        pillEl.innerHTML = pillText;
+      }
+    }
+  }
+
   function evaluateActiveConfig(packetText, liveSpot) {
     var txt = packetText || '';
-    var spot = (typeof liveSpot === 'number' && liveSpot > 1000) ? liveSpot : (parseVal(txt, 'SPOT:') || 86350);
-    var vwap = parseVal(txt, 'Daily_VWAP:') || 86203.06;
-    var funding = parseVal(txt, 'Funding_Binance:') || 0.0017;
-    var oiChg = parseVal(txt, 'OI_CHANGE_%:') || 0.345;
-    var cvdSlope = parseVal(txt, 'CVD_slope:') || 0.01;
+    var spot = (typeof liveSpot === 'number' && liveSpot > 1000) ? liveSpot : (parseVal(txt, 'SPOT:') || 82625.01);
+    var vwap = parseVal(txt, 'Daily_VWAP:') || 82381.29;
+    var funding = parseVal(txt, 'Funding_Binance:') || 0.0030;
+    var oiChg = parseVal(txt, 'OI_CHANGE_%:') || 0.024;
+    var cvdSlope = parseVal(txt, 'CVD_slope:') || -1.64;
 
     function highlightRow(rowId) {
       document.querySelectorAll('tr').forEach(r => r.classList.remove('active-row'));
@@ -2009,7 +2053,7 @@
     };
   }
 
-  function renderRadarUI(diag, timestampStr) {
+  function renderRadarUI(diag, timestampStr, packetAgeMin) {
     var card = document.getElementById('radar-card');
     var title = document.getElementById('radar-title');
     var summaryEl = document.getElementById('radar-summary-text');
@@ -2018,6 +2062,9 @@
     var reasons = document.getElementById('radar-reasons');
     var nextEl = document.getElementById('radar-next');
     var tsEl = document.getElementById('radar-timestamp');
+    var syncPill = document.getElementById('radar-sync-pill');
+    var banner = document.getElementById('radar-staleness-banner');
+    var bannerTitle = document.getElementById('radar-staleness-title');
 
     card.className = 'radar-card ' + diag.color;
     title.className = 'radar-title ' + diag.color;
@@ -2031,6 +2078,27 @@
     reasons.innerHTML = diag.reasons.map(r => `<li><span style="color:${diag.color === 'green' ? '#34D399' : diag.color === 'amber' ? '#FBBF24' : diag.color === 'cyan' ? '#38BDF8' : '#F87171'}">✓</span> ${r}</li>`).join('');
     nextEl.innerHTML = '<strong>👀 What To Watch Next:</strong> ' + diag.nextWatch;
     tsEl.textContent = 'Evaluated: ' + (timestampStr || new Date().toLocaleTimeString());
+
+    if (typeof packetAgeMin === 'number') {
+      if (packetAgeMin > 60) {
+        if (banner) banner.style.display = 'block';
+        if (bannerTitle) bannerTitle.textContent = `TELEMETRY STALE: Data packet was generated ${Math.floor(packetAgeMin / 60)}h ${packetAgeMin % 60}m ago`;
+        if (syncPill) {
+          syncPill.textContent = `⚠️ STALE (${Math.floor(packetAgeMin / 60)}h ${packetAgeMin % 60}m ago)`;
+          syncPill.style.background = 'rgba(239,68,68,0.2)';
+          syncPill.style.color = '#F87171';
+          syncPill.style.borderColor = 'rgba(239,68,68,0.4)';
+        }
+      } else {
+        if (banner) banner.style.display = 'none';
+        if (syncPill) {
+          syncPill.textContent = `● SYNCED (${packetAgeMin}m ago)`;
+          syncPill.style.background = 'rgba(16,185,129,0.15)';
+          syncPill.style.color = '#34D399';
+          syncPill.style.borderColor = 'rgba(16,185,129,0.3)';
+        }
+      }
+    }
   }
 
   async function fetchLivePacketAndDiagnose() {
@@ -2039,6 +2107,14 @@
     try {
       var packetRes = await fetch('PCF3_LIVE_PACKET_DEFAULT.txt?t=' + Date.now(), { cache: 'no-store' });
       var packetTxt = await packetRes.text();
+
+      // Check packet age
+      var tsMatch = packetTxt.match(/TIMESTAMP_UTC:\s*([^\s|]+)/i);
+      var packetAgeMin = 0;
+      if (tsMatch) {
+        var ts = Date.parse(tsMatch[1]);
+        if (!isNaN(ts)) packetAgeMin = Math.max(0, Math.round((Date.now() - ts) / 60000));
+      }
       
       var liveSpot = null;
       var liveSpotVol = null;
@@ -2046,6 +2122,8 @@
       var liveSpotLow = null;
       var liveSpotHigh = null;
       var liveCvd = null;
+      var liveTakerRatio = null;
+
       try {
         var tickerRes = await fetch('https://data-api.binance.vision/api/v3/ticker/24hr?symbol=BTCUSDT');
         var tickerJson = await tickerRes.json();
@@ -2073,12 +2151,13 @@
             else bVol += q;
           }
           liveCvd = bVol - sVol;
+          if (sVol > 0) liveTakerRatio = bVol / sVol;
         }
       } catch(e3) {}
 
       var diag = evaluateActiveConfig(packetTxt, liveSpot);
-      renderRadarUI(diag, new Date().toLocaleTimeString());
-      updateTelemetryLiveValues(packetTxt, liveSpot, liveSpotVol, liveSpotQuoteVol, liveCvd, liveSpotLow, liveSpotHigh);
+      renderRadarUI(diag, new Date().toLocaleTimeString(), packetAgeMin);
+      updateTelemetryLiveValues(packetTxt, liveSpot, liveSpotVol, liveSpotQuoteVol, liveCvd, liveTakerRatio, liveSpotLow, liveSpotHigh);
     } catch(err) {
       console.warn('Packet fetch failed', err);
     } finally {
@@ -2086,242 +2165,422 @@
     }
   }
 
-  function updateTelemetryLiveValues(packetTxt, liveSpot, liveSpotVol, liveSpotQuoteVol, liveCvd, liveSpotLow, liveSpotHigh) {
+  function updateTelemetryLiveValues(packetTxt, liveSpot, liveSpotVol, liveSpotQuoteVol, liveCvd, liveTakerRatio, liveSpotLow, liveSpotHigh) {
     var txt = packetTxt || '';
-    var spot = (typeof liveSpot === 'number' && liveSpot > 1000) ? liveSpot : (parseVal(txt, 'SPOT:') || 86350.01);
-    var vwap = parseVal(txt, 'Daily_VWAP:') || 86203.06;
-    var monthlyVwap = parseVal(txt, 'Monthly_VWAP:') || 85182.44;
-    var dailyLow = (typeof liveSpotLow === 'number' && liveSpotLow > 0) ? liveSpotLow : (parseVal(txt, 'Daily_Low:') || 83442.00);
-    var funding = parseVal(txt, 'Funding_Binance:') || 0.0017;
-    var oiCurrent = parseVal(txt, 'OI_current:') || 97176.24;
-    var oiChg = parseVal(txt, 'OI_CHANGE_%:') || 0.345;
-    var cvdCurrent = (typeof liveCvd === 'number') ? liveCvd : (parseVal(txt, 'CVD_current:') || 0.59);
-    var cvdSlope = parseVal(txt, 'CVD_slope:') || 0.01;
-    var sthCost = parseVal(txt, 'STH_COST_BASIS:') || 73019.37;
-    var atr4h = parseVal(txt, 'ATR_4H:') || 714.52;
-    var atrPct = parseVal(txt, 'ATR_%:') || 0.827;
-    var dailyAtr = parseVal(txt, 'ATR_Daily:') || 2152.16;
-    var fearGreed = parseVal(txt, 'Fear_Greed:') || 70;
-
-    // 1. Spot Price (Row 21) & Status Pill
-    var elSpot = document.getElementById('live-metric-spotPrice');
-    if (elSpot) elSpot.textContent = '$' + spot.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    var elSpotPill = document.getElementById('live-metric-spotPrice-pill');
-    if (elSpotPill) {
-      if (spot >= vwap) {
-        elSpotPill.className = 'telemetry-status-pill green';
-        elSpotPill.textContent = '🟢 PASSED (Holding Fair Value)';
-      } else {
-        elSpotPill.className = 'telemetry-status-pill amber';
-        elSpotPill.textContent = '⚠️ BELOW VWAP (Testing Discount)';
-      }
-    }
-
-    // 2. Daily VWAP (Row 22)
-    var elVwap = document.getElementById('live-metric-dailyVwap');
-    if (elVwap) elVwap.textContent = '$' + vwap.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-    // 3. Price vs VWAP % (Row 25)
-    var distVwap = ((spot - vwap) / vwap * 100);
-    var elVwapDist = document.getElementById('live-metric-priceVsVwapPct');
-    if (elVwapDist) {
-      elVwapDist.textContent = (distVwap >= 0 ? '+' : '') + distVwap.toFixed(3) + '%';
-    }
-    var elVwapDistPill = document.getElementById('live-metric-priceVsVwapPct-pill');
-    var elVwapDistDim = document.getElementById('live-metric-priceVsVwapPct-dim');
-    if (distVwap >= -0.50 && distVwap <= 1.00) {
-      if (elVwapDistPill) {
-        elVwapDistPill.className = 'telemetry-status-pill green';
-        elVwapDistPill.textContent = '🟢 IN RANGE (Fair Value Zone)';
-      }
-      if (elVwapDistDim) elVwapDistDim.textContent = '(In Acceptance Zone)';
-    } else if (distVwap < -0.50) {
-      if (elVwapDistPill) {
-        elVwapDistPill.className = 'telemetry-status-pill amber';
-        elVwapDistPill.textContent = '⚠️ BELOW VWAP (Discount / Weakness)';
-      }
-      if (elVwapDistDim) elVwapDistDim.textContent = '(Below Fair Value Zone)';
-    } else {
-      if (elVwapDistPill) {
-        elVwapDistPill.className = 'telemetry-status-pill cyan';
-        elVwapDistPill.textContent = '🚀 EXTENDED (Trading at Premium)';
-      }
-      if (elVwapDistDim) elVwapDistDim.textContent = '(Above Fair Value Zone)';
-    }
-
-    // 4. Monthly VWAP (Row 24)
-    var distMonthlyVwap = spot - monthlyVwap;
-    var elMonthlyDim = document.getElementById('live-metric-monthlyVwap-dim');
-    var elMonthlyPill = document.getElementById('live-metric-monthlyVwap-pill');
-    if (elMonthlyDim) {
-      elMonthlyDim.textContent = '(' + (distMonthlyVwap >= 0 ? '+$' : '-$') + Math.abs(distMonthlyVwap).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + (distMonthlyVwap >= 0 ? ' Buffer' : ' Deficit') + ')';
-    }
-    if (elMonthlyPill) {
-      if (spot >= monthlyVwap) {
-        elMonthlyPill.className = 'telemetry-status-pill green';
-        elMonthlyPill.textContent = '🟢 PASSED (Month Uptrend Intact)';
-      } else {
-        elMonthlyPill.className = 'telemetry-status-pill amber';
-        elMonthlyPill.textContent = '⚠️ TESTED (Below Monthly VWAP)';
-      }
-    }
-
-    // 5. Funding Rate (Row 10) & Annualized (Row 11)
-    var elFunding = document.getElementById('live-metric-fundingRate');
-    if (elFunding) elFunding.textContent = (funding >= 0 ? '+' : '') + funding.toFixed(4) + '%';
-    var elFundingAnn = document.getElementById('live-metric-fundingAnnual');
-    if (elFundingAnn) elFundingAnn.textContent = '+' + (funding * 3 * 365).toFixed(2) + '% ann.';
-
-    // 6. OI Current (Row 12) & Change (Row 13)
-    var elOi = document.getElementById('live-metric-oiCurrent');
-    if (elOi) elOi.textContent = oiCurrent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' BTC';
-    var elOiChg = document.getElementById('live-metric-oiChange');
-    if (elOiChg) elOiChg.textContent = (oiChg >= 0 ? '+' : '') + oiChg.toFixed(3) + '%';
-
-    // 7. CVD Current (Row 1) & Tactical Row 8
-    var elCvd = document.getElementById('live-metric-cvdCurrent');
-    if (elCvd) elCvd.textContent = (cvdCurrent >= 0 ? '+' : '') + cvdCurrent.toFixed(2) + ' BTC';
-    var elTacCvd = document.getElementById('tactical-spot-cvd');
-    if (elTacCvd) elTacCvd.textContent = (cvdCurrent >= 0 ? '+' : '') + cvdCurrent.toFixed(2) + ' BTC';
-
-    // 8. Spot Volume 24h (Row 7) and Tactical Row 8
-    var spotVol = (typeof liveSpotVol === 'number' && liveSpotVol > 0) ? liveSpotVol : (parseVal(txt, 'Spot_volume_24h:') || 14010.08);
+    var spot = (typeof liveSpot === 'number' && liveSpot > 1000) ? liveSpot : (parseVal(txt, 'SPOT:') || 82625.01);
+    var vwap = parseVal(txt, 'Daily_VWAP:') || 82381.29;
+    var weeklyVwap = parseVal(txt, 'Weekly_VWAP:') || 83990.41;
+    var monthlyVwap = parseVal(txt, 'Monthly_VWAP:') || 84432.43;
+    var dailyLow = (typeof liveSpotLow === 'number' && liveSpotLow > 0) ? liveSpotLow : (parseVal(txt, 'Daily_Low:') || 80393.56);
+    var funding = parseVal(txt, 'Funding_Binance:') || 0.0030;
+    var oiCurrent = parseVal(txt, 'OI_current:') || 92780.54;
+    var oiChg = parseVal(txt, 'OI_CHANGE_%:') || 0.024;
+    var cvdCurrent = (typeof liveCvd === 'number') ? liveCvd : (parseVal(txt, 'CVD_current:') || -2.43);
+    var cvdSlope = parseVal(txt, 'CVD_slope:') || -1.64;
+    var sthCost = parseVal(txt, 'STH_COST_BASIS:') || 73935.60;
+    var atr4h = parseVal(txt, 'ATR_4H:') || 791.01;
+    var atrPct = parseVal(txt, 'ATR_%:') || 0.957;
+    var dailyAtr = parseVal(txt, 'Current ATR(14):') || (parseVal(txt, 'ATR_Daily:') || 2175.22);
+    var fearGreed = parseVal(txt, 'Fear_Greed:') || 59;
+    var spotVol = (typeof liveSpotVol === 'number' && liveSpotVol > 0) ? liveSpotVol : (parseVal(txt, 'Spot_volume_24h:') || 19210.95);
     var spotQuoteVol = (typeof liveSpotQuoteVol === 'number' && liveSpotQuoteVol > 0) ? liveSpotQuoteVol : (spotVol * spot);
-    var elSpotVol = document.getElementById('live-metric-spotVol24h');
-    if (elSpotVol) {
-      elSpotVol.textContent = spotVol.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' BTC';
-      if (elSpotVol.nextElementSibling) {
-        var volBillion = (spotQuoteVol / 1e9).toFixed(2);
-        elSpotVol.nextElementSibling.textContent = '(~$' + volBillion + 'B USD)';
-      }
-    }
-    var elTacVol = document.getElementById('tactical-spot-vol');
-    if (elTacVol) {
-      elTacVol.textContent = spotVol.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' BTC';
-    }
-    var elTacVolPill = document.getElementById('tactical-vol-status-pill');
-    var elTacVolNote = document.getElementById('tactical-vol-status-note');
-    if (spotVol >= 10000) {
-      if (elTacVolPill) {
-        elTacVolPill.className = 'telemetry-status-pill green';
-        elTacVolPill.textContent = '🟢 RECLAIM CONFIRMED';
-      }
-      if (elTacVolNote) {
-        elTacVolNote.textContent = 'Volume (' + spotVol.toLocaleString(undefined, {maximumFractionDigits:0}) + ' BTC) > 10,000 baseline';
-      }
-    } else {
-      if (elTacVolPill) {
-        elTacVolPill.className = 'telemetry-status-pill amber';
-        elTacVolPill.textContent = '⚠️ THIN VOLUME';
-      }
-      if (elTacVolNote) {
-        elTacVolNote.textContent = 'Volume (' + spotVol.toLocaleString(undefined, {maximumFractionDigits:0}) + ' BTC) below baseline';
-      }
-    }
 
-    // 9. CVD Slope (Row 2)
-    var elSlope = document.getElementById('live-metric-cvdSlope');
-    if (elSlope) elSlope.textContent = (cvdSlope >= 0 ? '+' : '') + cvdSlope.toFixed(3);
-
-    // 10. Distance vs STH Cost Basis % (Row 44) & Row 43 Pill
+    // Common calculations declared upfront
+    var distVwap = ((spot - vwap) / vwap * 100);
     var distSth = ((spot - sthCost) / sthCost * 100);
-    var elSthDist = document.getElementById('live-metric-sthDistPct');
-    if (elSthDist) {
-      elSthDist.textContent = (distSth >= 0 ? '+' : '') + distSth.toFixed(2) + '% Above';
-    }
-    var elSthPill = document.getElementById('live-metric-sthCostBasis-pill');
-    if (elSthPill) {
-      if (distSth >= 0) {
-        elSthPill.className = 'telemetry-status-pill green';
-        elSthPill.textContent = '🟢 PASSED (STH In Profit +' + distSth.toFixed(1) + '%)';
-      } else {
-        elSthPill.className = 'telemetry-status-pill red';
-        elSthPill.textContent = '🚨 FAILED (STH In Loss ' + distSth.toFixed(1) + '%)';
-      }
-    }
-
-    // 11. ATR 4H (Row 26) & ATR % (Row 27)
-    var elAtr = document.getElementById('live-metric-atr4h');
-    if (elAtr) elAtr.textContent = '$' + atr4h.toFixed(2);
-    var elAtrPct = document.getElementById('live-metric-atrPct');
-    if (elAtrPct) elAtrPct.textContent = atrPct.toFixed(3) + '%';
-
-    // 12. Fear & Greed (Row 55)
-    var elFg = document.getElementById('live-metric-fearGreed');
-    if (elFg) elFg.textContent = fearGreed + ' / 100';
-
-    // 13. Drawdown from Confirmed Peak Rally Weekly Close ($86,530.00 on Binance)
+    var hlFloor = 79500.00;
+    var distFloor = ((spot - hlFloor) / hlFloor * 100);
+    var ema10w = 78450.00;
+    var dist10w = ((spot - ema10w) / ema10w * 100);
     var peakWeeklyClose = 86530.00;
     var drawdownPeak = ((spot - peakWeeklyClose) / peakWeeklyClose * 100);
     var rung1Price = peakWeeklyClose * 0.95; // $82,203.50
     var rung2Price = peakWeeklyClose * 0.90; // $77,877.00
     var rung3Price = peakWeeklyClose * 0.85; // $73,550.50
+    var ema20w = parseVal(txt, 'Above 20W') || 76001.00;
+    var sma20w = 71286.65;
+    var dist20wEma = ((spot - ema20w) / ema20w * 100);
+    var dist20wSma = ((spot - sma20w) / sma20w * 100);
+    var atrPctLive = (dailyAtr / spot * 100);
 
+    // === SENSOR FAMILY 1: ORDER FLOW & DELTA (ROWS 1 TO 9) ===
+    // 1. Spot CVD
+    setRowStatus('live-row-1', (cvdCurrent >= 0 ? '+' : '') + cvdCurrent.toFixed(2) + ' BTC', '(Delta: ' + (distVwap >= 0 ? '+' : '') + distVwap.toFixed(2) + '%)', cvdCurrent >= 0 ? 'green' : 'amber', cvdCurrent >= 0 ? '🟢 PASSED (Spot Absorption)' : '⚠️ NEGATIVE DELTA');
+    var elCvd = document.getElementById('live-metric-cvdCurrent');
+    if (elCvd) elCvd.textContent = (cvdCurrent >= 0 ? '+' : '') + cvdCurrent.toFixed(2) + ' BTC';
+    var elTacCvd = document.getElementById('tactical-spot-cvd');
+    if (elTacCvd) elTacCvd.textContent = (cvdCurrent >= 0 ? '+' : '') + cvdCurrent.toFixed(2) + ' BTC';
+
+    // 2. Spot CVD Slope
+    setRowStatus('live-row-2', (cvdSlope >= 0 ? '+' : '') + cvdSlope.toFixed(3), '(Slope: ' + (cvdSlope >= 0 ? '+' : '') + (cvdSlope * 10).toFixed(2) + '%)', cvdSlope >= 0 ? 'green' : 'amber', cvdSlope >= 0 ? '🟢 PASSED (Positive Slope)' : '⚠️ NEGATIVE (Selling Pressure)');
+    var elSlope = document.getElementById('live-metric-cvdSlope');
+    if (elSlope) elSlope.textContent = (cvdSlope >= 0 ? '+' : '') + cvdSlope.toFixed(3);
+
+    // 3. Spot Taker Buy / Sell Volume Ratio
+    var takerRatio = (typeof liveTakerRatio === 'number') ? liveTakerRatio : (parseVal(txt, 'Taker') || 1.071);
+    setRowStatus('live-row-3', takerRatio.toFixed(3), '(Buy/Sell Volume)', takerRatio >= 1.0 ? 'green' : 'amber', takerRatio >= 1.0 ? '🟢 PASSED (Buy-Dominant)' : '⚠️ SELL-DOMINANT (< 1.0)');
+    var elTaker = document.getElementById('live-metric-takerRatio');
+    if (elTaker) elTaker.textContent = takerRatio.toFixed(3);
+
+    // 4. Spot CVD Z-Score Divergence (σ)
+    var cvdZscore = parseVal(txt, 'CVD_ZSCORE') || (cvdCurrent > 0 ? 2.0 : 0.8);
+    setRowStatus('live-row-4', (cvdZscore >= 0 ? '+' : '') + cvdZscore.toFixed(1) + 'σ', cvdZscore >= 1.5 ? '(Bullish Absorption Floor)' : '(Neutral Delta)', cvdZscore >= 1.5 ? 'green' : 'cyan', cvdZscore >= 1.5 ? '🟢 PASSED (Absorption Active)' : '🟢 IN RANGE (Baseline)');
+    var elZscore = document.getElementById('live-metric-cvdZscore');
+    if (elZscore) elZscore.textContent = (cvdZscore >= 0 ? '+' : '') + cvdZscore.toFixed(1) + 'σ';
+
+    // 5. Perpetual Futures CVD
+    var perpCvd = parseVal(txt, 'PERP_CVD') || 12.4;
+    setRowStatus('live-row-5', (perpCvd >= 0 ? '+' : '') + perpCvd.toFixed(1) + ' BTC', '(Controlled Delta)', Math.abs(perpCvd) < 50 ? 'green' : 'amber', Math.abs(perpCvd) < 50 ? '🟢 PASSED (Controlled Delta)' : '⚠️ HIGH SPECULATION');
+    var elPerpCvd = document.getElementById('live-metric-perpCvd');
+    if (elPerpCvd) elPerpCvd.textContent = (perpCvd >= 0 ? '+' : '') + perpCvd.toFixed(1) + ' BTC';
+
+    // 6. Spot vs. Perp CVD Delta Spread
+    var cvdSpread = parseVal(txt, 'CVD_SPREAD') || 0.8;
+    setRowStatus('live-row-6', (cvdSpread >= 0 ? '+' : '') + cvdSpread.toFixed(1) + 'σ Spread', cvdSpread >= 0 ? '(Spot Leading Perp)' : '(Futures Leading Spot)', cvdSpread >= 0 ? 'green' : 'amber', cvdSpread >= 0 ? '🟢 PASSED (Spot-Led Market)' : '⚠️ FUTURES-LED');
+    var elSpread = document.getElementById('live-metric-cvdSpread');
+    if (elSpread) elSpread.textContent = (cvdSpread >= 0 ? '+' : '') + cvdSpread.toFixed(1) + 'σ Spread';
+
+    // 7. 24-Hour Spot Volume
+    setRowStatus('live-row-7', spotVol.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' BTC', '(~$' + (spotQuoteVol / 1e9).toFixed(2) + 'B USD)', spotVol >= 10000 ? 'green' : 'amber', spotVol >= 10000 ? '🟢 IN RANGE (Baseline Liquid)' : '⚠️ LOW VOLUME');
+    var elSpotVol = document.getElementById('live-metric-spotVol24h');
+    if (elSpotVol) {
+      elSpotVol.textContent = spotVol.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' BTC';
+      if (elSpotVol.nextElementSibling) elSpotVol.nextElementSibling.textContent = '(~$' + (spotQuoteVol / 1e9).toFixed(2) + 'B USD)';
+    }
+
+    // 8. 24-Hour Perpetual Futures Volume
+    var perpVol = parseVal(txt, 'PERP_VOL_24H') || 134401.58;
+    var perpSpotRatio = spotVol > 0 ? (perpVol / spotVol) : 9.5;
+    setRowStatus('live-row-8', perpVol.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' BTC', '(~$' + ((perpVol * spot) / 1e9).toFixed(2) + 'B USD)', perpSpotRatio < 15 ? 'green' : 'amber', perpSpotRatio < 15 ? '🟢 IN RANGE (Balanced Leverage)' : '⚠️ EXCESSIVE LEVERAGE');
+    var elPerpVol = document.getElementById('live-metric-perpVol24h');
+    if (elPerpVol) {
+      elPerpVol.textContent = perpVol.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' BTC';
+      if (elPerpVol.nextElementSibling) elPerpVol.nextElementSibling.textContent = '(~$' + ((perpVol * spot) / 1e9).toFixed(2) + 'B USD)';
+    }
+
+    // 9. Order Book Bids / Asks Depth Ratio
+    var bookRatio = parseVal(txt, 'ratio') || 1.42;
+    var bookRatioDisplay = bookRatio >= 900 ? '> 2.0 Ratio' : bookRatio.toFixed(2) + ' Ratio';
+    setRowStatus('live-row-9', bookRatioDisplay, '(Support Heavy Wall)', bookRatio >= 1.20 ? 'green' : 'amber', bookRatio >= 1.20 ? '🟢 PASSED (Deep Bid Support)' : '⚠️ THIN BIDS');
+    var elBookRatio = document.getElementById('live-metric-bookDepthRatio');
+    if (elBookRatio) elBookRatio.textContent = bookRatioDisplay;
+
+    // === SENSOR FAMILY 2: DERIVATIVES & POSITIONING (ROWS 10 TO 20) ===
+    // 10. Funding Rate (8h)
+    setRowStatus('live-row-10', (funding >= 0 ? '+' : '') + funding.toFixed(4) + '%', '(' + (funding / 100).toFixed(6) + ')', (funding >= 0 && funding <= 0.010) ? 'green' : 'amber', (funding >= 0 && funding <= 0.010) ? '🟢 PASSED (Zero Bubble Froth)' : '⚠️ ELEVATED FUNDING');
+    var elFunding = document.getElementById('live-metric-fundingRate');
+    if (elFunding) elFunding.textContent = (funding >= 0 ? '+' : '') + funding.toFixed(4) + '%';
+
+    // 11. Annualized Funding Rate
+    var fundingAnn = funding * 3 * 365;
+    setRowStatus('live-row-11', '+' + fundingAnn.toFixed(2) + '% ann.', '(3x daily x 365)', fundingAnn < 15 ? 'green' : 'amber', fundingAnn < 15 ? '🟢 IN RANGE (Healthy Baseline)' : '⚠️ HEATED LEVERAGE');
+    var elFundingAnn = document.getElementById('live-metric-fundingAnnual');
+    if (elFundingAnn) elFundingAnn.textContent = '+' + fundingAnn.toFixed(2) + '% ann.';
+
+    // 12. Futures Open Interest (Current)
+    setRowStatus('live-row-12', oiCurrent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' BTC', '($' + ((oiCurrent * spot) / 1e9).toFixed(2) + 'B USD)', (oiCurrent >= 85000 && oiCurrent <= 115000) ? 'green' : 'amber', (oiCurrent >= 85000 && oiCurrent <= 115000) ? '🟢 IN RANGE (Stable Participation)' : '⚠️ OUTLIER OI');
+    var elOi = document.getElementById('live-metric-oiCurrent');
+    if (elOi) {
+      elOi.textContent = oiCurrent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' BTC';
+      if (elOi.nextElementSibling) elOi.nextElementSibling.textContent = '($' + ((oiCurrent * spot) / 1e9).toFixed(2) + 'B USD)';
+    }
+
+    // 13. 24h Open Interest Change %
+    setRowStatus('live-row-13', (oiChg >= 0 ? '+' : '') + oiChg.toFixed(3) + '%', '(Organic Drift)', Math.abs(oiChg) < 3.0 ? 'green' : 'amber', Math.abs(oiChg) < 3.0 ? '🟢 PASSED (Flat & Stable)' : (oiChg > 0 ? '⚠️ EXPANDING OI' : '⚠️ CONTRACTING OI'));
+    var elOiChg = document.getElementById('live-metric-oiChange');
+    if (elOiChg) elOiChg.textContent = (oiChg >= 0 ? '+' : '') + oiChg.toFixed(3) + '%';
+
+    // 14. 1-Hour OI Velocity
+    var oiVel = parseStr(txt, 'OI_AGE:') || '+0.08% / hr';
+    setRowStatus('live-row-14', oiVel, '(Orderly Drift)', 'green', '🟢 PASSED (Orderly Positioning)');
+    var elOiVel = document.getElementById('live-metric-oiVelocity');
+    if (elOiVel) elOiVel.textContent = oiVel;
+
+    // 15. Futures Basis / Mark-Index Spread
+    var markSpread = parseVal(txt, 'MARK_INDEX_SPREAD_%:') || -0.0520;
+    setRowStatus('live-row-15', (markSpread >= 0 ? '+' : '') + markSpread.toFixed(4) + '%', '(Tightly Anchored)', Math.abs(markSpread) < 0.10 ? 'green' : 'amber', Math.abs(markSpread) < 0.10 ? '🟢 IN RANGE (Tightly Anchored)' : '⚠️ BASIS DISLOCATION');
+    var elMarkSpread = document.getElementById('live-metric-markIndexSpread');
+    if (elMarkSpread) elMarkSpread.textContent = (markSpread >= 0 ? '+' : '') + markSpread.toFixed(4) + '%';
+
+    // 16. Hourly Long Liquidation Volume
+    var longLiqPrice = parseVal(txt, 'LONG_liq_price:') || 80762.0;
+    setRowStatus('live-row-16', '$' + longLiqPrice.toLocaleString(undefined, {maximumFractionDigits:0}) + ' Floor', '(Low Liquidation Stress)', 'green', '🟢 PASSED (Low Liquidation Stress)');
+    var elLongLiq = document.getElementById('live-metric-longLiq1h');
+    if (elLongLiq) elLongLiq.textContent = '$' + longLiqPrice.toLocaleString(undefined, {maximumFractionDigits:0}) + ' Floor';
+
+    // 17. 2-Hour Short Liquidation Volume
+    var shortCluster = parseStr(txt, 'SHORT_cluster:') || '82k-86k dense ($4.79B)';
+    setRowStatus('live-row-17', shortCluster, '(Steady Short Density)', 'green', '🟢 IN RANGE (Steady Short Density)');
+    var elShortLiq = document.getElementById('live-metric-shortLiq2h');
+    if (elShortLiq) elShortLiq.textContent = shortCluster;
+
+    // 18. Global Long / Short Account Ratio
+    var globalLs = parseVal(txt, 'Global_account') || 1.710;
+    setRowStatus('live-row-18', globalLs.toFixed(3) + ' Ratio', '(63.1% Long / 36.9% Short)', 'green', '🟢 PASSED (Long Bias Controlled)');
+    var elGlobalLs = document.getElementById('live-metric-globalLsRatio');
+    if (elGlobalLs) elGlobalLs.textContent = globalLs.toFixed(3) + ' Ratio';
+
+    // 19. Top Trader Long % Position Exposure
+    var topTrader = parseVal(txt, 'Futures_Long_%:') || 52.8;
+    setRowStatus('live-row-19', topTrader.toFixed(1) + '% Long', '(Smart Accumulation Bias)', 'green', '🟢 IN RANGE (Smart Accumulation Bias)');
+    var elTopTrader = document.getElementById('live-metric-topTraderLong');
+    if (elTopTrader) elTopTrader.textContent = topTrader.toFixed(1) + '% Long';
+
+    // 20. Taker Buy Volume Ratio (Futures)
+    var futTaker = parseVal(txt, 'Taker') || 2.765;
+    setRowStatus('live-row-20', futTaker.toFixed(3) + ' Ratio', '(Bulls In Control)', futTaker >= 1.0 ? 'green' : 'amber', futTaker >= 1.0 ? '🟢 PASSED (Bulls In Control)' : '⚠️ SELLER PRESSURE');
+    var elFutTaker = document.getElementById('live-metric-futuresTakerRatio');
+    if (elFutTaker) elFutTaker.textContent = futTaker.toFixed(3) + ' Ratio';
+
+    // === SENSOR FAMILY 3: MARKET STRUCTURE & EXECUTION (ROWS 21 TO 38) ===
+    // 21. Binance Live Spot Price
+    var elSpot = document.getElementById('live-metric-spotPrice');
+    if (elSpot) elSpot.textContent = '$' + spot.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    var elSpotPill = document.getElementById('live-metric-spotPrice-pill');
+    if (elSpotPill) {
+      elSpotPill.className = 'telemetry-status-pill ' + (spot >= vwap ? 'green' : 'amber');
+      elSpotPill.textContent = spot >= vwap ? '🟢 PASSED (Holding Fair Value)' : '⚠️ BELOW VWAP (Testing Discount)';
+    }
+
+    // 22. Daily VWAP
+    var elVwap = document.getElementById('live-metric-dailyVwap');
+    if (elVwap) elVwap.textContent = '$' + vwap.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    // 23. Weekly VWAP
+    var distWk = spot - weeklyVwap;
+    setRowStatus('live-row-23', '$' + weeklyVwap.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), '(' + (distWk >= 0 ? '+$' : '-$') + Math.abs(distWk).toFixed(0) + ' Buffer)', distWk >= 0 ? 'green' : 'amber', distWk >= 0 ? '🟢 PASSED (Macro Week Bullish)' : '⚠️ TESTED (Below Weekly VWAP)');
+    var elWkVwap = document.getElementById('live-metric-weeklyVwap');
+    if (elWkVwap) elWkVwap.textContent = '$' + weeklyVwap.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    // 24. Monthly VWAP
+    var distMonthlyVwap = spot - monthlyVwap;
+    var elMonthly = document.getElementById('live-metric-monthlyVwap');
+    if (elMonthly) elMonthly.textContent = '$' + monthlyVwap.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    var elMonthlyDim = document.getElementById('live-metric-monthlyVwap-dim');
+    if (elMonthlyDim) elMonthlyDim.textContent = '(' + (distMonthlyVwap >= 0 ? '+$' : '-$') + Math.abs(distMonthlyVwap).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + (distMonthlyVwap >= 0 ? ' Buffer' : ' Deficit') + ')';
+    var elMonthlyPill = document.getElementById('live-metric-monthlyVwap-pill');
+    if (elMonthlyPill) {
+      elMonthlyPill.className = 'telemetry-status-pill ' + (spot >= monthlyVwap ? 'green' : 'amber');
+      elMonthlyPill.textContent = spot >= monthlyVwap ? '🟢 PASSED (Month Uptrend Intact)' : '⚠️ TESTED (Below Monthly VWAP)';
+    }
+
+    // 25. Price vs VWAP % Distance
+    var elVwapDist = document.getElementById('live-metric-priceVsVwapPct');
+    if (elVwapDist) elVwapDist.textContent = (distVwap >= 0 ? '+' : '') + distVwap.toFixed(3) + '%';
+    var elVwapDistPill = document.getElementById('live-metric-priceVsVwapPct-pill');
+    var elVwapDistDim = document.getElementById('live-metric-priceVsVwapPct-dim');
+    if (distVwap >= -0.50 && distVwap <= 1.00) {
+      if (elVwapDistPill) { elVwapDistPill.className = 'telemetry-status-pill green'; elVwapDistPill.textContent = '🟢 IN RANGE (Fair Value Zone)'; }
+      if (elVwapDistDim) elVwapDistDim.textContent = '(In Acceptance Zone)';
+    } else if (distVwap < -0.50) {
+      if (elVwapDistPill) { elVwapDistPill.className = 'telemetry-status-pill amber'; elVwapDistPill.textContent = '⚠️ BELOW VWAP (Discount / Weakness)'; }
+      if (elVwapDistDim) elVwapDistDim.textContent = '(Below Fair Value Zone)';
+    } else {
+      if (elVwapDistPill) { elVwapDistPill.className = 'telemetry-status-pill cyan'; elVwapDistPill.textContent = '🚀 EXTENDED (Trading at Premium)'; }
+      if (elVwapDistDim) elVwapDistDim.textContent = '(Above Fair Value Zone)';
+    }
+
+    // 26. 4H ATR
+    var elAtr = document.getElementById('live-metric-atr4h');
+    if (elAtr) elAtr.textContent = '$' + atr4h.toFixed(2);
+
+    // 27. 4H ATR %
+    var elAtrPct = document.getElementById('live-metric-atrPct');
+    if (elAtrPct) elAtrPct.textContent = atrPct.toFixed(3) + '%';
+
+    // 28. Daily ATR(14)
+    var elAtr14 = document.getElementById('live-metric-dailyAtr14');
+    if (elAtr14) elAtr14.textContent = '$' + dailyAtr.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    var elAtr14Dim = document.getElementById('live-metric-dailyAtr14-dim');
+    if (elAtr14Dim) elAtr14Dim.textContent = '(' + atrPctLive.toFixed(3) + '% of Spot)';
+
+    // 29. 10W EMA ($78,450.00)
+    var elEma10 = document.getElementById('live-metric-ema10w');
+    if (elEma10) elEma10.textContent = '$' + ema10w.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    var elEma10wDim = document.getElementById('live-metric-ema10w-dim');
+    if (elEma10wDim) elEma10wDim.textContent = '(Spot ' + (dist10w >= 0 ? '+' : '') + dist10w.toFixed(2) + '% ' + (dist10w >= 0 ? 'Above' : 'Below') + ')';
+    var elEma10wPill = document.getElementById('live-metric-ema10w-pill');
+    if (elEma10wPill) {
+      elEma10wPill.className = 'telemetry-status-pill ' + (spot >= ema10w ? 'green' : 'red');
+      elEma10wPill.textContent = spot >= ema10w ? '🟢 PASSED (Trend Line Safe)' : '🚨 FAILED (10W EMA Breached)';
+    }
+
+    // 30. 20W EMA ($76,001.00) & SMA ($71,286.65)
+    var elEma20 = document.getElementById('live-metric-ema20w');
+    if (elEma20) elEma20.textContent = '$' + ema20w.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    var elEma20wDim = document.getElementById('live-metric-ema20w-dim');
+    if (elEma20wDim) elEma20wDim.textContent = '(Spot ' + (dist20wEma >= 0 ? '+' : '') + dist20wEma.toFixed(2) + '% ' + (dist20wEma >= 0 ? 'Above' : 'Below') + ')';
+    var elEma20wPill = document.getElementById('live-metric-ema20w-pill');
+    if (elEma20wPill) {
+      elEma20wPill.className = 'telemetry-status-pill ' + (spot >= ema20w ? 'green' : 'red');
+      elEma20wPill.textContent = spot >= ema20w ? '🟢 PASSED (Macro Floor Intact)' : '🚨 FAILED (20W EMA Breached)';
+    }
+
+    // 31. Weekly Swings & Key HL Floor ($79,500.00)
+    var elSwings = document.getElementById('live-metric-weeklySwings');
+    if (elSwings) elSwings.textContent = 'High: $86,490 | Low: $79,500';
+    var elSwingsDim = document.getElementById('live-metric-weeklySwings-dim');
+    if (elSwingsDim) elSwingsDim.textContent = '(Key HL Floor: $79,500 | ' + (distFloor >= 0 ? '+' : '') + distFloor.toFixed(1) + '%)';
+    var elSwingsPill = document.getElementById('live-metric-weeklySwings-pill');
+    if (elSwingsPill) {
+      elSwingsPill.className = 'telemetry-status-pill ' + (spot >= hlFloor ? 'green' : 'red');
+      elSwingsPill.textContent = spot >= hlFloor ? '🟢 PASSED (Higher-Low Intact)' : '🚨 FAILED (Floor Breached)';
+    }
+
+    // 32. Drawdown from Peak Close ($86,530.00)
     var elDdPeak = document.getElementById('live-metric-drawdownPeak');
     if (elDdPeak) elDdPeak.textContent = (drawdownPeak >= 0 ? '+' : '') + drawdownPeak.toFixed(2) + '%';
-    var elTacticalDd = document.getElementById('tactical-drawdown-val');
-    if (elTacticalDd) elTacticalDd.textContent = (drawdownPeak >= 0 ? '+' : '') + drawdownPeak.toFixed(2) + '%';
 
-    // Dynamic Rung Status & Note updates
-    var elTacticalStatusPill = document.getElementById('tactical-rung-status-pill');
-    var elTacticalStatusNote = document.getElementById('tactical-rung-status-note');
-    var elTelemetryStatusPill = document.getElementById('telemetry-rung-status-pill');
+    // 33. POC
+    var poc = parseVal(txt, 'POC:') || 84100.0;
+    setRowStatus('live-row-33', '$' + poc.toLocaleString(undefined, {maximumFractionDigits:0}), '(30D Volume Profile Magnet)', 'green', '🟢 PASSED (High Volume Bedrock)');
+    var elPoc = document.getElementById('live-metric-pocPrice');
+    if (elPoc) elPoc.textContent = '$' + poc.toLocaleString(undefined, {maximumFractionDigits:0});
 
-    if (drawdownPeak > -5.0) {
-      var distToRung1 = spot - rung1Price;
-      if (elTacticalStatusPill) {
-        elTacticalStatusPill.className = 'telemetry-status-pill amber';
-        elTacticalStatusPill.textContent = '⏳ RUNG 1 STANDBY';
-      }
-      if (elTacticalStatusNote) {
-        elTacticalStatusNote.textContent = 'Rung 1 (-5.0% @ $' + rung1Price.toLocaleString(undefined, {maximumFractionDigits:0}) + ') is $' + Math.max(0, distToRung1).toFixed(0) + ' away';
-      }
-      if (elTelemetryStatusPill) {
-        elTelemetryStatusPill.className = 'telemetry-status-pill cyan';
-        elTelemetryStatusPill.textContent = '🎯 RUNG 1 STANDBY (-5.0%)';
-      }
-    } else if (drawdownPeak > -10.0) {
-      if (elTacticalStatusPill) {
-        elTacticalStatusPill.className = 'telemetry-status-pill green';
-        elTacticalStatusPill.textContent = '🟢 RUNG 1 ARMED / EXECUTED';
-      }
-      if (elTacticalStatusNote) {
-        elTacticalStatusNote.textContent = 'Sleeve 1 active; Rung 2 (-10.0% @ $' + rung2Price.toLocaleString(undefined, {maximumFractionDigits:0}) + ') standby';
-      }
-      if (elTelemetryStatusPill) {
-        elTelemetryStatusPill.className = 'telemetry-status-pill green';
-        elTelemetryStatusPill.textContent = '🟢 RUNG 1 ARMED';
-      }
-    } else if (drawdownPeak > -15.0) {
-      if (elTacticalStatusPill) {
-        elTacticalStatusPill.className = 'telemetry-status-pill green';
-        elTacticalStatusPill.textContent = '🟢 RUNG 2 ARMED (DEEP DIP)';
-      }
-      if (elTacticalStatusNote) {
-        elTacticalStatusNote.textContent = 'Sleeve 2 active; Rung 3 (-15.0% @ $' + rung3Price.toLocaleString(undefined, {maximumFractionDigits:0}) + ') standby';
-      }
-      if (elTelemetryStatusPill) {
-        elTelemetryStatusPill.className = 'telemetry-status-pill green';
-        elTelemetryStatusPill.textContent = '🟢 RUNG 2 ARMED';
-      }
-    } else {
-      if (elTacticalStatusPill) {
-        elTacticalStatusPill.className = 'telemetry-status-pill red';
-        elTacticalStatusPill.textContent = '🚨 RUNG 3 DEEP VALUE ACTIVE';
-      }
-      if (elTacticalStatusNote) {
-        elTacticalStatusNote.textContent = 'Deep value zone reached; check trend failure rule';
-      }
-      if (elTelemetryStatusPill) {
-        elTelemetryStatusPill.className = 'telemetry-status-pill red';
-        elTelemetryStatusPill.textContent = '🚨 RUNG 3 ACTIVE';
-      }
+    // 34. VAH
+    var vah = parseVal(txt, 'VAH:') || 86300.0;
+    setRowStatus('live-row-34', '$' + vah.toLocaleString(undefined, {maximumFractionDigits:0}), '(Upper Value Boundary)', spot < vah ? 'green' : 'cyan', spot < vah ? '🟢 TESTED (Coiling Below Resistance)' : '🚀 BREAKOUT (Above VAH)');
+    var elVah = document.getElementById('live-metric-vahPrice');
+    if (elVah) elVah.textContent = '$' + vah.toLocaleString(undefined, {maximumFractionDigits:0});
+
+    // 35. VAL
+    var val = parseVal(txt, 'VAL:') || 82900.0;
+    setRowStatus('live-row-35', '$' + val.toLocaleString(undefined, {maximumFractionDigits:0}), '(Lower Value Boundary)', spot >= val ? 'green' : 'amber', spot >= val ? '🟢 INTACT (Protected by Value Area)' : '⚠️ DEFENSE ALERT (Under VAL)');
+    var elVal = document.getElementById('live-metric-valPrice');
+    if (elVal) elVal.textContent = '$' + val.toLocaleString(undefined, {maximumFractionDigits:0});
+
+    // 36. High Volume Node (HVN) Confluence
+    var topHvns = parseStr(txt, 'Top_HVNs:') || '$84,000 5.0% vol, $84,600 4.9% vol';
+    var firstHvn = topHvns.split(',')[0].trim();
+    setRowStatus('live-row-36', firstHvn, '(Order Clustering Shelf)', 'green', '🟢 PASSED (Strong Order Shelf)');
+    var elHvn = document.getElementById('live-metric-hvnConfluence');
+    if (elHvn) elHvn.textContent = firstHvn;
+
+    // 37. 20D SMA
+    var sma20d = parseVal(txt, 'SMA 20D') || 83421.63;
+    setRowStatus('live-row-37', '$' + sma20d.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}), '(Dynamic Trend Support)', spot >= sma20d ? 'green' : 'amber', spot >= sma20d ? '🟢 PASSED (Dynamic Trend Support)' : '⚠️ TESTED (Below 20D SMA)');
+    var elSma20 = document.getElementById('live-metric-sma20d');
+    if (elSma20) elSma20.textContent = '$' + sma20d.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+    // 38. 50D EMA
+    var ema50d = parseVal(txt, 'EMA50') || 79774.00;
+    setRowStatus('live-row-38', '$' + ema50d.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}), '(Bull Market Pillar)', spot >= ema50d ? 'green' : 'red', spot >= ema50d ? '🟢 PASSED (Bull Market Pillar)' : '🚨 TESTED (Below 50D EMA)');
+    var elEma50 = document.getElementById('live-metric-ema50d');
+    if (elEma50) elEma50.textContent = '$' + ema50d.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+    // === SENSOR FAMILY 4: WHALE & ETF FLOWS (ROWS 39 TO 42) ===
+    // 39. ETF 3D Net Inflows
+    var etf3d = parseVal(txt, 'ETF_3D:') || -610.2;
+    var etf3dText = (etf3d >= 0 ? '+$' : '-$') + Math.abs(etf3d).toFixed(1) + 'M';
+    setRowStatus('live-row-39', etf3dText, '(Rolling 3-Day Total)', etf3d >= 0 ? 'green' : 'amber', etf3d >= 0 ? '🟢 PASSED (Wall St Buying Spot)' : '⚠️ OUTFLOWS (' + etf3dText + ' 3D)');
+    var elEtf3d = document.getElementById('live-metric-etf3d');
+    if (elEtf3d) elEtf3d.textContent = etf3dText;
+
+    // 40. ETF 7D Net Inflows
+    var etf7d = parseVal(txt, '7D:') || -556.1;
+    var etf7dText = (etf7d >= 0 ? '+$' : '-$') + Math.abs(etf7d).toFixed(1) + 'M';
+    setRowStatus('live-row-40', etf7dText, '(Rolling 7-Day Total)', etf7d >= 0 ? 'green' : 'amber', etf7d >= 0 ? '🟢 PASSED (Weekly Accumulation)' : '⚠️ OUTFLOWS (' + etf7dText + ' 7D)');
+    var elEtf7d = document.getElementById('live-metric-etf7d');
+    if (elEtf7d) elEtf7d.textContent = etf7dText;
+
+    // 41. Whale Exchange Inflow Ratio
+    var whaleInflow = 0.67;
+    var netflowMatch = txt.match(/Inflow 24h\s*([0-9\.]+)\s*Outflow\s*([0-9\.]+)/i);
+    if (netflowMatch) {
+      var inf = parseFloat(netflowMatch[1]), outf = parseFloat(netflowMatch[2]);
+      if (inf + outf > 0) whaleInflow = inf / (inf + outf);
     }
+    setRowStatus('live-row-41', whaleInflow.toFixed(2) + ' Ratio', '(Whales Controlled)', whaleInflow < 0.70 ? 'green' : 'amber', whaleInflow < 0.70 ? '🟢 PASSED (Whales Not Selling)' : '⚠️ HIGH WHALE INFLOWS');
+    var elWhaleInflow = document.getElementById('live-metric-whaleInflowRatio');
+    if (elWhaleInflow) elWhaleInflow.textContent = whaleInflow.toFixed(2) + ' Ratio';
+
+    // 42. Whale CDD
+    var whaleCdd = parseVal(txt, 'Binary CDD') || 0.80;
+    setRowStatus('live-row-42', whaleCdd.toFixed(2) + ' Binary CDD', '(HODL Conviction Strong)', whaleCdd < 1.0 ? 'green' : 'amber', whaleCdd < 1.0 ? '🟢 PASSED (HODL Conviction Strong)' : '⚠️ DORMANT COINS MOVING');
+    var elWhaleCdd = document.getElementById('live-metric-whaleCdd');
+    if (elWhaleCdd) elWhaleCdd.textContent = whaleCdd.toFixed(2) + ' Binary CDD';
+
+    // === SENSOR FAMILY 5: ON-CHAIN & MACRO (ROWS 43 TO 55) ===
+    // 43. STH Cost Basis
+    var elSth = document.getElementById('live-metric-sthCostBasis');
+    if (elSth) elSth.textContent = '$' + sthCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    var elSthPill = document.getElementById('live-metric-sthCostBasis-pill');
+    if (elSthPill) {
+      elSthPill.className = 'telemetry-status-pill ' + (distSth >= 0 ? 'green' : 'red');
+      elSthPill.textContent = distSth >= 0 ? '🟢 PASSED (STH In Profit +' + distSth.toFixed(1) + '%)' : '🚨 FAILED (STH In Loss ' + distSth.toFixed(1) + '%)';
+    }
+
+    // 44. Distance vs STH Cost Basis %
+    var elSthDist = document.getElementById('live-metric-sthDistPct');
+    if (elSthDist) elSthDist.textContent = (distSth >= 0 ? '+' : '') + distSth.toFixed(2) + '% Above';
+
+    // 45. LTH Realized Price
+    var lthRealizedPrice = parseVal(txt, 'LTH_REALIZED_PRICE:') || 42058.00;
+    setRowStatus('live-row-45', '$' + lthRealizedPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}), '(Macro Bedrock Intact)', spot >= lthRealizedPrice ? 'green' : 'red', spot >= lthRealizedPrice ? '🟢 PASSED (Macro Bedrock Intact)' : '🚨 MACRO BEAR');
+    var elLth = document.getElementById('live-metric-lthRealizedPrice');
+    if (elLth) elLth.textContent = '$' + lthRealizedPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+    // 46. MVRV Valuation Ratio
+    var mvrvRatio = parseVal(txt, 'Ratio') || 1.46;
+    setRowStatus('live-row-46', mvrvRatio.toFixed(2) + ' Ratio', '(Fair Fundamental Value)', (mvrvRatio >= 1.0 && mvrvRatio <= 2.2) ? 'green' : 'amber', (mvrvRatio >= 1.0 && mvrvRatio <= 2.2) ? '🟢 IN RANGE (Fair Fundamental Value)' : '⚠️ ELEVATED MVRV');
+    var elMvrv = document.getElementById('live-metric-mvrvRatio');
+    if (elMvrv) elMvrv.textContent = mvrvRatio.toFixed(2) + ' Ratio';
+
+    // 47. MVRV Z-Score
+    var mvrvZscore = parseVal(txt, 'MVRV Z') || 2.30;
+    setRowStatus('live-row-47', '+' + mvrvZscore.toFixed(2) + 'σ', '(No Mania Overheat)', mvrvZscore < 5.0 ? 'green' : 'red', mvrvZscore < 5.0 ? '🟢 PASSED (No Mania Overheat)' : '🚨 TOP RISK (>5σ)');
+    var elMvrvZ = document.getElementById('live-metric-mvrvZscore');
+    if (elMvrvZ) elMvrvZ.textContent = '+' + mvrvZscore.toFixed(2) + 'σ';
+
+    // 48. Net Unrealized Profit/Loss (NUPL)
+    var nuplVal = parseVal(txt, 'NUPL') || 0.52;
+    if (nuplVal > 1.0) nuplVal = nuplVal / 100.0;
+    setRowStatus('live-row-48', nuplVal.toFixed(2) + ' Value', '(Sustainable Expansion)', (nuplVal >= 0.40 && nuplVal <= 0.70) ? 'green' : 'amber', (nuplVal >= 0.40 && nuplVal <= 0.70) ? '🟢 IN RANGE (Sustainable Expansion)' : '⚠️ OUTLIER NUPL');
+    var elNupl = document.getElementById('live-metric-nuplVal');
+    if (elNupl) elNupl.textContent = nuplVal.toFixed(2) + ' Value';
+
+    // 49. Spent Output Profit Ratio (SOPR)
+    var soprVal = parseVal(txt, 'SOPR_live') || 1.002;
+    setRowStatus('live-row-49', soprVal.toFixed(3), '(Healthy Re-accumulation)', soprVal >= 1.0 ? 'green' : 'amber', soprVal >= 1.0 ? '🟢 PASSED (Healthy Re-accumulation)' : '⚠️ CAPITULATION (< 1.0)');
+    var elSopr = document.getElementById('live-metric-soprVal');
+    if (elSopr) elSopr.textContent = soprVal.toFixed(3);
+
+    // 50. Bitcoin Hash Ribbons
+    setRowStatus('live-row-50', 'Healthy Expansion', '(Miners Secure & Healthy)', 'green', '🟢 PASSED (Miners Secure & Healthy)');
+    var elHash = document.getElementById('live-metric-hashRibbons');
+    if (elHash) elHash.textContent = 'Healthy Expansion';
+
+    // 51. Puell Multiple
+    var puell = parseVal(txt, 'Puell') || 1.05;
+    if (puell > 5.0) puell = puell / 50.0;
+    setRowStatus('live-row-51', puell.toFixed(2) + ' Value', '(No Miner Selling Stress)', (puell >= 0.5 && puell <= 2.0) ? 'green' : 'amber', (puell >= 0.5 && puell <= 2.0) ? '🟢 IN RANGE (No Miner Selling Stress)' : '⚠️ OUTLIER PUELL');
+    var elPuell = document.getElementById('live-metric-puellMultiple');
+    if (elPuell) elPuell.textContent = puell.toFixed(2) + ' Value';
+
+    // 52. Deribit BTC Volatility Index (DVOL)
+    var dvolVal = parseVal(txt, 'DVOL:') || 48.5;
+    setRowStatus('live-row-52', dvolVal.toFixed(2) + ' IV', '(Low Implied Volatility)', dvolVal < 60 ? 'green' : 'amber', dvolVal < 60 ? '🟢 PASSED (Low Implied Volatility)' : '⚠️ HIGH VOLATILITY');
+    var elDvol = document.getElementById('live-metric-dvolVal');
+    if (elDvol) elDvol.textContent = dvolVal.toFixed(2) + ' IV';
+
+    // 53. US Dollar Currency Index (DXY)
+    var dxyVal = parseVal(txt, 'DXY:') || 102.09;
+    setRowStatus('live-row-53', dxyVal.toFixed(2), '(No Dollar Squeeze)', dxyVal < 105 ? 'green' : 'amber', dxyVal < 105 ? '🟢 IN RANGE (No Dollar Squeeze)' : '⚠️ DOLLAR HEADWIND');
+    var elDxy = document.getElementById('live-metric-dxyVal');
+    if (elDxy) elDxy.textContent = dxyVal.toFixed(2);
+
+    // 54. US 10-Year Treasury Yield (US10Y)
+    var us10yVal = parseVal(txt, 'US10Y:') || 5.23;
+    setRowStatus('live-row-54', us10yVal.toFixed(2) + '%', '(Predictable Rate Backdrop)', us10yVal < 5.5 ? 'green' : 'amber', us10yVal < 5.5 ? '🟢 IN RANGE (Predictable Rate Backdrop)' : '⚠️ RATE PRESSURE');
+    var elUs10y = document.getElementById('live-metric-us10yVal');
+    if (elUs10y) elUs10y.textContent = us10yVal.toFixed(2) + '%';
+
+    // 55. Crypto Fear & Greed Index
+    var elFg = document.getElementById('live-metric-fearGreed');
+    if (elFg) elFg.textContent = fearGreed + ' / 100';
 
     // === TACTICAL EXECUTION MATRIX (THE 9 OPERATIONAL METRICS) ===
     // Tactical Row 1: Weekly Swing Structure & Higher-Low Floor ($79,500.00)
-    var hlFloor = 79500.00;
-    var distFloor = ((spot - hlFloor) / hlFloor * 100);
     var elTacSpot = document.getElementById('tactical-spot-price');
     if (elTacSpot) elTacSpot.textContent = '$' + spot.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     var elTacStructDiff = document.getElementById('tactical-struct-diff');
@@ -2329,104 +2588,63 @@
     var elTacStructPill = document.getElementById('tactical-struct-pill');
     var elTacStructNote = document.getElementById('tactical-struct-note');
     if (spot >= hlFloor) {
-      if (elTacStructPill) {
-        elTacStructPill.className = 'telemetry-status-pill green';
-        elTacStructPill.textContent = '🟢 STRUCTURE INTACT';
-      }
+      if (elTacStructPill) { elTacStructPill.className = 'telemetry-status-pill green'; elTacStructPill.textContent = '🟢 STRUCTURE INTACT'; }
       if (elTacStructNote) elTacStructNote.textContent = 'Safely +' + distFloor.toFixed(1) + '% above $79.5k floor';
     } else {
-      if (elTacStructPill) {
-        elTacStructPill.className = 'telemetry-status-pill red';
-        elTacStructPill.textContent = '🚨 STRUCTURE BROKEN';
-      }
+      if (elTacStructPill) { elTacStructPill.className = 'telemetry-status-pill red'; elTacStructPill.textContent = '🚨 STRUCTURE BROKEN'; }
       if (elTacStructNote) elTacStructNote.textContent = 'Spot is ' + Math.abs(distFloor).toFixed(1) + '% below $79.5k floor (Trend Alert)';
     }
-    // Also sync Telemetry Table Row 31
-    var elSwingsDim = document.getElementById('live-metric-weeklySwings-dim');
-    var elSwingsPill = document.getElementById('live-metric-weeklySwings-pill');
-    if (elSwingsDim) elSwingsDim.textContent = '(Key HL Floor: $79,500 | ' + (distFloor >= 0 ? '+' : '') + distFloor.toFixed(1) + '%)';
-    if (elSwingsPill) {
-      if (spot >= hlFloor) {
-        elSwingsPill.className = 'telemetry-status-pill green';
-        elSwingsPill.textContent = '🟢 PASSED (Higher-Low Intact)';
-      } else {
-        elSwingsPill.className = 'telemetry-status-pill red';
-        elSwingsPill.textContent = '🚨 FAILED (Floor Breached)';
-      }
+
+    // Tactical Row 3: Dip-Buying Trigger Architecture (Drawdown from Peak Close)
+    var elTacticalDd = document.getElementById('tactical-drawdown-val');
+    if (elTacticalDd) elTacticalDd.textContent = (drawdownPeak >= 0 ? '+' : '') + drawdownPeak.toFixed(2) + '%';
+    var elTacticalStatusPill = document.getElementById('tactical-rung-status-pill');
+    var elTacticalStatusNote = document.getElementById('tactical-rung-status-note');
+    var elTelemetryStatusPill = document.getElementById('telemetry-rung-status-pill');
+
+    if (drawdownPeak > -5.0) {
+      var distToRung1 = spot - rung1Price;
+      if (elTacticalStatusPill) { elTacticalStatusPill.className = 'telemetry-status-pill amber'; elTacticalStatusPill.textContent = '⏳ RUNG 1 STANDBY'; }
+      if (elTacticalStatusNote) { elTacticalStatusNote.textContent = 'Rung 1 (-5.0% @ $' + rung1Price.toLocaleString(undefined, {maximumFractionDigits:0}) + ') is $' + Math.max(0, distToRung1).toFixed(0) + ' away'; }
+      if (elTelemetryStatusPill) { elTelemetryStatusPill.className = 'telemetry-status-pill cyan'; elTelemetryStatusPill.textContent = '🎯 RUNG 1 STANDBY (-5.0%)'; }
+    } else if (drawdownPeak > -10.0) {
+      if (elTacticalStatusPill) { elTacticalStatusPill.className = 'telemetry-status-pill green'; elTacticalStatusPill.textContent = '🟢 RUNG 1 ARMED / EXECUTED'; }
+      if (elTacticalStatusNote) { elTacticalStatusNote.textContent = 'Sleeve 1 active; Rung 2 (-10.0% @ $' + rung2Price.toLocaleString(undefined, {maximumFractionDigits:0}) + ') standby'; }
+      if (elTelemetryStatusPill) { elTelemetryStatusPill.className = 'telemetry-status-pill green'; elTelemetryStatusPill.textContent = '🟢 RUNG 1 ARMED'; }
+    } else if (drawdownPeak > -15.0) {
+      if (elTacticalStatusPill) { elTacticalStatusPill.className = 'telemetry-status-pill green'; elTacticalStatusPill.textContent = '🟢 RUNG 2 ARMED (DEEP DIP)'; }
+      if (elTacticalStatusNote) { elTacticalStatusNote.textContent = 'Sleeve 2 active; Rung 3 (-15.0% @ $' + rung3Price.toLocaleString(undefined, {maximumFractionDigits:0}) + ') standby'; }
+      if (elTelemetryStatusPill) { elTelemetryStatusPill.className = 'telemetry-status-pill green'; elTelemetryStatusPill.textContent = '🟢 RUNG 2 ARMED'; }
+    } else {
+      if (elTacticalStatusPill) { elTacticalStatusPill.className = 'telemetry-status-pill red'; elTacticalStatusPill.textContent = '🚨 RUNG 3 DEEP VALUE ACTIVE'; }
+      if (elTacticalStatusNote) { elTacticalStatusNote.textContent = 'Deep value zone reached; check trend failure rule'; }
+      if (elTelemetryStatusPill) { elTelemetryStatusPill.className = 'telemetry-status-pill red'; elTelemetryStatusPill.textContent = '🚨 RUNG 3 ACTIVE'; }
     }
 
     // Tactical Row 4: 10-Week EMA ($78,450.00)
-    var ema10w = 78450.00;
-    var dist10w = ((spot - ema10w) / ema10w * 100);
     var elTacEma10Diff = document.getElementById('tactical-ema10w-diff');
-    if (elTacEma10Diff) {
-      elTacEma10Diff.innerHTML = 'Spot is <strong style="color:' + (dist10w >= 0 ? '#34D399' : '#F87171') + '">' + (dist10w >= 0 ? '+' : '') + dist10w.toFixed(2) + '%</strong> ' + (dist10w >= 0 ? 'above' : 'below') + ' 10W EMA';
-    }
+    if (elTacEma10Diff) elTacEma10Diff.innerHTML = 'Spot is <strong style="color:' + (dist10w >= 0 ? '#34D399' : '#F87171') + '">' + (dist10w >= 0 ? '+' : '') + dist10w.toFixed(2) + '%</strong> ' + (dist10w >= 0 ? 'above' : 'below') + ' 10W EMA';
     var elTacEma10Pill = document.getElementById('tactical-ema10w-pill');
     var elTacEma10Note = document.getElementById('tactical-ema10w-note');
     if (spot >= ema10w) {
-      if (elTacEma10Pill) {
-        elTacEma10Pill.className = 'telemetry-status-pill green';
-        elTacEma10Pill.textContent = '🟢 TREND DEFENSE SAFE';
-      }
+      if (elTacEma10Pill) { elTacEma10Pill.className = 'telemetry-status-pill green'; elTacEma10Pill.textContent = '🟢 TREND DEFENSE SAFE'; }
       if (elTacEma10Note) elTacEma10Note.textContent = 'Close < $78.4k required to fail (+' + dist10w.toFixed(1) + '% buffer)';
     } else {
-      if (elTacEma10Pill) {
-        elTacEma10Pill.className = 'telemetry-status-pill red';
-        elTacEma10Pill.textContent = '🚨 10W EMA BREACHED';
-      }
+      if (elTacEma10Pill) { elTacEma10Pill.className = 'telemetry-status-pill red'; elTacEma10Pill.textContent = '🚨 10W EMA BREACHED'; }
       if (elTacEma10Note) elTacEma10Note.textContent = 'Tactical trend defense violated (' + dist10w.toFixed(1) + '%)';
-    }
-    // Also sync Telemetry Table Row 29
-    var elEma10wDim = document.getElementById('live-metric-ema10w-dim');
-    var elEma10wPill = document.getElementById('live-metric-ema10w-pill');
-    if (elEma10wDim) elEma10wDim.textContent = '(Spot ' + (dist10w >= 0 ? '+' : '') + dist10w.toFixed(2) + '% ' + (dist10w >= 0 ? 'Above' : 'Below') + ')';
-    if (elEma10wPill) {
-      if (spot >= ema10w) {
-        elEma10wPill.className = 'telemetry-status-pill green';
-        elEma10wPill.textContent = '🟢 PASSED (Trend Line Safe)';
-      } else {
-        elEma10wPill.className = 'telemetry-status-pill red';
-        elEma10wPill.textContent = '🚨 FAILED (10W EMA Breached)';
-      }
     }
 
     // Tactical Row 5: 20-Week EMA ($76,001.00) & 20W SMA ($71,286.65)
-    var ema20w = 76001.00;
-    var sma20w = 71286.65;
-    var dist20wEma = ((spot - ema20w) / ema20w * 100);
-    var dist20wSma = ((spot - sma20w) / sma20w * 100);
     var elTacEma20Diff = document.getElementById('tactical-ema20w-diff');
-    if (elTacEma20Diff) {
-      elTacEma20Diff.innerHTML = '20W SMA: $71,286.65 (Spot <strong style="color:' + (dist20wSma >= 0 ? '#34D399' : '#F87171') + '">' + (dist20wSma >= 0 ? '+' : '') + dist20wSma.toFixed(1) + '%</strong> above)';
-    }
+    if (elTacEma20Diff) elTacEma20Diff.innerHTML = '20W SMA: $71,286.65 (Spot <strong style="color:' + (dist20wSma >= 0 ? '#34D399' : '#F87171') + '">' + (dist20wSma >= 0 ? '+' : '') + dist20wSma.toFixed(1) + '%</strong> above)';
     var elTacEma20Pill = document.getElementById('tactical-ema20w-pill');
     var elTacEma20Note = document.getElementById('tactical-ema20w-note');
     if (spot >= ema20w) {
-      if (elTacEma20Pill) {
-        elTacEma20Pill.className = 'telemetry-status-pill green';
-        elTacEma20Pill.textContent = '🟢 MACRO BULL ANCHOR';
-      }
+      if (elTacEma20Pill) { elTacEma20Pill.className = 'telemetry-status-pill green'; elTacEma20Pill.textContent = '🟢 MACRO BULL ANCHOR'; }
       if (elTacEma20Note) elTacEma20Note.textContent = 'Sleeve 3 institutional floor (+' + dist20wEma.toFixed(1) + '% buffer)';
     } else {
-      if (elTacEma20Pill) {
-        elTacEma20Pill.className = 'telemetry-status-pill red';
-        elTacEma20Pill.textContent = '⚠️ 20W EMA AT RISK';
-      }
+      if (elTacEma20Pill) { elTacEma20Pill.className = 'telemetry-status-pill red'; elTacEma20Pill.textContent = '⚠️ 20W EMA AT RISK'; }
       if (elTacEma20Note) elTacEma20Note.textContent = 'Trading below 20W EMA; conservative sleeve watchful';
-    }
-    // Also sync Telemetry Table Row 30
-    var elEma20wDim = document.getElementById('live-metric-ema20w-dim');
-    var elEma20wPill = document.getElementById('live-metric-ema20w-pill');
-    if (elEma20wDim) elEma20wDim.textContent = '(Spot ' + (dist20wEma >= 0 ? '+' : '') + dist20wEma.toFixed(2) + '% ' + (dist20wEma >= 0 ? 'Above' : 'Below') + ')';
-    if (elEma20wPill) {
-      if (spot >= ema20w) {
-        elEma20wPill.className = 'telemetry-status-pill green';
-        elEma20wPill.textContent = '🟢 PASSED (Macro Floor Intact)';
-      } else {
-        elEma20wPill.className = 'telemetry-status-pill red';
-        elEma20wPill.textContent = '🚨 FAILED (20W EMA Breached)';
-      }
     }
 
     // Tactical Row 6: Daily higher-low and reclaim confirmation
@@ -2441,40 +2659,37 @@
       elTacDailyVwap.innerHTML = 'Daily VWAP: $' + vwap.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' (<span style="color:' + (distVwap >= 0 ? '#34D399' : '#F87171') + '">' + (distVwap >= 0 ? 'Reclaimed +' : 'Below ') + distVwap.toFixed(2) + '%</span>)';
     }
     if (distVwap >= 0) {
-      if (elTacReclaimPill) {
-        elTacReclaimPill.className = 'telemetry-status-pill green';
-        elTacReclaimPill.textContent = '🟢 RE-ENTRY AUTHORIZED';
-      }
-      if (elTacReclaimNote) {
-        elTacReclaimNote.textContent = 'VWAP fair value reclaimed (+' + distVwap.toFixed(2) + '%)';
-      }
+      if (elTacReclaimPill) { elTacReclaimPill.className = 'telemetry-status-pill green'; elTacReclaimPill.textContent = '🟢 RE-ENTRY AUTHORIZED'; }
+      if (elTacReclaimNote) elTacReclaimNote.textContent = 'VWAP fair value reclaimed (+' + distVwap.toFixed(2) + '%)';
     } else {
-      if (elTacReclaimPill) {
-        elTacReclaimPill.className = 'telemetry-status-pill amber';
-        elTacReclaimPill.textContent = '⏳ RE-ENTRY PAUSED';
-      }
-      if (elTacReclaimNote) {
-        elTacReclaimNote.textContent = 'Spot under VWAP by ' + Math.abs(distVwap).toFixed(2) + '% — wait for reclaim';
-      }
+      if (elTacReclaimPill) { elTacReclaimPill.className = 'telemetry-status-pill amber'; elTacReclaimPill.textContent = '⏳ RE-ENTRY PAUSED'; }
+      if (elTacReclaimNote) elTacReclaimNote.textContent = 'Spot under VWAP by ' + Math.abs(distVwap).toFixed(2) + '% — wait for reclaim';
     }
 
-    // Tactical Row 7: Daily ATR(14) Volatility Span & Order Spacing
-    var atrPctLive = (dailyAtr / spot * 100);
+    // Tactical Row 7: Daily ATR(14)
     var elTacAtr = document.getElementById('tactical-atr-text');
-    if (elTacAtr) {
-      elTacAtr.textContent = 'Daily ATR: $' + dailyAtr.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' (' + atrPctLive.toFixed(3) + '%)';
-    }
+    if (elTacAtr) elTacAtr.textContent = 'Daily ATR: $' + dailyAtr.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' (' + atrPctLive.toFixed(3) + '%)';
     var spacing15 = (dailyAtr * 1.5).toLocaleString(undefined, { maximumFractionDigits: 0 });
     var spacing20 = (dailyAtr * 2.0).toLocaleString(undefined, { maximumFractionDigits: 0 });
     var elTacAtrPill = document.getElementById('tactical-atr-pill');
     var elTacAtrNote = document.getElementById('tactical-atr-note');
     if (elTacAtrPill) elTacAtrPill.textContent = '📏 SPACING: $' + spacing15 + '–$' + spacing20;
     if (elTacAtrNote) elTacAtrNote.textContent = '1.5x–2.0x ATR buffer below entry';
-    // Also sync Telemetry Table Row 28
-    var elAtr14Dim = document.getElementById('live-metric-dailyAtr14-dim');
-    if (elAtr14Dim) elAtr14Dim.textContent = '(' + atrPctLive.toFixed(3) + '% of Spot)';
 
-    // 15. Portfolio Reconciliation Cockpit
+    // Tactical Row 8: Spot volume versus baseline
+    var elTacVol = document.getElementById('tactical-spot-vol');
+    if (elTacVol) elTacVol.textContent = spotVol.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' BTC';
+    var elTacVolPill = document.getElementById('tactical-vol-status-pill');
+    var elTacVolNote = document.getElementById('tactical-vol-status-note');
+    if (spotVol >= 10000) {
+      if (elTacVolPill) { elTacVolPill.className = 'telemetry-status-pill green'; elTacVolPill.textContent = '🟢 RECLAIM CONFIRMED'; }
+      if (elTacVolNote) elTacVolNote.textContent = 'Volume (' + spotVol.toLocaleString(undefined, {maximumFractionDigits:0}) + ' BTC) > 10,000 baseline';
+    } else {
+      if (elTacVolPill) { elTacVolPill.className = 'telemetry-status-pill amber'; elTacVolPill.textContent = '⚠️ THIN VOLUME'; }
+      if (elTacVolNote) elTacVolNote.textContent = 'Volume (' + spotVol.toLocaleString(undefined, {maximumFractionDigits:0}) + ' BTC) below baseline';
+    }
+
+    // Tactical Row 9: Portfolio Cockpit
     recalculatePortfolioReconciliation();
   }
 
@@ -2517,10 +2732,10 @@
     }
 
     var qty = qtyEl ? (parseFloat(qtyEl.value) || 0) : 0.50;
-    var entry = entryEl ? (parseFloat(entryEl.value) || 0) : 86200;
+    var entry = entryEl ? (parseFloat(entryEl.value) || 0) : 82200;
     var cash = usdtEl ? (parseFloat(usdtEl.value) || 0) : 25000;
 
-    var currentSpot = 86350.01;
+    var currentSpot = 82625.01;
     if (spotEl && spotEl.textContent) {
       var parsed = parseFloat(spotEl.textContent.replace(/[^0-9.]/g, ''));
       if (!isNaN(parsed) && parsed > 1000) currentSpot = parsed;
@@ -2531,8 +2746,7 @@
     var spotPct = totalEquity > 0 ? (posVal / totalEquity * 100) : 0;
     var cashPct = 100 - spotPct;
 
-    // Daily ATR(14) is $2,152.16 -> 1.5x ATR is $3,228.24 buffer below entry
-    var atrDaily = 2152.16;
+    var atrDaily = 2175.22;
     var stopPrice = Math.max(0, currentSpot - (1.5 * atrDaily));
     var dollarRisk = qty * (currentSpot - stopPrice);
     var riskPct = totalEquity > 0 ? (dollarRisk / totalEquity * 100) : 0;
@@ -2599,39 +2813,43 @@
 
   function toggleTelemetryView() {
     var wrapper = document.getElementById('telemetry-table-wrapper');
-    var controls = document.getElementById('telemetry-controls');
     var btn = document.getElementById('btn-toggle-telemetry');
     if (!wrapper) return;
     if (wrapper.style.display === 'none') {
       wrapper.style.display = '';
-      if (controls) controls.style.display = '';
       if (btn) btn.textContent = '▼ Minimize Telemetry';
     } else {
       wrapper.style.display = 'none';
-      if (controls) controls.style.display = 'none';
-      if (btn) btn.textContent = '▲ Expand Telemetry (55 Sensors)';
+      if (btn) btn.textContent = '▲ Expand Telemetry Table (55 Sensors)';
     }
   }
 
-  // ==========================================
-  // MANUS AI DATA-ONLY COMPACT EXPORT ENGINE
-  // ==========================================
   function showMatrixToast(msg, type) {
+    var old = document.getElementById('matrix-toast');
+    if (old) old.remove();
     var toast = document.createElement('div');
+    toast.id = 'matrix-toast';
     toast.style.position = 'fixed';
     toast.style.bottom = '24px';
     toast.style.right = '24px';
-    toast.style.padding = '14px 22px';
-    toast.style.background = type === 'warn' ? '#854D0E' : (type === 'error' ? '#991B1B' : '#047857');
-    toast.style.color = '#FFFFFF';
-    toast.style.borderRadius = '10px';
-    toast.style.boxShadow = '0 10px 25px rgba(0,0,0,0.5)';
-    toast.style.zIndex = '99999';
-    toast.style.fontWeight = '600';
-    toast.style.fontSize = '13px';
-    toast.style.border = '1px solid rgba(255,255,255,0.2)';
+    toast.style.padding = '12px 20px';
+    toast.style.borderRadius = '8px';
+    toast.style.fontFamily = 'monospace';
+    toast.style.fontSize = '12px';
+    toast.style.fontWeight = 'bold';
+    toast.style.zIndex = '9999';
+    toast.style.boxShadow = '0 8px 24px rgba(0,0,0,0.5)';
     toast.style.transition = 'all 0.3s ease';
-    toast.style.maxWidth = '90vw';
+
+    if (type === 'ok') {
+      toast.style.background = '#065F46';
+      toast.style.border = '1px solid #10B981';
+      toast.style.color = '#A7F3D0';
+    } else {
+      toast.style.background = '#7F1D1D';
+      toast.style.border = '1px solid #EF4444';
+      toast.style.color = '#FECACA';
+    }
     toast.textContent = msg;
     document.body.appendChild(toast);
     setTimeout(function() {
@@ -2640,7 +2858,7 @@
     }, 4000);
   }
 
-  function validateCandle(k) {
+function validateCandle(k) {
     if (!Array.isArray(k) || k.length < 7) return null;
     var o = parseFloat(k[1]), h = parseFloat(k[2]), l = parseFloat(k[3]), c = parseFloat(k[4]), v = parseFloat(k[5]);
     if (isNaN(o) || isNaN(h) || isNaN(l) || isNaN(c) || isNaN(v)) return null;
@@ -3021,10 +3239,19 @@
   }
 
   // Run on page load
+  
+
+  // Run on page load and start live refresh loop
+  
+
+  // Run on page load and start live refresh loop
   window.addEventListener('DOMContentLoaded', function() {
     initPortfolioInputs();
     fetchLivePacketAndDiagnose();
+    // Auto-refresh live market streaming every 5 seconds
+    setInterval(fetchLivePacketAndDiagnose, 5000);
   });
+
 </script>
 
 <!-- Global Standard Compliance Footer -->

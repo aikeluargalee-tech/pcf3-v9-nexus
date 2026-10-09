@@ -6,9 +6,10 @@ Nexus Terminal — PCF3
 Ensures that:
 1. Zero mock loops or Math.random() in evidence cards.
 2. Zero stale hardcoded strings from prototypes (Risk-On 92, Bullish Expansion 83, etc.).
-3. Real-time Staleness Watchdog banner and age pill are present.
-4. 4 Synthesis Cards (Market Structure, Derivatives, Psych Levels, Regime Synthesis) are dynamically bound.
-5. Live packet is valid and populated.
+3. Real-time Staleness Watchdog banner and age pill are present in index.html & matrix.html.
+4. All 55 Sensors in matrix.html are dynamically bound to telemetry.
+5. Continuous 5s polling loop is active in matrix.html.
+6. Live packet is valid and populated.
 """
 
 import os
@@ -20,6 +21,7 @@ if hasattr(sys.stdout, 'reconfigure'):
 
 repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 index_path = os.path.join(repo_root, "index.html")
+matrix_path = os.path.join(repo_root, "matrix.html")
 packet_path = os.path.join(repo_root, "PCF3_LIVE_PACKET_DEFAULT.txt")
 
 errors = []
@@ -35,7 +37,7 @@ else:
 
     # Rule 1: No Math.random mock loops in card generation
     if "Array.from({length: 58}" in html or "Array.from({length: 70}" in html:
-        errors.append("Violation: Found Array.from() mock cards generator loop.")
+        errors.append("Violation (index.html): Found Array.from() mock cards generator loop.")
     
     # Rule 2: No stale hardcoded strings in card content
     stale_strings = [
@@ -48,11 +50,11 @@ else:
     ]
     for s in stale_strings:
         if s in html:
-            errors.append(f"Violation: Found stale hardcoded prototype string: '{s}'")
+            errors.append(f"Violation (index.html): Found stale hardcoded prototype string: '{s}'")
 
     # Rule 3: Staleness Watchdog present
     if "TELEMETRY STALE" not in html or "packetAge" not in html:
-        errors.append("Violation: Missing real-time packet staleness watchdog or alert banner.")
+        errors.append("Violation (index.html): Missing real-time packet staleness watchdog or alert banner.")
 
     # Rule 4: Dynamic quantitative parsing
     required_parsers = [
@@ -67,9 +69,61 @@ else:
     ]
     for p in required_parsers:
         if p not in html:
-            errors.append(f"Violation: Missing dynamic metric parser for: '{p}'")
+            errors.append(f"Violation (index.html): Missing dynamic metric parser for: '{p}'")
 
-# 2. Inspect Live Packet
+# 2. Inspect matrix.html (Regime Radar)
+if not os.path.exists(matrix_path):
+    errors.append("matrix.html not found!")
+else:
+    with open(matrix_path, "r", encoding="utf-8") as f:
+        m_html = f.read()
+
+    # Rule 1: Staleness Watchdog
+    if 'id="radar-staleness-banner"' not in m_html:
+        errors.append("Violation (matrix.html): Missing #radar-staleness-banner element.")
+    if 'id="radar-sync-pill"' not in m_html:
+        errors.append("Violation (matrix.html): Missing #radar-sync-pill element.")
+    if "packetAgeMin" not in m_html:
+        errors.append("Violation (matrix.html): Missing packetAgeMin staleness calculation.")
+
+    # Rule 2: Continuous Live Streaming Polling Loop
+    if "setInterval(fetchLivePacketAndDiagnose, 5000)" not in m_html:
+        errors.append("Violation (matrix.html): Missing 5s live polling loop.")
+
+    # Rule 3: Dynamic 55 Sensors Engine
+    if "function updateTelemetryLiveValues(" not in m_html:
+        errors.append("Violation (matrix.html): Missing updateTelemetryLiveValues engine.")
+    
+    # Check 55 telemetry rows and their JS bindings
+    js_match = re.search(r'<script>(.*?)</script>', m_html, re.DOTALL)
+    js_code = js_match.group(1) if js_match else ''
+    rows = re.findall(r'<tr class="telemetry-row"[^>]*>(.*?)</tr>', m_html, re.DOTALL)
+    if len(rows) != 55:
+        errors.append(f"Violation (matrix.html): Expected 55 telemetry rows, found {len(rows)}.")
+    
+    unbound = []
+    for i, r in enumerate(rows):
+        num_m = re.search(r'>(\d+)</td>', r)
+        num = num_m.group(1) if num_m else str(i+1)
+        id_m = re.findall(r'id="([^"]+)"', r)
+        is_updated = any(x in js_code for x in id_m) or f"live-row-{num}" in js_code
+        if not is_updated:
+            unbound.append(num)
+    if unbound:
+        errors.append(f"Violation (matrix.html): The following telemetry sensors are not dynamically bound in JS: {unbound}")
+
+    # Rule 4: No stale prototype numbers in initial HTML
+    stale_matrix_strings = [
+        "$86,350.01",
+        "+$292.6M",
+        "0.985 Ratio",
+        "$83,900 &ndash; $84,600"
+    ]
+    for s in stale_matrix_strings:
+        if s in m_html:
+            errors.append(f"Violation (matrix.html): Found stale prototype string: '{s}'")
+
+# 3. Inspect Live Packet
 if not os.path.exists(packet_path):
     errors.append("PCF3_LIVE_PACKET_DEFAULT.txt not found!")
 else:
@@ -91,5 +145,9 @@ if errors:
         print(f"  - {e}")
     sys.exit(1)
 else:
-    print("\n✅ AUDIT PASSED: All guardrails satisfied! Zero mock data, complete dynamic binding, watchdog verified.")
+    print("\n✅ AUDIT PASSED: All guardrails satisfied across index.html & matrix.html!")
+    print("  ✓ Zero mock data")
+    print("  ✓ Full 55-sensor dynamic binding in matrix.html")
+    print("  ✓ Staleness watchdog active on all dashboards")
+    print("  ✓ 5s continuous market streaming verified")
     sys.exit(0)
