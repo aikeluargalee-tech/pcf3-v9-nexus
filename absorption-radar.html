@@ -407,6 +407,7 @@
       <a href="../quant-radar/" id="link-quant">Quant Radar</a> |
       <a href="../liquidity-radar/" id="link-liq">Liquidity Radar</a> |
       <a href="../sweep-desk/" id="link-sweep">Sweep Desk</a> |
+      <a href="../threat-matrix/" id="link-threat">Threat Matrix</a> |
       <a href="../fractal.html" id="link-fractal">Fractal Lab</a>
     </div>
     <div class="nav-links">
@@ -1176,12 +1177,14 @@ async function loadLive() {
   const linkQuant = document.getElementById('link-quant');
   const linkLiq = document.getElementById('link-liq');
   const linkSweep = document.getElementById('link-sweep');
+  const linkThreat = document.getElementById('link-threat');
   const linkFrac = document.getElementById('link-fractal');
   if (linkDash) linkDash.href = prefix + 'index.html';
   if (linkMat) linkMat.href = prefix + 'matrix.html';
   if (linkQuant) linkQuant.href = prefix + 'quant-radar/';
   if (linkLiq) linkLiq.href = prefix + 'liquidity-radar/';
   if (linkSweep) linkSweep.href = prefix + 'sweep-desk/';
+  if (linkThreat) linkThreat.href = prefix + 'threat-matrix/';
   if (linkFrac) linkFrac.href = prefix + 'fractal.html';
 
   let klinesSuccess = false;
