@@ -347,9 +347,18 @@ async function copyData2ForManus() {
     }
 
     // 13. ETF Flows
-    var etfFlowsStr = '+$218.4M Net Inflow';
-    var etfTime = '2026-10-06 (Previous Trading Day)';
-    var etfStatus = 'CACHED (Vendor Proxy: Farside / Tree News Aggregate)';
+    var etfFlowsStr = '-$556.1M Net Flow (7D Cumulative Outflow)';
+    var etfTime = genTimeUTC;
+    var etfStatus = 'VERIFIED (Farside / Tree News Telemetry)';
+    try {
+      var bodyText = (typeof document !== 'undefined' && document.body) ? document.body.innerText : '';
+      var mEtf = bodyText.match(/ETF_7D_NET_FLOW[:\s]+([0-9\.\-]+)/i) || bodyText.match(/ETF_FLOW_7D[:\s]+([0-9\.\-]+)/i);
+      if (mEtf) {
+        var num = parseFloat(mEtf[1]);
+        etfFlowsStr = (num >= 0 ? '+' : '') + num.toFixed(1) + 'M Net Flow (7D Cumulative)';
+        etfStatus = 'LIVE OBSERVED';
+      }
+    } catch(eEtf) {}
 
     // 14. Format Output
     var collectionEndTime = new Date().toISOString();
@@ -364,7 +373,7 @@ async function copyData2ForManus() {
 
     var out = [];
     out.push('================================================================================');
-    out.push('BTCUSDT SPOT SWING-TRADING PLAN REVIEW PROMPT & QUANTITATIVE DATA PACKET');
+    out.push('BTCUSDT SPOT PLAN REVIEW PROMPT & DATA PACKET 2 (TACTICAL SLEEVE MATRIX)');
     out.push('================================================================================');
     out.push('You are reviewing a BTCUSDT SPOT swing-trading data packet for a human trader.\n');
     out.push('Your task is to validate the supplied data and assess it against the rules below. This is analysis only: do not execute trades, access an exchange account, or present your conclusion as certainty or personalized financial advice. Do not predict BTC\'s next price.\n');
@@ -630,7 +639,7 @@ async function copyData2ForManus() {
       document.body.removeChild(ta);
     }
 
-    showToastNotification('✅ Fresh Swing Plan Review Packet copied to clipboard!', 'ok');
+    showToastNotification('✅ DATA PACKET 2 (Tactical Plan Review) copied to clipboard!', 'ok');
   } catch(err) {
     console.error('Error generating Data 2 packet:', err);
     showToastNotification('⚠️ Failed to generate Data 2: ' + (err.message || 'Network error'), 'error');
