@@ -213,7 +213,34 @@ for cname in ["btc_daily_klines.json", "btc_weekly_klines.json", "btc_4h_klines.
     if not os.path.exists(cpath):
         errors.append(f"Missing data/{cname} failover cache!")
 
-# 5. Inspect Live Packet
+# 5. Inspect fractal.html (BTC Fractal Lab)
+fractal_path = os.path.join(repo_root, "fractal.html")
+if not os.path.exists(fractal_path):
+    errors.append("fractal.html not found!")
+else:
+    with open(fractal_path, "r", encoding="utf-8") as f:
+        f_html = f.read()
+
+    # Rule 1: Zero Math.random() invocations
+    if re.search(r'Math\.random\s*\(', f_html):
+        errors.append("Violation (fractal.html): Found Math.random() invocation.")
+
+    # Rule 2: Staleness Watchdog & Sync Tag
+    if 'id="fractal-staleness-banner"' not in f_html:
+        errors.append("Violation (fractal.html): Missing #fractal-staleness-banner element.")
+    if 'id="fractal-sync-tag"' not in f_html:
+        errors.append("Violation (fractal.html): Missing #fractal-sync-tag element.")
+
+    # Rule 3: Continuous 10s auto-refresh polling loop
+    if "setInterval(refreshLive, 10000)" not in f_html:
+        errors.append("Violation (fractal.html): Missing 10s auto-refresh polling loop.")
+
+    # Rule 4: Required Dynamic Elements
+    for elem_id in ["live-btc-spot", "live-curr-corr", "void-status-pill", "bars", "analogs-body"]:
+        if f'id="{elem_id}"' not in f_html:
+            errors.append(f"Violation (fractal.html): Missing required element id='{elem_id}'.")
+
+# 6. Inspect Live Packet
 if not os.path.exists(packet_path):
     errors.append("PCF3_LIVE_PACKET_DEFAULT.txt not found!")
 else:
@@ -235,8 +262,8 @@ if errors:
         print(f"  - {e}")
     sys.exit(1)
 else:
-    print("\n✅ AUDIT PASSED: All guardrails satisfied across index.html, matrix.html, quant-radar, and liquidity-radar!")
-    print("  ✓ Zero mock/invented data across all pages")
+    print("\n✅ AUDIT PASSED: All guardrails satisfied across index.html, matrix.html, quant-radar, liquidity-radar, and fractal.html!")
+    print("  ✓ Zero mock/invented data across all pages (including zero Math.random() in fractal.html)")
     print("  ✓ Full 55-sensor dynamic binding in matrix.html")
     print("  ✓ Dynamic ETF flows & DXY macro telemetry in liquidity-radar")
     print("  ✓ Staleness watchdog active across all dashboards")
