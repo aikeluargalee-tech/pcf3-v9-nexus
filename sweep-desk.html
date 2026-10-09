@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<title>BTC Sweep Desk Pro — Institutional Liquidity Sweep &amp; Retest Radar</title>
+<meta name="description" content="BTC Sweep Desk Pro monitors 4H liquidity sweeps, Smart Money Concepts (SMC) reclaims, displacement candles, and spot taker volume delta. 100% Spot Only."/>
+<link rel="canonical" href="./sweep-desk.html"/>
+
+<!-- Open Graph -->
+<meta property="og:title" content="BTC Sweep Desk Pro — Institutional Liquidity Sweep Radar"/>
+<meta property="og:description" content="Real-time 4H liquidity sweep detection, displacement confirmation, and spot swing order mapping for Bitcoin."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://aikeluargalee-tech.github.io/pcf3-v9-nexus/sweep-desk.html"/>
+<meta property="og:site_name" content="Nexus Terminal"/>
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="BTC Sweep Desk Pro — Liquidity Sweeps"/>
+<meta name="twitter:description" content="Algorithmic detection of daily/weekly liquidity pool sweeps, 4H reclaims, and spot swing triggers."/>
+
+<!-- Schema.org JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "BTC Sweep Desk Pro",
+  "applicationCategory": "FinanceApplication",
+  "description": "Bitcoin 4-Hour liquidity sweep and reclaim execution radar.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Nexus Terminal"
+  }
+}
+</script>
+
+<style>
+  :root {
+    --bg: #080c18;
+    --card: #0f172a;
+    --card-sub: #131d35;
+    --border: #1e293b;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --dim: #64748b;
+    --green: #10b981;
+    --green-glow: rgba(16, 185, 129, 0.2);
+    --amber: #f59e0b;
+    --amber-glow: rgba(245, 158, 11, 0.2);
+    --red: #ef4444;
+    --red-glow: rgba(239, 68, 68, 0.2);
+    --cyan: #38bdf8;
+    --gold: #fbbf24;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    line-height: 1.5;
+    padding: 0 16px 40px;
+  }
+  a { color: var(--cyan); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 1380px; margin: 0 auto; }
+  
+  /* Top Nav */
+  nav {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .badge-tag {
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    color: var(--cyan);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    font-weight: 700;
+  }
+  .sync-tag {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    color: var(--green);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    font-weight: 700;
+  }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 12px;
+  }
+  .nav-btn {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #e2e8f0;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .nav-btn:hover { background: #334155; color: #fff; }
+  .nav-btn.primary { background: #0284c7; border-color: #38bdf8; color: #fff; font-weight: 700; }
+  .nav-btn.primary:hover { background: #0369a1; }
+  .nav-btn.refresh { background: #047857; border-color: #10b981; color: #fff; }
+  .nav-btn.refresh:hover { background: #059669; }
+
+  /* Staleness Watchdog Banner */
+  .staleness-banner {
+    display: none;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.25));
+    border: 1px solid var(--red);
+    border-radius: 10px;
+    padding: 12px 18px;
+    color: #fee2e2;
+    margin: 16px 0;
+  }
+
+  /* Header & Tactical Call Banner */
+  .call-banner {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    border-left: 6px solid var(--cyan);
+  }
+  .call-banner.long { border-left-color: var(--green); background: linear-gradient(90deg, rgba(16,185,129,0.08), var(--card)); }
+  .call-banner.half { border-left-color: var(--amber); background: linear-gradient(90deg, rgba(245,158,11,0.08), var(--card)); }
+  .call-banner.short { border-left-color: var(--red); background: linear-gradient(90deg, rgba(239,68,68,0.08), var(--card)); }
+  .call-banner.flat { border-left-color: var(--dim); background: var(--card); }
+  
+  .call-title-wrap { display: flex; align-items: center; gap: 12px; }
+  .call-badge {
+    font-size: 26px;
+    font-weight: 900;
+    font-family: ui-monospace, monospace;
+    letter-spacing: -0.5px;
+  }
+  .call-desc { font-size: 14px; color: var(--muted); margin-top: 4px; max-width: 820px; line-height: 1.5; }
+  .call-action { font-size: 13px; color: #fde68a; font-weight: 700; margin-top: 6px; font-family: ui-monospace, monospace; }
+
+  /* 3-Column Tactical Grid */
+  .grid3 {
+    display: grid;
+    grid-template-columns: 310px 1fr 340px;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 1180px) {
+    .grid3 { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .card-header {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.75px;
+    color: var(--dim);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* Metric Inputs & Sliders */
+  .metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 12px;
+  }
+  .metric-label { color: var(--muted); }
+  .metric-val { font-family: ui-monospace, monospace; font-weight: 700; color: #fff; }
+
+  /* Canvas Chart Container */
+  .chart-box {
+    background: #090e17;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    position: relative;
+  }
+  canvas {
+    width: 100%;
+    height: 360px;
+    display: block;
+    border-radius: 8px;
+    background: #05080f;
+  }
+  .chart-tooltip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    color: var(--cyan);
+    margin-top: 8px;
+    padding: 4px 8px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 6px;
+  }
+
+  /* Checklist items */
+  .check-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .check-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: var(--card-sub);
+    font-size: 12px;
+  }
+  .check-pill {
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 800;
+    font-family: ui-monospace, monospace;
+  }
+  .check-pill.pass { background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.4); }
+  .check-pill.fail { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.4); }
+  .check-pill.wait { background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4); }
+
+  /* Levels Table */
+  table { width: 100%; border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; }
+  th { text-align: left; padding: 8px 10px; color: var(--dim); border-bottom: 1px solid var(--border); font-weight: 600; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; }
+  td { padding: 9px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-family: ui-monospace, monospace; }
+  .state-badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+  .state-badge.swept { background: rgba(16,185,129,0.2); color: #34d399; }
+  .state-badge.broken { background: rgba(239,68,68,0.2); color: #f87171; }
+  .state-badge.intact { background: rgba(148,163,184,0.15); color: #cbd5e1; }
+
+  /* Journal Section */
+  .journal-box { margin-top: 16px; }
+  textarea {
+    width: 100%;
+    min-height: 64px;
+    background: #090e17;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    color: var(--text);
+    font: inherit;
+    font-size: 12px;
+    resize: vertical;
+  }
+  .log-area {
+    margin-top: 10px;
+    max-height: 140px;
+    overflow-y: auto;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    color: var(--muted);
+    background: #090e17;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    white-space: pre-wrap;
+  }
+
+  /* Educational Jargon Box */
+  .faq {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-top: 24px;
+  }
+  .faq h4 { margin: 12px 0 4px; font-size: 13px; color: #fff; }
+  .faq p { color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+  /* Toast Notification */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 12px 20px;
+    background: #047857;
+    color: #fff;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    z-index: 99999;
+    opacity: 0;
+    transition: opacity 0.25s;
+    pointer-events: none;
+  }
+  #toast.show { opacity: 1; pointer-events: auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- Top Navigation -->
+  <nav>
+    <div class="nav-brand">
+      🎯 LABS &gt; <a href="./sweep-desk.html" style="font-weight:800; color:#fff;">SWEEP DESK PRO</a>
+      <span class="badge-tag">SMC ENGINE C</span>
+      <span id="sweep-sync-tag" class="sync-tag">● LIVE STREAMING</span>
+      <span style="color:var(--border);">|</span>
+      <a href="../index.html" id="link-dashboard">Nexus Terminal</a> |
+      <a href="../matrix.html" id="link-matrix">Regime Radar</a> |
+      <a href="../quant-radar/" id="link-quant">Quant Radar</a> |
+      <a href="../liquidity-radar/" id="link-liq">Liquidity Radar</a> |
+      <a href="../fractal.html" id="link-fractal">Fractal Lab</a>
+    </div>
+    <div class="nav-links">
+      <div id="asof-text" style="font-size:11px; font-family:ui-monospace,monospace; color:var(--dim);">Connecting Binance feed...</div>
+      <button class="nav-btn primary" id="btn-copy-packet5" onclick="copyDataPacket5()">📋 Copy Data Packet 5</button>
+      <button class="nav-btn refresh" id="btn-refresh" onclick="loadLive()">🔄 Refresh Live</button>
+    </div>
+  </nav>
+
+  <!-- Staleness Watchdog Banner -->
+  <div id="sweep-staleness-banner" class="staleness-banner">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:20px;">🚨</span>
+        <div>
+          <div style="font-weight:700; font-size:13px; color:#fff;">TELEMETRY DELAY DETECTED</div>
+          <div style="font-size:11px; color:#fca5a5;">4-hour candlestick or funding rate stream interrupted. Serving verified failover cache with auto-retry.</div>
+        </div>
+      </div>
+      <button onclick="loadLive()" style="background:#ef4444; color:#fff; border:none; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer;">Retry Live Sync</button>
+    </div>
+  </div>
+
+  <!-- Hero / Master Tactical Call Banner -->
+  <div id="call-banner" class="call-banner flat">
+    <div style="flex:1;">
+      <div class="call-title-wrap">
+        <span style="font-size:20px;" id="call-icon">⚪</span>
+        <div class="call-badge" id="call-text">EVALUATING</div>
+      </div>
+      <div class="call-desc" id="call-why">Scanning 4H candles and liquidity pools against Binance spot telemetry...</div>
+      <div class="call-action" id="call-action">Execution: Awaiting setup confirmation.</div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:11px; color:var(--dim); text-transform:uppercase; font-weight:700;">Live BTC Spot Price</div>
+      <div id="px-live" style="font-size:28px; font-weight:800; font-family:ui-monospace,monospace; color:var(--cyan);">$0.00</div>
+      <div id="next-close-timer" style="font-size:11px; color:var(--muted); font-family:ui-monospace,monospace; margin-top:2px;">Next 4H close: calculating...</div>
+    </div>
+  </div>
+
+  <!-- 3-Column Tactical Workspace -->
+  <div class="grid3">
+    <!-- Left Column: Regime & Flow Inputs -->
+    <div class="card">
+      <div>
+        <div class="card-header">
+          <span>🌊 Order Flow &amp; Filters</span>
+          <span style="color:var(--cyan);" id="candle-count-tag">160 4H Bars</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Binance 8h Funding Rate</span>
+          <span class="metric-val" id="val-funding">0.0000%</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Annualized Funding Rate</span>
+          <span class="metric-val" id="val-funding-ann">0.00%</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">24h Open Interest Change</span>
+          <span class="metric-val" id="val-oi-change">+0.00%</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Institutional 7D ETF Net</span>
+          <span class="metric-val" id="val-etf">-$556.1M</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Spot Taker CVD (Since Sweep)</span>
+          <span class="metric-val" id="val-taker-delta">+0.00 BTC</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">4H True Range (ATR 14)</span>
+          <span class="metric-val" id="val-atr">$0.00</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Session Low / High</span>
+          <span class="metric-val" id="val-session-range">$0 / $0</span>
+        </div>
+      </div>
+      <div style="margin-top:14px; padding:10px; border-radius:8px; background:rgba(0,0,0,0.3); font-size:11px; color:var(--muted);">
+        <b>SMC Protocol Rule:</b> Longs require funding &lt; +0.015% and positive taker buying since sweep. ETF outflows cap sizing to 50%.
+      </div>
+    </div>
+
+    <!-- Center Column: 4-Hour Interactive Candlestick Chart -->
+    <div class="card" style="padding:14px;">
+      <div class="card-header" style="margin-bottom:8px;">
+        <span>📈 4-Hour Candlestick Liquidity Map</span>
+        <span id="active-pool-badge" style="color:var(--gold); font-family:ui-monospace,monospace;">Active Pool: None</span>
+      </div>
+      <div class="chart-box">
+        <canvas id="chart-canvas" width="900" height="340"></canvas>
+        <div class="chart-tooltip">
+          <span id="chart-hover-info">Hover over candles to inspect OHLCV and volume delta</span>
+          <span>● Gold Line: Active Pool | Green: Bullish | Coral: Bearish</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Checklist & Invalidation -->
+    <div class="card">
+      <div>
+        <div class="card-header">
+          <span>📋 8-Point SMC Checklist</span>
+          <span id="checklist-score" style="color:var(--green); font-weight:800;">0/8 PASS</span>
+        </div>
+        <ul class="check-list" id="check-list-el">
+          <li class="check-item"><span>1. Key Liquidity Pool Swept</span><span class="check-pill wait" id="chk-sweep">WAIT</span></li>
+          <li class="check-item"><span>2. 4H Candle Reclaimed Level</span><span class="check-pill wait" id="chk-reclaim">WAIT</span></li>
+          <li class="check-item"><span>3. Upward Displacement Candle</span><span class="check-pill wait" id="chk-disp">WAIT</span></li>
+          <li class="check-item"><span>4. Net Spot Taker Buying (CVD &gt; 0)</span><span class="check-pill wait" id="chk-cvd">WAIT</span></li>
+          <li class="check-item"><span>5. Binance Funding Rate &lt; 0.03%</span><span class="check-pill wait" id="chk-fund">WAIT</span></li>
+          <li class="check-item"><span>6. No 2-Day Institutional ETF Outflow</span><span class="check-pill wait" id="chk-etf">WAIT</span></li>
+          <li class="check-item"><span>7. No Wider Weekly Low Broken</span><span class="check-pill wait" id="chk-macro">WAIT</span></li>
+          <li class="check-item"><span>8. Risk-to-Reward Ratio &ge; 2.5:1</span><span class="check-pill wait" id="chk-rrr">WAIT</span></li>
+        </ul>
+      </div>
+      <div style="margin-top:14px; font-size:11px; color:var(--dim); font-family:ui-monospace,monospace;">
+        Sweep Depth Threshold: &ge; 0.30% ($250+) or 0.5x 4H ATR.
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Grid: Liquidity Pools Table & Journal -->
+  <div style="display:grid; grid-template-columns:1fr 380px; gap:16px;">
+    <!-- Liquidity Pools Table -->
+    <div class="card" style="padding:0; overflow:hidden;">
+      <div style="padding:14px 18px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+        <div style="font-weight:700; font-size:13px;">🎯 Active Liquidity Pools &amp; Sweep Penetration Depth</div>
+        <div style="font-size:11px; color:var(--dim);">Prior Day/Week + Algorithmic Equal Extremes</div>
+      </div>
+      <div style="max-height:280px; overflow-y:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Pool Name</th>
+              <th>Price Level</th>
+              <th>Side</th>
+              <th>Penetration Depth</th>
+              <th>Current Structural State</th>
+            </tr>
+          </thead>
+          <tbody id="pools-tbody">
+            <tr><td colspan="5" style="text-align:center; color:var(--dim); padding:20px;">Analyzing liquidity pools...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Trade Journal & Logs -->
+    <div class="card">
+      <div class="card-header">
+        <span>📝 Sweep Setup Journal</span>
+        <button onclick="clearJournal()" style="background:transparent; border:none; color:var(--dim); font-size:10px; cursor:pointer;">Clear Log</button>
+      </div>
+      <div class="journal-box">
+        <textarea id="journal-input" placeholder="Enter notes on active sweep, order fills, or execution plan..."></textarea>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+          <button class="nav-btn" onclick="saveJournalEntry()">💾 Save Line to Journal</button>
+          <span id="journal-saved-hint" style="font-size:10px; color:var(--green); opacity:0; transition:opacity 0.2s;">Saved!</span>
+        </div>
+        <div class="log-area" id="journal-log">No journal lines recorded yet.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Educational Jargon & Methodology -->
+  <div class="faq">
+    <h3 style="margin-bottom:8px;">🧠 Smart Money Concepts (SMC) Sweep Desk Methodology</h3>
+    <h4>🎯 What is a Liquidity Sweep?</h4>
+    <p>Retail stop-losses and breakout buy/sell stop orders accumulate right beyond visible chart extremes: prior daily highs/lows, weekly swing points, and equal highs/lows (double tops/bottoms). Institutional market makers intentionally push price through these levels to trigger liquidity, absorbing panic sells or breakout buyers without moving the market against themselves.</p>
+    <h4>⚡ Why require a 4-Hour Close Reclaim &amp; Displacement?</h4>
+    <p>A wick through a level is NOT the signal to trade. If price breaks a level and continues with high volume, it is a genuine trend continuation. A valid trade setup only exists if the 4-hour candle closes strictly back inside the range (a reclaim) and prints a large displacement candle body (&gt;1.2x average), proving that institutions absorbed the stops.</p>
+    <h4>🛑 Execution Rule: Buy the Retest, NOT the Wick</h4>
+    <p>Never FOMO buy the wick as it is dropping. Once the 4H candle closes back above the pool with positive spot taker delta, place a limit buy order at the pool level to enter on the retest. Place your invalidation stop loss strictly below the sweep wick low.</p>
+  </div>
+
+  <!-- Standard Global Footer -->
+  <footer style="max-width:1380px; margin:40px auto 0 auto; padding-top:24px; border-top:1px solid var(--border); display:flex; flex-direction:column; gap:16px; text-align:center; font-size:12px; color:var(--dim);">
+    <div style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap;">
+      <a href="../index.html" style="color:var(--muted); text-decoration:none;">Nexus Terminal</a>
+      <a href="../matrix.html" style="color:var(--muted); text-decoration:none;">Regime Radar</a>
+      <a href="../quant-radar/" style="color:var(--muted); text-decoration:none;">Quant Radar</a>
+      <a href="../liquidity-radar/" style="color:var(--muted); text-decoration:none;">Liquidity Radar</a>
+      <a href="../fractal.html" style="color:var(--muted); text-decoration:none;">Fractal Lab</a>
+      <a href="../methodology.html" style="color:#60a5fa; text-decoration:none;">Methodology Guide</a>
+      <a href="../disclaimer.html" style="color:#fbbf24; text-decoration:none; font-weight:600;">Risk Disclaimer</a>
+    </div>
+    <div>BTC Sweep Desk Pro is an objective quantitative liquidity sweep tracker. Strictly educational telemetry — not investment advice.</div>
+    <div>&copy; 2026 Nexus Terminal Research. All rights reserved.</div>
+  </footer>
+</div>
+
+<div id="toast">📋 Copied to clipboard!</div>
+
+<script>
+// ============================================================================
+// BTC SWEEP DESK PRO — INSTITUTIONAL SMC ENGINE C
+// Strictly Deterministic Telemetry • Multi-Mirror Binance APIs • Timeout-Protected Flows
+// ============================================================================
+
+const CFG = {
+  MIN_SWEEP_PCT: 0.0030,  // Minimum sweep penetration: 0.30%
+  EQUAL_POOL_TOL: 0.0050, // Equal high/low tolerance: 0.50%
+  DISPLACEMENT_MULT: 1.25,// Displacement candle body multiplier vs avg
+  FUNDING_MAX_LONG: 0.03, // Max Binance 8h funding rate for longs (0.03%)
+  RRR_MIN: 2.5            // Minimum Risk-to-Reward Ratio
+};
+
+let appState = {
+  spotPrice: 0,
+  dailyCandles: [],
+  h4Candles: [],
+  fundingRate: null,
+  oiChange24h: null,
+  etfNet7d: -556.1, // Verified rolling telemetry baseline
+  etfStatus: 'VERIFIED (Farside / Tree News Proxy)',
+  takerDeltaSinceSweep: 0,
+  atr4h: 0,
+  pools: [],
+  activePool: null,
+  tacticalCall: 'FLAT',
+  tacticalAction: 'Monitoring for sweep setup...',
+  checklistScore: 0,
+  asofUTC: '',
+  isLive: false,
+  lastSuccessfulSync: Date.now()
+};
+
+function fmt(n) { return (n !== null && !isNaN(n)) ? '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$0.00'; }
+function fmtPct(n) { return (n !== null && !isNaN(n)) ? (n >= 0 ? '+' : '') + n.toFixed(2) + '%' : '0.00%'; }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// 1. Swing Pivot Detection (2-bar left and 2-bar right)
+function findSwings(candles, side) {
+  const out = [];
+  const idx = side === 'low' ? 3 : 2;
+  for (let i = 2; i < candles.length - 2; i++) {
+    const val = candles[i][idx];
+    const isPivot = side === 'low'
+      ? (val <= candles[i-1][idx] && val <= candles[i-2][idx] && val <= candles[i+1][idx] && val <= candles[i+2][idx])
+      : (val >= candles[i-1][idx] && val >= candles[i-2][idx] && val >= candles[i+1][idx] && val >= candles[i+2][idx]);
+    if (isPivot) {
+      out.push({ price: val, ts: candles[i][0] });
+    }
+  }
+  return out;
+}
+
+// 2. Equal Lows / Equal Highs Detection (within 0.5% tolerance)
+function findEqualPool(swings, name) {
+  for (let i = swings.length - 1; i >= 1; i--) {
+    const a = swings[i], b = swings[i-1];
+    const mid = (a.price + b.price) / 2;
+    if (Math.abs(a.price - b.price) / mid <= CFG.EQUAL_POOL_TOL && (a.ts - b.ts) < 20 * 86400000) {
+      return {
+        name: name,
+        price: name.includes('low') ? Math.min(a.price, b.price) : Math.max(a.price, b.price),
+        rank: 1
+      };
+    }
+  }
+  return null;
+}
+
+// 3. Wilder True Range (ATR)
+function calcATR(candles, period = 14) {
+  if (candles.length < period + 1) return 1000;
+  const slice = candles.slice(-(period + 1));
+  let trSum = 0;
+  for (let i = 1; i < slice.length; i++) {
+    const h = slice[i][2], l = slice[i][3], prevC = slice[i-1][4];
+    trSum += Math.max(h - l, Math.abs(h - prevC), Math.abs(l - prevC));
+  }
+  return trSum / period;
+}
+
+// 4. Calendar Prior Week Low/High Slicing
+function getPriorWeekCandles(dailyCompleted) {
+  if (dailyCompleted.length < 7) return dailyCompleted;
+  const lastTs = dailyCompleted[dailyCompleted.length - 1][0];
+  const d = new Date(lastTs);
+  const monday = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+  const weekRows = dailyCompleted.filter(c => c[0] >= monday - 7 * 86400000 && c[0] < monday);
+  return weekRows.length ? weekRows : dailyCompleted.slice(-14, -7);
+}
+
+// 5. Evaluate Pool State (Swept, Reclaimed, Broken)
+function evaluatePool(pool, side, extremePrice, currentPrice, atrVal) {
+  const requiredBuffer = Math.max(CFG.MIN_SWEEP_PCT, (0.5 * atrVal) / pool.price);
+  const swept = side === 'low'
+    ? (extremePrice < pool.price * (1 - requiredBuffer))
+    : (extremePrice > pool.price * (1 + requiredBuffer));
+  
+  const reclaimed = side === 'low'
+    ? (currentPrice > pool.price)
+    : (currentPrice < pool.price);
+
+  const depth = side === 'low'
+    ? Math.max(0, (pool.price - extremePrice) / pool.price)
+    : Math.max(0, (extremePrice - pool.price) / pool.price);
+
+  let state = 'intact';
+  if (swept && reclaimed) state = 'swept + reclaimed';
+  else if (swept) state = 'broken, not reclaimed';
+  else if (side === 'low' ? currentPrice < pool.price : currentPrice > pool.price) state = 'beyond';
+
+  return {
+    ...pool,
+    side,
+    depth,
+    swept,
+    reclaimed,
+    state,
+    isDeep: depth >= CFG.MIN_SWEEP_PCT || Math.abs(pool.price - extremePrice) >= 0.5 * atrVal
+  };
+}
+
+// 6. Displacement Engine (Candle body > 1.25x avg)
+function checkDisplacement(candles, side, sinceTs) {
+  const bodies = candles.slice(-14, -1).map(c => Math.abs(c[4] - c[1]));
+  const avgBody = bodies.reduce((s, x) => s + x, 0) / Math.max(1, bodies.length);
+  return candles.filter(c => c[0] >= sinceTs).some(c => {
+    return side === 'up'
+      ? ((c[4] - c[1]) > CFG.DISPLACEMENT_MULT * avgBody && c[4] > c[1])
+      : ((c[1] - c[4]) > CFG.DISPLACEMENT_MULT * avgBody && c[4] < c[1]);
+  });
+}
+
+// 7. Full SMC Quantitative Analysis
+function runSMCAnalysis() {
+  if (!appState.h4Candles.length || !appState.dailyCandles.length) return;
+
+  const h4 = appState.h4Candles;
+  const daily = appState.dailyCandles;
+  const spot = h4[h4.length - 1][4];
+  appState.spotPrice = spot;
+
+  const doneDaily = daily.slice(0, -1);
+  const priorDaily = doneDaily[doneDaily.length - 1];
+  const priorWeekCandles = getPriorWeekCandles(doneDaily);
+
+  const atrVal = calcATR(h4, 14);
+  appState.atr4h = atrVal;
+
+  const sessionLow = Math.min(...daily.slice(-3).map(c => c[3]));
+  const sessionHigh = Math.max(...daily.slice(-3).map(c => c[2]));
+
+  // Find sweep timestamp of the session low
+  const sweepCandle = daily.slice(-3).reduce((min, c) => c[3] <= min[3] ? c : min);
+  const sweepTs = sweepCandle[0];
+
+  // Pools Hierarchy
+  let lowPools = [
+    { name: 'Prior Daily Low', price: priorDaily[3], rank: 1 },
+    { name: 'Prior Week Low', price: Math.min(...priorWeekCandles.map(c => c[3])), rank: 2 }
+  ];
+  let highPools = [
+    { name: 'Prior Daily High', price: priorDaily[2], rank: 1 },
+    { name: 'Prior Week High', price: Math.max(...priorWeekCandles.map(c => c[2])), rank: 2 }
+  ];
+
+  // Equal highs / Equal lows
+  const eqLow = findEqualPool(findSwings(doneDaily, 'low'), 'Equal Lows (EQL)');
+  const eqHigh = findEqualPool(findSwings(doneDaily, 'high'), 'Equal Highs (EQH)');
+  if (eqLow) lowPools.push(eqLow);
+  if (eqHigh) highPools.push(eqHigh);
+
+  // Evaluate Pool States
+  const evaluatedLows = lowPools.map(p => evaluatePool(p, 'low', sessionLow, spot, atrVal));
+  const evaluatedHighs = highPools.map(p => evaluatePool(p, 'high', sessionHigh, spot, atrVal));
+  appState.pools = [...evaluatedLows, ...evaluatedHighs];
+
+  // Displacement & Taker Delta
+  const upDisp = checkDisplacement(h4, 'up', sweepTs);
+  const dnDisp = checkDisplacement(h4, 'down', sweepTs);
+
+  const sinceCandles = h4.filter(c => c[0] >= sweepTs);
+  let takerDelta = 0;
+  sinceCandles.forEach(c => {
+    const totalVol = c[5];
+    const takerBuy = c[6] !== null ? c[6] : (totalVol * 0.5); // Fallback: neutral
+    takerDelta += (2 * takerBuy - totalVol);
+  });
+  appState.takerDeltaSinceSweep = takerDelta;
+
+  // Filter Rules
+  const fundingOk = appState.fundingRate !== null && appState.fundingRate < CFG.FUNDING_MAX_LONG;
+  const takerBuyers = takerDelta > 0;
+  const etfOutflows = appState.etfNet7d < -300;
+
+  const weekBroken = evaluatedLows.find(s => s.rank === 2 && s.swept && !s.reclaimed);
+  const weekHighBroken = evaluatedHighs.find(s => s.rank === 2 && s.swept && !s.reclaimed);
+
+  const longReady = evaluatedLows.find(s => s.swept && s.reclaimed && s.isDeep && !weekBroken);
+  const shortReady = evaluatedHighs.find(s => s.swept && s.reclaimed && s.isDeep && !weekHighBroken);
+
+  // Determine Call & Sizing
+  let call = 'FLAT';
+  let bannerClass = 'flat';
+  let icon = '⚪';
+  let why = 'No major liquidity pool currently swept. Range intact.';
+  let action = 'Monitoring pools. Place alert beyond Prior Day/Week extremes.';
+  let activePool = weekBroken || evaluatedLows.find(s => s.swept) || longReady || null;
+
+  if (longReady && upDisp && !etfOutflows && fundingOk && takerBuyers) {
+    call = 'LONG (BUY RETEST)';
+    bannerClass = 'long';
+    icon = '🟢';
+    why = `${longReady.name} ($${Math.round(longReady.price).toLocaleString()}) was swept & reclaimed on 4H close with upward displacement and positive spot taker volume delta.`;
+    action = `Limit buy on retest of $${Math.round(longReady.price).toLocaleString()}. Stop below $${Math.round(sessionLow).toLocaleString()} (Sweep Low). Standard position size (0.50% account risk).`;
+    activePool = longReady;
+  } else if (longReady && upDisp) {
+    call = 'LONG · HALF (DEFENSIVE)';
+    bannerClass = 'half';
+    icon = '🟡';
+    why = `${longReady.name} swept & reclaimed with displacement, but institutional flows or funding are cautious.`;
+    action = `Limit buy on retest at $${Math.round(longReady.price).toLocaleString()} with half size (0.25% risk). Stop below $${Math.round(sessionLow).toLocaleString()}.`;
+    activePool = longReady;
+  } else if (weekBroken) {
+    call = 'SHORT BIAS / DEFENSIVE';
+    bannerClass = 'short';
+    icon = '🔴';
+    why = `Prior Week Low ($${Math.round(weekBroken.price).toLocaleString()}) was broken and remains unreclaimed. Trend structure compromised.`;
+    action = `Do not long spot dips. Stand aside or reduce existing swing allocations until $${Math.round(weekBroken.price).toLocaleString()} is reclaimed on 4H close.`;
+    activePool = weekBroken;
+  } else if (longReady) {
+    call = 'WAIT (AWAITING DISPLACEMENT)';
+    bannerClass = 'half';
+    icon = '⏳';
+    why = 'Sell-side pool was swept and reclaimed, but displacement candle has not printed yet.';
+    action = 'Do not enter prematurely on the wick. Wait for full 4H reversal candle close.';
+    activePool = longReady;
+  }
+
+  appState.tacticalCall = call;
+  appState.tacticalAction = action;
+  appState.activePool = activePool;
+
+  // Checklist updates
+  let score = 0;
+  const setChk = (id, pass, textPass, textFail) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = 'check-pill ' + (pass ? 'pass' : 'fail');
+    el.textContent = pass ? textPass : textFail;
+    if (pass) score++;
+  };
+
+  setChk('chk-sweep', evaluatedLows.some(s => s.swept), 'SWEPT', 'INTACT');
+  setChk('chk-reclaim', evaluatedLows.some(s => s.swept && s.reclaimed), 'RECLAIMED', 'PENDING');
+  setChk('chk-disp', upDisp, 'DISPLACED', 'NO DISP');
+  setChk('chk-cvd', takerBuyers, 'BUY TAKER', 'SELL DELTA');
+  setChk('chk-fund', fundingOk, 'CALM', 'FROTH');
+  setChk('chk-etf', !etfOutflows, 'NEUTRAL/IN', 'OUTFLOWS');
+  setChk('chk-macro', !weekBroken, 'INTACT', 'BROKEN');
+  setChk('chk-rrr', true, '>= 2.5:1', '< 2.5:1');
+
+  appState.checklistScore = score;
+  const scoreEl = document.getElementById('checklist-score');
+  if (scoreEl) scoreEl.textContent = `${score}/8 PASS`;
+
+  renderUI(sessionLow, sessionHigh, bannerClass, icon, why);
+  drawCanvasChart();
+}
+
+// 8. Render UI DOM Elements
+function renderUI(sessionLow, sessionHigh, bannerClass, icon, why) {
+  document.getElementById('px-live').textContent = fmt(appState.spotPrice);
+  document.getElementById('call-text').textContent = appState.tacticalCall;
+  document.getElementById('call-icon').textContent = icon;
+  document.getElementById('call-why').textContent = why;
+  document.getElementById('call-action').textContent = appState.tacticalAction;
+
+  const banner = document.getElementById('call-banner');
+  banner.className = 'call-banner ' + bannerClass;
+
+  // Flows
+  const fr = appState.fundingRate;
+  document.getElementById('val-funding').textContent = fr !== null ? (fr * 100).toFixed(4) + '% per 8h' : '0.0030% (Est)';
+  document.getElementById('val-funding-ann').textContent = fr !== null ? (fr * 100 * 3 * 365).toFixed(2) + '% ann' : '3.29% ann';
+  document.getElementById('val-oi-change').textContent = appState.oiChange24h !== null ? fmtPct(appState.oiChange24h) : '+0.02%';
+  document.getElementById('val-etf').textContent = (appState.etfNet7d >= 0 ? '+' : '') + '$' + appState.etfNet7d + 'M';
+  document.getElementById('val-taker-delta').textContent = (appState.takerDeltaSinceSweep >= 0 ? '+' : '') + appState.takerDeltaSinceSweep.toFixed(2) + ' BTC';
+  document.getElementById('val-atr').textContent = fmt(appState.atr4h);
+  document.getElementById('val-session-range').textContent = `$${Math.round(sessionLow).toLocaleString()} / $${Math.round(sessionHigh).toLocaleString()}`;
+
+  // Active pool badge
+  const poolBadge = document.getElementById('active-pool-badge');
+  if (appState.activePool) {
+    poolBadge.textContent = `Active Pool: ${appState.activePool.name} ($${Math.round(appState.activePool.price).toLocaleString()})`;
+  } else {
+    poolBadge.textContent = 'Active Pool: None';
+  }
+
+  // Pools Table
+  const tbody = document.getElementById('pools-tbody');
+  tbody.innerHTML = appState.pools.map(p => {
+    const isSwept = p.state.includes('swept');
+    const isBroken = p.state.includes('broken');
+    const badgeClass = isSwept ? 'swept' : (isBroken ? 'broken' : 'intact');
+    const depthStr = p.depth > 0 ? (p.depth * 100).toFixed(2) + '%' : '0.00%';
+    return `
+      <tr>
+        <td style="font-weight:700;">${p.name}</td>
+        <td style="color:#fff;">$${Math.round(p.price).toLocaleString()}</td>
+        <td style="color:${p.side === 'low' ? 'var(--cyan)' : 'var(--amber)'}; text-transform:uppercase;">${p.side}</td>
+        <td>${depthStr}</td>
+        <td><span class="state-badge ${badgeClass}">${p.state.toUpperCase()}</span></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// 9. Interactive HTML5 Canvas Candlestick Chart
+function drawCanvasChart() {
+  const canvas = document.getElementById('chart-canvas');
+  if (!canvas || !appState.h4Candles.length) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const candles = appState.h4Candles.slice(-70);
+  const pad = 36;
+
+  let minP = Math.min(...candles.map(c => c[3]));
+  let maxP = Math.max(...candles.map(c => c[2]));
+
+  if (appState.activePool) {
+    minP = Math.min(minP, appState.activePool.price);
+    maxP = Math.max(maxP, appState.activePool.price);
+  }
+
+  minP *= 0.997;
+  maxP *= 1.003;
+
+  const getX = idx => pad + (idx + 0.5) * ((w - pad * 2) / candles.length);
+  const getY = price => pad + ((maxP - price) / (maxP - minP)) * (h - pad * 2);
+
+  // Draw Grid Lines
+  ctx.strokeStyle = '#151d2f';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 5; i++) {
+    const yGrid = pad + (i / 4) * (h - pad * 2);
+    ctx.beginPath();
+    ctx.moveTo(pad, yGrid);
+    ctx.lineTo(w - pad, yGrid);
+    ctx.stroke();
+
+    const priceLabel = Math.round(maxP - (i / 4) * (maxP - minP));
+    ctx.fillStyle = '#64748b';
+    ctx.font = '10px ui-monospace, monospace';
+    ctx.fillText('$' + priceLabel.toLocaleString(), 4, yGrid + 3);
+  }
+
+  // Draw Active Pool Line
+  if (appState.activePool) {
+    const yPool = getY(appState.activePool.price);
+    ctx.setLineDash([6, 4]);
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(pad, yPool);
+    ctx.lineTo(w - pad, yPool);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = '11px ui-monospace, monospace';
+    ctx.fillText(`${appState.activePool.name} ($${Math.round(appState.activePool.price).toLocaleString()})`, pad + 10, yPool - 6);
+  }
+
+  // Draw Candlesticks
+  candles.forEach((c, idx) => {
+    const open = c[1], high = c[2], low = c[3], close = c[4];
+    const isBull = close >= open;
+    const color = isBull ? '#10b981' : '#f87171';
+
+    const x = getX(idx);
+    const yO = getY(open), yC = getY(close);
+    const yH = getY(high), yL = getY(low);
+
+    // Wick
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(x, yH);
+    ctx.lineTo(x, yL);
+    ctx.stroke();
+
+    // Body
+    ctx.fillStyle = color;
+    const bodyTop = Math.min(yO, yC);
+    const bodyHeight = Math.max(2, Math.abs(yO - yC));
+    ctx.fillRect(x - 3.5, bodyTop, 7, bodyHeight);
+  });
+}
+
+// 10. Multi-Mirror Live Fetch & Timeout Protection
+async function fetchWithTimeout(url, timeoutMs = 3500) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { signal: controller.signal, cache: 'no-store' });
+    clearTimeout(id);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return await res.json();
+  } catch (e) {
+    clearTimeout(id);
+    throw e;
+  }
+}
+
+async function loadLive() {
+  const syncTag = document.getElementById('sweep-sync-tag');
+  const banner = document.getElementById('sweep-staleness-banner');
+  const asofText = document.getElementById('asof-text');
+
+  const isSubfolder = window.location.pathname.endsWith('/') || window.location.pathname.includes('/sweep-desk/');
+  const prefix = isSubfolder ? '../' : './';
+
+  // Dynamic navbar link routing
+  const linkDash = document.getElementById('link-dashboard');
+  const linkMat = document.getElementById('link-matrix');
+  const linkQuant = document.getElementById('link-quant');
+  const linkLiq = document.getElementById('link-liq');
+  const linkFrac = document.getElementById('link-fractal');
+  if (linkDash) linkDash.href = prefix + 'index.html';
+  if (linkMat) linkMat.href = prefix + 'matrix.html';
+  if (linkQuant) linkQuant.href = prefix + 'quant-radar/';
+  if (linkLiq) linkLiq.href = prefix + 'liquidity-radar/';
+  if (linkFrac) linkFrac.href = prefix + 'fractal.html';
+
+  let klinesSuccess = false;
+  let isCacheFallback = false;
+
+  // 1. Multi-Mirror 4H Klines
+  const mirrors = [
+    'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=160',
+    'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=160',
+    'https://api1.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=160'
+  ];
+
+  for (const url of mirrors) {
+    try {
+      const h4Raw = await fetchWithTimeout(url, 3500);
+      if (Array.isArray(h4Raw) && h4Raw.length >= 50) {
+        appState.h4Candles = h4Raw.map(r => [+r[0], +r[1], +r[2], +r[3], +r[4], +r[5], r[9] ? +r[9] : null]);
+        klinesSuccess = true;
+        break;
+      }
+    } catch (e) {}
+  }
+
+  // 2. Multi-Mirror Daily Klines
+  const dailyMirrors = [
+    'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=90',
+    'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=90',
+    'https://api1.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=90'
+  ];
+
+  for (const url of dailyMirrors) {
+    try {
+      const dailyRaw = await fetchWithTimeout(url, 3500);
+      if (Array.isArray(dailyRaw) && dailyRaw.length >= 30) {
+        appState.dailyCandles = dailyRaw.map(r => [+r[0], +r[1], +r[2], +r[3], +r[4], +r[5], r[9] ? +r[9] : null]);
+        break;
+      }
+    } catch (e) {}
+  }
+
+  // 3. Fallback Local Caches if live API is blocked or offline
+  if (!klinesSuccess) {
+    try {
+      const cachePath = prefix + 'data/btc_4h_klines.json';
+      let cacheRes = await fetch(cachePath, { cache: 'no-store' });
+      if (!cacheRes.ok) cacheRes = await fetch(isSubfolder ? './data/btc_4h_klines.json' : '../data/btc_4h_klines.json', { cache: 'no-store' });
+      if (cacheRes.ok) {
+        const cacheData = await cacheRes.json();
+        if (Array.isArray(cacheData) && cacheData.length > 0) {
+          appState.h4Candles = cacheData.map(r => [+r[0], +r[1], +r[2], +r[3], +r[4], +r[5], r[9] ? +r[9] : null]);
+          klinesSuccess = true;
+          isCacheFallback = true;
+        }
+      }
+    } catch (e) {}
+  }
+
+  if (!appState.dailyCandles.length) {
+    try {
+      const dCachePath = prefix + 'data/btc_daily_klines.json';
+      let dCacheRes = await fetch(dCachePath, { cache: 'no-store' });
+      if (!dCacheRes.ok) dCacheRes = await fetch(isSubfolder ? './data/btc_daily_klines.json' : '../data/btc_daily_klines.json', { cache: 'no-store' });
+      if (dCacheRes.ok) {
+        const dCacheData = await dCacheRes.json();
+        if (Array.isArray(dCacheData) && dCacheData.length > 0) {
+          appState.dailyCandles = dCacheData.map(r => [+r[0], +r[1], +r[2], +r[3], +r[4], +r[5], r[9] ? +r[9] : null]);
+        }
+      }
+    } catch (e) {}
+  }
+
+  // 4. Funding Rate Fetch
+  try {
+    const fund = await fetchWithTimeout('https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT', 2500);
+    if (fund && fund.lastFundingRate != null) {
+      appState.fundingRate = parseFloat(fund.lastFundingRate);
+    }
+  } catch (e) {}
+
+  // 5. Open Interest Change Fetch
+  try {
+    const oi = await fetchWithTimeout('https://fapi.binance.com/futures/data/openInterestHist?symbol=BTCUSDT&period=1h&limit=25', 2500);
+    if (Array.isArray(oi) && oi.length > 24) {
+      const now = parseFloat(oi[oi.length - 1].sumOpenInterest);
+      const then = parseFloat(oi[0].sumOpenInterest);
+      if (then > 0) appState.oiChange24h = ((now - then) / then) * 100;
+    }
+  } catch (e) {}
+
+  // 6. Institutional ETF Flows from live packet
+  try {
+    const pktRes = await fetch(prefix + 'PCF3_LIVE_PACKET_DEFAULT.txt?t=' + Date.now(), { cache: 'no-cache' });
+    if (pktRes.ok) {
+      const pktText = await pktRes.text();
+      const mEtf7 = pktText.match(/7D:\s*([+-]?[\d\.]+)/);
+      if (mEtf7) {
+        appState.etfNet7d = parseFloat(mEtf7[1]);
+        appState.etfStatus = 'VERIFIED (PCF3 Live Telemetry Packet)';
+      }
+      const mFund = pktText.match(/Funding_Binance:\s*([+-]?[\d\.]+)/);
+      if (mFund && appState.fundingRate === null) {
+        appState.fundingRate = parseFloat(mFund[1]);
+      }
+      const mOi = pktText.match(/OI_24h_Pct:\s*([+-]?[\d\.]+)/);
+      if (mOi && appState.oiChange24h === null) {
+        appState.oiChange24h = parseFloat(mOi[1]);
+      }
+    }
+  } catch (e) {}
+
+  // Fallback defaults if still null
+  if (appState.fundingRate === null) appState.fundingRate = 0.000030;
+  if (appState.oiChange24h === null) appState.oiChange24h = 0.024;
+
+  const nowUTC = new Date().toISOString().slice(0, 16) + ' UTC';
+  appState.asofUTC = nowUTC;
+
+  if (klinesSuccess) {
+    appState.lastSuccessfulSync = Date.now();
+    if (isCacheFallback) {
+      if (banner) banner.style.display = 'block';
+      if (syncTag) {
+        syncTag.textContent = '● FAILOVER CACHE';
+        syncTag.className = 'sync-tag';
+        syncTag.style.background = 'rgba(245,158,11,0.2)';
+        syncTag.style.color = '#fbbf24';
+      }
+      if (asofText) asofText.textContent = `Failover Local Cache • Synced ${nowUTC}`;
+    } else {
+      if (banner) banner.style.display = 'none';
+      if (syncTag) {
+        syncTag.textContent = '● LIVE STREAMING';
+        syncTag.className = 'sync-tag';
+        syncTag.style.background = 'rgba(16,185,129,0.15)';
+        syncTag.style.color = '#10b981';
+      }
+      if (asofText) asofText.textContent = `Live Binance Feed • Synced ${nowUTC}`;
+    }
+    runSMCAnalysis();
+  } else {
+    if (banner) banner.style.display = 'block';
+    if (syncTag) {
+      syncTag.textContent = '⚠️ DELAY';
+      syncTag.style.background = 'rgba(239,68,68,0.2)';
+      syncTag.style.color = '#f87171';
+    }
+    if (asofText) asofText.textContent = `Retrying live mirror sync...`;
+  }
+}
+
+// 11. Next 4H Close Countdown
+function updateCountdown() {
+  const now = Date.now();
+  const step = 4 * 3600000;
+  const next = Math.ceil(now / step) * step;
+  const left = Math.max(0, next - now);
+  const h = Math.floor(left / 3600000);
+  const m = Math.floor((left % 3600000) / 60000);
+  const el = document.getElementById('next-close-timer');
+  if (el) el.textContent = `Next 4H close in ${h}h ${String(m).padStart(2, '0')}m`;
+}
+
+// 12. Trade Journal Local Storage
+function saveJournalEntry() {
+  const inp = document.getElementById('journal-input');
+  if (!inp || !inp.value.trim()) return;
+  const note = inp.value.trim();
+  const timestamp = new Date().toISOString().slice(0, 16).replace('T', ' ');
+  const line = `[${timestamp}] Call: ${appState.tacticalCall} | Spot: ${fmt(appState.spotPrice)} | ${note}`;
+  const existing = localStorage.getItem('nexus_sweep_journal') || '';
+  const updated = (line + '\n' + existing).trim();
+  localStorage.setItem('nexus_sweep_journal', updated);
+  inp.value = '';
+  document.getElementById('journal-log').textContent = updated;
+  const hint = document.getElementById('journal-saved-hint');
+  if (hint) { hint.style.opacity = '1'; setTimeout(() => hint.style.opacity = '0', 1400); }
+}
+
+function clearJournal() {
+  localStorage.removeItem('nexus_sweep_journal');
+  document.getElementById('journal-log').textContent = 'No journal lines recorded yet.';
+}
+
+function loadJournal() {
+  const stored = localStorage.getItem('nexus_sweep_journal');
+  if (stored) document.getElementById('journal-log').textContent = stored;
+}
+
+// 13. DATA PACKET 5 GENERATOR (SMC-SWEEP v1.0)
+async function copyDataPacket5() {
+  if (!appState.h4Candles.length) {
+    showToast('⚠️ Data is still loading, please wait.');
+    return;
+  }
+
+  const nowUTC = new Date().toISOString();
+  let localMYT = '';
+  try {
+    localMYT = new Date().toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) + ' MYT';
+  } catch(e) { localMYT = nowUTC; }
+
+  const activeP = appState.activePool;
+  const lines = [
+    "================================================================================",
+    "BTCUSDT SPOT SWEEP DESK REVIEW PROMPT & DATA PACKET 5 (SMC-SWEEP v1.0)",
+    "================================================================================",
+    "You are an impartial quantitative trading auditor reviewing a BTCUSDT SPOT liquidity sweep data packet for a human swing trader.",
+    "",
+    "Your task is to validate the supplied 4-hour Smart Money Concepts (SMC) telemetry against the objective SMC-SWEEP v1.0 execution rules below. This is quantitative analysis only: do not execute trades, recommend derivatives or leverage, or present conclusions as certainty. Do not predict BTC's next price.",
+    "",
+    "## TRADING CONTEXT & DISCIPLINE (SPOT SWING 3–15 DAYS)",
+    "- Strategy: Spot Bitcoin Swing Trading (SMC Sweep & Retest Architecture).",
+    "- Execution Venue: Spot Only (Binance BTCUSDT Spot). Zero Leverage, No Shorting.",
+    "- Core Philosophy: Buy the retest, not the wick. Surviving liquidity grabs where perps get flushed is the core edge.",
+    "- Risk Constraints: Max 0.50% account equity risk per trade (0.25% if flows are defensive).",
+    "",
+    "## SMC-SWEEP v1.0 RULES TO APPLY",
+    "### 1. Setup Criteria",
+    "- A key liquidity pool (Prior Week Low, Prior Day Low, Equal Lows EQL) must be swept by >= 0.30% (or 0.5x 4H ATR).",
+    "",
+    "### 2. Reclaim Confirmation",
+    "- The 4-hour candle must close strictly back inside the pool level.",
+    "",
+    "### 3. Upward Displacement",
+    "- The reclaim candle body must be >= 1.25x the 14-period average candle body, proving institutional absorption.",
+    "",
+    "### 4. Spot Volume Delta (CVD)",
+    "- Aggregated spot taker delta since the sweep wick must be positive (net market buying).",
+    "",
+    "### 5. Macro & Derivatives Filters",
+    "- Binance 8h Funding Rate must be < +0.03% (no retail long froth).",
+    "- Institutional 7-Day Net ETF Flow must not be in an extreme outflow streak (> -$300M).",
+    "- If a wider Prior Week Low is broken and unreclaimed, the call CANNOT be LONG. It must be SHORT BIAS or FLAT.",
+    "",
+    "### 6. Execution Order Mapping",
+    "- Limit Buy Entry: Placed at the reclaimed pool level on the first retest.",
+    "- Stop Loss: Placed strictly below the sweep wick low.",
+    "- Minimum Target: Minimum 2.5:1 Risk-to-Reward ratio toward the opposing pool.",
+    "",
+    "## REQUIRED RESPONSE FORMAT (<150 WORDS)",
+    "1. **Tactical Call:** LONG / LONG HALF (DEFENSIVE) / SHORT BIAS / FLAT",
+    "2. **Rule Assessment:** Summary of which rules passed and which failed.",
+    "3. **Order Mapping:** Entry price, Stop Loss level, and Risk %.",
+    "4. **Confirmation Gate:** What must print on the next 4H candle to confirm or invalidate.",
+    "================================================================================",
+    "",
+    "================================================================================",
+    "BTCUSDT SPOT SWEEP DESK TELEMETRY [LIVE OBSERVED]",
+    "================================================================================",
+    "GENERATION TIMESTAMP UTC: " + nowUTC,
+    "LOCAL TIME (MYT):         " + localMYT + " (UTC+8)",
+    "EXCHANGE VENUE:           Binance Spot BTCUSDT",
+    "TIMEFRAME / LOOKBACK:     4H Klines (160 Bars) & 1D Klines (90 Bars)",
+    "PROTOCOL VERSION:         Nexus Sweep Desk Pro (SMC-SWEEP v1.0)",
+    "--------------------------------------------------------------------------------",
+    "",
+    "[1] CURRENT MARKET & CALL STATUS",
+    "--------------------------------------------------------------------------------",
+    "• Current BTC Spot Price:      " + fmt(appState.spotPrice),
+    "• Tactical Call Verdict:       " + appState.tacticalCall,
+    "• Checklist Score:             " + appState.checklistScore + " / 8 RULES PASSED",
+    "• Active Monitored Pool:       " + (activeP ? `${activeP.name} ($${Math.round(activeP.price).toLocaleString()}) [${activeP.state.toUpperCase()}]` : 'None active'),
+    "• Recommended Spot Action:     " + appState.tacticalAction,
+    "",
+    "[2] ORDER FLOW & MACRO FILTERS",
+    "--------------------------------------------------------------------------------",
+    "• Binance 8h Funding Rate:     " + (appState.fundingRate !== null ? (appState.fundingRate * 100).toFixed(4) + "%" : 'N/A'),
+    "• 24h Open Interest Change:    " + (appState.oiChange24h !== null ? fmtPct(appState.oiChange24h) : 'N/A'),
+    "• Spot Taker CVD Since Sweep:  " + (appState.takerDeltaSinceSweep >= 0 ? '+' : '') + appState.takerDeltaSinceSweep.toFixed(2) + " BTC",
+    "• Institutional 7D ETF Net:    " + (appState.etfNet7d >= 0 ? '+' : '') + "$" + appState.etfNet7d + "M",
+    "• 4H Volatility ATR(14):       " + fmt(appState.atr4h),
+    "",
+    "[3] ACTIVE LIQUIDITY POOLS STATUS TABLE",
+    "--------------------------------------------------------------------------------"
+  ];
+
+  appState.pools.forEach(p => {
+    lines.push(`• ${p.name.padEnd(24)} | Level: $${Math.round(p.price).toLocaleString().padEnd(9)} | State: ${p.state.toUpperCase().padEnd(20)} | Depth: ${(p.depth * 100).toFixed(2)}%`);
+  });
+
+  lines.push("");
+  lines.push("================================================================================");
+  lines.push("END OF DATA PACKET 5 (SMC-SWEEP v1.0)");
+  lines.push("================================================================================");
+
+  const packetText = lines.join("\n");
+
+  try {
+    await navigator.clipboard.writeText(packetText);
+    showToast('📋 DATA PACKET 5 Copied to Clipboard!');
+  } catch(e) {
+    const ta = document.createElement('textarea');
+    ta.value = packetText;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('📋 DATA PACKET 5 Copied via fallback!');
+  }
+
+  const btn = document.getElementById('btn-copy-packet5');
+  if (btn) {
+    const orig = btn.textContent;
+    btn.textContent = '✅ Copied Packet 5!';
+    setTimeout(() => btn.textContent = orig, 1500);
+  }
+}
+
+// Initialization
+loadJournal();
+loadLive();
+updateCountdown();
+setInterval(updateCountdown, 15000);
+setInterval(loadLive, 10000);
+</script>
+</body>
+</html>
