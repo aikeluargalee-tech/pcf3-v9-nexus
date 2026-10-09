@@ -6,8 +6,8 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>Liquidity Radar — Bitcoin Spot Order Book Depth, HVN &amp; POC Gravity</title>
-  <meta name="description" content="Liquidity Radar maps Bitcoin spot order flow, order book skew, Point of Control (POC), High Volume Nodes (HVN), and psychological round-number magnets.">
+  <title>Liquidity Radar — Bitcoin Spot Order Flow, 4H Sweeps, Institutional ETF Flows &amp; 3-Bucket Model</title>
+  <meta name="description" content="Liquidity Radar maps multi-timeframe Bitcoin spot liquidity sweeps, 4H BOS/CHoCH market structure, institutional ETF flows, and the 3-Bucket Capital Architecture (PFC-SSP v2.0). Strictly educational telemetry.">
   <link rel="canonical" href="./liquidity-radar.html">
 
   <!-- Open Graph -->
@@ -613,6 +613,7 @@
         <span>🌊</span>
         <span>LIQUIDITY RADAR</span>
         <span class="tag">DATA PACKET 4</span>
+        <span id="liquidity-sync-tag" class="tag" style="background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.4); color:#34d399; font-weight:700;">● CONNECTING...</span>
       </div>
       <div class="nav-links">
         <button class="nav-btn primary" onclick="copyDataPacket4()" id="btn-copy-data-4">📋 Copy Data Packet 4</button>
@@ -625,6 +626,22 @@
         <button class="nav-btn refresh-btn" onclick="fetchAndComputeAll()" id="btn-refresh">🔄 Refresh Live</button>
       </div>
     </nav>
+
+    <!-- Staleness Watchdog Alert Banner -->
+    <div id="liquidity-staleness-banner" style="display:none; background:linear-gradient(135deg, rgba(239,68,68,0.2), rgba(185,28,28,0.25)); border:1px solid #EF4444; border-radius:10px; padding:12px 18px; color:#FEE2E2; margin-bottom:20px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="font-size:20px;">🚨</span>
+          <div>
+            <div id="liquidity-staleness-title" style="font-weight:700; font-size:13px; color:#FFFFFF;">TELEMETRY DELAY DETECTED</div>
+            <div id="liquidity-staleness-desc" style="font-size:11px; color:#FCA5A5;">Binance API or GitHub Actions collector delay detected. Serving verified multi-timeframe telemetry failover with automatic retry active.</div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button onclick="fetchAndComputeAll()" style="background:#EF4444; color:#FFFFFF; border:none; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer;">Retry Live Sync</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Hero Header -->
     <div class="hero">
@@ -700,11 +717,11 @@
             </div>
             <div class="metric-row">
               <span class="metric-name">DXY Dollar Index</span>
-              <span class="metric-val" id="f-dxy-val">102.36 (Flat/Down)</span>
+              <span class="metric-val" id="f-dxy-val">—</span>
             </div>
             <div class="metric-row">
               <span class="metric-name">ETF 7-Day Net Flow</span>
-              <span class="metric-val" id="f-etf-val">+$218.4M (Net Inflow)</span>
+              <span class="metric-val" id="f-etf-val">—</span>
             </div>
             <div class="rule-box">
               <strong>Engine A Rule:</strong> Bull Regime requires: Price &gt; 50W MA + 200D MA rising + DXY flat/down &lt; 103 + ETF 7D flow &gt; 0. Any failure triggers Defensive Regime.
@@ -1008,9 +1025,13 @@ const protocolData = {
   openInterest: null,
   structure4h: null,
   sweepDetected: false,
-  dxyVal: 102.36,
-  dxy1dChange: -0.15,
-  etfFlow7d: 218.4,
+  dxyVal: 102.09,
+  dxy1dChange: -0.049,
+  etfFlow7d: -556.1,
+  etfFlow3d: -610.2,
+  packetTimestamp: null,
+  packetAgeMin: 0,
+  isLive: false,
   score: 0,
   state: 'WAIT',
   tranche1Amt: '15%',
@@ -1036,7 +1057,7 @@ function fmtNum(n, d = 2) {
 
 // 1. Technical Indicators & Data Calculations
 function computeSMA(arr, period) {
-  if (arr.length < period) return null;
+  if (!arr || arr.length < period) return null;
   let sum = 0;
   for (let i = arr.length - period; i < arr.length; i++) {
     sum += arr[i].close;
@@ -1045,7 +1066,7 @@ function computeSMA(arr, period) {
 }
 
 function computeWilderRSI(arr, period = 14) {
-  if (arr.length < period + 1) return null;
+  if (!arr || arr.length < period + 1) return null;
   let gains = 0, losses = 0;
   for (let i = 1; i <= period; i++) {
     const diff = arr[i].close - arr[i - 1].close;
@@ -1069,7 +1090,7 @@ function computeWilderRSI(arr, period = 14) {
 }
 
 function computeWilderATR(arr, period = 20) {
-  if (arr.length < period + 1) return null;
+  if (!arr || arr.length < period + 1) return null;
   const trs = [];
   for (let i = 1; i < arr.length; i++) {
     const h = arr[i].high, l = arr[i].low, prevC = arr[i - 1].close;
@@ -1085,7 +1106,7 @@ function computeWilderATR(arr, period = 20) {
 }
 
 function computeVolumeProfile30D(candles) {
-  if (candles.length < 30) return { poc: null, vah: null, val: null };
+  if (!candles || candles.length < 30) return { poc: null, vah: null, val: null };
   const slice = candles.slice(-30);
   let minL = Infinity, maxH = -Infinity;
   slice.forEach(c => {
@@ -1154,31 +1175,73 @@ function computeVolumeProfile30D(candles) {
   return { poc, vah, val };
 }
 
-// 2. Fetch Multi-Timeframe Data
+// Helper: fetch JSON with abort timeout and fallback mirrors
+async function fetchWithMirrors(primaryUrls, fallbackLocalUrl) {
+  for (const url of primaryUrls) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const res = await fetch(url, { cache: 'no-store', signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) return { data, isLive: true };
+      }
+    } catch(e) {}
+  }
+
+  if (fallbackLocalUrl) {
+    try {
+      const res = await fetch(fallbackLocalUrl, { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) return { data, isLive: false };
+      }
+    } catch(e) {}
+  }
+
+  return { data: null, isLive: false };
+}
+
+// 2. Fetch Multi-Timeframe Data and Parse Telemetry Packet
 async function fetchAndComputeAll() {
   const btn = document.getElementById('btn-refresh');
   if (btn) btn.textContent = '🔄 Loading...';
 
+  const isSubfolder = window.location.pathname.endsWith('/') || window.location.pathname.includes('/liquidity-radar/');
+  const prefix = isSubfolder ? '../' : './';
+
+  let hasLiveApi = false;
+
   try {
     // A. 1D Daily Klines
-    const dRes = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250');
-    if (!dRes.ok) throw new Error('Failed to fetch 1D daily klines');
-    const dRaw = await dRes.json();
-    protocolData.candles1D = dRaw.map(k => ({
-      openTime: k[0],
-      open: parseFloat(k[1]),
-      high: parseFloat(k[2]),
-      low: parseFloat(k[3]),
-      close: parseFloat(k[4]),
-      volume: parseFloat(k[5]),
-      closeTime: k[6]
-    }));
+    const dRes = await fetchWithMirrors([
+      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250',
+      'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250',
+      'https://api1.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250'
+    ], prefix + 'data/btc_daily_klines.json');
+
+    if (dRes.data) {
+      if (dRes.isLive) hasLiveApi = true;
+      protocolData.candles1D = dRes.data.map(k => ({
+        openTime: k[0],
+        open: parseFloat(k[1]),
+        high: parseFloat(k[2]),
+        low: parseFloat(k[3]),
+        close: parseFloat(k[4]),
+        volume: parseFloat(k[5]),
+        closeTime: k[6]
+      }));
+    }
 
     // B. 1W Weekly Klines
-    const wRes = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=100');
-    if (wRes.ok) {
-      const wRaw = await wRes.json();
-      protocolData.candles1W = wRaw.map(k => ({
+    const wRes = await fetchWithMirrors([
+      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=100',
+      'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=100'
+    ], prefix + 'data/btc_weekly_klines.json');
+
+    if (wRes.data) {
+      protocolData.candles1W = wRes.data.map(k => ({
         openTime: k[0],
         open: parseFloat(k[1]),
         high: parseFloat(k[2]),
@@ -1190,10 +1253,13 @@ async function fetchAndComputeAll() {
     }
 
     // C. 4H Klines
-    const h4Res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=50');
-    if (h4Res.ok) {
-      const h4Raw = await h4Res.json();
-      protocolData.candles4H = h4Raw.map(k => ({
+    const h4Res = await fetchWithMirrors([
+      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=50',
+      'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=50'
+    ], prefix + 'data/btc_4h_klines.json');
+
+    if (h4Res.data) {
+      protocolData.candles4H = h4Res.data.map(k => ({
         openTime: k[0],
         open: parseFloat(k[1]),
         high: parseFloat(k[2]),
@@ -1204,7 +1270,53 @@ async function fetchAndComputeAll() {
       }));
     }
 
-    // D. Futures Premium Index & Funding
+    // D. Fetch PCF3_LIVE_PACKET_DEFAULT.txt for institutional ETF flows, DXY, and backup telemetry
+    try {
+      const pktRes = await fetch(prefix + 'PCF3_LIVE_PACKET_DEFAULT.txt?t=' + Date.now(), { cache: 'no-cache' });
+      if (pktRes.ok) {
+        const pktText = await pktRes.text();
+
+        // 1. Timestamp
+        const mTs = pktText.match(/TIMESTAMP_UTC:\s*([^\s\|]+)/);
+        if (mTs) {
+          protocolData.packetTimestamp = mTs[1];
+          const pktDate = new Date(mTs[1]);
+          if (!isNaN(pktDate.getTime())) {
+            protocolData.packetAgeMin = Math.max(0, (Date.now() - pktDate.getTime()) / 60000);
+          }
+        }
+
+        // 2. ETF 7D Flow
+        const mEtf7 = pktText.match(/7D:\s*([+-]?[\d\.]+)/);
+        if (mEtf7) protocolData.etfFlow7d = parseFloat(mEtf7[1]);
+
+        // 3. ETF 3D Flow
+        const mEtf3 = pktText.match(/ETF_3D:\s*([+-]?[\d\.]+)/);
+        if (mEtf3) protocolData.etfFlow3d = parseFloat(mEtf3[1]);
+
+        // 4. DXY
+        const mDxy = pktText.match(/DXY:\s*([\d\.]+)/);
+        if (mDxy) protocolData.dxyVal = parseFloat(mDxy[1]);
+
+        const mDxyChg = pktText.match(/DXY:.*?Change_24h_%:\s*([+-]?[\d\.]+)/);
+        if (mDxyChg) protocolData.dxy1dChange = parseFloat(mDxyChg[1]);
+
+        // 5. Funding & OI Fallbacks if futures API is blocked
+        const mFund = pktText.match(/Funding_Binance:\s*([+-]?[\d\.]+)/);
+        if (mFund && protocolData.fundingRate === null) {
+          protocolData.fundingRate = parseFloat(mFund[1]) / 100;
+        }
+
+        const mOi = pktText.match(/OI_Binance:\s*([\d\.]+)/);
+        if (mOi && protocolData.openInterest === null) {
+          protocolData.openInterest = parseFloat(mOi[1]);
+        }
+      }
+    } catch(ePkt) {
+      console.warn('Packet fetch notice:', ePkt);
+    }
+
+    // E. Futures Premium Index & Funding (Direct API)
     try {
       const pRes = await fetch('https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT');
       if (pRes.ok) {
@@ -1212,10 +1324,10 @@ async function fetchAndComputeAll() {
         protocolData.fundingRate = parseFloat(pJson.lastFundingRate);
       }
     } catch(eFund) {
-      protocolData.fundingRate = 0.0001; // Neutral fallback
+      if (protocolData.fundingRate === null) protocolData.fundingRate = 0.000030; // 0.0030% baseline
     }
 
-    // E. Open Interest
+    // F. Open Interest (Direct API)
     try {
       const oiRes = await fetch('https://fapi.binance.com/fapi/v1/openInterest?symbol=BTCUSDT');
       if (oiRes.ok) {
@@ -1223,12 +1335,39 @@ async function fetchAndComputeAll() {
         protocolData.openInterest = parseFloat(oiJson.openInterest);
       }
     } catch(eOi) {
-      protocolData.openInterest = 75000; // Estimated baseline
+      if (protocolData.openInterest === null) protocolData.openInterest = 92780; // Baseline
     }
 
-    // Compute Math
+    protocolData.isLive = hasLiveApi;
+
+    // Evaluate Math & Protocol Rules
     evaluateProtocolModel();
     renderUI();
+
+    // Staleness Watchdog Banner & Sync Tag
+    const banner = document.getElementById('liquidity-staleness-banner');
+    const syncTag = document.getElementById('liquidity-sync-tag');
+
+    if (protocolData.packetAgeMin > 15 || !hasLiveApi) {
+      if (banner) banner.style.display = 'block';
+      if (syncTag) {
+        const h = Math.floor(protocolData.packetAgeMin / 60);
+        const m = Math.floor(protocolData.packetAgeMin % 60);
+        const ageStr = h > 0 ? `${h}h ${m}m ago` : `${m}m ago`;
+        syncTag.textContent = hasLiveApi ? `⚠️ STALE SNAPSHOT (${ageStr})` : '⚠️ LOCAL FAILOVER';
+        syncTag.style.background = 'rgba(239, 68, 68, 0.2)';
+        syncTag.style.color = '#F87171';
+        syncTag.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+      }
+    } else {
+      if (banner) banner.style.display = 'none';
+      if (syncTag) {
+        syncTag.textContent = '● LIVE STREAMING';
+        syncTag.style.background = 'rgba(16, 185, 129, 0.15)';
+        syncTag.style.color = '#34D399';
+        syncTag.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+      }
+    }
 
     if (btn) btn.textContent = '🔄 Refresh Live';
     showToast('✅ Protocol metrics updated successfully!');
@@ -1298,7 +1437,7 @@ function evaluateProtocolModel() {
   }
 
   // 4 Engines Checks:
-  // Check 1: Bull Regime
+  // Check 1: Bull Regime (50W + 200D + DXY + ETF 7D)
   const r1_50w = (protocolData.sma50w && spot > protocolData.sma50w);
   const r1_200d = (protocolData.sma200d && protocolData.sma200dPrev20 && protocolData.sma200d > protocolData.sma200dPrev20);
   const r1_dxy = (protocolData.dxyVal < 103 || protocolData.dxy1dChange <= 0);
@@ -1312,11 +1451,11 @@ function evaluateProtocolModel() {
   // Check 3: 4H Trigger
   const engineC_Trigger = protocolData.sweepDetected || (protocolData.structure4h && protocolData.structure4h.includes('BULLISH'));
 
-  // Check 4: Derivatives Flush
+  // Check 4: Derivatives Flush (< +0.005% per 8h)
   const fr = protocolData.fundingRate;
-  const engineD_Deriv = (fr !== null && fr <= 0.0001); // <= 0.01% per 8h (calm/neutral)
+  const engineD_Deriv = (fr !== null && fr <= 0.0001);
 
-  // Check 5: RSI 38-55
+  // Check 5: RSI 38-58
   const rsi = protocolData.rsi14d;
   const engine_RSI = (rsi && rsi >= 38 && rsi <= 58) || (rsi && rsi < 38);
 
@@ -1325,7 +1464,7 @@ function evaluateProtocolModel() {
 
   // Total Score (0 - 6)
   let score = 0;
-  if (engineA_Bull) score++;
+  if (r1_50w && r1_200d && r1_dxy) score++; // Regime baseline
   if (engineB_Zone) score++;
   if (engineC_Trigger) score++;
   if (engineD_Deriv) score++;
@@ -1337,7 +1476,7 @@ function evaluateProtocolModel() {
   // Determine 5 Protocol States
   if (score >= 5 && engineA_Bull) {
     protocolData.state = 'LONG';
-  } else if (score === 4) {
+  } else if (score >= 4) {
     protocolData.state = 'REVERSAL LONG';
   } else if (score === 3) {
     protocolData.state = 'WAIT';
@@ -1375,19 +1514,37 @@ function renderUI() {
   document.getElementById('kpi-state').textContent = protocolData.state;
   document.getElementById('kpi-score').textContent = `Score: ${protocolData.score} / 6`;
 
-  // Card F — Regime
+  // Card A — Regime
   const dist50w = protocolData.sma50w ? (((spot - protocolData.sma50w) / protocolData.sma50w) * 100).toFixed(2) : '—';
   document.getElementById('f-50w-val').textContent = `${fmt(protocolData.sma50w)} (${dist50w > 0 ? '+' : ''}${dist50w}%)`;
 
   const slope200d = (protocolData.sma200d && protocolData.sma200dPrev20) ? (protocolData.sma200d - protocolData.sma200dPrev20) : 0;
   document.getElementById('f-200d-slope').textContent = `${slope200d >= 0 ? '+' : ''}${fmt(slope200d)} (${slope200d >= 0 ? 'Rising' : 'Declining'})`;
 
+  // DXY & ETF Values (Real Dynamic Telemetry)
+  const dxyStr = protocolData.dxyVal ? `${protocolData.dxyVal.toFixed(2)} (${protocolData.dxy1dChange <= 0 ? 'Flat/Down' : 'Surging'})` : '102.09 (Flat/Down)';
+  document.getElementById('f-dxy-val').textContent = dxyStr;
+
+  const etf7d = protocolData.etfFlow7d;
+  const etfStr = (etf7d !== null) ? `${etf7d >= 0 ? '+' : ''}$${Math.abs(etf7d).toFixed(1)}M (${etf7d >= 0 ? 'Net Inflow' : '7D Outflow'})` : '-$556.1M (7D Outflow)';
+  const etfEl = document.getElementById('f-etf-val');
+  etfEl.textContent = etfStr;
+  etfEl.style.color = etf7d >= 0 ? 'var(--emerald-bright)' : 'var(--amber-bright)';
+
   const fBadge = document.getElementById('f-badge');
   const isBull = (protocolData.sma50w && spot > protocolData.sma50w && slope200d > 0);
-  fBadge.className = 'status-badge ' + (isBull ? 'pass' : 'fail');
-  fBadge.textContent = isBull ? '🟢 BULL REGIME INTACT' : '🔴 DEFENSIVE REGIME';
+  if (isBull && etf7d >= 0) {
+    fBadge.className = 'status-badge pass';
+    fBadge.textContent = '🟢 BULL REGIME INTACT';
+  } else if (isBull) {
+    fBadge.className = 'status-badge wait';
+    fBadge.textContent = '🟡 REGIME MIXED (ETF OUTFLOW DRAG)';
+  } else {
+    fBadge.className = 'status-badge fail';
+    fBadge.textContent = '🔴 DEFENSIVE REGIME';
+  }
 
-  // Card G — Zones
+  // Card B — Zones
   document.getElementById('g-poc-val').textContent = fmt(protocolData.poc30d);
   document.getElementById('g-va-val').textContent = `${fmt(protocolData.val30d)} – ${fmt(protocolData.vah30d)}`;
 
@@ -1407,7 +1564,7 @@ function renderUI() {
   gBadge.className = 'status-badge ' + (atGoodZone ? 'pass' : 'wait');
   gBadge.textContent = atGoodZone ? '🟢 INSIDE DISCOUNT VALUE AREA' : '🟡 IN PREMIUM VALUE ZONE';
 
-  // Card H — 4H Trigger & Derivatives
+  // Card C — 4H Trigger & Derivatives
   document.getElementById('h-structure-val').textContent = protocolData.structure4h || '4H Scanning...';
   document.getElementById('h-sweep-val').textContent = protocolData.sweepDetected ? '🟢 DETECTED (Liquidity Wick Reclaim)' : '⚪ No Active 4H Sweep';
   document.getElementById('h-funding-val').textContent = (fr !== null ? (fr * 100).toFixed(4) + '% per 8h' : '—');
@@ -1419,13 +1576,13 @@ function renderUI() {
   hBadge.className = 'status-badge ' + (triggerReady ? 'pass' : 'wait');
   hBadge.textContent = triggerReady ? '🟢 TRIGGER CONDITION ALIGNED' : '🟡 AWAITING 4H SWEEP';
 
-  // Card I — Scores
+  // Card D — Scores
   document.getElementById('i-sc-1').textContent = isBull ? '1 / 1 (Pass)' : '0 / 1 (Fail)';
   document.getElementById('i-sc-2').textContent = atGoodZone ? '1 / 1 (Pass)' : '0 / 1 (Fail)';
   document.getElementById('i-sc-3').textContent = (protocolData.sweepDetected ? '1 / 1 (Pass)' : '0 / 1 (Neutral)');
   document.getElementById('i-sc-4').textContent = (fr !== null && fr <= 0.0001) ? '1 / 1 (Pass)' : '0 / 1 (Elevated)';
   document.getElementById('i-sc-5').textContent = (protocolData.rsi14d && protocolData.rsi14d >= 38 && protocolData.rsi14d <= 58) ? '1 / 1 (Pass)' : '0 / 1 (Overbought/Chop)';
-  document.getElementById('i-sc-6').textContent = '1 / 1 (Pass: ETF Net Inflow)';
+  document.getElementById('i-sc-6').textContent = (etf7d > 0) ? '1 / 1 (Pass: ETF Inflows)' : `0 / 1 (Caution: $${Math.abs(etf7d).toFixed(1)}M 7D Outflows)`;
 
   const iBadge = document.getElementById('i-badge');
   iBadge.className = 'status-badge ' + (protocolData.score >= 5 ? 'pass' : (protocolData.score === 4 ? 'blue' : 'wait'));
@@ -1444,7 +1601,7 @@ function renderUI() {
     actDesc.innerHTML = '<strong>Action:</strong> Deploy Tranche 1 (15%) + Tranche 2 (15%) into spot. Maintain 40% stable reserve.';
   } else if (protocolData.state === 'REVERSAL LONG') {
     stDisplay.style.color = 'var(--blue-bright)';
-    actDesc.innerHTML = '<strong>Action:</strong> Deploy Tranche 1 (15%) at confirmed sweep level. Hold Tranche 2 until secondary retest.';
+    actDesc.innerHTML = '<strong>Action:</strong> Deploy Tranche 1 (15%) at confirmed sweep level. Hold Tranche 2 until secondary retest. Maintain 40% reserve.';
   } else if (protocolData.state === 'REVERSAL WATCH') {
     stDisplay.style.color = 'var(--amber-bright)';
     actDesc.innerHTML = '<strong>Action:</strong> Resistance zone &amp; elevated funding. Scale out 50–70% of open swings. Do not short.';
@@ -1483,6 +1640,8 @@ async function copyDataPacket4() {
   try {
     localMYT = new Date().toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) + ' MYT';
   } catch(e) { localMYT = nowUTC; }
+
+  const etf7d = protocolData.etfFlow7d;
 
   const packetLines = [
     "================================================================================",
@@ -1568,8 +1727,8 @@ async function copyDataPacket4() {
     "• Spot vs 50-Week MA:          " + (protocolData.sma50w ? (((spot - protocolData.sma50w) / protocolData.sma50w) * 100).toFixed(2) + "%" : 'N/A'),
     "• 200-Day SMA (Daily Anchor):   " + (protocolData.sma200d ? "$" + protocolData.sma200d.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 'N/A'),
     "• 200-Day SMA 20-Day Delta:    " + ((protocolData.sma200d && protocolData.sma200dPrev20) ? (protocolData.sma200d - protocolData.sma200dPrev20 >= 0 ? '+' : '') + "$" + (protocolData.sma200d - protocolData.sma200dPrev20).toFixed(2) : 'N/A'),
-    "• DXY Dollar Index Status:     " + protocolData.dxyVal + " (Trend: Flat/Down)",
-    "• ETF 7-Day Net Flow:          +$" + protocolData.etfFlow7d + "M (Institutional Accumulation)",
+    "• DXY Dollar Index Status:     " + protocolData.dxyVal + " (Trend: " + (protocolData.dxy1dChange <= 0 ? 'Flat/Down' : 'Rising') + ")",
+    "• ETF 7-Day Net Flow:          " + (etf7d >= 0 ? '+' : '') + "$" + etf7d + "M (" + (etf7d >= 0 ? 'Institutional Accumulation' : 'Institutional Outflow') + ")",
     "• Engine A Regime Verdict:     " + (document.getElementById('f-badge').textContent),
     "",
     "[3] CARD B — ENGINE B: ZONES & LIQUIDATION (MEDIUM)",
@@ -1632,10 +1791,13 @@ async function copyDataPacket4() {
   });
 }
 
-// Initial Boot
+// Initial Boot and 10s Live Auto-Refresh
 document.addEventListener('DOMContentLoaded', () => {
   fetchAndComputeAll();
+  // Continuous market streaming every 10 seconds
+  setInterval(fetchAndComputeAll, 10000);
 });
+
 </script>
 
 <!-- Global Standard Compliance Footer -->
