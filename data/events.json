@@ -1,0 +1,84 @@
+{
+  "note": "Institutional Macro Event & Volatility Shock Ledger. A headline is not a buy. Blank prices were not fetched.",
+  "updated_utc": "2026-10-09T16:00:00Z",
+  "events": [
+    {
+      "id": "2026-10-27-fomc",
+      "time_utc": "2026-10-27T18:00:00Z",
+      "kind": "scheduled",
+      "label": "FOMC Interest Rate Decision & Press Conference",
+      "source": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+      "btc_before": null,
+      "btc_15m": null,
+      "btc_1h": null,
+      "btc_24h": null,
+      "daily_close_under_floor": null,
+      "wash_note": "Awaiting rate guidance and dot plot recalibration. High macro volatility expected."
+    },
+    {
+      "id": "2026-10-14-cpi",
+      "time_utc": "2026-10-14T12:30:00Z",
+      "kind": "scheduled",
+      "label": "US Consumer Price Index (CPI YoY/MoM)",
+      "source": "https://www.bls.gov/schedule/news_release/cpi.htm",
+      "btc_before": null,
+      "btc_15m": null,
+      "btc_1h": null,
+      "btc_24h": null,
+      "daily_close_under_floor": null,
+      "wash_note": "Headline CPI print drives real-yield volatility and immediate 15m spot delta reactions."
+    },
+    {
+      "id": "2026-10-08-flush",
+      "time_utc": "2026-10-08T12:00:00Z",
+      "kind": "shock",
+      "label": "Long Liquidation Cascade post Hawkish FOMC Minutes",
+      "source": "https://www.federalreserve.gov/monetarypolicy/fomcminutes20260916.htm",
+      "btc_before": 83322,
+      "btc_15m": 82450,
+      "btc_1h": 81890,
+      "btc_24h": 81693,
+      "daily_close_under_floor": true,
+      "wash_note": "Session low $80,394 swept. ~$340M longs liquidated across venues. Verified breakdown under $82.5k floor."
+    },
+    {
+      "id": "2026-10-07-reject",
+      "time_utc": "2026-10-07T12:00:00Z",
+      "kind": "shock",
+      "label": "Triple Rejection at $87,000 as 10Y Yields Spiked",
+      "source": "https://www.federalreserve.gov/releases/h15/",
+      "btc_before": 86600,
+      "btc_15m": 85910,
+      "btc_1h": 85120,
+      "btc_24h": 83276,
+      "daily_close_under_floor": false,
+      "wash_note": "Session low printed near $82,759. 94% of liquidated leverage were long contracts."
+    },
+    {
+      "id": "2025-10-10-tariff",
+      "time_utc": "2025-10-10T20:00:00Z",
+      "kind": "shock",
+      "label": "Tariff Escalation Headline Liquidation Cascade",
+      "source": "https://www.reuters.com/markets/",
+      "btc_before": 122000,
+      "btc_15m": 116500,
+      "btc_1h": 112000,
+      "btc_24h": 108000,
+      "daily_close_under_floor": null,
+      "wash_note": "Over $1.9B in speculative perpetual leverage flushed in 4 hours. Lows bottomed near $102k-$108k value shelf."
+    },
+    {
+      "id": "2024-08-05-yen-carry",
+      "time_utc": "2024-08-05T06:00:00Z",
+      "kind": "shock",
+      "label": "Global Yen Carry Trade Unwind Cascade",
+      "source": "https://www.bloomberg.com/markets",
+      "btc_before": 58300,
+      "btc_15m": 53500,
+      "btc_1h": 50200,
+      "btc_24h": 54700,
+      "daily_close_under_floor": false,
+      "wash_note": "Extreme 4H wick absorption (>62% lower wick) closed back into $54k value shelf. Classic institutional V-reversal."
+    }
+  ]
+}

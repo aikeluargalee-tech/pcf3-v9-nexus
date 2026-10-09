@@ -347,6 +347,7 @@
       <a href="../matrix.html" id="link-matrix">Regime Radar</a> |
       <a href="../quant-radar/" id="link-quant">Quant Radar</a> |
       <a href="../liquidity-radar/" id="link-liq">Liquidity Radar</a> |
+      <a href="../absorption-radar/" id="link-absorb">Absorption Radar</a> |
       <a href="../fractal.html" id="link-fractal">Fractal Lab</a>
     </div>
     <div class="nav-links">
@@ -985,6 +986,8 @@ async function loadLive() {
   if (linkQuant) linkQuant.href = prefix + 'quant-radar/';
   if (linkLiq) linkLiq.href = prefix + 'liquidity-radar/';
   if (linkFrac) linkFrac.href = prefix + 'fractal.html';
+  const linkAbsorb = document.getElementById('link-absorb');
+  if (linkAbsorb) linkAbsorb.href = prefix + 'absorption-radar/';
 
   let klinesSuccess = false;
   let isCacheFallback = false;

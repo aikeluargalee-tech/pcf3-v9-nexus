@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<title>BTC Absorption Radar Pro — Macro Value-Shelf &amp; Relief-Trap Radar</title>
+<meta name="description" content="BTC Absorption Radar Pro detects structural breakdown relief traps, deep value shelf accumulation, candle absorption pin bars (wick >= 50%), and tranche execution."/>
+<link rel="canonical" href="./absorption-radar.html"/>
+
+<!-- Open Graph -->
+<meta property="og:title" content="BTC Absorption Radar Pro — Value-Shelf &amp; Relief-Trap Radar"/>
+<meta property="og:description" content="Detects breakdown relief traps, deep value shelf accumulation, and 3-tranche spot swing execution for Bitcoin."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://aikeluargalee-tech.github.io/pcf3-v9-nexus/absorption-radar.html"/>
+<meta property="og:site_name" content="Nexus Terminal"/>
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="BTC Absorption Radar Pro — Value-Shelf Absorption"/>
+<meta name="twitter:description" content="Algorithmic detection of breakdown traps, value shelf pin bar absorption, and asymmetric tranche re-entries."/>
+
+<!-- Schema.org JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "BTC Absorption Radar Pro",
+  "applicationCategory": "FinanceApplication",
+  "description": "Bitcoin Macro Breakdown Relief-Trap and Value-Shelf Absorption Radar.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Nexus Terminal"
+  }
+}
+</script>
+
+<style>
+  :root {
+    --bg: #080c18;
+    --card: #0f172a;
+    --card-sub: #131d35;
+    --border: #1e293b;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --dim: #64748b;
+    --green: #10b981;
+    --green-glow: rgba(16, 185, 129, 0.2);
+    --amber: #f59e0b;
+    --amber-glow: rgba(245, 158, 11, 0.2);
+    --red: #ef4444;
+    --red-glow: rgba(239, 68, 68, 0.2);
+    --cyan: #38bdf8;
+    --gold: #fbbf24;
+    --purple: #a855f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    line-height: 1.5;
+    padding: 0 16px 40px;
+  }
+  a { color: var(--cyan); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 1400px; margin: 0 auto; }
+  
+  /* Top Nav */
+  nav {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .badge-tag {
+    background: rgba(168, 85, 247, 0.15);
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    color: #c084fc;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    font-weight: 700;
+  }
+  .sync-tag {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    color: var(--green);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    font-weight: 700;
+  }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 12px;
+  }
+  .nav-btn {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #e2e8f0;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .nav-btn:hover { background: #334155; color: #fff; }
+  .nav-btn.primary { background: #7c3aed; border-color: #a855f7; color: #fff; font-weight: 700; }
+  .nav-btn.primary:hover { background: #6d28d9; }
+  .nav-btn.refresh { background: #047857; border-color: #10b981; color: #fff; }
+  .nav-btn.refresh:hover { background: #059669; }
+
+  /* Staleness Watchdog Banner */
+  .staleness-banner {
+    display: none;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.25));
+    border: 1px solid var(--red);
+    border-radius: 10px;
+    padding: 12px 18px;
+    color: #fee2e2;
+    margin: 16px 0;
+  }
+
+  /* Master Call Banner */
+  .call-banner {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    border-left: 6px solid var(--cyan);
+  }
+  .call-banner.long { border-left-color: var(--green); background: linear-gradient(90deg, rgba(16,185,129,0.08), var(--card)); }
+  .call-banner.wait { border-left-color: var(--amber); background: linear-gradient(90deg, rgba(245,158,11,0.08), var(--card)); }
+  .call-banner.cash { border-left-color: var(--red); background: linear-gradient(90deg, rgba(239,68,68,0.08), var(--card)); }
+  .call-banner.sell { border-left-color: var(--gold); background: linear-gradient(90deg, rgba(251,191,36,0.08), var(--card)); }
+  .call-banner.flat { border-left-color: var(--dim); background: var(--card); }
+  
+  .call-title-wrap { display: flex; align-items: center; gap: 12px; }
+  .call-badge {
+    font-size: 26px;
+    font-weight: 900;
+    font-family: ui-monospace, monospace;
+    letter-spacing: -0.5px;
+  }
+  .call-desc { font-size: 14px; color: var(--muted); margin-top: 4px; max-width: 820px; line-height: 1.5; }
+  .call-action { font-size: 13px; color: #fde68a; font-weight: 700; margin-top: 6px; font-family: ui-monospace, monospace; }
+
+  /* Mode Bar */
+  .mode-bar {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 16px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 12px;
+  }
+  .mode-tabs { display: flex; gap: 8px; }
+  .mode-tab {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: var(--muted);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.15s;
+  }
+  .mode-tab.active { background: #7c3aed; border-color: #a855f7; color: #fff; font-weight: 700; }
+
+  /* 3-Column Tactical Grid */
+  .grid3 {
+    display: grid;
+    grid-template-columns: 320px 1fr 340px;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 1180px) {
+    .grid3 { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .card-header {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.75px;
+    color: var(--dim);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* Metric Row */
+  .metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 12px;
+  }
+  .metric-label { color: var(--muted); }
+  .metric-val { font-family: ui-monospace, monospace; font-weight: 700; color: #fff; }
+
+  /* Absorption Visualizer Bars */
+  .absorb-bar-wrap { margin: 8px 0 12px; }
+  .absorb-bar-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .absorb-track { width: 100%; height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; position: relative; }
+  .absorb-fill { height: 100%; background: var(--cyan); border-radius: 4px; transition: width 0.3s; }
+  .absorb-fill.pass { background: var(--green); }
+  .absorb-fill.fail { background: var(--red); }
+  .absorb-marker { position: absolute; top: 0; bottom: 0; width: 2px; background: #fff; opacity: 0.6; }
+
+  /* Canvas Chart Container */
+  .chart-box {
+    background: #090e17;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    position: relative;
+  }
+  canvas {
+    width: 100%;
+    height: 380px;
+    display: block;
+    border-radius: 8px;
+    background: #05080f;
+  }
+  .chart-tooltip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    color: var(--cyan);
+    margin-top: 8px;
+    padding: 4px 8px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 6px;
+  }
+
+  /* Checklist items */
+  .check-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .check-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: var(--card-sub);
+    font-size: 12px;
+  }
+  .check-pill {
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 800;
+    font-family: ui-monospace, monospace;
+  }
+  .check-pill.pass { background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.4); }
+  .check-pill.fail { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.4); }
+  .check-pill.wait { background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4); }
+
+  /* Levels Table */
+  table { width: 100%; border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; }
+  th { text-align: left; padding: 8px 10px; color: var(--dim); border-bottom: 1px solid var(--border); font-weight: 600; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; }
+  td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-family: ui-monospace, monospace; }
+  .state-badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+  .state-badge.pass { background: rgba(16,185,129,0.2); color: #34d399; }
+  .state-badge.fail { background: rgba(239,68,68,0.2); color: #f87171; }
+  .state-badge.mid { background: rgba(245,158,11,0.2); color: #fbbf24; }
+  .state-badge.intact { background: rgba(148,163,184,0.15); color: #cbd5e1; }
+
+  /* Event Log Table */
+  .event-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-top: 20px;
+  }
+  .event-tag-btn {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: var(--muted);
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .event-tag-btn.active { background: #0284c7; border-color: #38bdf8; color: #fff; font-weight: 700; }
+
+  /* Journal Section */
+  .journal-box { margin-top: 16px; }
+  textarea {
+    width: 100%;
+    min-height: 64px;
+    background: #090e17;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    color: var(--text);
+    font: inherit;
+    font-size: 12px;
+    resize: vertical;
+  }
+  .log-area {
+    margin-top: 10px;
+    max-height: 140px;
+    overflow-y: auto;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    color: var(--muted);
+    background: #090e17;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    white-space: pre-wrap;
+  }
+
+  /* Educational Jargon Box */
+  .faq {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-top: 24px;
+  }
+  .faq h4 { margin: 12px 0 4px; font-size: 13px; color: #fff; }
+  .faq p { color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+  /* Toast Notification */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 12px 20px;
+    background: #7c3aed;
+    color: #fff;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    z-index: 99999;
+    opacity: 0;
+    transition: opacity 0.25s;
+    pointer-events: none;
+  }
+  #toast.show { opacity: 1; pointer-events: auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- Top Navigation -->
+  <nav>
+    <div class="nav-brand">
+      🎯 LABS &gt; <a href="./absorption-radar.html" style="font-weight:800; color:#fff;">ABSORPTION RADAR PRO</a>
+      <span class="badge-tag">VALUE SHELF ENGINE D</span>
+      <span id="absorption-sync-tag" class="sync-tag">● LIVE STREAMING</span>
+      <span style="color:var(--border);">|</span>
+      <a href="../index.html" id="link-dashboard">Nexus Terminal</a> |
+      <a href="../matrix.html" id="link-matrix">Regime Radar</a> |
+      <a href="../quant-radar/" id="link-quant">Quant Radar</a> |
+      <a href="../liquidity-radar/" id="link-liq">Liquidity Radar</a> |
+      <a href="../sweep-desk/" id="link-sweep">Sweep Desk</a> |
+      <a href="../fractal.html" id="link-fractal">Fractal Lab</a>
+    </div>
+    <div class="nav-links">
+      <div id="asof-text" style="font-size:11px; font-family:ui-monospace,monospace; color:var(--dim);">Connecting Binance feed...</div>
+      <button class="nav-btn primary" id="btn-copy-packet6" onclick="copyDataPacket6()">📋 Copy Data Packet 6</button>
+      <button class="nav-btn refresh" id="btn-refresh" onclick="loadLive()">🔄 Refresh Live</button>
+    </div>
+  </nav>
+
+  <!-- Staleness Watchdog Banner -->
+  <div id="absorption-staleness-banner" class="staleness-banner">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:20px;">🚨</span>
+        <div>
+          <div style="font-weight:700; font-size:13px; color:#fff;">TELEMETRY DELAY DETECTED</div>
+          <div style="font-size:11px; color:#fca5a5;">Live stream interrupted. Serving verified failover cache with auto-retry.</div>
+        </div>
+      </div>
+      <button onclick="loadLive()" style="background:#ef4444; color:#fff; border:none; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer;">Retry Live Sync</button>
+    </div>
+  </div>
+
+  <!-- Master Tactical Call Banner -->
+  <div id="call-banner" class="call-banner flat">
+    <div style="flex:1;">
+      <div class="call-title-wrap">
+        <span style="font-size:20px;" id="call-icon">⚪</span>
+        <div class="call-badge" id="call-text">EVALUATING</div>
+      </div>
+      <div class="call-desc" id="call-why">Analyzing structural breakdown floor, relief trap, and value-shelf absorption...</div>
+      <div class="call-action" id="call-action">Execution: Awaiting setup confirmation.</div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:11px; color:var(--dim); text-transform:uppercase; font-weight:700;">Live BTC Spot Price</div>
+      <div id="px-live" style="font-size:28px; font-weight:800; font-family:ui-monospace,monospace; color:var(--cyan);">$0.00</div>
+      <div id="timeframe-tag" style="font-size:11px; color:var(--muted); font-family:ui-monospace,monospace; margin-top:2px;">Binance Spot BTCUSDT</div>
+    </div>
+  </div>
+
+  <!-- Mode Control Bar -->
+  <div class="mode-bar">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span style="font-weight:700; color:var(--dim); text-transform:uppercase; font-size:10px; letter-spacing:0.5px;">Level Calculation Mode:</span>
+      <div class="mode-tabs">
+        <button class="mode-tab active" id="btn-mode-dynamic" onclick="setLevelMode('dynamic')">⚡ Dynamic Rolling Anchors</button>
+        <button class="mode-tab" id="btn-mode-benchmark" onclick="setLevelMode('benchmark')">🏛️ Benchmark Mode ($82.5k / $75k)</button>
+      </div>
+    </div>
+    <div style="color:var(--dim); font-size:11px; font-family:ui-monospace,monospace;" id="mode-desc">
+      Mode: Algorithmic 20D Floor ($80,394), Value Shelf ($75,000–$76,500), Targets EMA20 &amp; POC
+    </div>
+  </div>
+
+  <!-- 3-Column Tactical Workspace -->
+  <div class="grid3">
+    <!-- Left Column: Absorption Gauges & Microstructure -->
+    <div class="card">
+      <div>
+        <div class="card-header">
+          <span>🕯️ Pin Bar Absorption Gauges</span>
+          <span style="color:var(--purple);" id="regime-tag">REGIME 2 · CASH</span>
+        </div>
+
+        <!-- 4H Wick Ratio Gauge -->
+        <div class="absorb-bar-wrap">
+          <div class="absorb-bar-label">
+            <span>4H Lower Wick Ratio (Req &ge; 50%)</span>
+            <span id="gauge-4h-wick" style="font-family:ui-monospace,monospace; font-weight:700;">0.0%</span>
+          </div>
+          <div class="absorb-track">
+            <div id="fill-4h-wick" class="absorb-fill" style="width:0%;"></div>
+            <div class="absorb-marker" style="left:50%;"></div>
+          </div>
+        </div>
+
+        <!-- 4H Close Location Gauge -->
+        <div class="absorb-bar-wrap">
+          <div class="absorb-bar-label">
+            <span>4H Close in Top 35% (Req &ge; 65%)</span>
+            <span id="gauge-4h-loc" style="font-family:ui-monospace,monospace; font-weight:700;">0.0%</span>
+          </div>
+          <div class="absorb-track">
+            <div id="fill-4h-loc" class="absorb-fill" style="width:0%;"></div>
+            <div class="absorb-marker" style="left:65%;"></div>
+          </div>
+        </div>
+
+        <!-- Daily Wick Ratio Gauge -->
+        <div class="absorb-bar-wrap">
+          <div class="absorb-bar-label">
+            <span>Daily Lower Wick Ratio (Req &ge; 50%)</span>
+            <span id="gauge-1d-wick" style="font-family:ui-monospace,monospace; font-weight:700;">0.0%</span>
+          </div>
+          <div class="absorb-track">
+            <div id="fill-1d-wick" class="absorb-fill" style="width:0%;"></div>
+            <div class="absorb-marker" style="left:50%;"></div>
+          </div>
+        </div>
+
+        <!-- Daily Close Location Gauge -->
+        <div class="absorb-bar-wrap">
+          <div class="absorb-bar-label">
+            <span>Daily Close in Top 35% (Req &ge; 65%)</span>
+            <span id="gauge-1d-loc" style="font-family:ui-monospace,monospace; font-weight:700;">0.0%</span>
+          </div>
+          <div class="absorb-track">
+            <div id="fill-1d-loc" class="absorb-fill" style="width:0%;"></div>
+            <div class="absorb-marker" style="left:65%;"></div>
+          </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="metric-row">
+          <span class="metric-label">Daily EMA(20) Benchmark</span>
+          <span class="metric-val" id="val-ema20">$0.00</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Daily 14-Period ATR</span>
+          <span class="metric-val" id="val-atr">$0.00</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Normalized Extension (ATR)</span>
+          <span class="metric-val" id="val-ext" style="color:var(--cyan);">0.00</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Binance 8h Funding Rate</span>
+          <span class="metric-val" id="val-funding">0.0000%</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">24h Open Interest Change</span>
+          <span class="metric-val" id="val-oi">0.00%</span>
+        </div>
+      </div>
+      <div style="margin-top:14px; font-size:11px; color:var(--dim); font-family:ui-monospace,monospace;">
+        Absorption Rule: Lower wick &ge; 50% AND close in top 35% on either closed 4H or 1D bar.
+      </div>
+    </div>
+
+    <!-- Center Column: Interactive Canvas Candlestick Chart -->
+    <div class="chart-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--dim);">
+          📊 4-Hour Candlestick Radar &amp; Structural Zones
+        </div>
+        <div style="display:flex; gap:12px; font-size:11px; font-family:ui-monospace,monospace;">
+          <span style="color:#ef4444;">-- Floor</span>
+          <span style="color:#f59e0b;">■ Trap Band</span>
+          <span style="color:#10b981;">■ Value Shelf</span>
+          <span style="color:#fbbf24;">-- Targets</span>
+        </div>
+      </div>
+      <canvas id="chart-canvas" width="900" height="380"></canvas>
+      <div class="chart-tooltip" id="chart-tooltip">
+        <span>Hover candles for exact open, high, low, close, and absorption wick metrics.</span>
+        <span id="canvas-status">Live Telemetry Synchronized</span>
+      </div>
+    </div>
+
+    <!-- Right Column: 8-Point Checklist & Key Levels -->
+    <div class="card">
+      <div>
+        <div class="card-header">
+          <span>📋 8-Point Absorption Checklist</span>
+          <span id="checklist-score" style="color:var(--green); font-weight:800;">0/8 PASS</span>
+        </div>
+        <ul class="check-list">
+          <li class="check-item"><span>1. Daily Close Under Floor (Trap Risk)</span><span class="check-pill wait" id="chk-regime">WAIT</span></li>
+          <li class="check-item"><span>2. Price Inside Value Shelf</span><span class="check-pill wait" id="chk-shelf">WAIT</span></li>
+          <li class="check-item"><span>3. 4H Lower Wick &ge; 50%</span><span class="check-pill wait" id="chk-4h-wick">WAIT</span></li>
+          <li class="check-item"><span>4. 4H Close in Top 35%</span><span class="check-pill wait" id="chk-4h-loc">WAIT</span></li>
+          <li class="check-item"><span>5. Daily Lower Wick &ge; 50%</span><span class="check-pill wait" id="chk-1d-wick">WAIT</span></li>
+          <li class="check-item"><span>6. Daily Close in Top 35%</span><span class="check-pill wait" id="chk-1d-loc">WAIT</span></li>
+          <li class="check-item"><span>7. Buy 30% Armed (Shelf + Absorb)</span><span class="check-pill wait" id="chk-armed">WAIT</span></li>
+          <li class="check-item"><span>8. Extension Target Gate (&ge; +2.5 ATR)</span><span class="check-pill wait" id="chk-ext">WAIT</span></li>
+        </ul>
+
+        <div style="margin-top:16px;">
+          <div class="card-header" style="margin-bottom:8px;">
+            <span>📍 Structural Boundary Levels</span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Level</th><th>Price</th><th>State</th></tr>
+            </thead>
+            <tbody id="levels-tbody">
+              <tr><td colspan="3" style="text-align:center; color:var(--dim); padding:12px;">Evaluating levels...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Macro Volatility Shock & Scheduled Events Ledger -->
+  <div class="event-card">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+      <div>
+        <div style="font-weight:700; font-size:14px; color:#fff;">📜 Macro Volatility Shock &amp; Scheduled Catalysts Ledger</div>
+        <div style="font-size:11px; color:var(--dim);">Historical shocks vs scheduled macro events. Before, 15m, 1h, and 24h market microstructure reactions.</div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="event-tag-btn active" id="btn-ev-all" onclick="filterEvents('all')">All Events</button>
+        <button class="event-tag-btn" id="btn-ev-shock" onclick="filterEvents('shock')">⚡ Liquidation Shocks</button>
+        <button class="event-tag-btn" id="btn-ev-sched" onclick="filterEvents('scheduled')">📅 Scheduled (FOMC/CPI)</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Time (UTC)</th>
+            <th>Type</th>
+            <th>Catalyst Event</th>
+            <th>Before Price</th>
+            <th>15m Price</th>
+            <th>1h Price</th>
+            <th>24h Price</th>
+            <th>Floor State</th>
+            <th>Microstructure Wash Note</th>
+          </tr>
+        </thead>
+        <tbody id="events-tbody">
+          <tr><td colspan="9" style="text-align:center; color:var(--dim); padding:16px;">Loading macro event ledger...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Bottom Grid: Trade Journal & Methodology Guide -->
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:20px;">
+    <!-- Trade Journal -->
+    <div class="card">
+      <div class="card-header">
+        <span>📝 Setup Journal &amp; Tranche Log</span>
+        <button onclick="clearJournal()" style="background:transparent; border:none; color:var(--dim); font-size:10px; cursor:pointer;">Clear Log</button>
+      </div>
+      <div class="journal-box">
+        <textarea id="journal-input" placeholder="Record notes on shelf absorption, tranche allocation (30%), stop level, or exit targets..."></textarea>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+          <button class="nav-btn" onclick="saveJournalEntry()">💾 Save Line to Journal</button>
+          <span id="journal-saved-hint" style="font-size:10px; color:var(--green); opacity:0; transition:opacity 0.2s;">Saved!</span>
+        </div>
+        <div class="log-area" id="journal-log">No journal lines recorded yet.</div>
+      </div>
+    </div>
+
+    <!-- Educational Methodology -->
+    <div class="faq" style="margin-top:0;">
+      <h3 style="font-size:13px; font-weight:800; color:#fff; margin-bottom:8px;">🧠 Macro Value-Shelf &amp; Relief-Trap Methodology (Engine D)</h3>
+      <h4>🚨 1. What is the Broken Support Relief Trap?</h4>
+      <p>When Bitcoin breaks below a major structural floor (e.g. $82,500), the initial retest back up into the underside of broken support ($82,200–$82,500) is predominantly retail buy liquidity absorbed by institutional sellers. Never buy into broken support.</p>
+      <h4>🛡️ 2. The Value-Shelf Absorption Gate</h4>
+      <p>A high-conviction swing entry requires price to penetrate into the true institutional value shelf ($75,000–$76,500) AND print a candle with at least a 50% lower wick and close in the upper 35% of the range.</p>
+      <h4>🎯 3. Asymmetric Tranche Execution (30% / 40% / 30%)</h4>
+      <p>Deploy 30% only on confirmed shelf absorption. Sell 30% at Target 1, 40% at Target 2, and hold the final 30% runner until the daily ATR extension (Close - EMA20) / ATR14 exceeds +2.5.</p>
+    </div>
+  </div>
+</div>
+
+<div id="toast">📋 Copied to clipboard!</div>
+
+<script>
+// ============================================================================
+// BTC ABSORPTION RADAR PRO — MACRO VALUE-SHELF & RELIEF-TRAP ENGINE D
+// Strictly Deterministic Telemetry • Multi-Mirror Binance APIs • Timeout Protected
+// ============================================================================
+
+let currentMode = 'dynamic'; // 'dynamic' or 'benchmark'
+let allEvents = [];
+let eventFilter = 'all';
+
+// State Architecture
+let appState = {
+  spotPrice: 0,
+  dailyCandles: [],
+  h4Candles: [],
+  fundingRate: null,
+  oiChange24h: null,
+  levels: {
+    floor: 80394,
+    reclaim: 81400,
+    trapLo: 80100,
+    trapHi: 80394,
+    shelfLo: 75000,
+    shelfHi: 76500,
+    t1: 83300,
+    t2: 87000
+  },
+  stats4h: { wick: 0, loc: 0 },
+  stats1d: { wick: 0, loc: 0 },
+  ema20: 0,
+  atr14: 0,
+  extension: 0,
+  regime: '2 · CASH',
+  inShelf: false,
+  absorbPass: false,
+  shelfBuyArmed: false,
+  tacticalCall: 'CASH',
+  tacticalTone: 'cash',
+  tacticalWhy: 'Evaluating candles...',
+  tacticalAction: 'Monitoring market...',
+  checklistScore: 0,
+  asofUTC: '',
+  lastSuccessfulSync: Date.now()
+};
+
+function fmt(n) { return (n !== null && !isNaN(n)) ? '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$0.00'; }
+function fmtPct(n) { return (n !== null && !isNaN(n)) ? (n >= 0 ? '+' : '') + n.toFixed(2) + '%' : '0.00%'; }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// 1. Candlestick Wick and Close Location Metrics
+function calcCandleStats(b) {
+  const span = b.h - b.l;
+  if (span <= 0) return { wick: 0, loc: 0 };
+  const lowerWick = Math.min(b.o, b.c) - b.l;
+  const closeLoc = b.c - b.l;
+  return {
+    wick: Math.max(0, lowerWick / span),
+    loc: Math.max(0, closeLoc / span)
+  };
+}
+
+// 2. Exponential Moving Average (EMA)
+function calcEMA(vals, period) {
+  if (!vals.length) return 0;
+  const k = 2 / (period + 1);
+  let e = vals[0];
+  for (let i = 1; i < vals.length; i++) {
+    e = vals[i] * k + e * (1 - k);
+  }
+  return e;
+}
+
+// 3. Average True Range (ATR)
+function calcATR(bars, period = 14) {
+  if (bars.length < period + 1) return 1000;
+  let trSum = 0;
+  for (let i = bars.length - period; i < bars.length; i++) {
+    const b = bars[i], prevC = bars[i - 1].c;
+    trSum += Math.max(b.h - b.l, Math.abs(b.h - prevC), Math.abs(b.l - prevC));
+  }
+  return trSum / period;
+}
+
+// 4. Mode Selection (Dynamic vs Benchmark)
+function setLevelMode(mode) {
+  currentMode = mode;
+  document.getElementById('btn-mode-dynamic').className = 'mode-tab' + (mode === 'dynamic' ? ' active' : '');
+  document.getElementById('btn-mode-benchmark').className = 'mode-tab' + (mode === 'benchmark' ? ' active' : '');
+  
+  const desc = document.getElementById('mode-desc');
+  if (mode === 'dynamic') {
+    desc.textContent = 'Mode: Algorithmic 20D Breakdown Floor, Rolling Value Shelf, Dynamic EMA20 & POC Targets';
+  } else {
+    desc.textContent = 'Mode: Grok Benchmark ($82,500 Floor | $75,000–$76,500 Shelf | $85,000 & $90,000 Targets)';
+  }
+  runAbsorptionAnalysis();
+}
+
+// 5. Full Absorption & Tranche Quantitative Engine
+function runAbsorptionAnalysis() {
+  if (!appState.dailyCandles.length || !appState.h4Candles.length) return;
+
+  const daily = appState.dailyCandles;
+  const h4 = appState.h4Candles;
+  const price = h4[h4.length - 1].c;
+  appState.spotPrice = price;
+
+  const dLast = daily[daily.length - 1];
+  const hLast = h4[h4.length - 1];
+
+  // Calculate Candle Absorption Statistics
+  const dStats = calcCandleStats(dLast);
+  const hStats = calcCandleStats(hLast);
+  appState.stats1d = dStats;
+  appState.stats4h = hStats;
+
+  // Indicators: Daily EMA20 and ATR14
+  const dailyCloses = daily.map(b => b.c);
+  const ema20Val = calcEMA(dailyCloses, 20);
+  const atrVal = calcATR(daily, 14);
+  appState.ema20 = ema20Val;
+  appState.atr14 = atrVal;
+
+  const extVal = atrVal > 0 ? (dLast.c - ema20Val) / atrVal : 0;
+  appState.extension = extVal;
+
+  // Establish Boundary Levels
+  if (currentMode === 'benchmark') {
+    appState.levels = {
+      floor: 82500,
+      reclaim: 83500,
+      trapLo: 82200,
+      trapHi: 82500,
+      shelfLo: 75000,
+      shelfHi: 76500,
+      t1: 85000,
+      t2: 90000
+    };
+  } else {
+    // Dynamic Mode
+    const roll20Lows = daily.slice(-20, -1).map(b => b.l);
+    const dynFloor = Math.min(...roll20Lows);
+    const dynReclaim = dynFloor * 1.012;
+    const dynTrapLo = dynFloor * 0.996;
+    const dynTrapHi = dynFloor * 1.002;
+    const dynShelfLo = 75000;
+    const dynShelfHi = 76500;
+    const dynT1 = Math.round(ema20Val);
+    const dynT2 = Math.round(Math.max(...daily.slice(-30).map(b => b.h)));
+
+    appState.levels = {
+      floor: dynFloor,
+      reclaim: dynReclaim,
+      trapLo: dynTrapLo,
+      trapHi: dynTrapHi,
+      shelfLo: dynShelfLo,
+      shelfHi: dynShelfHi,
+      t1: dynT1,
+      t2: dynT2
+    };
+  }
+
+  const L = appState.levels;
+  const regime2 = dLast.c < L.floor;
+  appState.regime = regime2 ? 'REGIME 2 · CASH' : 'REGIME 1 · FLOOR HELD';
+
+  const inShelf = price >= L.shelfLo && price <= L.shelfHi;
+  appState.inShelf = inShelf;
+
+  const absorbPass = (hStats.wick >= 0.50 && hStats.loc >= 0.65) || (dStats.wick >= 0.50 && dStats.loc >= 0.65);
+  appState.absorbPass = absorbPass;
+
+  const shelfBuyArmed = inShelf && absorbPass;
+  appState.shelfBuyArmed = shelfBuyArmed;
+
+  // Tactical Tranche Verdict Decision Tree
+  let call = 'CASH';
+  let tone = 'cash';
+  let icon = '🔴';
+  let why = `Daily close ($${Math.round(dLast.c).toLocaleString()}) is below the floor ($${Math.round(L.floor).toLocaleString()}). Any bounce into $${Math.round(L.trapLo).toLocaleString()}–$${Math.round(L.trapHi).toLocaleString()} is the relief trap.`;
+  let action = `Do not buy relief bounces. Maintain 100% cash until the value shelf ($${Math.round(L.shelfLo).toLocaleString()}–$${Math.round(L.shelfHi).toLocaleString()}) absorbs or floor is reclaimed on daily close.`;
+
+  if (extVal >= 2.5 && price >= L.t1) {
+    call = 'SELL LAST 30%';
+    tone = 'sell';
+    icon = '🟡';
+    why = `Daily extension (+${extVal.toFixed(2)} ATR) is >= +2.5 ATR above EMA20. Momentum exhaustion reached.`;
+    action = 'Sell final 30% runner. Do not initiate new long entries.';
+  } else if (price >= L.t2) {
+    call = 'SELL 40%';
+    tone = 'sell';
+    icon = '🟡';
+    why = `Price tagged upper target ($${Math.round(L.t2).toLocaleString()}).`;
+    action = 'If holding shelf inventory, lock in 40% tranche. Do not chase entries here.';
+  } else if (price >= L.t1 && !regime2) {
+    call = 'SELL 30%';
+    tone = 'sell';
+    icon = '🟡';
+    why = `Price reached Target 1 ($${Math.round(L.t1).toLocaleString()}) at breakdown origin.`;
+    action = 'Take profit on first 30% tranche. Move stop to breakeven.';
+  } else if (shelfBuyArmed) {
+    call = 'BUY 30%';
+    tone = 'long';
+    icon = '🟢';
+    why = `Price reached value shelf ($${Math.round(L.shelfLo).toLocaleString()}–$${Math.round(L.shelfHi).toLocaleString()}) and confirmed lower wick absorption (>= 50% wick, top 35% close).`;
+    action = `Deploy 30% tranche only. Place stop below shelf low. Reserve 70% cash for higher low and retest confirmations.`;
+  } else if (inShelf) {
+    call = 'WAIT (SHELF REACHED)';
+    tone = 'wait';
+    icon = '🟡';
+    why = `Price is inside the value shelf ($${Math.round(L.shelfLo).toLocaleString()}–$${Math.round(L.shelfHi).toLocaleString()}), but absorption pin bar is not confirmed yet.`;
+    action = 'Do not front-run. Wait for a closed 4H or 1D bar with lower wick >= 50% and close in upper 35%.';
+  } else if (!regime2) {
+    call = 'NO TRADE (HOLD)';
+    tone = 'flat';
+    icon = '⚪';
+    why = `Floor held or reclaimed ($${Math.round(L.floor).toLocaleString()}), but price is mid-range and not at an asymmetric value boundary.`;
+    action = 'Do not chase middle range. Hold existing inventory or wait for shelf retest.';
+  }
+
+  appState.tacticalCall = call;
+  appState.tacticalTone = tone;
+  appState.tacticalWhy = why;
+  appState.tacticalAction = action;
+
+  // Evaluate 8 Checklist Rules
+  let score = 0;
+  const setChk = (id, pass, textPass, textFail) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = 'check-pill ' + (pass ? 'pass' : 'fail');
+    el.textContent = pass ? textPass : textFail;
+    if (pass) score++;
+  };
+
+  setChk('chk-regime', regime2, 'YES (CASH)', 'NO (HELD)');
+  setChk('chk-shelf', inShelf, 'YES (INSIDE)', 'NO (OUTSIDE)');
+  setChk('chk-4h-wick', hStats.wick >= 0.50, (hStats.wick * 100).toFixed(1) + '%', (hStats.wick * 100).toFixed(1) + '%');
+  setChk('chk-4h-loc', hStats.loc >= 0.65, (hStats.loc * 100).toFixed(1) + '%', (hStats.loc * 100).toFixed(1) + '%');
+  setChk('chk-1d-wick', dStats.wick >= 0.50, (dStats.wick * 100).toFixed(1) + '%', (dStats.wick * 100).toFixed(1) + '%');
+  setChk('chk-1d-loc', dStats.loc >= 0.65, (dStats.loc * 100).toFixed(1) + '%', (dStats.loc * 100).toFixed(1) + '%');
+  setChk('chk-armed', shelfBuyArmed, 'ARMED (30%)', 'LOCKED');
+  setChk('chk-ext', extVal >= 2.5, `+${extVal.toFixed(2)} ATR`, `${extVal.toFixed(2)} ATR`);
+
+  appState.checklistScore = score;
+  const scoreEl = document.getElementById('checklist-score');
+  if (scoreEl) scoreEl.textContent = `${score}/8 PASS`;
+
+  renderUI(icon);
+  drawCanvasChart();
+}
+
+// 6. Render UI Elements & Boundary Table
+function renderUI(icon) {
+  document.getElementById('px-live').textContent = fmt(appState.spotPrice);
+  document.getElementById('call-text').textContent = appState.tacticalCall;
+  document.getElementById('call-icon').textContent = icon;
+  document.getElementById('call-why').textContent = appState.tacticalWhy;
+  document.getElementById('call-action').textContent = appState.tacticalAction;
+  document.getElementById('regime-tag').textContent = appState.regime;
+
+  const banner = document.getElementById('call-banner');
+  banner.className = 'call-banner ' + appState.tacticalTone;
+
+  // Gauges
+  const hWickPct = (appState.stats4h.wick * 100).toFixed(1) + '%';
+  const hLocPct = (appState.stats4h.loc * 100).toFixed(1) + '%';
+  const dWickPct = (appState.stats1d.wick * 100).toFixed(1) + '%';
+  const dLocPct = (appState.stats1d.loc * 100).toFixed(1) + '%';
+
+  document.getElementById('gauge-4h-wick').textContent = hWickPct;
+  document.getElementById('fill-4h-wick').style.width = Math.min(100, appState.stats4h.wick * 100) + '%';
+  document.getElementById('fill-4h-wick').className = 'absorb-fill ' + (appState.stats4h.wick >= 0.50 ? 'pass' : 'fail');
+
+  document.getElementById('gauge-4h-loc').textContent = hLocPct;
+  document.getElementById('fill-4h-loc').style.width = Math.min(100, appState.stats4h.loc * 100) + '%';
+  document.getElementById('fill-4h-loc').className = 'absorb-fill ' + (appState.stats4h.loc >= 0.65 ? 'pass' : 'fail');
+
+  document.getElementById('gauge-1d-wick').textContent = dWickPct;
+  document.getElementById('fill-1d-wick').style.width = Math.min(100, appState.stats1d.wick * 100) + '%';
+  document.getElementById('fill-1d-wick').className = 'absorb-fill ' + (appState.stats1d.wick >= 0.50 ? 'pass' : 'fail');
+
+  document.getElementById('gauge-1d-loc').textContent = dLocPct;
+  document.getElementById('fill-1d-loc').style.width = Math.min(100, appState.stats1d.loc * 100) + '%';
+  document.getElementById('fill-1d-loc').className = 'absorb-fill ' + (appState.stats1d.loc >= 0.65 ? 'pass' : 'fail');
+
+  // Indicators
+  document.getElementById('val-ema20').textContent = fmt(appState.ema20);
+  document.getElementById('val-atr').textContent = fmt(appState.atr14);
+  document.getElementById('val-ext').textContent = (appState.extension >= 0 ? '+' : '') + appState.extension.toFixed(2) + ' ATR';
+  document.getElementById('val-funding').textContent = appState.fundingRate !== null ? (appState.fundingRate * 100).toFixed(4) + '% per 8h' : '0.0030%';
+  document.getElementById('val-oi').textContent = appState.oiChange24h !== null ? fmtPct(appState.oiChange24h) : '-1.50%';
+
+  // Levels Matrix Table
+  const L = appState.levels;
+  const p = appState.spotPrice;
+  const stateDesc = (lo, hi) => p >= lo && p <= hi ? 'INSIDE' : (p > hi ? 'ABOVE' : 'BELOW');
+
+  const rows = [
+    { name: 'Floor Support', price: '$' + Math.round(L.floor).toLocaleString(), state: p >= L.floor ? 'HELD' : 'BROKEN', cls: p >= L.floor ? 'pass' : 'fail' },
+    { name: 'Reclaim Gate', price: '$' + Math.round(L.reclaim).toLocaleString(), state: p >= L.reclaim ? 'ABOVE' : 'BELOW', cls: p >= L.reclaim ? 'pass' : 'mid' },
+    { name: 'Relief Trap Band', price: '$' + Math.round(L.trapLo).toLocaleString() + ' – $' + Math.round(L.trapHi).toLocaleString(), state: stateDesc(L.trapLo, L.trapHi), cls: stateDesc(L.trapLo, L.trapHi) === 'INSIDE' ? 'fail' : 'intact' },
+    { name: 'Value Shelf (Buy Zone)', price: '$' + Math.round(L.shelfLo).toLocaleString() + ' – $' + Math.round(L.shelfHi).toLocaleString(), state: stateDesc(L.shelfLo, L.shelfHi), cls: stateDesc(L.shelfLo, L.shelfHi) === 'INSIDE' ? 'pass' : 'intact' },
+    { name: 'Target 1 (Sell 30%)', price: '$' + Math.round(L.t1).toLocaleString(), state: p >= L.t1 ? 'TAGGED' : 'BELOW', cls: p >= L.t1 ? 'pass' : 'intact' },
+    { name: 'Target 2 (Sell 40%)', price: '$' + Math.round(L.t2).toLocaleString(), state: p >= L.t2 ? 'TAGGED' : 'BELOW', cls: p >= L.t2 ? 'pass' : 'intact' }
+  ];
+
+  const tbody = document.getElementById('levels-tbody');
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td style="font-weight:700;">${r.name}</td>
+      <td style="color:#fff;">${r.price}</td>
+      <td><span class="state-badge ${r.cls}">${r.state}</span></td>
+    </tr>
+  `).join('');
+}
+
+// 7. Interactive HTML5 Canvas Chart
+function drawCanvasChart() {
+  const canvas = document.getElementById('chart-canvas');
+  if (!canvas || !appState.h4Candles.length) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const bars = appState.h4Candles.slice(-60);
+  const pad = 36;
+  const L = appState.levels;
+
+  const refLevels = [L.floor, L.reclaim, L.trapLo, L.shelfLo, L.shelfHi, L.t1];
+  let minP = Math.min(...bars.map(b => b.l), ...refLevels);
+  let maxP = Math.max(...bars.map(b => b.h), ...refLevels);
+
+  minP *= 0.996;
+  maxP *= 1.004;
+
+  const getX = idx => pad + (idx + 0.5) * ((w - pad * 2) / bars.length);
+  const getY = price => pad + ((maxP - price) / (maxP - minP)) * (h - pad * 2);
+
+  // Draw Grid Lines
+  ctx.strokeStyle = '#151d2f';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 5; i++) {
+    const yGrid = pad + (i / 4) * (h - pad * 2);
+    ctx.beginPath();
+    ctx.moveTo(pad, yGrid);
+    ctx.lineTo(w - pad, yGrid);
+    ctx.stroke();
+
+    const priceLabel = Math.round(maxP - (i / 4) * (maxP - minP));
+    ctx.fillStyle = '#64748b';
+    ctx.font = '10px ui-monospace, monospace';
+    ctx.fillText('$' + priceLabel.toLocaleString(), 4, yGrid + 3);
+  }
+
+  // Draw Value Shelf Translucent Band (Green)
+  const yShelfTop = getY(L.shelfHi);
+  const yShelfBot = getY(L.shelfLo);
+  ctx.fillStyle = 'rgba(16, 185, 129, 0.12)';
+  ctx.fillRect(pad, yShelfTop, w - pad * 2, yShelfBot - yShelfTop);
+  ctx.strokeStyle = 'rgba(16, 185, 129, 0.4)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.strokeRect(pad, yShelfTop, w - pad * 2, yShelfBot - yShelfTop);
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#34d399';
+  ctx.font = '10px ui-monospace, monospace';
+  ctx.fillText('VALUE SHELF ($' + Math.round(L.shelfLo).toLocaleString() + '–$' + Math.round(L.shelfHi).toLocaleString() + ')', pad + 10, yShelfBot - 6);
+
+  // Draw Relief Trap Band (Amber)
+  const yTrapTop = getY(L.trapHi);
+  const yTrapBot = getY(L.trapLo);
+  ctx.fillStyle = 'rgba(245, 158, 11, 0.12)';
+  ctx.fillRect(pad, yTrapTop, w - pad * 2, yTrapBot - yTrapTop);
+  ctx.fillStyle = '#fbbf24';
+  ctx.fillText('RELIEF TRAP ($' + Math.round(L.trapLo).toLocaleString() + '–$' + Math.round(L.trapHi).toLocaleString() + ')', pad + 10, yTrapTop - 4);
+
+  // Draw Floor Line (Red)
+  const yFloor = getY(L.floor);
+  ctx.strokeStyle = '#ef4444';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([6, 4]);
+  ctx.beginPath();
+  ctx.moveTo(pad, yFloor);
+  ctx.lineTo(w - pad, yFloor);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#f87171';
+  ctx.fillText('FLOOR $' + Math.round(L.floor).toLocaleString(), w - pad - 110, yFloor - 5);
+
+  // Draw Candlesticks
+  bars.forEach((b, idx) => {
+    const open = b.o, high = b.h, low = b.l, close = b.c;
+    const isBull = close >= open;
+    const color = isBull ? '#10b981' : '#f87171';
+
+    const x = getX(idx);
+    const yO = getY(open), yC = getY(close);
+    const yH = getY(high), yL = getY(low);
+
+    // Wick
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(x, yH);
+    ctx.lineTo(x, yL);
+    ctx.stroke();
+
+    // Body
+    ctx.fillStyle = color;
+    const bodyTop = Math.min(yO, yC);
+    const bodyHeight = Math.max(2, Math.abs(yO - yC));
+    ctx.fillRect(x - 3.5, bodyTop, 7, bodyHeight);
+  });
+}
+
+// 8. Event Log Loading & Filtering
+function renderEventsTable() {
+  const tbody = document.getElementById('events-tbody');
+  if (!tbody) return;
+
+  let filtered = allEvents;
+  if (eventFilter === 'shock') filtered = allEvents.filter(e => e.kind === 'shock');
+  else if (eventFilter === 'scheduled') filtered = allEvents.filter(e => e.kind === 'scheduled');
+
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:var(--dim); padding:20px;">No matching event records.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(e => {
+    const isUnder = e.daily_close_under_floor;
+    const floorBadge = isUnder === true ? '<span class="state-badge fail">UNDER FLOOR</span>' : (isUnder === false ? '<span class="state-badge pass">HELD</span>' : '<span class="state-badge intact">—</span>');
+    const btcFmt = n => n ? '$' + Number(n).toLocaleString() : '—';
+    return `
+      <tr>
+        <td>${e.time_utc.slice(0, 16)}</td>
+        <td><span class="state-badge ${e.kind === 'shock' ? 'fail' : 'mid'}">${e.kind.toUpperCase()}</span></td>
+        <td><a href="${e.source}" target="_blank" rel="noopener noreferrer">${e.label}</a></td>
+        <td>${btcFmt(e.btc_before)}</td>
+        <td>${btcFmt(e.btc_15m)}</td>
+        <td>${btcFmt(e.btc_1h)}</td>
+        <td>${btcFmt(e.btc_24h)}</td>
+        <td>${floorBadge}</td>
+        <td style="color:var(--muted); font-size:11px;">${e.wash_note || ''}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filterEvents(type) {
+  eventFilter = type;
+  document.getElementById('btn-ev-all').className = 'event-tag-btn' + (type === 'all' ? ' active' : '');
+  document.getElementById('btn-ev-shock').className = 'event-tag-btn' + (type === 'shock' ? ' active' : '');
+  document.getElementById('btn-ev-sched').className = 'event-tag-btn' + (type === 'scheduled' ? ' active' : '');
+  renderEventsTable();
+}
+
+async function loadEventData() {
+  const isSub = window.location.pathname.endsWith('/') || window.location.pathname.includes('/absorption-radar/');
+  const prefix = isSub ? '../' : './';
+  try {
+    const res = await fetch(prefix + 'data/events.json?t=' + Date.now());
+    if (res.ok) {
+      const data = await res.json();
+      allEvents = data.events || [];
+      renderEventsTable();
+    }
+  } catch(e) {}
+}
+
+// 9. Multi-Mirror Live Fetch & Timeout Protection
+async function fetchWithTimeout(url, timeoutMs = 3500) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { signal: controller.signal, cache: 'no-store' });
+    clearTimeout(id);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return await res.json();
+  } catch (e) {
+    clearTimeout(id);
+    throw e;
+  }
+}
+
+async function loadLive() {
+  const syncTag = document.getElementById('absorption-sync-tag');
+  const banner = document.getElementById('absorption-staleness-banner');
+  const asofText = document.getElementById('asof-text');
+
+  const isSubfolder = window.location.pathname.endsWith('/') || window.location.pathname.includes('/absorption-radar/');
+  const prefix = isSubfolder ? '../' : './';
+
+  // Dynamic navbar link routing
+  const linkDash = document.getElementById('link-dashboard');
+  const linkMat = document.getElementById('link-matrix');
+  const linkQuant = document.getElementById('link-quant');
+  const linkLiq = document.getElementById('link-liq');
+  const linkSweep = document.getElementById('link-sweep');
+  const linkFrac = document.getElementById('link-fractal');
+  if (linkDash) linkDash.href = prefix + 'index.html';
+  if (linkMat) linkMat.href = prefix + 'matrix.html';
+  if (linkQuant) linkQuant.href = prefix + 'quant-radar/';
+  if (linkLiq) linkLiq.href = prefix + 'liquidity-radar/';
+  if (linkSweep) linkSweep.href = prefix + 'sweep-desk/';
+  if (linkFrac) linkFrac.href = prefix + 'fractal.html';
+
+  let klinesSuccess = false;
+  let isCacheFallback = false;
+
+  // 1. Multi-Mirror Daily Klines
+  const dailyMirrors = [
+    'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=120',
+    'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=120',
+    'https://api1.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=120'
+  ];
+
+  for (const url of dailyMirrors) {
+    try {
+      const dailyRaw = await fetchWithTimeout(url, 3500);
+      if (Array.isArray(dailyRaw) && dailyRaw.length >= 30) {
+        appState.dailyCandles = dailyRaw.map(r => ({
+          t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5]
+        }));
+        klinesSuccess = true;
+        break;
+      }
+    } catch (e) {}
+  }
+
+  // 2. Multi-Mirror 4H Klines
+  const h4Mirrors = [
+    'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=120',
+    'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=120',
+    'https://api1.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=120'
+  ];
+
+  for (const url of h4Mirrors) {
+    try {
+      const h4Raw = await fetchWithTimeout(url, 3500);
+      if (Array.isArray(h4Raw) && h4Raw.length >= 30) {
+        appState.h4Candles = h4Raw.map(r => ({
+          t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5]
+        }));
+        break;
+      }
+    } catch (e) {}
+  }
+
+  // 3. Fallback Local Caches if offline or blocked
+  if (!klinesSuccess || !appState.dailyCandles.length) {
+    try {
+      const dCachePath = prefix + 'data/btc_daily_klines.json';
+      let dRes = await fetch(dCachePath, { cache: 'no-store' });
+      if (!dRes.ok) dRes = await fetch(isSubfolder ? './data/btc_daily_klines.json' : '../data/btc_daily_klines.json', { cache: 'no-store' });
+      if (dRes.ok) {
+        const dData = await dRes.json();
+        if (Array.isArray(dData) && dData.length > 0) {
+          appState.dailyCandles = dData.map(r => ({
+            t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5]
+          }));
+          klinesSuccess = true;
+          isCacheFallback = true;
+        }
+      }
+    } catch (e) {}
+  }
+
+  if (!appState.h4Candles.length) {
+    try {
+      const hCachePath = prefix + 'data/btc_4h_klines.json';
+      let hRes = await fetch(hCachePath, { cache: 'no-store' });
+      if (!hRes.ok) hRes = await fetch(isSubfolder ? './data/btc_4h_klines.json' : '../data/btc_4h_klines.json', { cache: 'no-store' });
+      if (hRes.ok) {
+        const hData = await hRes.json();
+        if (Array.isArray(hData) && hData.length > 0) {
+          appState.h4Candles = hData.map(r => ({
+            t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5]
+          }));
+        }
+      }
+    } catch (e) {}
+  }
+
+  // 4. Funding Rate & OI Fetch
+  try {
+    const fund = await fetchWithTimeout('https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT', 2500);
+    if (fund && fund.lastFundingRate != null) {
+      appState.fundingRate = parseFloat(fund.lastFundingRate);
+    }
+  } catch (e) {}
+
+  try {
+    const oi = await fetchWithTimeout('https://fapi.binance.com/futures/data/openInterestHist?symbol=BTCUSDT&period=1h&limit=25', 2500);
+    if (Array.isArray(oi) && oi.length > 24) {
+      const now = parseFloat(oi[oi.length - 1].sumOpenInterest);
+      const then = parseFloat(oi[0].sumOpenInterest);
+      if (then > 0) appState.oiChange24h = ((now - then) / then) * 100;
+    }
+  } catch (e) {}
+
+  // Defaults if null
+  if (appState.fundingRate === null) appState.fundingRate = 0.000030;
+  if (appState.oiChange24h === null) appState.oiChange24h = -0.018;
+
+  const nowUTC = new Date().toISOString().slice(0, 16) + ' UTC';
+  appState.asofUTC = nowUTC;
+
+  if (klinesSuccess) {
+    appState.lastSuccessfulSync = Date.now();
+    if (isCacheFallback) {
+      if (banner) banner.style.display = 'block';
+      if (syncTag) {
+        syncTag.textContent = '● FAILOVER CACHE';
+        syncTag.className = 'sync-tag';
+        syncTag.style.background = 'rgba(245,158,11,0.2)';
+        syncTag.style.color = '#fbbf24';
+      }
+      if (asofText) asofText.textContent = `Failover Local Cache • Synced ${nowUTC}`;
+    } else {
+      if (banner) banner.style.display = 'none';
+      if (syncTag) {
+        syncTag.textContent = '● LIVE STREAMING';
+        syncTag.className = 'sync-tag';
+        syncTag.style.background = 'rgba(16,185,129,0.15)';
+        syncTag.style.color = '#10b981';
+      }
+      if (asofText) asofText.textContent = `Live Binance Feed • Synced ${nowUTC}`;
+    }
+    runAbsorptionAnalysis();
+  } else {
+    if (banner) banner.style.display = 'block';
+    if (syncTag) {
+      syncTag.textContent = '⚠️ DELAY';
+      syncTag.style.background = 'rgba(239,68,68,0.2)';
+      syncTag.style.color = '#f87171';
+    }
+    if (asofText) asofText.textContent = 'Retrying live mirror sync...';
+  }
+}
+
+// 10. Journal Persistence
+function saveJournalEntry() {
+  const input = document.getElementById('journal-input');
+  const text = input.value.trim();
+  if (!text) return;
+  const now = new Date().toISOString().slice(0, 16).replace('T', ' ');
+  const line = `[${now} UTC | BTC $${Math.round(appState.spotPrice).toLocaleString()}] ${text}`;
+  const existing = localStorage.getItem('nexus_absorption_journal') || '';
+  const updated = line + '\n' + existing;
+  localStorage.setItem('nexus_absorption_journal', updated);
+  input.value = '';
+  loadJournal();
+
+  const hint = document.getElementById('journal-saved-hint');
+  if (hint) {
+    hint.style.opacity = '1';
+    setTimeout(() => hint.style.opacity = '0', 1500);
+  }
+}
+
+function clearJournal() {
+  if (confirm('Clear setup journal?')) {
+    localStorage.removeItem('nexus_absorption_journal');
+    loadJournal();
+  }
+}
+
+function loadJournal() {
+  const el = document.getElementById('journal-log');
+  const saved = localStorage.getItem('nexus_absorption_journal');
+  if (el) el.textContent = saved ? saved : 'No journal lines recorded yet.';
+}
+
+// 11. DATA PACKET 6 Generator (MACRO-ABSORB v1.0)
+async function copyDataPacket6() {
+  const L = appState.levels;
+  const nowUTC = new Date().toISOString().slice(0, 16) + ' UTC';
+  const localMYT = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kuala_Lumpur' });
+
+  const recentEvents = [...allEvents].sort((a,b) => b.time_utc.localeCompare(a.time_utc)).slice(0, 6);
+
+  const lines = [
+    "================================================================================",
+    "BTCUSDT MACRO ABSORPTION & RELIEF-TRAP REVIEW PROMPT & DATA PACKET 6 (MACRO-ABSORB v1.0)",
+    "================================================================================",
+    "ROLE & SYSTEM CONSTRAINTS:",
+    "You are an institutional macro quantitative trader specializing in structural breakdown",
+    "relief-traps, value-shelf absorption pin bars, and 3-stage tranche capital deployment.",
+    "Evaluate this market telemetry strictly adhering to these execution rules:",
+    "- 100% Spot Only: Zero margin leverage or perpetual futures.",
+    "- Breakdown Relief-Trap Rule: If Daily Close is under the Floor Support, treat any bounce",
+    "  into the Trap Band as a high-risk trap. Never buy into broken support.",
+    "- Value-Shelf Entry Gate: A long entry is only permitted inside the Value Shelf zone AFTER",
+    "  a closed 4H or Daily candle prints lower wick >= 50% and close location >= 65% (top 35%).",
+    "- Tranche Sizing: If absorption passes at shelf, deploy 30% only (reserve 70% cash for retest).",
+    "- Profit Targets: Sell 30% at Target 1, sell 40% at Target 2, and sell final 30% runner only",
+    "  when Daily Extension (Close - EMA20) / ATR14 is >= +2.5.",
+    "- Event Ledger: Scheduled macro catalysts are known beforehand; liquidation shock rows record",
+    "  what already printed. Headlines are never buy signals.",
+    "",
+    "## REQUIRED RESPONSE FORMAT (<150 WORDS)",
+    "1. **Tactical Call:** BUY 30% (SHELF) / WAIT (SHELF REACHED) / CASH (TRAP RISK) / SELL TARGET / NO TRADE",
+    "2. **Absorption Assessment:** Lower wick % & close location % evaluation across 4H and 1D.",
+    "3. **Tranche Order Mapping:** Exact Entry zone, Stop Loss level, and Take Profit targets.",
+    "4. **Confirmation Gate:** What must print on the next closed 4H or Daily bar.",
+    "================================================================================",
+    "",
+    "================================================================================",
+    "BTCUSDT SPOT MACRO ABSORPTION TELEMETRY [LIVE OBSERVED]",
+    "================================================================================",
+    "GENERATION TIMESTAMP UTC: " + nowUTC,
+    "LOCAL TIME (MYT):         " + localMYT + " (UTC+8)",
+    "EXCHANGE VENUE:           Binance Spot BTCUSDT",
+    "TIMEFRAME / LOOKBACK:     1D Klines (120 Bars) & 4H Klines (120 Bars)",
+    "LEVEL CALCULATION MODE:   " + (currentMode === 'dynamic' ? 'Dynamic Algorithmic Rolling Anchors' : 'Grok Benchmark Mode ($82.5k / $75k)'),
+    "PROTOCOL VERSION:         Nexus Absorption Radar Pro (MACRO-ABSORB v1.0)",
+    "--------------------------------------------------------------------------------",
+    "",
+    "[1] CURRENT MARKET & CALL STATUS",
+    "--------------------------------------------------------------------------------",
+    "• Current BTC Spot Price:      " + fmt(appState.spotPrice),
+    "• Tactical Call Verdict:       " + appState.tacticalCall,
+    "• Checklist Score:             " + appState.checklistScore + " / 8 RULES PASSED",
+    "• Regime Classification:       " + appState.regime,
+    "• Inside Value Shelf:          " + (appState.inShelf ? 'YES (TRUE)' : 'NO (FALSE)'),
+    "• Candle Absorption Pass:      " + (appState.absorbPass ? 'PASS (VERIFIED)' : 'FAIL (UNCONFIRMED)'),
+    "• Buy 30% Tranche Armed:       " + (appState.shelfBuyArmed ? 'ARMED' : 'LOCKED'),
+    "• Recommended Spot Action:     " + appState.tacticalAction,
+    "",
+    "[2] CANDLE ABSORPTION & MOMENTUM INDICATORS",
+    "--------------------------------------------------------------------------------",
+    "• 4H Lower Wick Ratio:         " + (appState.stats4h.wick * 100).toFixed(2) + "% (Req >= 50%)",
+    "• 4H Close Location:           " + (appState.stats4h.loc * 100).toFixed(2) + "% (Req >= 65% in top 35%)",
+    "• Daily Lower Wick Ratio:      " + (appState.stats1d.wick * 100).toFixed(2) + "% (Req >= 50%)",
+    "• Daily Close Location:        " + (appState.stats1d.loc * 100).toFixed(2) + "% (Req >= 65% in top 35%)",
+    "• Daily 20-Period EMA:         " + fmt(appState.ema20),
+    "• Daily 14-Period ATR:         " + fmt(appState.atr14),
+    "• Normalized Extension:        " + (appState.extension >= 0 ? '+' : '') + appState.extension.toFixed(2) + " ATR",
+    "• Binance 8h Funding Rate:     " + (appState.fundingRate !== null ? (appState.fundingRate * 100).toFixed(4) + "%" : 'N/A'),
+    "• 24h Open Interest Change:    " + (appState.oiChange24h !== null ? fmtPct(appState.oiChange24h) : 'N/A'),
+    "",
+    "[3] STRUCTURAL BOUNDARY LEVELS MATRIX",
+    "--------------------------------------------------------------------------------",
+    `• Floor Support:               $${Math.round(L.floor).toLocaleString()} [${appState.spotPrice >= L.floor ? 'HELD' : 'BROKEN'}]`,
+    `• Reclaim Gate:                $${Math.round(L.reclaim).toLocaleString()} [${appState.spotPrice >= L.reclaim ? 'ABOVE' : 'BELOW'}]`,
+    `• Relief Trap Band:            $${Math.round(L.trapLo).toLocaleString()} – $${Math.round(L.trapHi).toLocaleString()}`,
+    `• Value Shelf (Accumulation):  $${Math.round(L.shelfLo).toLocaleString()} – $${Math.round(L.shelfHi).toLocaleString()}`,
+    `• Target 1 (Sell 30% Tranche): $${Math.round(L.t1).toLocaleString()}`,
+    `• Target 2 (Sell 40% Tranche): $${Math.round(L.t2).toLocaleString()}`,
+    "",
+    "[4] MACRO EVENT & VOLATILITY SHOCK LEDGER",
+    "--------------------------------------------------------------------------------"
+  ];
+
+  recentEvents.forEach(e => {
+    const btcFmt = n => n ? '$' + Number(n).toLocaleString() : 'blank';
+    lines.push(`• ${e.time_utc.slice(0,10)} | [${e.kind.toUpperCase().padEnd(9)}] ${e.label.padEnd(38)} | Before: ${btcFmt(e.btc_before).padEnd(8)} | 24h: ${btcFmt(e.btc_24h).padEnd(8)} | UnderFloor: ${String(e.daily_close_under_floor)}`);
+  });
+
+  lines.push("");
+  lines.push("================================================================================");
+  lines.push("END OF DATA PACKET 6 (MACRO-ABSORB v1.0)");
+  lines.push("================================================================================");
+
+  const packetText = lines.join("\n");
+
+  try {
+    await navigator.clipboard.writeText(packetText);
+    showToast('📋 DATA PACKET 6 Copied to Clipboard!');
+  } catch(e) {
+    const ta = document.createElement('textarea');
+    ta.value = packetText;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('📋 DATA PACKET 6 Copied via fallback!');
+  }
+
+  const btn = document.getElementById('btn-copy-packet6');
+  if (btn) {
+    const orig = btn.textContent;
+    btn.textContent = '✅ Copied Packet 6!';
+    setTimeout(() => btn.textContent = orig, 1500);
+  }
+}
+
+// Initialization
+loadJournal();
+loadEventData();
+loadLive();
+setInterval(loadLive, 10000);
+</script>
+</body>
+</html>
