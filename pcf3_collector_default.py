@@ -6074,6 +6074,21 @@ bullish market != valid entry
             f.write(full_packet)
         print(f"\n✅ PCF3 FULL RAW + PSYCH + REGIME + SMA 10/20 packet written to {PACKET_OUTPUT} and {default_path}")
         print(f"Size: {len(full_packet)} chars | Spot: {spot_price} | POC: {vp_data.get('poc') if vp_data else 'MISSING'} | HVNs: {len(vp_data.get('top_hvns',[])) if vp_data else 0} | STH: {sth_data.get('sth_price') if sth_data else 'MISSING'} | Depth levels: {len(depth_data.get('depths',[])) if depth_data else 0} | SMA10: {sma_data.get('sma10_daily') if sma_data else 'MISSING'} SMA20: {sma_data.get('sma20_daily') if sma_data else 'MISSING'} | EXAMPLE:0")
+
+        # Auto-update Macro Threat Telemetry feed
+        try:
+            macro_script = BASE_DIR / "scripts" / "macro_collector.py"
+            if macro_script.exists():
+                import importlib.util
+                spec = importlib.util.spec_from_file_location("macro_collector", str(macro_script))
+                macro_mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(macro_mod)
+                macro_mod.run_collector()
+                import subprocess
+                subprocess.run(["git", "add", "data/macro_threat_feed.json"], cwd=str(BASE_DIR), check=False)
+                print("✅ Macro Threat feed updated and staged.")
+        except Exception as me:
+            print(f"⚠️ Note: Macro collector execution note: {me}")
     except Exception as e:
         print(f"Write failed: {e}")
 

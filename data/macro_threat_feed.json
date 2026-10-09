@@ -1,44 +1,64 @@
 {
   "version": "1.0.0",
-  "asof": "2026-10-10T00:00:00Z",
+  "asof": "2026-10-09T16:44:25Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
-    "score": 85,
+    "score": 100,
     "max_score": 100,
     "status": "CRITICAL THREAT / SQUEEZE IMMINENT",
     "level": "CRIMSON",
     "tactical_call": "FORCE DMRA REGIME 2: 100% USDT CASH PRESERVATION",
     "execution_instruction": "HALT all spot dip-buying across Quant Radar, Liquidity Radar, Sweep Desk, and Absorption Radar. Maintain 100% USDT dry powder until US 10Y pulls back below 5.0% and SPX/RSP breadth recovers.",
     "breakdown": {
-      "spx_rsp_breadth_divergence": { "points": 35, "max": 35, "triggered": true, "reason": "SPX at ATH while RSP lagging down; double-bottom breakout into 2008 fractal" },
-      "us10y_elevated_yield": { "points": 30, "max": 30, "triggered": true, "reason": "10Y Treasury Yield at 5.284% >= 5.00% toxic liquidity squeeze threshold" },
-      "mstr_bearish_divergence": { "points": 20, "max": 20, "triggered": true, "reason": "MSTR failing to reclaim cycle highs ($1,999); momentum squeeze and RSI divergence" },
-      "seasonality_election_window": { "points": 15, "max": 15, "triggered": true, "reason": "US Election volatility cycle active; crypto recovery lag warning in effect" }
+      "spx_rsp_breadth_divergence": {
+        "points": 35,
+        "max": 35,
+        "triggered": true,
+        "reason": "SPX at ATH while RSP lagging down; double-bottom breakout into 2008 fractal"
+      },
+      "us10y_elevated_yield": {
+        "points": 30,
+        "max": 30,
+        "triggered": true,
+        "reason": "10Y Treasury Yield at 5.253% >= 5.00% toxic threshold"
+      },
+      "mstr_bearish_divergence": {
+        "points": 20,
+        "max": 20,
+        "triggered": true,
+        "reason": "MSTR failing to reclaim cycle highs; momentum squeeze and RSI divergence"
+      },
+      "seasonality_election_window": {
+        "points": 15,
+        "max": 15,
+        "triggered": true,
+        "reason": "US Election volatility cycle active; crypto recovery lag warning in effect"
+      }
     }
   },
   "modules": {
     "module_a_breadth": {
-      "spx_price": 5782.76,
-      "spx_change_24h": 0.62,
-      "spx_ath": 5790.20,
+      "spx_price": 7805.96,
+      "spx_change_24h": 1.08,
+      "spx_ath": 5790.2,
       "spx_distance_ath_pct": -0.13,
-      "rsp_price": 168.42,
-      "rsp_change_24h": -0.38,
-      "rsp_52w_high": 174.50,
+      "rsp_price": 212.82,
+      "rsp_change_24h": 1.47,
+      "rsp_52w_high": 174.5,
       "rsp_distance_high_pct": -3.48,
-      "ratio_raw": 34.335,
+      "ratio_raw": 36.679,
       "ratio_normalized": 1.428,
-      "ratio_50sma": 33.620,
-      "ratio_sma_diff_pct": 2.13,
+      "ratio_50sma": 33.995,
+      "ratio_sma_diff_pct": 7.89,
       "divergence_flag": "CRITICAL BREADTH DIVERGENCE: TECH CONCENTRATION MIRAGE",
       "fractal_note": "Fewer than 10 mega-caps propping up headline index. 2008 double-bottom breakout similarity active."
     },
     "module_b_yield": {
-      "yield_pct": 5.284,
+      "yield_pct": 5.253,
       "change_30d_bps": 42.0,
-      "danger_threshold_pct": 5.000,
-      "caution_threshold_pct": 4.250,
+      "danger_threshold_pct": 5.0,
+      "caution_threshold_pct": 4.25,
       "danger_zone_distance_bps": 3.4,
       "status": "TOXIC",
       "status_label": "YIELD ANOMALY / LIQUIDITY SQUEEZE ACTIVE",
@@ -46,14 +66,14 @@
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity."
     },
     "module_c_mstr": {
-      "price": 1485.50,
-      "change_24h_pct": -1.85,
+      "price": 156.32,
+      "change_24h_pct": -2.31,
       "cycle_high": 1999.99,
       "distance_from_high_pct": -25.72,
       "daily_rsi": 41.2,
       "rolling_corr_btc_30d": 0.842,
-      "support_shelf": 1420.00,
-      "resistance_gate": 1750.00,
+      "support_shelf": 1420.0,
+      "resistance_gate": 1750.0,
       "status": "BEARISH DIVERGENCE / SQUEEZE WARNING",
       "color": "amber",
       "interpretation": "MSTR is the high-beta sentiment canary for BTC. Structural failure to reclaim May highs precedes crypto spot corrections."
@@ -64,10 +84,30 @@
       "historical_lag_rule": "Crypto takes 3-6x longer than equities to recover from macro election and yield volatility shocks.",
       "dry_powder_instruction": "Preserve 100% USDT cash for deep demand shelves during post-shock liquidation cascades.",
       "catalysts": [
-        { "event": "US CPI Inflation Print", "date": "2026-10-15", "days_away": 5, "impact": "HIGH" },
-        { "event": "US Non-Farm Payrolls (NFP)", "date": "2026-11-01", "days_away": 22, "impact": "HIGH" },
-        { "event": "US Presidential Election", "date": "2026-11-05", "days_away": 26, "impact": "EXTREME" },
-        { "event": "US FOMC Rate Decision", "date": "2026-11-06", "days_away": 27, "impact": "CRITICAL" }
+        {
+          "event": "US CPI Inflation Print",
+          "date": "2026-10-15",
+          "days_away": 5,
+          "impact": "HIGH"
+        },
+        {
+          "event": "US Non-Farm Payrolls (NFP)",
+          "date": "2026-11-01",
+          "days_away": 22,
+          "impact": "HIGH"
+        },
+        {
+          "event": "US Presidential Election",
+          "date": "2026-11-05",
+          "days_away": 26,
+          "impact": "EXTREME"
+        },
+        {
+          "event": "US FOMC Rate Decision",
+          "date": "2026-11-06",
+          "days_away": 27,
+          "impact": "CRITICAL"
+        }
       ]
     },
     "tech_overextension": {
@@ -80,57 +120,444 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 62840.00,
-      "change_24h_pct": -1.15,
-      "htf_support": 60000.00,
-      "htf_resistance": 65200.00,
+      "spot_price": 82645.31,
+      "change_24h_pct": -3.66,
+      "htf_support": 60000.0,
+      "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
       "regime_posture": "DEFENSIVE (Awaiting macro de-escalation)"
     }
   },
   "history": [
-    { "date": "2026-08-11", "spx": 5344.16, "rsp": 162.10, "ratio": 32.968, "sma50": 32.750, "us10y": 4.88, "mstr": 1320.0, "btc": 59400 },
-    { "date": "2026-08-12", "spx": 5344.39, "rsp": 162.20, "ratio": 32.949, "sma50": 32.760, "us10y": 4.90, "mstr": 1335.0, "btc": 60500 },
-    { "date": "2026-08-13", "spx": 5434.43, "rsp": 163.50, "ratio": 33.238, "sma50": 32.780, "us10y": 4.92, "mstr": 1360.0, "btc": 61200 },
-    { "date": "2026-08-14", "spx": 5455.21, "rsp": 163.80, "ratio": 33.304, "sma50": 32.800, "us10y": 4.91, "mstr": 1380.0, "btc": 58900 },
-    { "date": "2026-08-15", "spx": 5543.22, "rsp": 165.10, "ratio": 33.575, "sma50": 32.825, "us10y": 4.94, "mstr": 1410.0, "btc": 57800 },
-    { "date": "2026-08-18", "spx": 5608.25, "rsp": 166.40, "ratio": 33.703, "sma50": 32.860, "us10y": 4.96, "mstr": 1445.0, "btc": 59200 },
-    { "date": "2026-08-19", "spx": 5597.12, "rsp": 166.10, "ratio": 33.697, "sma50": 32.890, "us10y": 4.95, "mstr": 1420.0, "btc": 59700 },
-    { "date": "2026-08-20", "spx": 5620.85, "rsp": 166.90, "ratio": 33.678, "sma50": 32.920, "us10y": 4.98, "mstr": 1430.0, "btc": 60200 },
-    { "date": "2026-08-21", "spx": 5634.61, "rsp": 167.30, "ratio": 33.679, "sma50": 32.950, "us10y": 4.97, "mstr": 1440.0, "btc": 60800 },
-    { "date": "2026-08-22", "spx": 5570.64, "rsp": 165.80, "ratio": 33.598, "sma50": 32.970, "us10y": 5.01, "mstr": 1415.0, "btc": 61200 },
-    { "date": "2026-08-25", "spx": 5625.80, "rsp": 167.00, "ratio": 33.687, "sma50": 32.990, "us10y": 5.03, "mstr": 1450.0, "btc": 62400 },
-    { "date": "2026-08-26", "spx": 5633.91, "rsp": 167.20, "ratio": 33.695, "sma50": 33.010, "us10y": 5.02, "mstr": 1460.0, "btc": 61800 },
-    { "date": "2026-08-27", "spx": 5591.96, "rsp": 166.10, "ratio": 33.666, "sma50": 33.030, "us10y": 5.05, "mstr": 1435.0, "btc": 59100 },
-    { "date": "2026-08-28", "spx": 5598.40, "rsp": 166.40, "ratio": 33.644, "sma50": 33.050, "us10y": 5.06, "mstr": 1440.0, "btc": 59000 },
-    { "date": "2026-08-29", "spx": 5648.40, "rsp": 167.50, "ratio": 33.721, "sma50": 33.080, "us10y": 5.08, "mstr": 1475.0, "btc": 59600 },
-    { "date": "2026-09-02", "spx": 5528.93, "rsp": 164.20, "ratio": 33.671, "sma50": 33.100, "us10y": 5.12, "mstr": 1390.0, "btc": 58200 },
-    { "date": "2026-09-03", "spx": 5520.07, "rsp": 164.00, "ratio": 33.658, "sma50": 33.120, "us10y": 5.11, "mstr": 1380.0, "btc": 57500 },
-    { "date": "2026-09-04", "spx": 5503.41, "rsp": 163.50, "ratio": 33.660, "sma50": 33.140, "us10y": 5.14, "mstr": 1365.0, "btc": 56800 },
-    { "date": "2026-09-05", "spx": 5408.42, "rsp": 161.20, "ratio": 33.551, "sma50": 33.160, "us10y": 5.16, "mstr": 1310.0, "btc": 54200 },
-    { "date": "2026-09-08", "spx": 5471.05, "rsp": 162.80, "ratio": 33.605, "sma50": 33.180, "us10y": 5.15, "mstr": 1340.0, "btc": 55100 },
-    { "date": "2026-09-09", "spx": 5495.52, "rsp": 163.20, "ratio": 33.673, "sma50": 33.200, "us10y": 5.18, "mstr": 1360.0, "btc": 56900 },
-    { "date": "2026-09-10", "spx": 5554.13, "rsp": 164.50, "ratio": 33.763, "sma50": 33.220, "us10y": 5.17, "mstr": 1395.0, "btc": 57800 },
-    { "date": "2026-09-11", "spx": 5595.76, "rsp": 165.40, "ratio": 33.831, "sma50": 33.250, "us10y": 5.19, "mstr": 1420.0, "btc": 58300 },
-    { "date": "2026-09-12", "spx": 5626.02, "rsp": 166.00, "ratio": 33.891, "sma50": 33.280, "us10y": 5.20, "mstr": 1445.0, "btc": 59900 },
-    { "date": "2026-09-15", "spx": 5633.09, "rsp": 165.80, "ratio": 33.975, "sma50": 33.310, "us10y": 5.22, "mstr": 1450.0, "btc": 58500 },
-    { "date": "2026-09-16", "spx": 5634.58, "rsp": 165.70, "ratio": 34.004, "sma50": 33.340, "us10y": 5.21, "mstr": 1455.0, "btc": 59200 },
-    { "date": "2026-09-17", "spx": 5618.26, "rsp": 165.20, "ratio": 34.008, "sma50": 33.370, "us10y": 5.23, "mstr": 1440.0, "btc": 60100 },
-    { "date": "2026-09-18", "spx": 5713.64, "rsp": 167.40, "ratio": 34.131, "sma50": 33.400, "us10y": 5.22, "mstr": 1510.0, "btc": 62800 },
-    { "date": "2026-09-19", "spx": 5702.55, "rsp": 166.80, "ratio": 34.187, "sma50": 33.430, "us10y": 5.24, "mstr": 1495.0, "btc": 63400 },
-    { "date": "2026-09-22", "spx": 5718.57, "rsp": 167.10, "ratio": 34.222, "sma50": 33.460, "us10y": 5.23, "mstr": 1505.0, "btc": 63700 },
-    { "date": "2026-09-23", "spx": 5732.93, "rsp": 167.30, "ratio": 34.267, "sma50": 33.490, "us10y": 5.25, "mstr": 1515.0, "btc": 63500 },
-    { "date": "2026-09-24", "spx": 5722.20, "rsp": 166.80, "ratio": 34.305, "sma50": 33.520, "us10y": 5.26, "mstr": 1500.0, "btc": 64200 },
-    { "date": "2026-09-25", "spx": 5745.37, "rsp": 167.20, "ratio": 34.362, "sma50": 33.550, "us10y": 5.25, "mstr": 1520.0, "btc": 63900 },
-    { "date": "2026-09-26", "spx": 5738.17, "rsp": 166.90, "ratio": 34.380, "sma50": 33.580, "us10y": 5.27, "mstr": 1505.0, "btc": 65500 },
-    { "date": "2026-09-29", "spx": 5762.48, "rsp": 167.40, "ratio": 34.423, "sma50": 33.600, "us10y": 5.26, "mstr": 1530.0, "btc": 65800 },
-    { "date": "2026-09-30", "spx": 5762.48, "rsp": 167.10, "ratio": 34.485, "sma50": 33.620, "us10y": 5.28, "mstr": 1525.0, "btc": 64400 },
-    { "date": "2026-10-01", "spx": 5708.75, "rsp": 165.20, "ratio": 34.556, "sma50": 33.640, "us10y": 5.30, "mstr": 1470.0, "btc": 60800 },
-    { "date": "2026-10-02", "spx": 5709.94, "rsp": 165.00, "ratio": 34.605, "sma50": 33.660, "us10y": 5.31, "mstr": 1465.0, "btc": 60500 },
-    { "date": "2026-10-03", "spx": 5699.94, "rsp": 164.60, "ratio": 34.629, "sma50": 33.680, "us10y": 5.32, "mstr": 1455.0, "btc": 61200 },
-    { "date": "2026-10-06", "spx": 5751.07, "rsp": 166.20, "ratio": 34.603, "sma50": 33.700, "us10y": 5.30, "mstr": 1490.0, "btc": 62700 },
-    { "date": "2026-10-07", "spx": 5790.20, "rsp": 166.80, "ratio": 34.713, "sma50": 33.730, "us10y": 5.29, "mstr": 1510.0, "btc": 63200 },
-    { "date": "2026-10-08", "spx": 5780.05, "rsp": 166.10, "ratio": 34.798, "sma50": 33.760, "us10y": 5.31, "mstr": 1495.0, "btc": 62400 },
-    { "date": "2026-10-09", "spx": 5782.76, "rsp": 168.42, "ratio": 34.335, "sma50": 33.620, "us10y": 5.284, "mstr": 1485.5, "btc": 62840 }
+    {
+      "date": "2026-08-11",
+      "spx": 5344.16,
+      "rsp": 162.1,
+      "ratio": 32.968,
+      "sma50": 32.75,
+      "us10y": 4.88,
+      "mstr": 1320.0,
+      "btc": 59400
+    },
+    {
+      "date": "2026-08-12",
+      "spx": 5344.39,
+      "rsp": 162.2,
+      "ratio": 32.949,
+      "sma50": 32.76,
+      "us10y": 4.9,
+      "mstr": 1335.0,
+      "btc": 60500
+    },
+    {
+      "date": "2026-08-13",
+      "spx": 5434.43,
+      "rsp": 163.5,
+      "ratio": 33.238,
+      "sma50": 32.78,
+      "us10y": 4.92,
+      "mstr": 1360.0,
+      "btc": 61200
+    },
+    {
+      "date": "2026-08-14",
+      "spx": 5455.21,
+      "rsp": 163.8,
+      "ratio": 33.304,
+      "sma50": 32.8,
+      "us10y": 4.91,
+      "mstr": 1380.0,
+      "btc": 58900
+    },
+    {
+      "date": "2026-08-15",
+      "spx": 5543.22,
+      "rsp": 165.1,
+      "ratio": 33.575,
+      "sma50": 32.825,
+      "us10y": 4.94,
+      "mstr": 1410.0,
+      "btc": 57800
+    },
+    {
+      "date": "2026-08-18",
+      "spx": 5608.25,
+      "rsp": 166.4,
+      "ratio": 33.703,
+      "sma50": 32.86,
+      "us10y": 4.96,
+      "mstr": 1445.0,
+      "btc": 59200
+    },
+    {
+      "date": "2026-08-19",
+      "spx": 5597.12,
+      "rsp": 166.1,
+      "ratio": 33.697,
+      "sma50": 32.89,
+      "us10y": 4.95,
+      "mstr": 1420.0,
+      "btc": 59700
+    },
+    {
+      "date": "2026-08-20",
+      "spx": 5620.85,
+      "rsp": 166.9,
+      "ratio": 33.678,
+      "sma50": 32.92,
+      "us10y": 4.98,
+      "mstr": 1430.0,
+      "btc": 60200
+    },
+    {
+      "date": "2026-08-21",
+      "spx": 5634.61,
+      "rsp": 167.3,
+      "ratio": 33.679,
+      "sma50": 32.95,
+      "us10y": 4.97,
+      "mstr": 1440.0,
+      "btc": 60800
+    },
+    {
+      "date": "2026-08-22",
+      "spx": 5570.64,
+      "rsp": 165.8,
+      "ratio": 33.598,
+      "sma50": 32.97,
+      "us10y": 5.01,
+      "mstr": 1415.0,
+      "btc": 61200
+    },
+    {
+      "date": "2026-08-25",
+      "spx": 5625.8,
+      "rsp": 167.0,
+      "ratio": 33.687,
+      "sma50": 32.99,
+      "us10y": 5.03,
+      "mstr": 1450.0,
+      "btc": 62400
+    },
+    {
+      "date": "2026-08-26",
+      "spx": 5633.91,
+      "rsp": 167.2,
+      "ratio": 33.695,
+      "sma50": 33.01,
+      "us10y": 5.02,
+      "mstr": 1460.0,
+      "btc": 61800
+    },
+    {
+      "date": "2026-08-27",
+      "spx": 5591.96,
+      "rsp": 166.1,
+      "ratio": 33.666,
+      "sma50": 33.03,
+      "us10y": 5.05,
+      "mstr": 1435.0,
+      "btc": 59100
+    },
+    {
+      "date": "2026-08-28",
+      "spx": 5598.4,
+      "rsp": 166.4,
+      "ratio": 33.644,
+      "sma50": 33.05,
+      "us10y": 5.06,
+      "mstr": 1440.0,
+      "btc": 59000
+    },
+    {
+      "date": "2026-08-29",
+      "spx": 5648.4,
+      "rsp": 167.5,
+      "ratio": 33.721,
+      "sma50": 33.08,
+      "us10y": 5.08,
+      "mstr": 1475.0,
+      "btc": 59600
+    },
+    {
+      "date": "2026-09-02",
+      "spx": 5528.93,
+      "rsp": 164.2,
+      "ratio": 33.671,
+      "sma50": 33.1,
+      "us10y": 5.12,
+      "mstr": 1390.0,
+      "btc": 58200
+    },
+    {
+      "date": "2026-09-03",
+      "spx": 5520.07,
+      "rsp": 164.0,
+      "ratio": 33.658,
+      "sma50": 33.12,
+      "us10y": 5.11,
+      "mstr": 1380.0,
+      "btc": 57500
+    },
+    {
+      "date": "2026-09-04",
+      "spx": 5503.41,
+      "rsp": 163.5,
+      "ratio": 33.66,
+      "sma50": 33.14,
+      "us10y": 5.14,
+      "mstr": 1365.0,
+      "btc": 56800
+    },
+    {
+      "date": "2026-09-05",
+      "spx": 5408.42,
+      "rsp": 161.2,
+      "ratio": 33.551,
+      "sma50": 33.16,
+      "us10y": 5.16,
+      "mstr": 1310.0,
+      "btc": 54200
+    },
+    {
+      "date": "2026-09-08",
+      "spx": 5471.05,
+      "rsp": 162.8,
+      "ratio": 33.605,
+      "sma50": 33.18,
+      "us10y": 5.15,
+      "mstr": 1340.0,
+      "btc": 55100
+    },
+    {
+      "date": "2026-09-09",
+      "spx": 5495.52,
+      "rsp": 163.2,
+      "ratio": 33.673,
+      "sma50": 33.2,
+      "us10y": 5.18,
+      "mstr": 1360.0,
+      "btc": 56900
+    },
+    {
+      "date": "2026-09-10",
+      "spx": 5554.13,
+      "rsp": 164.5,
+      "ratio": 33.763,
+      "sma50": 33.22,
+      "us10y": 5.17,
+      "mstr": 1395.0,
+      "btc": 57800
+    },
+    {
+      "date": "2026-09-11",
+      "spx": 5595.76,
+      "rsp": 165.4,
+      "ratio": 33.831,
+      "sma50": 33.25,
+      "us10y": 5.19,
+      "mstr": 1420.0,
+      "btc": 58300
+    },
+    {
+      "date": "2026-09-12",
+      "spx": 5626.02,
+      "rsp": 166.0,
+      "ratio": 33.891,
+      "sma50": 33.28,
+      "us10y": 5.2,
+      "mstr": 1445.0,
+      "btc": 59900
+    },
+    {
+      "date": "2026-09-15",
+      "spx": 5633.09,
+      "rsp": 165.8,
+      "ratio": 33.975,
+      "sma50": 33.31,
+      "us10y": 5.22,
+      "mstr": 1450.0,
+      "btc": 58500
+    },
+    {
+      "date": "2026-09-16",
+      "spx": 5634.58,
+      "rsp": 165.7,
+      "ratio": 34.004,
+      "sma50": 33.34,
+      "us10y": 5.21,
+      "mstr": 1455.0,
+      "btc": 59200
+    },
+    {
+      "date": "2026-09-17",
+      "spx": 5618.26,
+      "rsp": 165.2,
+      "ratio": 34.008,
+      "sma50": 33.37,
+      "us10y": 5.23,
+      "mstr": 1440.0,
+      "btc": 60100
+    },
+    {
+      "date": "2026-09-18",
+      "spx": 5713.64,
+      "rsp": 167.4,
+      "ratio": 34.131,
+      "sma50": 33.4,
+      "us10y": 5.22,
+      "mstr": 1510.0,
+      "btc": 62800
+    },
+    {
+      "date": "2026-09-19",
+      "spx": 5702.55,
+      "rsp": 166.8,
+      "ratio": 34.187,
+      "sma50": 33.43,
+      "us10y": 5.24,
+      "mstr": 1495.0,
+      "btc": 63400
+    },
+    {
+      "date": "2026-09-22",
+      "spx": 5718.57,
+      "rsp": 167.1,
+      "ratio": 34.222,
+      "sma50": 33.46,
+      "us10y": 5.23,
+      "mstr": 1505.0,
+      "btc": 63700
+    },
+    {
+      "date": "2026-09-23",
+      "spx": 5732.93,
+      "rsp": 167.3,
+      "ratio": 34.267,
+      "sma50": 33.49,
+      "us10y": 5.25,
+      "mstr": 1515.0,
+      "btc": 63500
+    },
+    {
+      "date": "2026-09-24",
+      "spx": 5722.2,
+      "rsp": 166.8,
+      "ratio": 34.305,
+      "sma50": 33.52,
+      "us10y": 5.26,
+      "mstr": 1500.0,
+      "btc": 64200
+    },
+    {
+      "date": "2026-09-25",
+      "spx": 5745.37,
+      "rsp": 167.2,
+      "ratio": 34.362,
+      "sma50": 33.55,
+      "us10y": 5.25,
+      "mstr": 1520.0,
+      "btc": 63900
+    },
+    {
+      "date": "2026-09-26",
+      "spx": 5738.17,
+      "rsp": 166.9,
+      "ratio": 34.38,
+      "sma50": 33.58,
+      "us10y": 5.27,
+      "mstr": 1505.0,
+      "btc": 65500
+    },
+    {
+      "date": "2026-09-29",
+      "spx": 5762.48,
+      "rsp": 167.4,
+      "ratio": 34.423,
+      "sma50": 33.6,
+      "us10y": 5.26,
+      "mstr": 1530.0,
+      "btc": 65800
+    },
+    {
+      "date": "2026-09-30",
+      "spx": 5762.48,
+      "rsp": 167.1,
+      "ratio": 34.485,
+      "sma50": 33.62,
+      "us10y": 5.28,
+      "mstr": 1525.0,
+      "btc": 64400
+    },
+    {
+      "date": "2026-10-01",
+      "spx": 5708.75,
+      "rsp": 165.2,
+      "ratio": 34.556,
+      "sma50": 33.64,
+      "us10y": 5.3,
+      "mstr": 1470.0,
+      "btc": 60800
+    },
+    {
+      "date": "2026-10-02",
+      "spx": 5709.94,
+      "rsp": 165.0,
+      "ratio": 34.605,
+      "sma50": 33.66,
+      "us10y": 5.31,
+      "mstr": 1465.0,
+      "btc": 60500
+    },
+    {
+      "date": "2026-10-03",
+      "spx": 5699.94,
+      "rsp": 164.6,
+      "ratio": 34.629,
+      "sma50": 33.68,
+      "us10y": 5.32,
+      "mstr": 1455.0,
+      "btc": 61200
+    },
+    {
+      "date": "2026-10-06",
+      "spx": 5751.07,
+      "rsp": 166.2,
+      "ratio": 34.603,
+      "sma50": 33.7,
+      "us10y": 5.3,
+      "mstr": 1490.0,
+      "btc": 62700
+    },
+    {
+      "date": "2026-10-07",
+      "spx": 5790.2,
+      "rsp": 166.8,
+      "ratio": 34.713,
+      "sma50": 33.73,
+      "us10y": 5.29,
+      "mstr": 1510.0,
+      "btc": 63200
+    },
+    {
+      "date": "2026-10-08",
+      "spx": 5780.05,
+      "rsp": 166.1,
+      "ratio": 34.798,
+      "sma50": 33.76,
+      "us10y": 5.31,
+      "mstr": 1495.0,
+      "btc": 62400
+    },
+    {
+      "date": "2026-10-09",
+      "spx": 7805.96,
+      "rsp": 212.82,
+      "ratio": 36.679,
+      "sma50": 33.995,
+      "us10y": 5.253,
+      "mstr": 156.3,
+      "btc": 82645.0
+    }
   ]
 }

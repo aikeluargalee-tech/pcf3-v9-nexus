@@ -83,8 +83,9 @@ for target_url in test_urls:
     print(f"  • Tactical Action:        {action_text}")
     print(f"  • Sync Tag Status:        {sync_text}")
 
-    if "85" not in score_text:
-        print(f"  ❌ ERROR: Unexpected threat score: {score_text}")
+    score_num = int(re.sub(r'[^0-9]', '', score_text)) if re.sub(r'[^0-9]', '', score_text) else 0
+    if score_num < 66:
+        print(f"  ❌ ERROR: Unexpected threat score: {score_text} (expected >= 66% Crimson Gate)")
         all_passed = False
     elif "CRITICAL" not in status_text:
         print(f"  ❌ ERROR: Threat status not evaluated properly: {status_text}")
