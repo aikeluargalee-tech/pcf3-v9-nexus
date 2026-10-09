@@ -6,21 +6,21 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Quant Radar — Bitcoin Derivatives Telemetry, Funding Spreads &amp; Open Interest</title>
-<meta name="description" content="Quant Radar provides real-time quantitative derivatives telemetry, Open Interest velocity, basis spreads, and annualized funding rate analysis for Bitcoin.">
+<title>Quant Radar — Bitcoin Spot Swing Model (USSM v1.0), 200 SMA Regime, 21 EMA Dip &amp; 30D Volume Profile POC</title>
+<meta name="description" content="Quant Radar provides real-time quantitative spot swing model telemetry (USSM v1.0), 200-day SMA regime slope, 21-day EMA dip bands, 14-day RSI, and 30-day Volume Profile POC for Bitcoin. 100% Spot Only, Zero Derivatives, Zero Leverage.">
 <link rel="canonical" href="../quant-radar.html">
 
 <!-- Open Graph -->
-<meta property="og:title" content="Quant Radar — Bitcoin Derivatives Telemetry &amp; Open Interest">
-<meta property="og:description" content="Real-time quantitative derivatives telemetry, funding rate spreads, and Open Interest velocity for Bitcoin.">
+<meta property="og:title" content="Quant Radar — Bitcoin Spot Swing Model (USSM v1.0) &amp; Daily Telemetry">
+<meta property="og:description" content="Objective 3-rule quantitative swing model evaluated exclusively on daily spot klines (Manus + Grok + Gemini + DeepSeek). 100% Spot Only, Zero Derivatives.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://aikeluargalee-tech.github.io/pcf3-v9-nexus/quant-radar.html">
 <meta property="og:site_name" content="Nexus Terminal">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Quant Radar — Bitcoin Derivatives Telemetry &amp; Open Interest">
-<meta name="twitter:description" content="Quantitative Bitcoin derivatives telemetry, funding rate curves, and open interest metrics.">
+<meta name="twitter:title" content="Quant Radar — Bitcoin Spot Swing Model (USSM v1.0) &amp; Daily Telemetry">
+<meta name="twitter:description" content="Objective 3-rule quantitative swing model evaluated exclusively on daily spot klines. 100% Spot Only.">
 
 <!-- Schema.org JSON-LD -->
 <script type="application/ld+json">
@@ -29,7 +29,7 @@
   "@type": "SoftwareApplication",
   "name": "Quant Radar",
   "applicationCategory": "FinanceApplication",
-  "description": "Real-time Bitcoin derivatives telemetry, funding spreads, and open interest velocity analytics.",
+  "description": "Objective 3-rule quantitative swing model evaluated exclusively on daily spot klines (Manus + Grok + Gemini + DeepSeek). 100% Spot Only, Zero Derivatives.",
   "publisher": {
     "@type": "Organization",
     "name": "Nexus Terminal"
@@ -487,6 +487,7 @@
       <span>⚡</span>
       <span>QUANT RADAR</span>
       <span class="tag">DATA PACKET 3</span>
+      <span id="quant-sync-tag" class="tag" style="background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.4); color:#34d399; font-weight:700;">● CONNECTING...</span>
     </div>
     <div class="nav-links">
       <button class="nav-btn primary" onclick="copyDataPacket3()" id="btn-copy-data-3">📋 Copy Data Packet 3</button>
@@ -499,6 +500,22 @@
       <button class="nav-btn refresh-btn" onclick="fetchAndCompute()" id="btn-refresh">🔄 Refresh Live</button>
     </div>
   </nav>
+
+  <!-- Staleness Watchdog Alert Banner -->
+  <div id="quant-staleness-banner" style="display:none; background:linear-gradient(135deg, rgba(239,68,68,0.2), rgba(185,28,28,0.25)); border:1px solid #EF4444; border-radius:10px; padding:12px 18px; color:#FEE2E2; margin-bottom:20px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span style="font-size:20px;">🚨</span>
+        <div>
+          <div id="quant-staleness-title" style="font-weight:700; font-size:13px; color:#FFFFFF;">API CONNECTION DELAY DETECTED</div>
+          <div id="quant-staleness-desc" style="font-size:11px; color:#FCA5A5;">Unable to reach live Binance Spot 1D klines API. Serving verified local daily bar telemetry snapshot with automatic retry active.</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button onclick="fetchAndCompute()" style="background:#EF4444; color:#FFFFFF; border:none; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer;">Retry API Sync</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Hero Banner -->
   <div class="hero">
@@ -749,7 +766,9 @@ let quantData = {
   signal: false,
   failsafeStop: null,
   initialStop: null,
-  trailActivation: null
+  trailActivation: null,
+  isLive: false,
+  lastSyncTime: null
 };
 
 // Toast helper
@@ -761,26 +780,65 @@ function showToast(msg) {
   setTimeout(() => { t.style.display = 'none'; }, 3200);
 }
 
-// 1. Fetch Binance Daily Klines (250 limit)
+// 1. Fetch Binance Daily Klines (250 limit) with Multi-Mirror Fallback
 async function fetchAndCompute() {
   const refreshBtn = document.getElementById('btn-refresh');
   if (refreshBtn) refreshBtn.textContent = '⏳ Fetching...';
   
-  try {
-    // Primary Binance Vision API (CORS-enabled globally), with fallback to Binance Direct
-    let res;
-    try {
-      res = await fetch('https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250', { cache: 'no-store' });
-      if (!res.ok) throw new Error('Status ' + res.status);
-    } catch(errVision) {
-      console.warn('data-api.binance.vision failed, falling back to api.binance.com:', errVision);
-      res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250', { cache: 'no-store' });
-    }
+  const isSubfolder = window.location.pathname.endsWith('/') || window.location.pathname.includes('/quant-radar/');
+  const prefix = isSubfolder ? '../' : './';
 
-    const raw = await res.json();
-    if (!Array.isArray(raw) || raw.length < 200) {
-      throw new Error('Received insufficient kline bars from Binance.');
+  const endpoints = [
+    { url: 'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250', isLive: true },
+    { url: 'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250', isLive: true },
+    { url: 'https://api1.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250', isLive: true },
+    { url: 'https://api2.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250', isLive: true },
+    { url: 'https://api3.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250', isLive: true },
+    { url: prefix + 'data/btc_daily_klines.json', isLive: false }
+  ];
+
+  let raw = null;
+  let sourceIsLive = false;
+
+  for (const ep of endpoints) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4500);
+      const res = await fetch(ep.url, { cache: 'no-store', signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length >= 200) {
+          raw = data;
+          sourceIsLive = ep.isLive;
+          break;
+        }
+      }
+    } catch (err) {
+      // Try next endpoint
     }
+  }
+
+  if (!raw) {
+    console.error('All kline endpoints failed.');
+    const banner = document.getElementById('quant-staleness-banner');
+    if (banner) banner.style.display = 'block';
+    const syncTag = document.getElementById('quant-sync-tag');
+    if (syncTag) {
+      syncTag.textContent = '⚠️ API DISCONNECTED';
+      syncTag.style.background = 'rgba(239, 68, 68, 0.2)';
+      syncTag.style.color = '#F87171';
+      syncTag.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+    }
+    const updateText = document.getElementById('last-updated-text');
+    if (updateText) updateText.textContent = 'Fetch failed across all mirrors. Retrying in 10s...';
+    if (refreshBtn) refreshBtn.textContent = '🔄 Refresh Live';
+    return;
+  }
+
+  try {
+    quantData.isLive = sourceIsLive;
+    quantData.lastSyncTime = new Date();
 
     // Parse Candles
     quantData.candles = raw.map(k => ({
@@ -804,14 +862,40 @@ async function fetchAndCompute() {
     evaluateRules();
 
     // Render UI
-    try { updateUI(); } catch (errUI) { console.error('UI update error:', errUI); }
+    updateUI();
 
-    document.getElementById('last-updated-text').textContent = 'UTC: ' + new Date().toISOString().replace('T',' ').slice(0,19);
-    showToast('✅ Live market data & indicators refreshed successfully');
+    // Sync pill and banner updates
+    const banner = document.getElementById('quant-staleness-banner');
+    const syncTag = document.getElementById('quant-sync-tag');
+    const updateText = document.getElementById('last-updated-text');
+
+    const lastCandle = quantData.candles[N - 1];
+    const candleDate = new Date(lastCandle.openTime).toISOString().slice(0, 10);
+    const timeStr = new Date().toISOString().replace('T', ' ').slice(11, 19) + ' UTC';
+
+    if (sourceIsLive) {
+      if (banner) banner.style.display = 'none';
+      if (syncTag) {
+        syncTag.textContent = '● LIVE STREAMING';
+        syncTag.style.background = 'rgba(16, 185, 129, 0.15)';
+        syncTag.style.color = '#34D399';
+        syncTag.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+      }
+      if (updateText) updateText.textContent = 'Binance Spot 1D ● Bar: ' + candleDate + ' ● ' + timeStr;
+    } else {
+      if (banner) banner.style.display = 'block';
+      if (syncTag) {
+        syncTag.textContent = '⚠️ CACHED SNAPSHOT';
+        syncTag.style.background = 'rgba(245, 158, 11, 0.15)';
+        syncTag.style.color = '#FBBF24';
+        syncTag.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+      }
+      if (updateText) updateText.textContent = 'Offline Bar Snapshot (' + candleDate + ') ● Retrying API in 10s...';
+    }
+
   } catch (e) {
-    console.error('Fetch error:', e);
-    showToast('⚠️ Error fetching live data: ' + e.message);
-    document.getElementById('last-updated-text').textContent = 'Fetch failed: ' + e.message;
+    console.error('Computation error:', e);
+    showToast('⚠️ Error computing indicators: ' + e.message);
   } finally {
     if (refreshBtn) refreshBtn.textContent = '🔄 Refresh Live';
   }
@@ -1210,7 +1294,7 @@ async function copyDataPacket3() {
     "================================================================================",
     "GENERATION TIMESTAMP UTC: " + nowUTC,
     "LOCAL TIME (MYT):         " + localMYT + " (UTC+8)",
-    "SYMBOL / VENUE:           BTCUSDT SPOT | Binance (data-api.binance.vision)",
+    "SYMBOL / VENUE:           BTCUSDT SPOT | Binance Public API",
     "TIMEFRAME / LOOKBACK:     1D (Daily Spot Klines) | 250 Completed Daily Bars",
     "MODEL ARCHITECTURE:       PCF3 Unified Simple Swing Model (USSM v1.0)",
     "AUDITED ARCHITECTURES:    Manus (Regime) + Grok (Setup) + Gemini (Value) + DeepSeek (Risk)",
@@ -1221,7 +1305,7 @@ async function copyDataPacket3() {
     "[1] CURRENT SPOT & CANDLE CLOSE",
     "--------------------------------------------------------------------------------",
     "Current BTC Daily Close:   $" + close.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-    "Data Provenance / Source:  Binance Public REST API (CORS enabled)",
+    "Data Provenance / Source:  " + (quantData.isLive ? "Binance Public REST API (Live)" : "Verified Local Daily Kline Snapshot"),
     "Data Freshness Gate:       Observed at bar close snapshot",
     "",
     "[2] CARD A — RULE 1: REGIME FILTER (MANUS ARCHITECTURE)",
@@ -1303,10 +1387,13 @@ async function copyDataPacket3() {
   });
 }
 
-// Initial Boot
+// Initial Boot and 10s Live Auto-Refresh
 document.addEventListener('DOMContentLoaded', () => {
   fetchAndCompute();
+  // Auto-refresh live market streaming every 10 seconds
+  setInterval(fetchAndCompute, 10000);
 });
+
 </script>
 
 <!-- Global Standard Compliance Footer -->
@@ -1320,7 +1407,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <a href="../terms.html" style="color:var(--text-secondary); text-decoration:none;">Terms of Service</a>
     <a href="../contact.html" style="color:var(--text-secondary); text-decoration:none;">Contact</a>
   </div>
-  <div>Quant Radar provides independent quantitative derivatives telemetry, Open Interest velocity, and funding rate analytics. Strictly educational telemetry — not investment advice.</div>
+  <div>Quant Radar provides objective 3-rule quantitative spot swing model telemetry (USSM v1.0). 100% Spot Only, Zero Derivatives, Zero Leverage. Strictly educational telemetry — not investment advice.</div>
   <div>&copy; 2026 Nexus Terminal Research. All rights reserved.</div>
 </footer>
 
