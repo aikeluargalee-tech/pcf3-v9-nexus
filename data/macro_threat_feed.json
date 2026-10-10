@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "asof": "2026-10-09T23:42:16Z",
+  "asof": "2026-10-10T03:20:18Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
@@ -120,8 +120,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 82527.76,
-      "change_24h_pct": -3.8,
+      "spot_price": 82507.77,
+      "change_24h_pct": -3.56,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -558,6 +558,16 @@
       "us10y": 5.244,
       "mstr": 154.3,
       "btc": 82528.0
+    },
+    {
+      "date": "2026-10-10",
+      "spx": 7811.54,
+      "rsp": 213.04,
+      "ratio": 36.667,
+      "sma50": 34.048,
+      "us10y": 5.244,
+      "mstr": 154.3,
+      "btc": 82508.0
     }
   ]
 }
