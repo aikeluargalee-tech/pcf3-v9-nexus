@@ -71,14 +71,22 @@
   function resolveLocalUrl(relativePath) {
     if (typeof window === 'undefined') return relativePath;
     const cleanPath = relativePath.replace(/^\.?\//, '');
-    let dir = window.location.pathname;
-    if (dir.endsWith('.html') || dir.endsWith('.htm')) {
-      dir = dir.substring(0, dir.lastIndexOf('/') + 1);
-    } else if (!dir.endsWith('/')) {
-      dir = dir + '/';
+
+    // Reliably anchor to repository root across root and subfolder paths
+    let repoBase = window.location.origin;
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    if (pathParts.length > 0 && window.location.hostname.endsWith('github.io')) {
+      repoBase += '/' + pathParts[0] + '/';
+    } else {
+      let dir = window.location.pathname;
+      if (dir.endsWith('.html') || dir.endsWith('.htm')) {
+        dir = dir.substring(0, dir.lastIndexOf('/') + 1);
+      } else if (!dir.endsWith('/')) {
+        dir = dir + '/';
+      }
+      repoBase += dir;
     }
-    const base = window.location.origin + dir;
-    return `${base}${cleanPath}?t=${Date.now()}`;
+    return `${repoBase}${cleanPath}?t=${Date.now()}`;
   }
 
   /**
@@ -86,6 +94,8 @@
    * CRITICAL: NEVER append ?t= to Binance or external REST APIs.
    * Binance strictly validates query parameters and throws HTTP 400 Bad Request
    * if unexpected parameters like 't' are received.
+   * Also NEVER pass { cache: 'no-store' } to external APIs as it triggers CORS preflight
+   * OPTIONS which Binance edge WAF rejects with HTTP 403 Forbidden.
    */
   async function fetchWithWaterfall(urlList, isJson = true, timeoutMs = 1800) {
     for (const rawUrl of urlList) {
@@ -95,7 +105,10 @@
 
         const ctrl = new AbortController();
         const tid = setTimeout(() => ctrl.abort(), timeoutMs);
-        const res = await fetch(url, { cache: 'no-store', signal: ctrl.signal });
+        const fetchOpts = isExternal 
+          ? { signal: ctrl.signal } 
+          : { cache: 'no-store', signal: ctrl.signal };
+        const res = await fetch(url, fetchOpts);
         clearTimeout(tid);
 
         if (!res.ok) continue;

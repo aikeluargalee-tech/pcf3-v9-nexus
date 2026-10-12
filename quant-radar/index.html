@@ -802,10 +802,6 @@ async function fetchAndCompute() {
 
   const endpoints = [
     { url: 'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250', isLive: true },
-    { url: 'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250', isLive: true },
-    { url: 'https://api1.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250', isLive: true },
-    { url: 'https://api2.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250', isLive: true },
-    { url: 'https://api3.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250', isLive: true },
     { url: prefix + 'data/btc_daily_klines.json', isLive: false }
   ];
 
@@ -815,8 +811,11 @@ async function fetchAndCompute() {
   for (const ep of endpoints) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4500);
-      const res = await fetch(ep.url, { cache: 'no-store', signal: controller.signal });
+      const timeoutId = setTimeout(() => controller.abort(), 1800);
+      const fetchOpts = ep.isLive
+        ? { signal: controller.signal }
+        : { cache: 'no-store', signal: controller.signal };
+      const res = await fetch(ep.url, fetchOpts);
       clearTimeout(timeoutId);
       if (res.ok) {
         const data = await res.json();
