@@ -532,10 +532,15 @@
         🛡️ POSITION BIAS: DEFENSIVE / SHORT RALLIES (0.25x – 0.5x SIZE)
       </div>
     </div>
-    <div style="text-align:right;">
-      <div style="font-size:11px; color:var(--dim); text-transform:uppercase; font-weight:700;">Live BTC Spot Price</div>
-      <div id="px-live" style="font-size:30px; font-weight:900; font-family:ui-monospace,monospace; color:var(--cyan);">$0.00</div>
-      <div id="time-myt" class="mono" style="font-size:11px; color:var(--muted); margin-top:2px;">Shah Alam MYT (Asia/Kuala_Lumpur)</div>
+    <div style="text-align:right; min-width:260px; display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <div style="font-size:11px; color:var(--dim); text-transform:uppercase; font-weight:700;">Live BTC Spot Price</div>
+        <div id="px-live" style="font-size:30px; font-weight:900; font-family:ui-monospace,monospace; color:var(--cyan);">$0.00</div>
+        <div id="time-myt" class="mono" style="font-size:11px; color:var(--muted); margin-top:2px;">Shah Alam MYT (Asia/Kuala_Lumpur)</div>
+      </div>
+      <button class="nav-btn primary" id="btn-copy-packet8-hero" onclick="copyDataPacket8()" style="margin-top:14px; width:100%; justify-content:center; padding:10px 16px; font-size:12px; font-weight:800; background:linear-gradient(135deg, #059669, #10b981); border:1px solid #34d399; box-shadow:0 4px 14px rgba(16,185,129,0.35);">
+        📋 COPY DATA PACKET 8 (FOR META AI)
+      </button>
     </div>
   </div>
 
@@ -576,7 +581,8 @@
     <div class="card" style="min-width:0;">
       <div class="card-header" style="flex-wrap:wrap; gap:8px;">
         <span class="card-title">HISTORICAL OPERATIONAL LEDGER &amp; JOURNAL</span>
-        <div style="display:flex; gap:6px;">
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <button class="nav-btn primary" id="btn-copy-packet8-ledger" onclick="copyDataPacket8()">📋 Copy Packet 8</button>
           <button class="nav-btn" id="btn-export-csv" onclick="exportActiveTabCSV()">📥 Export Tab CSV</button>
           <button class="nav-btn" onclick="exportMasterJSON()">📦 Export Master JSON</button>
         </div>
@@ -1185,7 +1191,10 @@ async function loadLive() {
 
 // DATA PACKET 8: CONFLUENCE-RADAR v1.0
 async function copyDataPacket8() {
-  if (!radarData) return;
+  if (!radarData) {
+    showToast('⚠️ Volatility Radar data loading, please wait...');
+    return;
+  }
 
   const score = calcTotalScore();
   const cl = getScoreClassification(score);
@@ -1253,17 +1262,27 @@ async function copyDataPacket8() {
     showToast('📋 DATA PACKET 8 Copied via fallback!');
   }
 
-  const btn = document.getElementById('btn-copy-packet8');
-  if (btn) {
-    const orig = btn.textContent;
-    btn.textContent = '✅ Copied Packet 8!';
-    setTimeout(() => btn.textContent = orig, 1500);
-  }
+  const btnIds = ['btn-copy-packet8', 'btn-copy-packet8-hero', 'btn-copy-packet8-ledger', 'btn-copy-packet8-float'];
+  btnIds.forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      const orig = btn.textContent;
+      btn.textContent = '✅ Copied Packet 8!';
+      setTimeout(() => btn.textContent = orig, 1800);
+    }
+  });
 }
 
 // Initialization
 loadLive();
 setInterval(loadLive, 10000);
 </script>
+
+<!-- Floating Quick Copy Button for Instant Access -->
+<div id="floating-packet-copy" style="position:fixed; bottom:24px; right:24px; z-index:9999;">
+  <button id="btn-copy-packet8-float" onclick="copyDataPacket8()" class="nav-btn primary" style="padding:11px 20px; font-size:13px; font-weight:800; border-radius:30px; box-shadow:0 8px 24px rgba(0,0,0,0.6), 0 0 16px rgba(16,185,129,0.45); border:1px solid #34d399; background:linear-gradient(135deg, #059669, #10b981); cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
+    📋 Copy Data Packet 8
+  </button>
+</div>
 </body>
 </html>
