@@ -819,27 +819,56 @@ async function fetchLiveBtcPrice() {
   return btcLivePrice;
 }
 
-// Load baseline JSON or restore from localStorage
+function escapeHTML(str) {
+  if (str === null || str === undefined) return '';
+  return String(str).replace(/[&<>'"]/g, tag => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    "'": '&#39;',
+    '"': '&quot;'
+  }[tag] || tag));
+}
+
+// Load baseline JSON or restore from localStorage with fresh version checks
 async function initRadarData() {
+  const isRoot = window.location.pathname.endsWith('volatility-radar.html') || !window.location.pathname.includes('/volatility-radar/');
+  const cachePath = isRoot ? 'data/volatility_confluence_feed.json' : '../data/volatility_confluence_feed.json';
+
+  let fetchedData = null;
+  try {
+    const res = await fetch(cachePath + '?t=' + Date.now());
+    if (res.ok) {
+      fetchedData = await res.json();
+    }
+  } catch(e) {}
+
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored) {
     try {
-      radarData = JSON.parse(stored);
+      const parsedStored = JSON.parse(stored);
+      if (fetchedData && parsedStored) {
+        // Version check: if remote JSON has newer version or newer asof, merge feed updates
+        if (fetchedData.asof && (!parsedStored.asof || fetchedData.asof > parsedStored.asof)) {
+          radarData = { ...fetchedData };
+          // Preserve any custom user-added ledger rows
+          if (parsedStored.tables) {
+            radarData.tables = { ...fetchedData.tables, ...parsedStored.tables };
+          }
+          saveToStorage();
+          return radarData;
+        }
+      }
+      radarData = parsedStored;
       return radarData;
     } catch(e) {}
   }
 
-  const isRoot = window.location.pathname.endsWith('volatility-radar.html') || !window.location.pathname.includes('/volatility-radar/');
-  const cachePath = isRoot ? 'data/volatility_confluence_feed.json' : '../data/volatility_confluence_feed.json';
-
-  try {
-    const res = await fetch(cachePath + '?t=' + Date.now());
-    if (res.ok) {
-      radarData = await res.json();
-      saveToStorage();
-      return radarData;
-    }
-  } catch(e) {}
+  if (fetchedData) {
+    radarData = fetchedData;
+    saveToStorage();
+    return radarData;
+  }
 
   return null;
 }
@@ -914,13 +943,24 @@ function renderUI() {
   renderTabs();
   renderActiveTable();
 
+  // Dynamic Oil Transmission State
+  const geopolPillar = (radarData.pillars && radarData.pillars.find(p => p.id === 'geopolitics')) || {};
+  const isOilActive = geopolPillar.score === -1;
+  const oilBadge = document.getElementById('oil-flag-badge');
+  if (oilBadge) {
+    oilBadge.textContent = isOilActive ? 'OIL_TRANSMISSION_ACTIVE' : 'OIL_TRANSMISSION_CALM';
+    oilBadge.style.color = isOilActive ? '#f87171' : '#34d399';
+    oilBadge.style.borderColor = isOilActive ? 'rgba(239,68,68,0.4)' : 'rgba(52,211,153,0.4)';
+    oilBadge.style.background = isOilActive ? 'rgba(239,68,68,0.2)' : 'rgba(52,211,153,0.15)';
+  }
+
   // Expose global state for cross-dashboard reading
   window.nexusVolatilityRadarState = {
     total_confluence_score: score,
     risk_state: cl.text,
-    oil_transmission_flag: true,
-    oil_spike_24h_pct: 2.1,
-    real_yield_delta_bps: 12.0
+    oil_transmission_flag: isOilActive,
+    oil_spike_24h_pct: isOilActive ? 2.1 : 0.0,
+    real_yield_delta_bps: isOilActive ? 12.0 : 0.0
   };
 }
 
@@ -937,11 +977,11 @@ function renderPillars() {
     card.innerHTML = `
       <div>
         <div class="pillar-header mono">
-          <span>${p.short}</span>
+          <span>${escapeHTML(p.short)}</span>
           <span class="pillar-dot ${dotClass}"></span>
         </div>
-        <div class="pillar-title">${p.label}</div>
-        <div class="pillar-desc mono">${p.rationale}</div>
+        <div class="pillar-title">${escapeHTML(p.label)}</div>
+        <div class="pillar-desc mono">${escapeHTML(p.rationale)}</div>
       </div>
       <div class="pillar-btn-group">
         <button class="btn-score ${p.score === -1 ? 'active-neg' : ''}" onclick="setPillarScore(${idx}, -1)">-1</button>
@@ -978,7 +1018,7 @@ function renderChecklist() {
     div.innerHTML = `
       <input type="checkbox" class="check-box" ${item.done ? 'checked' : ''} onchange="toggleChecklist(${idx})"/>
       <div class="mono" style="font-size:11px; line-height:1.35;">
-        <span>${item.desc || item.label}</span>
+        <span>${escapeHTML(item.desc || item.label)}</span>
       </div>
     `;
     container.appendChild(div);
@@ -1026,8 +1066,10 @@ function renderActiveTable() {
   tbody.innerHTML = '';
   rows.forEach((row, rIdx) => {
     const tr = document.createElement('tr');
-    tr.innerHTML = row.map((cell, cIdx) => {
-      const cellStr = String(cell);
+    row.forEach((cell, cIdx) => {
+      const td = document.createElement('td');
+      td.textContent = String(cell);
+      const cellStr = td.textContent;
       let colorStyle = 'color:#e2e8f0;';
       if (cellStr.includes('-1') || cellStr.includes('Bear') || cellStr.includes('-$') || (cellStr.startsWith('-') && !cellStr.startsWith('--'))) {
         colorStyle = 'color:#f87171;';
@@ -1036,8 +1078,9 @@ function renderActiveTable() {
       } else if (cellStr === '0' || cellStr === 'Neutral') {
         colorStyle = 'color:#94a3b8;';
       }
-      return `<td style="${colorStyle}">${cell}</td>`;
-    }).join('');
+      td.setAttribute('style', colorStyle);
+      tr.appendChild(td);
+    });
     tbody.appendChild(tr);
   });
 
@@ -1147,7 +1190,7 @@ async function copyDataPacket8() {
   const score = calcTotalScore();
   const cl = getScoreClassification(score);
   const now = new Date();
-  const timestampMYT = now.toISOString().replace(/\.\d{3}Z$/, '+08:00');
+  const timestampMYT = new Date(now.getTime() + (8 * 3600 * 1000)).toISOString().slice(0, 19) + '+08:00';
   const doneChecklist = radarData.checklist_p1.filter(c => c.done).length;
 
   const lines = [
