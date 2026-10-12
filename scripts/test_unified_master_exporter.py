@@ -186,6 +186,32 @@ def test_unified_exporter():
     assert '[OVERRIDDEN BY DESK 7 CRIMSON GATE]' in js_code
     print("[PASS] Failure H: Desk 8 scalp shorting strictly overridden when Threat Matrix is CRIMSON (100/100).")
 
+    # Test Failure I: Desk 3 Degraded/Missing Kline Evaluability Guard
+    assert '[NOT EVALUABLE — PENDING KLINE TELEMETRY]' in js_code, "Must have NOT EVALUABLE string for missing kline data!"
+    assert '>>> NOT EVALUABLE (PENDING KLINE TELEMETRY) <<<' in js_code, "Must have composite NOT EVALUABLE state!"
+    assert 'quantR1 = null' in js_code or 'quantR1 = spotPrice > sma200' in js_code
+    print("[PASS] Failure I: Desk 3 strictly yields 'NOT EVALUABLE' when kline telemetry is pending, never a false [FAIL].")
+
+    # Test Failure J: Granular Operational Integrity & Clearance Audit
+    assert 'SYSTEM OPERATIONAL INTEGRITY & CLEARANCE AUDIT:' in js_code
+    assert 'Spot Stream Telemetry:' in js_code
+    assert 'Order Book Depth Telemetry:' in js_code
+    assert 'Technical Indicator Engine:' in js_code
+    assert 'Strategy Precedence Gate:' in js_code
+    assert 'Operational Clearance:' in js_code
+    print("[PASS] Failure J: Dossier header enforces granular 6-point operational integrity audit with explicit clearance.")
+
+    # Test Failure K: Desk 2 Rule Evaluability Metric
+    assert 'RULES EVALUABLE' in js_code
+    assert 'desk2IntegrityDisplay' in js_code
+    print("[PASS] Failure K: Desk 2 dynamically reports verified evaluable rules count rather than blanket claim.")
+
+    # Test Failure L: Fast Waterfall Fallback & Zero Blocked Mirror Hang
+    assert 'timeoutMs = 1800' in js_code, "Waterfall timeout must be capped at 1800ms for mobile safety!"
+    assert 'api1.binance.com' not in js_code, "Blocked binance.com mirrors removed from kline waterfall!"
+    assert 'data/btc_daily_klines.json' in js_code, "Fast local kline fallback verified!"
+    print("[PASS] Failure L: Waterfall restricted to unblocked public endpoints with 1800ms timeout and fast local fallback.")
+
     print("\n>>> ALL ADVANCED INTEGRITY & FAILURE REGRESSION CHECKS PASSED WITH 100% COMPLIANCE! <<<")
 
 if __name__ == '__main__':

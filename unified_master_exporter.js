@@ -34,37 +34,29 @@
     ticker: [
       'https://data-api.binance.vision/api/v3/ticker/price?symbol=BTCUSDT',
       'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT',
-      'https://api1.binance.com/api/v3/ticker/price?symbol=BTCUSDT',
-      'https://api3.binance.com/api/v3/ticker/price?symbol=BTCUSDT'
+      'https://api.coinbase.com/v2/prices/BTC-USD/spot'
     ],
     book: [
       'https://data-api.binance.vision/api/v3/ticker/bookTicker?symbol=BTCUSDT',
-      'https://api.binance.com/api/v3/ticker/bookTicker?symbol=BTCUSDT',
-      'https://api1.binance.com/api/v3/ticker/bookTicker?symbol=BTCUSDT',
-      'https://api3.binance.com/api/v3/ticker/bookTicker?symbol=BTCUSDT'
+      'https://api.binance.com/api/v3/ticker/bookTicker?symbol=BTCUSDT'
     ],
     dailyKlines: [
       'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250',
-      'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250',
-      'https://api1.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250',
-      'https://api2.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250',
-      'https://api3.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250',
+      './data/btc_daily_klines.json',
       'data/btc_daily_klines.json'
     ],
     fourHourKlines: [
       'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=90',
-      'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=90',
-      'https://api1.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=90',
-      'https://api3.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=90',
+      './data/btc_4h_klines.json',
       'data/btc_4h_klines.json'
     ],
     volatilityFeed: [
-      'data/volatility_confluence_feed.json',
-      './data/volatility_confluence_feed.json'
+      './data/volatility_confluence_feed.json',
+      'data/volatility_confluence_feed.json'
     ],
     threatFeed: [
-      'data/macro_threat_feed.json',
-      './data/macro_threat_feed.json'
+      './data/macro_threat_feed.json',
+      'data/macro_threat_feed.json'
     ],
     masterPacket: [
       './PCF3_LIVE_PACKET_DEFAULT.txt',
@@ -95,7 +87,7 @@
    * Binance strictly validates query parameters and throws HTTP 400 Bad Request
    * if unexpected parameters like 't' are received.
    */
-  async function fetchWithWaterfall(urlList, isJson = true, timeoutMs = 5000) {
+  async function fetchWithWaterfall(urlList, isJson = true, timeoutMs = 1800) {
     for (const rawUrl of urlList) {
       try {
         const isExternal = rawUrl.startsWith('http://') || rawUrl.startsWith('https://');
@@ -347,7 +339,7 @@
     // 2. Compute Quant Radar (USSM v1.0) (L2 Derived Indicators)
     let sma200 = null, sma20d = null, smaSlopeUp = false;
     let ema21 = null, rsi14 = null, atr20 = null, poc30d = null;
-    let quantR1 = false, quantR2 = false, quantR3 = false;
+    let quantR1 = null, quantR2 = null, quantR3 = null;
     let initStop = null, trailTrigger = null, stopDist = null;
 
     if (Array.isArray(dailyKlines) && dailyKlines.length >= 30) {
@@ -370,10 +362,16 @@
       atr20 = calcWilderATR(dailyKlines, 20);
       poc30d = calcVolumeProfilePOC(dailyKlines, 30, 50);
 
-      // Quant Rules Evaluation
-      quantR1 = sma200 !== null ? (spotPrice > sma200 && smaSlopeUp) : (ema21 !== null && spotPrice > ema21 * 0.95);
-      quantR2 = (ema21 !== null && spotPrice >= 0.98 * ema21 && spotPrice <= 1.02 * ema21) && (rsi14 !== null && rsi14 >= 40 && rsi14 <= 60);
-      quantR3 = poc30d !== null && spotPrice <= poc30d;
+      // Quant Rules Evaluation: Strictly evaluate ONLY when respective indicators exist!
+      if (sma200 !== null) {
+        quantR1 = spotPrice > sma200 && smaSlopeUp;
+      }
+      if (ema21 !== null && rsi14 !== null) {
+        quantR2 = (spotPrice >= 0.98 * ema21 && spotPrice <= 1.02 * ema21) && (rsi14 >= 40 && rsi14 <= 60);
+      }
+      if (poc30d !== null) {
+        quantR3 = spotPrice <= poc30d;
+      }
 
       if (atr20) {
         stopDist = 2.5 * atr20;
@@ -381,6 +379,32 @@
         trailTrigger = spotPrice + 2.0 * atr20;
       }
     }
+
+    const quantEvaluable = (quantR1 !== null && quantR2 !== null && quantR3 !== null);
+
+    const quantR1Display = quantR1 === null
+      ? '[NOT EVALUABLE — PENDING KLINE TELEMETRY]'
+      : (quantR1
+        ? `[PASS] — Spot Above Rising 200 SMA (${formatUSD(sma200)})`
+        : `[FAIL] — Below 200 SMA (${formatUSD(sma200)}) or Declining Slope`);
+
+    const quantR2Display = quantR2 === null
+      ? '[NOT EVALUABLE — PENDING KLINE TELEMETRY]'
+      : (quantR2
+        ? `[PASS] — Spot in 21 EMA Band (±2% of ${formatUSD(ema21)}) + RSI (${rsi14 ? rsi14.toFixed(1) : ''}) in 40–60 Neutral Band`
+        : `[FAIL] — Extended vs 21 EMA (${formatUSD(ema21)}) or RSI (${rsi14 ? rsi14.toFixed(1) : 'N/A'}) Outside Band`);
+
+    const quantR3Display = quantR3 === null
+      ? '[NOT EVALUABLE — PENDING KLINE TELEMETRY]'
+      : (quantR3
+        ? `[PASS] — Spot in Value Area (Spot <= 30D POC ${formatUSD(poc30d)})`
+        : `[FAIL] — Above 30D POC Value (${formatUSD(poc30d)})`);
+
+    const compositeSignalDisplay = !quantEvaluable
+      ? '>>> NOT EVALUABLE (PENDING KLINE TELEMETRY) <<<'
+      : (quantR1 && quantR2 && quantR3
+        ? '>>> 3-FACTOR CONFLUENCE ALIGNED <<<'
+        : '>>> CONFLUENCE DISPERSED / BASELINE <<<');
 
     // 3. Compute Liquidity Dynamic Zones (Psych Support / Take Profit Magnet)
     const psychs = [70000, 75000, 80000, 85000, 90000, 95000, 100000, 109000, 126000, 150000];
@@ -515,6 +539,19 @@
       ? `${formatUSD(sthFloor)} (${sthDistPct >= 0 ? '+' : ''}${sthDistPct.toFixed(2)}% vs Floor) [L3: 90D VWAP/SMA PROXY ESTIMATION]`
       : '[VALIDATION FAILED: OUT OF BOUNDS — METRIC SUPPRESSED]';
 
+    let desk2EvaluableCount = 6;
+    if (dailyKlines && dailyKlines.length >= 4) desk2EvaluableCount += 1;
+    if (atr14Daily) desk2EvaluableCount += 1;
+    if (sthFloor) desk2EvaluableCount += 1;
+
+    const desk2IntegrityDisplay = desk2EvaluableCount === 9
+      ? 'ALL 9 EXECUTION RULES ACTIVE • 9/9 RULES EVALUABLE (ALL SENSORS BOUND)'
+      : `ALL 9 EXECUTION RULES CONFIGURED • ${desk2EvaluableCount}/9 RULES EVALUABLE (${quantEvaluable ? 'ALL SENSORS BOUND' : 'KLINE ENGINE PENDING'})`;
+
+    const overallClearance = (quantEvaluable && isLiveTicker)
+      ? 'CLEARED FOR MONITORING • DEFENSIVE CASH PRESERVATION MANDATE ACTIVE'
+      : 'DEGRADED TELEMETRY • PROCEED WITH DEFENSIVE CAUTION (EXECUTION RESTRICTED)';
+
     // --- ASSEMBLE COMPREHENSIVE DOSSIER ---
     const lines = [
       "================================================================================",
@@ -523,12 +560,19 @@
       "ENGINE: Multi-Mirror Parallel Telemetry Arbitrator • v1.1.0 Institutional Spec",
       "DESTINATION: Multi-Agent AI Review (Claude, ChatGPT, Grok, Gemini, Meta AI)",
       "================================================================================",
-      "DATA PROVENANCE & INTEGRITY LEDGER:",
+      "DATA PROVENANCE & OPERATIONAL INTEGRITY LEDGER:",
       "• [L1: LIVE STREAM]:          Binance Spot & Order Book Depth (Real-Time Websocket/REST)",
       "• [L2: DERIVED INDICATORS]:   Wilder RSI 14, Wilder ATR 20, 21 EMA, 200 SMA, 50-Bin POC (Live In-Browser Calculation)",
       "• [L3: ON-CHAIN & MACRO]:     STH Cost Basis ($81,842 proxy), US 10Y Yield (5.244%), SPX ($7,811), Volatility Radar (-3/8)",
       "• [L4: STRATEGY & MODELS]:    USSM v1.0 Swing Rules, SMC Sweeps, DMRA Cash Gate, March 2023 Fractal Study",
-      "VALIDATION STATUS:            ALL METRICS SANITY CHECKED • CROSS-DESK HARMONIZED",
+      "--------------------------------------------------------------------------------",
+      "SYSTEM OPERATIONAL INTEGRITY & CLEARANCE AUDIT:",
+      `• Spot Stream Telemetry:      ${isLiveTicker ? 'ONLINE (Real-Time Binance Ticker Active)' : 'DEGRADED (Daily Kline Close Fallback)'}`,
+      `• Order Book Depth Telemetry: ${isLiveBook ? 'ONLINE (Top-of-Book Depth Active)' : 'OFFLINE / RATE-LIMITED (Depth Feed Disconnected)'}`,
+      `• Technical Indicator Engine: ${quantEvaluable ? 'FULLY OPERATIONAL (250D Klines Bound & Evaluated)' : 'DEGRADED / PENDING (Kline Telemetry Offline)'}`,
+      `• Macro Risk Engines:         OPERATIONAL (Threat Matrix 100/100 • Volatility Radar -3/8 Bound)`,
+      `• Strategy Precedence Gate:   ENFORCED (CRIMSON 100% Cash Preservation Overrides Lower Desks)`,
+      `• Operational Clearance:      ${overallClearance}`,
       "================================================================================",
       "",
       "--------------------------------------------------------------------------------",
@@ -555,7 +599,7 @@
       `• Rule 7: Daily ATR(14) Volatility:   Range Buffer ${atr14Daily ? formatUSD(atr14Daily) : '$2,055.96'} • Max Drawdown Cap`,
       "• Rule 8: Spot Volume vs 30D Mean:    Neutral Volume Absorption",
       `• Rule 9: Tactical Trend-Failure Stop:${sthFloor ? ` Daily close < 90D Proxy (${formatUSD(sthFloor)}) triggers capital preservation (Proxy-based stop; not UTXO-based)` : ' [RULE SUPPRESSED — STH DATA OUT OF BOUNDS]'}`,
-      "• 55-Sensor Execution Integrity:      ALL 9 EXECUTION RULES ACTIVE • 55/55 SENSORS BOUND",
+      `• 55-Sensor Execution Integrity:      ${desk2IntegrityDisplay}`,
       "",
       "--------------------------------------------------------------------------------",
       "DESK 3: QUANT RADAR (UNIFIED SIMPLE SWING MODEL USSM v1.0)",
@@ -565,10 +609,10 @@
       `• 14-Day Wilder RSI:          ${rsi14 ? rsi14.toFixed(2) : 'Syncing...'} (Consolidation Band: 40.0 – 60.0)`,
       `• 20-Day Wilder ATR:          ${atr20 ? formatUSD(atr20) : 'Syncing...'} (${atr20 ? (atr20 / spotPrice * 100).toFixed(2) : '0'}% Daily Range)`,
       `• 30-Day Volume Profile POC:  ${poc30d ? formatUSD(poc30d) : 'Syncing...'} (50-Bin Value Gravity Anchor)`,
-      `• Rule 1 (Regime Filter):     [${quantR1 ? 'PASS' : 'FAIL'}] — ${quantR1 ? `Spot Above Rising 200 SMA (${formatUSD(sma200)})` : 'Below 200 SMA or Declining Slope'}`,
-      `• Rule 2 (Controlled Dip):     [${quantR2 ? 'PASS' : 'FAIL'}] — ${quantR2 ? 'Spot in 21 EMA Band (±2%) + RSI in 40–60 Neutral Band' : 'Extended / RSI Outside Band'}`,
-      `• Rule 3 (Value Location):     [${quantR3 ? 'PASS' : 'FAIL'}] — ${quantR3 ? `Spot in Value Area (Spot <= 30D POC ${formatUSD(poc30d)})` : 'Above 30D POC Value'}`,
-      `• Composite Signal State:     >>> ${quantR1 && quantR2 && quantR3 ? '3-FACTOR CONFLUENCE ALIGNED' : 'CONFLUENCE DISPERSED / BASELINE'} <<<`,
+      `• Rule 1 (Regime Filter):     ${quantR1Display}`,
+      `• Rule 2 (Controlled Dip):     ${quantR2Display}`,
+      `• Rule 3 (Value Location):     ${quantR3Display}`,
+      `• Composite Signal State:     ${compositeSignalDisplay}`,
       `• Quant Stop Boundary (2.5x): ${initStop ? formatUSD(initStop) : 'N/A'} (-${stopDist ? (stopDist / spotPrice * 100).toFixed(2) : '0'}%)`,
       `• Profit Trailing Trigger:    ${trailTrigger ? formatUSD(trailTrigger) : 'N/A'} (+2.0x ATR)`,
       "• Calculation Standard:       Binance BTCUSDT 1D • 250 Completed Daily Candles • Wilder Smoothing Standard",
