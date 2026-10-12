@@ -52,8 +52,12 @@ for name, rel_path in radars:
     if rel_path == 'index.html':
         if '🔄 Refresh Live' in html:
             refresh_list.append('🔄 Refresh Live')
+        if 'Cloud Hard Regenerate' in html:
+            refresh_list.append('⚡ Cloud Hard Regenerate')
         if 'Force Refresh Now' in html:
             refresh_list.append('🔄 Force Refresh Now')
+        if '📋 Copy 9-Desk Master Packet' in html:
+            copy_list.append('📋 Copy 9-Desk Master Packet (For LLM)')
         if '📋 Copy Full Packet' in html:
             copy_list.append('📋 Copy Full Packet')
 
