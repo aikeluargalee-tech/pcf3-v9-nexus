@@ -518,16 +518,16 @@
     <div style="flex:1;">
       <div class="score-badge-wrap">
         <div class="score-pill bearish" id="total-score-pill">
-          <span id="total-score-val">-4</span>
+          <span id="total-score-val">-3</span>
           <span style="font-size:14px; color:var(--dim);">/ 8</span>
         </div>
         <div>
           <div class="banner-status-title" id="risk-state-val" style="color:#f87171;">MILD BEARISH</div>
-          <div id="conviction-val" class="mono" style="font-size:11px; color:var(--muted);">CONVICTION: Medium (4 of 8 pillars aligned bearish)</div>
+          <div id="conviction-val" class="mono" style="font-size:11px; color:var(--muted);">CONVICTION: Moderate (3 of 8 pillars aligned bearish: Macro, ETF, Geopolitics)</div>
         </div>
       </div>
       <div class="banner-desc" id="sizing-rule-val">
-        Reduce size, defensive shorts only. Oil → CPI inflation risk. Hot headline CPI expected +0.6% MoM from gasoline. ETF outflows 2nd consecutive day. Crowded longs into overhead resistance.
+        Defensive posture, scalp shorts only (0.25x - 0.5x). Geopolitical supply risk + ETF outflow pressure.
       </div>
       <div class="banner-action" id="bias-action-val" style="color:#fca5a5; border-color:rgba(239,68,68,0.4);">
         🛡️ POSITION BIAS: DEFENSIVE / SHORT RALLIES (0.25x – 0.5x SIZE)
@@ -1022,6 +1022,19 @@ function renderUI() {
   if (actionVal) {
     actionVal.textContent = `🛡️ POSITION BIAS: ${cl.action}`;
     actionVal.style.color = cl.color;
+  }
+
+  const convictionVal = document.getElementById('conviction-val');
+  if (convictionVal) {
+    const bearishCount = radarData.pillars.filter(p => p.score < 0).length;
+    convictionVal.textContent = radarData.overall && radarData.overall.conviction
+      ? `CONVICTION: ${radarData.overall.conviction}`
+      : `CONVICTION: Moderate (${bearishCount} of 8 pillars aligned bearish)`;
+  }
+
+  const sizingVal = document.getElementById('sizing-rule-val');
+  if (sizingVal && radarData.overall && radarData.overall.sizing_rule) {
+    sizingVal.textContent = radarData.overall.sizing_rule;
   }
 
   // BTC Price
