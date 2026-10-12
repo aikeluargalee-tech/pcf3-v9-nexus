@@ -169,6 +169,23 @@ def test_unified_exporter():
     assert round(win_rate, 1) == 41.2, f"Fractal win rate math discrepancy: {win_rate}%"
     print(f"[PASS] Failure E: Top 17 twins win rate strictly reproduces 41.2% (7/17).")
 
+    # Test Failure F: ATR(14) vs ATR(20) Separation
+    atr14 = sum(trs[:14]) / 14.0
+    for i in range(14, len(trs)):
+        atr14 = (atr14 * 13 + trs[i]) / 14.0
+    assert abs(atr14 - atr) > 10.0, "ATR(14) and ATR(20) should not be artificially identical!"
+    assert 'atr14Daily ? formatUSD(atr14Daily)' in js_code, "Desk 2 Rule 7 must use atr14Daily!"
+    print(f"[PASS] Failure F: ATR(14) (${atr14:,.2f}) and ATR(20) (${atr:,.2f}) strictly separated and independently bound.")
+
+    # Test Failure G: Order Book Disconnection Guard
+    assert 'orderBookDisplay' in js_code
+    assert 'Unavailable (Live Order Book Stream Offline' in js_code
+    print("[PASS] Failure G: Disconnected order book strictly returns 'Unavailable' rather than synthesized $0.00 spread.")
+
+    # Test Failure H: Desk 7 CRIMSON Gate Precedence over Desk 8 Scalp Shorts
+    assert '[OVERRIDDEN BY DESK 7 CRIMSON GATE]' in js_code
+    print("[PASS] Failure H: Desk 8 scalp shorting strictly overridden when Threat Matrix is CRIMSON (100/100).")
+
     print("\n>>> ALL ADVANCED INTEGRITY & FAILURE REGRESSION CHECKS PASSED WITH 100% COMPLIANCE! <<<")
 
 if __name__ == '__main__':

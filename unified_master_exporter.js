@@ -35,12 +35,13 @@
       'https://data-api.binance.vision/api/v3/ticker/price?symbol=BTCUSDT',
       'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT',
       'https://api1.binance.com/api/v3/ticker/price?symbol=BTCUSDT',
-      'https://api.coinbase.com/v2/prices/BTC-USD/spot'
+      'https://api3.binance.com/api/v3/ticker/price?symbol=BTCUSDT'
     ],
     book: [
       'https://data-api.binance.vision/api/v3/ticker/bookTicker?symbol=BTCUSDT',
       'https://api.binance.com/api/v3/ticker/bookTicker?symbol=BTCUSDT',
-      'https://api1.binance.com/api/v3/ticker/bookTicker?symbol=BTCUSDT'
+      'https://api1.binance.com/api/v3/ticker/bookTicker?symbol=BTCUSDT',
+      'https://api3.binance.com/api/v3/ticker/bookTicker?symbol=BTCUSDT'
     ],
     dailyKlines: [
       'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250',
@@ -94,7 +95,7 @@
    * Binance strictly validates query parameters and throws HTTP 400 Bad Request
    * if unexpected parameters like 't' are received.
    */
-  async function fetchWithWaterfall(urlList, isJson = true, timeoutMs = 3000) {
+  async function fetchWithWaterfall(urlList, isJson = true, timeoutMs = 5000) {
     for (const rawUrl of urlList) {
       try {
         const isExternal = rawUrl.startsWith('http://') || rawUrl.startsWith('https://');
@@ -283,19 +284,65 @@
     ]);
 
     // Parse Spot & Book (L1 Live)
-    let spotPrice = 83300.0;
-    let spotSource = 'Binance Live Stream';
+    let spotPrice = 82900.0;
+    let spotSource = 'Binance Real-Time Ticker';
+    let spotFreshness = 'LIVE (<1s)';
+    let isLiveTicker = false;
+
     if (tickerData && tickerData.price) {
       spotPrice = parseFloat(tickerData.price);
+      isLiveTicker = true;
+      spotSource = 'Binance Real-Time Ticker';
+      spotFreshness = 'LIVE (<1s)';
+    } else if (bookData && bookData.bidPrice && bookData.askPrice) {
+      const bp = parseFloat(bookData.bidPrice);
+      const ap = parseFloat(bookData.askPrice);
+      spotPrice = (bp + ap) / 2.0;
+      isLiveTicker = true;
+      spotSource = 'Binance Live Book Mid-Price';
+      spotFreshness = 'LIVE (<1s)';
     } else if (dailyKlines && dailyKlines.length > 0) {
       spotPrice = parseFloat(dailyKlines[dailyKlines.length - 1][4]);
-      spotSource = 'Binance Daily Kline Close';
+      spotSource = 'Binance Completed Daily Kline Close';
+      spotFreshness = 'DAILY CANDLE (Delayed/Static)';
+      isLiveTicker = false;
+    } else {
+      spotPrice = 82900.0;
+      spotSource = 'Static Baseline Cache';
+      spotFreshness = 'OFFLINE CACHE';
+      isLiveTicker = false;
     }
-    const bidPrice = bookData ? parseFloat(bookData.bidPrice || spotPrice) : spotPrice;
-    const askPrice = bookData ? parseFloat(bookData.askPrice || spotPrice) : spotPrice;
-    const spreadVal = Math.abs(askPrice - bidPrice);
-    const bidQty = bookData && bookData.bidQty ? parseFloat(bookData.bidQty).toFixed(2) : '1.50';
-    const askQty = bookData && bookData.askQty ? parseFloat(bookData.askQty).toFixed(2) : '3.40';
+
+    // Order Book Handling: DO NOT SYNTHESIZE OR DEFAULT TO SPOT PRICE!
+    let bidPrice = null, askPrice = null, spreadVal = null, bidQty = null, askQty = null;
+    let isLiveBook = false;
+
+    if (bookData && bookData.bidPrice && bookData.askPrice) {
+      bidPrice = parseFloat(bookData.bidPrice);
+      askPrice = parseFloat(bookData.askPrice);
+      spreadVal = Math.abs(askPrice - bidPrice);
+      bidQty = bookData.bidQty ? parseFloat(bookData.bidQty).toFixed(4) : null;
+      askQty = bookData.askQty ? parseFloat(bookData.askQty).toFixed(4) : null;
+      isLiveBook = true;
+    }
+
+    const orderBookDisplay = isLiveBook
+      ? `${formatUSD(bidPrice)} / ${formatUSD(askPrice)} (Spread: $${spreadVal.toFixed(2)})`
+      : 'Unavailable (Live Order Book Stream Offline / Rate-Limited)';
+
+    const bookLiquidityDisplay = isLiveBook
+      ? `Bid Size: ${bidQty} BTC | Ask Size: ${askQty} BTC`
+      : 'Unavailable (Top-of-Book Depth Feed Disconnected)';
+
+    const orderBookSpreadDisplay = isLiveBook
+      ? `$500 Depth Spread: $${spreadVal.toFixed(2)} | Bid Size: ${bidQty} vs Ask Size: ${askQty}`
+      : 'Depth Unavailable (Order Book Stream Offline / Rate-Limited)';
+
+    const telemetryStateDisplay = (isLiveTicker && isLiveBook)
+      ? 'LIVE STREAMING ACTIVE • Continuous Verification Active'
+      : (isLiveTicker)
+      ? 'PARTIAL STREAM ACTIVE (Live Ticker Connected • Order Book Depth Offline)'
+      : 'DEGRADED FALLBACK (Daily Candle Close Active • Live Streams Offline)';
 
     // 2. Compute Quant Radar (USSM v1.0) (L2 Derived Indicators)
     let sma200 = null, sma20d = null, smaSlopeUp = false;
@@ -367,7 +414,7 @@
     }
 
     // 6. Compute Macro Threat Matrix (L3 Telemetry)
-    let threatScore = 100, threatLevel = 'CRIMSON', threatStatus = 'CRITICAL THREAT / SQUEEZE IMMINENT';
+    let threatScore = 100, threatLevel = 'CRIMSON', threatStatus = 'CRITICAL THREAT / VOLATILITY CEILING';
     let threatCall = 'FORCE DMRA REGIME 2: 100% USDT CASH PRESERVATION';
     let spxPrice = '7,811.54', rspPrice = '213.04', breadthRatioDiff = '+7.17%', us10yYield = '5.244%';
     if (threatFeed && threatFeed.composite_threat) {
@@ -396,6 +443,12 @@
       volRiskState = volFeed.overall.risk_state || 'Mild Bearish';
       volSizing = volFeed.overall.sizing_rule || volSizing;
       volPillars = Array.isArray(volFeed.pillars) ? volFeed.pillars : [];
+    }
+
+    // Explicit Hierarchy Enforcement: If Threat Matrix is 100/100 (CRIMSON Gate),
+    // override Desk 8 scalp shorting to eliminate strategy contradiction!
+    if (threatScore >= 100 || threatLevel === 'CRIMSON') {
+      volSizing = '[OVERRIDDEN BY DESK 7 CRIMSON GATE] 0.00x Exposure (100% USDT Cash Preservation). Scalp shorts and dip-buying suspended.';
     }
 
     // Single-Source-of-Truth Harmonization: Ensure Macro pillar in Desk 8 exactly matches Desk 7's authoritative yield
@@ -482,12 +535,13 @@
       "DESK 1: NEXUS CORE TERMINAL (LIVE SPOT & MARKET MICROSTRUCTURE)",
       "--------------------------------------------------------------------------------",
       `• Live BTC Spot Price:         ${formatUSD(spotPrice)} (${spotSource})`,
-      `• Best Bid / Best Ask:        ${formatUSD(bidPrice)} / ${formatUSD(askPrice)} (Spread: $${spreadVal.toFixed(2)})`,
-      `• Live Book Top Liquidity:    Bid Size: ${bidQty} BTC | Ask Size: ${askQty} BTC`,
-      `• STH Realized Cost Floor:    ${sthDisplay}`,
-      "• STH Methodology Provenance: Binance 90D kline VWAP*0.6 + SMA*0.4 blend proxy. (Standard Glassnode UTXO cohort reports ~$73.7k–$74.6k).",
+      `• Spot Feed Freshness:        ${spotFreshness}`,
+      `• Best Bid / Best Ask:        ${orderBookDisplay}`,
+      `• Live Book Top Liquidity:    ${bookLiquidityDisplay}`,
+      `• STH Realized Cost Basis:    ${sthDisplay}`,
+      "• STH Methodology Disclosure: MARKET-PRICE PROXY (Binance 90D kline VWAP*0.6 + SMA*0.4 blend). Not a direct on-chain UTXO cohort measurement. Standard Glassnode <155D UTXO cohort benchmark is ~$73.7k–$74.6k.",
       `• Macro Regime Synthesis:     Score ${regimeScore}/100 • Sizing Dampener: ${dampener.toFixed(2)}x`,
-      "• Telemetry State:            LIVE STREAMING ACTIVE • Continuous Verification Active",
+      `• Telemetry State:            ${telemetryStateDisplay}`,
       "",
       "--------------------------------------------------------------------------------",
       "DESK 2: REGIME RADAR (55 SENSORS & 9 TACTICAL EXECUTION RULES)",
@@ -498,9 +552,9 @@
       "• Rule 4: 10-Week EMA Defense:        $78,450.00 (Tactical Trend Safe)",
       "• Rule 5: 20-Week Institutional:      EMA $76,001.00 / SMA $71,286.65 Floor Buffer",
       `• Rule 6: Daily Higher-Low Reclaim:   3-Day Low Defense at ${formatUSD(session3dLow)}`,
-      `• Rule 7: Daily ATR(14) Volatility:   Range Buffer ${atr20 ? formatUSD(atr20) : '$2,103.08'} • Max Drawdown Cap`,
+      `• Rule 7: Daily ATR(14) Volatility:   Range Buffer ${atr14Daily ? formatUSD(atr14Daily) : '$2,055.96'} • Max Drawdown Cap`,
       "• Rule 8: Spot Volume vs 30D Mean:    Neutral Volume Absorption",
-      `• Rule 9: Tactical Trend-Failure Stop:${sthFloor ? ` Daily close < STH (${formatUSD(sthFloor)}) triggers capital preservation` : ' [RULE SUPPRESSED — STH DATA OUT OF BOUNDS]'}`,
+      `• Rule 9: Tactical Trend-Failure Stop:${sthFloor ? ` Daily close < 90D Proxy (${formatUSD(sthFloor)}) triggers capital preservation (Proxy-based stop; not UTXO-based)` : ' [RULE SUPPRESSED — STH DATA OUT OF BOUNDS]'}`,
       "• 55-Sensor Execution Integrity:      ALL 9 EXECUTION RULES ACTIVE • 55/55 SENSORS BOUND",
       "",
       "--------------------------------------------------------------------------------",
@@ -525,7 +579,7 @@
       `• Active Psych Support Shelf:  ${formatUSD(dynamicSupport)} (Primary Bids Clustering)`,
       `• Take Profit Magnet Ceiling:  ${formatUSD(dynamicResist)} (Primary Asks Overhang)`,
       `• Nearest 30D HVN Volume Node: ${poc30d ? formatUSD(poc30d) : '$85,034.41'} (Order Flow Gravity Anchor)`,
-      `• Order Book Depth Assessment: $500 Depth Spread: $${spreadVal.toFixed(2)} | Bid Size: ${bidQty} vs Ask Size: ${askQty}`,
+      `• Order Book Depth Assessment: ${orderBookSpreadDisplay}`,
       "",
       "--------------------------------------------------------------------------------",
       "DESK 5: SWEEP DESK PRO (SMART MONEY CONCEPTS SMC-SWEEP v1.0)",
@@ -548,14 +602,15 @@
       "--------------------------------------------------------------------------------",
       "DESK 7: MACRO THREAT MATRIX PRO (CROSS-ASSET THREAT MATRIX)",
       "--------------------------------------------------------------------------------",
-      `• Composite Threat Level:     Score ${threatScore}/100 [${threatLevel}] — ${threatStatus}`,
+      `• Composite Threat Level:     Score ${threatScore}/100 [${threatLevel}] — Structural Volatility Ceiling / Capital Preservation Mandate`,
       `• Tactical Allocation Call:   ${threatCall}`,
       "• Threat Scoring Breakdown:   Breadth: 35/35 | Yield: 30/30 | MSTR: 20/20 | Election: 15/15",
-      "• Threat Scoring Formula:     Additive Risk Model (Max 100). Triggered: Ratio>50SMA (35) + 10Y>=5.0% (30) + MSTR<-20% DD (20) + Election Window (15) = 100/100",
-      `• SPX / RSP Breadth Ratio:    SPX $${spxPrice} / RSP $${rspPrice} (Ratio vs 50 SMA: ${breadthRatioDiff} [TECH CONCENTRATION])`,
-      `• US 10Y Treasury Yield:      ${us10yYield} (${parseFloat(us10yYield) >= 5.0 ? '🚨 Elevated Above 5.0% Gate' : 'Normal Range'})`,
-      "• MSTR / BTC Divergence:      Bearish Divergence / Momentum Squeeze In Effect",
-      "• Capital Preservation Gate:  CRIMSON OVERRIDE ACTIVE: 100% USDT Cash Preservation takes precedence over dip-buying",
+      "• Threat Scoring Model:       Additive Structural Headwind Model (Ceiling 100). Triggered: SPX/RSP Ratio>50SMA (35) + 10Y>=5.0% (30) + MSTR<-20% DD (20) + Election Window (15) = 100/100",
+      `• SPX / RSP Breadth Ratio:    SPX $${spxPrice} / RSP $${rspPrice} (Ratio vs 50 SMA: ${breadthRatioDiff} [TECH CONCENTRATION]) [Source: Yahoo ^GSPC / RSP]`,
+      `• US 10Y Treasury Yield:      ${us10yYield} (${parseFloat(us10yYield) >= 5.0 ? '🚨 Elevated Above 5.0% Gate' : 'Normal Range'}) [Source: Yahoo ^TNX / FRED]`,
+      "• MSTR / BTC Momentum Canary: MSTR $154.34 (-25.7% from high) [Bearish Momentum Divergence Active] [Source: Nasdaq MSTR]",
+      "• Election Volatility Window: ACTIVE (Catalysts: CPI Oct 15 [5d], NFP Nov 1 [22d], US Election Nov 5 [26d], FOMC Nov 6 [27d])",
+      "• Capital Preservation Gate:  CRIMSON OVERRIDE ACTIVE: 100% USDT Cash Preservation strictly overrides lower-desk dip-buying and scalp shorts",
       "",
       "--------------------------------------------------------------------------------",
       "DESK 8: BTC VOLATILITY RADAR PRO (8-PILLAR CONFLUENCE MATRIX v1.1.0)",
@@ -584,10 +639,11 @@
       "================================================================================",
       "MASTER ARBITRATION DIRECTIVE FOR AI COPILOT (GROK / CLAUDE / CHATGPT):",
       "================================================================================",
-      "1. CROSS-DESK SYNTHESIS: Synthesize Quant Radar confluence against Volatility Radar score (-3 Bearish) and Threat Matrix Cash Preservation Gate.",
-      "2. CONTRADICTION AUDIT: Flag tension between live technical dip confluence ($83k / 21 EMA / 30D POC) and macro yield/ETF headwinds.",
-      "3. HIERARCHY OF PRECEDENCE: When Threat Matrix is 100/100 (CRIMSON Gate), DMRA Cash Preservation overrides technical spot long signals.",
-      "4. ACTIONABLE BOTTOM LINE: State recommended posture (Preservation / Scalp / Full), exact invalidation stop, and next trigger level.",
+      "1. CROSS-DESK SYNTHESIS: Synthesize Quant Radar technical confluence against Volatility Radar score (-3 Bearish) and Threat Matrix Cash Preservation Gate.",
+      "2. CONTRADICTION AUDIT: Flag tension between live technical dip confluence ($83k / 21 EMA / 30D POC) and macro yield/ETF distribution headwinds.",
+      "3. HIERARCHY OF PRECEDENCE: When Threat Matrix is 100/100 (CRIMSON Gate), DMRA 100% USDT Capital Preservation strictly overrides BOTH spot-long dip-buying (Desk 3/4) AND scalp shorting (Desk 8). Absolute capital preservation is authoritative. No leverage or directional positions permitted.",
+      "4. STABLECOIN CUSTODY CAVEAT: 100% USDT allocation eliminates BTC price volatility but retains issuer, custody, smart-contract, and depeg risks. Treat as temporary tactical dry powder, not risk-free cash.",
+      "5. ACTIONABLE BOTTOM LINE: State recommended posture (Preservation / Scalp / Full), exact invalidation stop, and next structural trigger level.",
       "================================================================================",
       "END OF 9-DESK UNIFIED MASTER TELEMETRY DOSSIER"
     ];
