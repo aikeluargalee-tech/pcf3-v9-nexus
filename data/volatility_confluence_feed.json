@@ -15,7 +15,7 @@
       "label": "Macro",
       "short": "MCR",
       "score": -1,
-      "raw": "10Y=4.62% (+8bps d/d), DXY=104.8 (+0.4%), FedHoldProb=82%->76%",
+      "raw": "10Y=5.244% (+8bps d/d), DXY=104.8 (+0.4%), FedHoldProb=82%->76%",
       "rationale": "Headline CPI consensus +0.6% MoM from gasoline; yields up, hold odds dropping"
     },
     {
@@ -47,7 +47,7 @@
       "label": "Geopolitics / Security",
       "short": "GEO",
       "score": -1,
-      "raw": "Event=Riyadh_KingKhalid_Airport_Attack, Escalation=L3, Oil=Brent 103.2 (+2.1%), Character=Supply_Shock_Premium",
+      "raw": "Event=Riyadh_KingKhalid_Airport_Attack, Escalation=L3, Oil=Brent 106.5 (+2.1%), Character=Supply_Shock_Premium",
       "rationale": "L3 civilian transit incident: risk premium elevated, physical oil infrastructure intact. Dynamic decay active if Brent retraces >50%"
     },
     {
