@@ -56,10 +56,6 @@ for name, rel_path in radars:
             refresh_list.append('🔄 Force Refresh Now')
         if '📋 Copy Full Packet' in html:
             copy_list.append('📋 Copy Full Packet')
-        if '📋 Copy Data 2' in html:
-            copy_list.append('📋 Copy Data 2')
-        if '📋 Copy Packet 8' in html:
-            copy_list.append('📋 Copy Packet 8')
 
     has_refresh = bool(refresh_list) and has_refresh_fn
     has_copy = bool(copy_list) and has_copy_fn
