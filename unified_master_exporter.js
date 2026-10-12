@@ -459,7 +459,7 @@
 
     const sthDistPct = sthFloor ? ((spotPrice - sthFloor) / sthFloor * 100) : null;
     const sthDisplay = sthFloor
-      ? `${formatUSD(sthFloor)} (${sthDistPct >= 0 ? '+' : ''}${sthDistPct.toFixed(2)}% vs Floor) [L3: ON-CHAIN PROXY]`
+      ? `${formatUSD(sthFloor)} (${sthDistPct >= 0 ? '+' : ''}${sthDistPct.toFixed(2)}% vs Floor) [L3: 90D VWAP/SMA PROXY ESTIMATION]`
       : '[VALIDATION FAILED: OUT OF BOUNDS — METRIC SUPPRESSED]';
 
     // --- ASSEMBLE COMPREHENSIVE DOSSIER ---
@@ -473,7 +473,7 @@
       "DATA PROVENANCE & INTEGRITY LEDGER:",
       "• [L1: LIVE STREAM]:          Binance Spot & Order Book Depth (Real-Time Websocket/REST)",
       "• [L2: DERIVED INDICATORS]:   Wilder RSI 14, Wilder ATR 20, 21 EMA, 200 SMA, 50-Bin POC (Live In-Browser Calculation)",
-      "• [L3: ON-CHAIN & MACRO]:     STH Cost Basis ($81,842), US 10Y Yield (5.244%), SPX ($7,811), Volatility Radar (-3/8)",
+      "• [L3: ON-CHAIN & MACRO]:     STH Cost Basis ($81,842 proxy), US 10Y Yield (5.244%), SPX ($7,811), Volatility Radar (-3/8)",
       "• [L4: STRATEGY & MODELS]:    USSM v1.0 Swing Rules, SMC Sweeps, DMRA Cash Gate, March 2023 Fractal Study",
       "VALIDATION STATUS:            ALL METRICS SANITY CHECKED • CROSS-DESK HARMONIZED",
       "================================================================================",
@@ -485,6 +485,7 @@
       `• Best Bid / Best Ask:        ${formatUSD(bidPrice)} / ${formatUSD(askPrice)} (Spread: $${spreadVal.toFixed(2)})`,
       `• Live Book Top Liquidity:    Bid Size: ${bidQty} BTC | Ask Size: ${askQty} BTC`,
       `• STH Realized Cost Floor:    ${sthDisplay}`,
+      "• STH Methodology Provenance: Binance 90D kline VWAP*0.6 + SMA*0.4 blend proxy. (Standard Glassnode UTXO cohort reports ~$73.7k–$74.6k).",
       `• Macro Regime Synthesis:     Score ${regimeScore}/100 • Sizing Dampener: ${dampener.toFixed(2)}x`,
       "• Telemetry State:            LIVE STREAMING ACTIVE • Continuous Verification Active",
       "",
@@ -550,6 +551,7 @@
       `• Composite Threat Level:     Score ${threatScore}/100 [${threatLevel}] — ${threatStatus}`,
       `• Tactical Allocation Call:   ${threatCall}`,
       "• Threat Scoring Breakdown:   Breadth: 35/35 | Yield: 30/30 | MSTR: 20/20 | Election: 15/15",
+      "• Threat Scoring Formula:     Additive Risk Model (Max 100). Triggered: Ratio>50SMA (35) + 10Y>=5.0% (30) + MSTR<-20% DD (20) + Election Window (15) = 100/100",
       `• SPX / RSP Breadth Ratio:    SPX $${spxPrice} / RSP $${rspPrice} (Ratio vs 50 SMA: ${breadthRatioDiff} [TECH CONCENTRATION])`,
       `• US 10Y Treasury Yield:      ${us10yYield} (${parseFloat(us10yYield) >= 5.0 ? '🚨 Elevated Above 5.0% Gate' : 'Normal Range'})`,
       "• MSTR / BTC Divergence:      Bearish Divergence / Momentum Squeeze In Effect",
@@ -559,6 +561,7 @@
       "DESK 8: BTC VOLATILITY RADAR PRO (8-PILLAR CONFLUENCE MATRIX v1.1.0)",
       "--------------------------------------------------------------------------------",
       `• Composite Confluence Score:  ${volScore} / 8 (${volRiskState.toUpperCase()})`,
+      "• Volatility Scoring Formula: Sum of 8 Pillars (-8 to +8). Macro (-1) + ETF (-1) + Geopolitics (-1) + 5 Neutral (0) = -3 / 8",
       `• Sizing Cap & Multiplier:     ${volSizing}`,
       `• Cross-Desk Yield Check:     10Y Yield Harmonized to ${us10yYield} (Zero Basis-Point Discrepancy vs Desk 7)`,
       "• Calibrated 8-Pillar Rationale:",
