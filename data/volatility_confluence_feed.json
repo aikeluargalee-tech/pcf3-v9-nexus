@@ -1,13 +1,13 @@
 {
-  "version": "1.0.0",
-  "asof": "2026-10-12T00:00:00Z",
-  "source": "Nexus Terminal — BTC Volatility Radar Live Tracker (CONFLUENCE-RADAR v1.0)",
+  "version": "1.1.0",
+  "asof": "2026-10-12T11:00:00Z",
+  "source": "Nexus Terminal — BTC Volatility Radar Live Tracker (CONFLUENCE-RADAR v1.1 - Calibrated)",
   "overall": {
-    "score": -4,
+    "score": -3,
     "risk_state": "Mild Bearish",
     "bias": "Defensive / Short Rallies",
-    "conviction": "Medium (4 of 8 pillars aligned bearish)",
-    "sizing_rule": "Reduce size, defensive shorts only. Oil → CPI risk."
+    "conviction": "Moderate (3 of 8 pillars aligned bearish: Macro, ETF, Geopolitics)",
+    "sizing_rule": "Defensive posture, scalp shorts only (0.25x - 0.5x). Geopolitical supply risk + ETF outflow pressure."
   },
   "pillars": [
     {
@@ -16,7 +16,7 @@
       "short": "MCR",
       "score": -1,
       "raw": "10Y=4.62% (+8bps d/d), DXY=104.8 (+0.4%), FedHoldProb=82%->76%",
-      "rationale": "Hot headline CPI expected +0.6% MoM from gasoline, yields up, hold odds dropping"
+      "rationale": "Headline CPI consensus +0.6% MoM from gasoline; yields up, hold odds dropping"
     },
     {
       "id": "etf",
@@ -24,31 +24,31 @@
       "short": "ETF",
       "score": -1,
       "raw": "Net=-244M (IBIT -120M, FBTC -80M), 5d=-681M, Premium=-0.15%",
-      "rationale": "2nd consecutive outflow, largest single day -485M Oct 7"
+      "rationale": "5d cumulative institutional distribution (-681M < -400M trigger); discount persists"
     },
     {
       "id": "derivatives",
       "label": "Derivatives",
       "short": "DRV",
-      "score": -1,
-      "raw": "Funding=+0.012% avg, OI=+4.2%, LongLiq=1.17B (Oct6-8)",
-      "rationale": "Crowded longs, rising OI into resistance"
+      "score": 0,
+      "raw": "Funding=+0.012% avg (neutral 0.005-0.020% baseline), OI=+4.2%, LongLiq=1.17B (Oct6-8)",
+      "rationale": "Funding resting on exchange baseline floor (0.01%); OI expanding into resistance without extreme froth (<0.030%)"
     },
     {
       "id": "onchain",
       "label": "On-Chain",
       "short": "ONC",
       "score": 0,
-      "raw": "NetExFlow=+1.2k BTC inflow, Whale=Neutral, Stablecoin=+20M",
-      "rationale": "Balanced, slight distribution"
+      "raw": "NetExFlow=+1.2k BTC inflow (neutral ±6k band), Whale=Neutral, Stablecoin=+20M",
+      "rationale": "Inflow within routine ±6k BTC liquidity band; stablecoin supply flat"
     },
     {
       "id": "geopolitics",
       "label": "Geopolitics / Security",
       "short": "GEO",
       "score": -1,
-      "raw": "Event=Riyadh_KingKhalid_Airport_Attack, Escalation=L3, Oil=Brent 103.2 (+2.1%)",
-      "rationale": "Oil risk premium up, civilian airport closed"
+      "raw": "Event=Riyadh_KingKhalid_Airport_Attack, Escalation=L3, Oil=Brent 103.2 (+2.1%), Character=Supply_Shock_Premium",
+      "rationale": "L3 civilian transit incident: risk premium elevated, physical oil infrastructure intact. Dynamic decay active if Brent retraces >50%"
     },
     {
       "id": "regulation",
@@ -64,7 +64,7 @@
       "short": "SNT",
       "score": 0,
       "raw": "F&G=42, X_Tone=Mixed/Consolidation, Crowded=No",
-      "rationale": "82.5-83.2k weekend chop"
+      "rationale": "82.5-83.2k weekend chop; no extreme social crowding"
     },
     {
       "id": "cross",
@@ -72,7 +72,7 @@
       "short": "XAS",
       "score": 0,
       "raw": "Nasdaq=-0.3%, VIX=18.2, BTC.D=52.1%",
-      "rationale": "Mild risk-off, no breakdown"
+      "rationale": "Mild risk-off, equities within ±1% band, VIX <20"
     }
   ],
   "checklist_p1": [
@@ -87,8 +87,8 @@
   "levels": {
     "support": "80.3k (Oct8 low) / 80-82k zone",
     "resistance": "85.0k / 87.5k",
-    "invalidation_long": "Daily close <80k with ETF outflows + funding >0.01%",
-    "invalidation_short": "Daily close >87.5k with inflows >+150M + funding <0%",
+    "invalidation_long": "Daily close <80k with ETF outflows <-250M + funding >0.030%",
+    "invalidation_short": "Daily close >87.5k with inflows >+250M + funding <0%",
     "current_benchmark": 83075
   },
   "watch_next": [
@@ -109,7 +109,7 @@
     ],
     "derivatives": [
       ["2026-10-10", "+0.007% avg", "-1.5%", "$180M", "$210M", "Neutral", "56%", "0"],
-      ["2026-10-08", "+0.012% avg", "+4.2%", "$650M", "$120M", "Bearish", "62%", "-1"],
+      ["2026-10-08", "+0.012% avg", "+4.2%", "$650M", "$120M", "Neutral (Baseline)", "62%", "0"],
       ["2026-10-06", "+0.009% avg", "+2.1%", "$320M", "$80M", "Neutral", "58%", "0"]
     ],
     "onchain": [
@@ -139,7 +139,7 @@
     ],
     "summary": [
       ["2026-10-11", "Fading cross-asset shock; awaiting US CPI", "CPI shock >0.6% MoM", "Scalp range 80k-85k", "-2", "Mild Bearish", "Defensive / Half Size", "0.5x"],
-      ["2026-10-10", "ETF outflow + Geopol L3 + Deriv crowded", "Brent >105 / 10Y >4.70%", "Hedge spot longs", "-4", "Mild Bearish", "Defensive / Short Rallies", "0.25x"],
+      ["2026-10-10", "ETF distribution + Geopol L3 (Deriv neutral)", "Brent >105 / 10Y >4.70%", "Hedge spot longs", "-3", "Mild Bearish", "Defensive / Short Rallies", "0.25x"],
       ["2026-10-08", "ETF -$487M + $1.17B Long liquidation + Oil spike", "Cascading liquidation to $80k", "Reclaim 85k-87.5k shelf", "-5", "Strong Bearish", "Capital Preservation / Shorts", "0.25x"]
     ]
   }

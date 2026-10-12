@@ -50,9 +50,16 @@
       } catch (e) {}
 
       if (!radarData || !Array.isArray(radarData.pillars)) {
-        const res = await fetch('./data/volatility_confluence_feed.json?t=' + Date.now());
-        if (res.ok) {
-          radarData = await res.json();
+        const repoBase = window.location.pathname.includes('/pcf3-v9-nexus') ? '/pcf3-v9-nexus/' : '/';
+        const tryPaths = [repoBase + 'data/volatility_confluence_feed.json', './data/volatility_confluence_feed.json', 'data/volatility_confluence_feed.json'];
+        for (const tp of tryPaths) {
+          try {
+            const res = await fetch(tp + '?t=' + Date.now());
+            if (res.ok) {
+              radarData = await res.json();
+              break;
+            }
+          } catch(e) {}
         }
       }
 
