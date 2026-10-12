@@ -33,12 +33,10 @@
   const VENUES = {
     ticker: [
       'https://data-api.binance.vision/api/v3/ticker/price?symbol=BTCUSDT',
-      'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT',
       'https://api.coinbase.com/v2/prices/BTC-USD/spot'
     ],
     book: [
-      'https://data-api.binance.vision/api/v3/ticker/bookTicker?symbol=BTCUSDT',
-      'https://api.binance.com/api/v3/ticker/bookTicker?symbol=BTCUSDT'
+      'https://data-api.binance.vision/api/v3/ticker/bookTicker?symbol=BTCUSDT'
     ],
     dailyKlines: [
       'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250',
@@ -97,7 +95,7 @@
    * Also NEVER pass { cache: 'no-store' } to external APIs as it triggers CORS preflight
    * OPTIONS which Binance edge WAF rejects with HTTP 403 Forbidden.
    */
-  async function fetchWithWaterfall(urlList, isJson = true, timeoutMs = 1800) {
+  async function fetchWithWaterfall(urlList, isJson = true, timeoutMs = 1200) {
     for (const rawUrl of urlList) {
       try {
         const isExternal = rawUrl.startsWith('http://') || rawUrl.startsWith('https://');
@@ -306,6 +304,11 @@
       isLiveTicker = true;
       spotSource = 'Binance Live Book Mid-Price';
       spotFreshness = 'LIVE (<1s)';
+    } else if (typeof window !== 'undefined' && window.__NEXUS_SPOT_PRICE__ && window.__NEXUS_SPOT_PRICE__ > 1000) {
+      spotPrice = parseFloat(window.__NEXUS_SPOT_PRICE__);
+      isLiveTicker = true;
+      spotSource = 'Nexus Terminal Live Spot Stream';
+      spotFreshness = 'LIVE (<2s)';
     } else if (dailyKlines && dailyKlines.length > 0) {
       spotPrice = parseFloat(dailyKlines[dailyKlines.length - 1][4]);
       spotSource = 'Binance Completed Daily Kline Close';

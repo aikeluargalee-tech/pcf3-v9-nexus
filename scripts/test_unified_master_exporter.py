@@ -207,10 +207,10 @@ def test_unified_exporter():
     print("[PASS] Failure K: Desk 2 dynamically reports verified evaluable rules count rather than blanket claim.")
 
     # Test Failure L: Fast Waterfall Fallback & Zero Blocked Mirror Hang
-    assert 'timeoutMs = 1800' in js_code, "Waterfall timeout must be capped at 1800ms for mobile safety!"
+    assert 'timeoutMs = 1200' in js_code, "Waterfall timeout must be capped at 1200ms for mobile safety!"
     assert 'api1.binance.com' not in js_code, "Blocked binance.com mirrors removed from kline waterfall!"
     assert 'data/btc_daily_klines.json' in js_code, "Fast local kline fallback verified!"
-    print("[PASS] Failure L: Waterfall restricted to unblocked public endpoints with 1800ms timeout and fast local fallback.")
+    print("[PASS] Failure L: Waterfall restricted to unblocked public endpoints with 1200ms timeout and fast local fallback.")
 
     print("\n>>> ALL ADVANCED INTEGRITY & FAILURE REGRESSION CHECKS PASSED WITH 100% COMPLIANCE! <<<")
 
