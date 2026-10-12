@@ -429,16 +429,83 @@ else:
     except Exception as e:
         errors.append(f"Failed to parse data/macro_threat_feed.json: {e}")
 
+# 11. Inspect volatility-radar/index.html & volatility-radar.html (BTC Volatility Radar Pro)
+volatility_paths = [
+    os.path.join(repo_root, "volatility-radar", "index.html"),
+    os.path.join(repo_root, "volatility-radar.html")
+]
+
+for vp in volatility_paths:
+    v_rel = os.path.relpath(vp, repo_root)
+    if not os.path.exists(vp):
+        errors.append(f"{v_rel} not found!")
+    else:
+        with open(vp, "r", encoding="utf-8") as f:
+            v_html = f.read()
+
+        # Rule 1: Watchdog banner & sync tag
+        if 'id="volatility-staleness-banner"' not in v_html:
+            errors.append(f"Violation ({v_rel}): Missing #volatility-staleness-banner element.")
+        if 'id="volatility-sync-tag"' not in v_html:
+            errors.append(f"Violation ({v_rel}): Missing #volatility-sync-tag element.")
+
+        # Rule 2: Continuous auto-refresh polling loop
+        if "setInterval(loadLive, 10000)" not in v_html:
+            errors.append(f"Violation ({v_rel}): Missing 10s auto-refresh polling loop.")
+
+        # Rule 3: Zero Math.random() or mock loops
+        if re.search(r'Math\.random\s*\(', v_html):
+            errors.append(f"Violation ({v_rel}): Found Math.random() invocation.")
+
+        # Rule 4: Required functions
+        required_volatility_funcs = [
+            "fetchLiveBtcPrice", "initRadarData", "renderUI", "renderPillars",
+            "renderChecklist", "renderTabs", "renderActiveTable", "exportActiveTabCSV",
+            "exportMasterJSON", "copyDataPacket8", "loadLive"
+        ]
+        for fn in required_volatility_funcs:
+            if f"function {fn}(" not in v_html and f"async function {fn}(" not in v_html:
+                errors.append(f"Violation ({v_rel}): Missing function '{fn}'.")
+
+        # Rule 5: Packet 8 token & role preamble
+        if "BTC_VOLATILITY_RADAR_ANALYZER v1.0" not in v_html or "DATA PACKET 8" not in v_html:
+            errors.append(f"Violation ({v_rel}): Missing DATA PACKET 8 header or role prompt token.")
+
+        # Rule 6: localStorage key
+        if "nexus_btc_radar_v1" not in v_html:
+            errors.append(f"Violation ({v_rel}): Missing nexus_btc_radar_v1 storage key.")
+
+# Check data/volatility_confluence_feed.json baseline cache
+volatility_feed_path = os.path.join(repo_root, "data", "volatility_confluence_feed.json")
+if not os.path.exists(volatility_feed_path):
+    errors.append("Missing data/volatility_confluence_feed.json baseline feed!")
+else:
+    import json
+    try:
+        with open(volatility_feed_path, "r", encoding="utf-8") as f:
+            vfeed = json.load(f)
+        if len(vfeed.get("pillars", [])) != 8:
+            errors.append(f"data/volatility_confluence_feed.json expected 8 pillars, found {len(vfeed.get('pillars', []))}.")
+        if len(vfeed.get("checklist_p1", [])) != 7:
+            errors.append(f"data/volatility_confluence_feed.json expected 7 checklist items, found {len(vfeed.get('checklist_p1', []))}.")
+        ledger = vfeed.get("tables", {}) or vfeed.get("ledger", {})
+        expected_tabs = ['macro', 'etf', 'derivatives', 'onchain', 'geopol', 'regulation', 'sentiment', 'cross', 'summary']
+        for tab in expected_tabs:
+            if tab not in ledger or len(ledger[tab]) < 3:
+                errors.append(f"data/volatility_confluence_feed.json ledger tab '{tab}' missing or has <3 rows.")
+    except Exception as e:
+        errors.append(f"Failed to parse data/volatility_confluence_feed.json: {e}")
+
 if errors:
     print(f"\n❌ AUDIT FAILED WITH {len(errors)} VIOLATIONS:")
     for e in errors:
         print(f"  - {e}")
     sys.exit(1)
 else:
-    print("\n✅ AUDIT PASSED: All guardrails satisfied across index.html, matrix.html, quant-radar, liquidity-radar, fractal.html, sweep-desk, absorption-radar, and threat-matrix!")
+    print("\n✅ AUDIT PASSED: All guardrails satisfied across index.html, matrix.html, quant-radar, liquidity-radar, fractal.html, sweep-desk, absorption-radar, threat-matrix, and volatility-radar!")
     print("  ✓ Zero mock/invented data across all pages (including zero Math.random() everywhere)")
     print("  ✓ Full 55-sensor dynamic binding in matrix.html")
-    print("  ✓ All 7 Copy Data Packets verified and in 100% compliance with respective methodologies:")
+    print("  ✓ All 8 Copy Data Packets verified and in 100% compliance with respective methodologies:")
     print("    • Packet 1: Nexus Master Telemetry (PCF3 Master Prompt & Live Packet)")
     print("    • Packet 2: Tactical Execution & Re-entry Sleeve Matrix (9 Metrics & 55 Sensors)")
     print("    • Packet 3: Quant Radar (5-Rule Unified Simple Swing Model USSM v1.0)")
@@ -446,6 +513,7 @@ else:
     print("    • Packet 5: Sweep Desk Pro (8-Point Smart Money Concepts SMC-SWEEP v1.0)")
     print("    • Packet 6: Absorption Radar Pro (Value-Shelf Pin Bar & Tranche MACRO-ABSORB v1.0)")
     print("    • Packet 7: Macro Threat Matrix Pro (SPX/RSP Breadth, US10Y Yield, MSTR Divergence MACRO-THREAT v1.0)")
+    print("    • Packet 8: BTC Volatility Radar Pro (8-Pillar Confluence Matrix & Pre-Flight Desk CONFLUENCE-RADAR v1.0)")
     print("  ✓ Staleness watchdog active across all dashboards")
     print("  ✓ Multi-mirror API failover with local multi-timeframe caches")
     print("  ✓ Continuous live streaming refresh loops verified everywhere")

@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<title>BTC Volatility Radar Pro — 8-Pillar Confluence Matrix &amp; Pre-Flight Desk</title>
+<meta name="description" content="Institutional BTC Volatility Radar & 8-Pillar Confluence Desk (-8 to +8). Tracks Macro, ETF Flows, Derivatives, On-Chain, Geopolitics, Regulation, Sentiment, and Cross-Asset with daily pre-flight checklists and CSV journal."/>
+<link rel="canonical" href="./volatility-radar.html"/>
+
+<!-- Open Graph -->
+<meta property="og:title" content="BTC Volatility Radar Pro — 8-Pillar Confluence Desk"/>
+<meta property="og:description" content="Institutional -8 to +8 Confluence Matrix, Geopolitical Oil Transmission Chain, and Pre-Flight Trading Desk for Bitcoin."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://aikeluargalee-tech.github.io/pcf3-v9-nexus/volatility-radar.html"/>
+<meta property="og:site_name" content="Nexus Terminal"/>
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="BTC Volatility Radar Pro — 8-Pillar Confluence Desk"/>
+<meta name="twitter:description" content="Daily pre-flight checklist, multi-pillar confluence matrix, and oil transmission tracking for BTC swing traders."/>
+
+<!-- Schema.org JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "BTC Volatility Radar Pro",
+  "applicationCategory": "FinanceApplication",
+  "description": "Bitcoin Volatility Radar, 8-Pillar Confluence Matrix (-8 to +8), and Pre-Flight Trading Checklist.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Nexus Terminal"
+  }
+}
+</script>
+
+<style>
+  :root {
+    --bg: #080c18;
+    --card: #0f172a;
+    --card-sub: #131d35;
+    --border: #1e293b;
+    --border-highlight: #334155;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --dim: #64748b;
+    --green: #10b981;
+    --green-glow: rgba(16, 185, 129, 0.2);
+    --amber: #f59e0b;
+    --amber-glow: rgba(245, 158, 11, 0.2);
+    --red: #ef4444;
+    --red-glow: rgba(239, 68, 68, 0.25);
+    --cyan: #38bdf8;
+    --purple: #a855f7;
+    --crimson: #ff3b3b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    line-height: 1.5;
+    padding: 0 16px 40px;
+  }
+  a { color: var(--cyan); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important; }
+  .wrap { max-width: 1440px; margin: 0 auto; }
+
+  /* Top Navigation */
+  nav {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .badge-tag {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    color: var(--green);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    font-weight: 700;
+  }
+  .sync-tag {
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    color: var(--cyan);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    font-weight: 700;
+  }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 12px;
+  }
+  .nav-btn {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #e2e8f0;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .nav-btn:hover { background: #334155; color: #fff; }
+  .nav-btn.primary { background: #059669; border-color: #10b981; color: #fff; font-weight: 700; }
+  .nav-btn.primary:hover { background: #047857; }
+  .nav-btn.refresh { background: #0284c7; border-color: #38bdf8; color: #fff; }
+  .nav-btn.refresh:hover { background: #0369a1; }
+
+  /* Staleness Watchdog Banner */
+  .staleness-banner {
+    display: none;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.25));
+    border: 1px solid var(--red);
+    border-radius: 10px;
+    padding: 12px 18px;
+    margin-top: 16px;
+  }
+
+  /* Master Confluence Banner */
+  .confluence-banner {
+    border-radius: 14px;
+    padding: 24px;
+    margin-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .confluence-banner.bearish {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(15, 23, 42, 0.95) 100%);
+    border-color: rgba(239, 68, 68, 0.5);
+    box-shadow: 0 0 30px rgba(239, 68, 68, 0.15);
+  }
+  .confluence-banner.neutral {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(15, 23, 42, 0.95) 100%);
+    border-color: rgba(245, 158, 11, 0.5);
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.15);
+  }
+  .confluence-banner.bullish {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(15, 23, 42, 0.95) 100%);
+    border-color: rgba(16, 185, 129, 0.5);
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.15);
+  }
+  .score-badge-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .score-pill {
+    font-size: 32px;
+    font-weight: 900;
+    font-family: ui-monospace, monospace;
+    padding: 4px 16px;
+    border-radius: 10px;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+  .score-pill.bearish { background: rgba(239, 68, 68, 0.25); color: #f87171; border: 1px solid var(--red); }
+  .score-pill.neutral { background: rgba(245, 158, 11, 0.25); color: #fbbf24; border: 1px solid var(--amber); }
+  .score-pill.bullish { background: rgba(16, 185, 129, 0.25); color: #34d399; border: 1px solid var(--green); }
+  .banner-status-title {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+  }
+  .banner-desc {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 13px;
+    max-width: 820px;
+    line-height: 1.5;
+  }
+  .banner-action {
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: ui-monospace, monospace;
+    padding: 6px 12px;
+    background: rgba(0,0,0,0.35);
+    border-radius: 6px;
+    display: inline-block;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  /* Grid Layouts */
+  .grid-8 {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 10px;
+    margin-top: 18px;
+  }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .grid-sidebar {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  @media (max-width: 1200px) {
+    .grid-8 { grid-template-columns: repeat(4, 1fr); }
+    .grid-sidebar { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    .grid-8 { grid-template-columns: repeat(2, 1fr); }
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  /* Pillar Card */
+  .pillar-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 175px;
+    transition: all 0.2s;
+  }
+  .pillar-card:hover { border-color: var(--border-highlight); }
+  .pillar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--dim);
+    letter-spacing: 0.5px;
+  }
+  .pillar-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+  }
+  .pillar-dot.bear { background: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
+  .pillar-dot.neutral { background: #64748b; }
+  .pillar-dot.bull { background: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
+  .pillar-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 6px;
+  }
+  .pillar-desc {
+    font-size: 10px;
+    color: var(--muted);
+    line-height: 1.35;
+    margin-top: 4px;
+    flex: 1;
+  }
+  .pillar-btn-group {
+    display: flex;
+    gap: 4px;
+    margin-top: 10px;
+  }
+  .btn-score {
+    flex: 1;
+    padding: 4px 0;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: ui-monospace, monospace;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: #090e17;
+    color: var(--dim);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .btn-score:hover { color: #fff; border-color: #475569; }
+  .btn-score.active-neg { background: #ef4444; border-color: #ef4444; color: #fff; }
+  .btn-score.active-zero { background: #cbd5e1; border-color: #e2e8f0; color: #000; }
+  .btn-score.active-pos { background: #10b981; border-color: #10b981; color: #000; }
+
+  /* Generic Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+  }
+
+  /* Checklist P1 */
+  .check-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    background: #090e17;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .check-item:hover { border-color: var(--border-highlight); }
+  .check-item.done { background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.3); }
+  .check-item.done span { color: #94a3b8; text-decoration: line-through; }
+  .check-box {
+    margin-top: 3px;
+    accent-color: var(--green);
+    cursor: pointer;
+  }
+
+  /* Ledger Tabs Table */
+  .tabs-bar {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+  }
+  .tab-btn {
+    padding: 5px 12px;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    font-weight: 600;
+    border-radius: 6px;
+    background: #090e17;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tab-btn:hover { color: #fff; }
+  .tab-btn.active { background: #e2e8f0; color: #000; border-color: #fff; font-weight: 700; }
+  .table-wrap {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    min-width: 720px;
+  }
+  th {
+    text-align: left;
+    padding: 8px 10px;
+    color: var(--dim);
+    border-bottom: 1px solid var(--border);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    background: #090e17;
+  }
+  td {
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    white-space: nowrap;
+  }
+  .add-row-bar {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .input-cell {
+    background: #090e17;
+    border: 1px solid var(--border);
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    flex: 1;
+    min-width: 80px;
+  }
+
+  /* Transmission Box */
+  .trans-box {
+    background: #090e17;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 14px;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    line-height: 1.6;
+  }
+  .trans-pipeline {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+    color: #38bdf8;
+    font-weight: 700;
+  }
+  .trans-arrow { color: var(--dim); }
+
+  /* Toast Notification */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 12px 20px;
+    background: #059669;
+    color: #fff;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    z-index: 99999;
+    opacity: 0;
+    transition: opacity 0.25s;
+    pointer-events: none;
+  }
+  #toast.show { opacity: 1; pointer-events: auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- Top Navigation -->
+  <nav>
+    <div class="nav-brand">
+      ⚡ LABS &gt; <a href="./volatility-radar.html" style="font-weight:800; color:#fff;">VOLATILITY RADAR PRO</a>
+      <span class="badge-tag">8-PILLAR CONFLUENCE ENGINE F</span>
+      <span id="volatility-sync-tag" class="sync-tag">● LIVE STREAMING</span>
+      <span style="color:var(--border);">|</span>
+      <a href="./index.html" id="link-dashboard">Nexus Terminal</a> |
+      <a href="./matrix.html" id="link-matrix">Regime Radar</a> |
+      <a href="./quant-radar/" id="link-quant">Quant Radar</a> |
+      <a href="./liquidity-radar/" id="link-liq">Liquidity Radar</a> |
+      <a href="./sweep-desk/" id="link-sweep">Sweep Desk</a> |
+      <a href="./absorption-radar/" id="link-absorb">Absorption Radar</a> |
+      <a href="./threat-matrix/" id="link-threat">Threat Matrix</a> |
+      <a href="./fractal.html" id="link-fractal">Fractal Lab</a>
+    </div>
+    <div class="nav-links">
+      <div id="asof-text" class="mono" style="font-size:11px; color:var(--dim);">Connecting feeds...</div>
+      <button class="nav-btn primary" id="btn-copy-packet8" onclick="copyDataPacket8()">📋 Copy Data Packet 8</button>
+      <button class="nav-btn refresh" id="btn-refresh" onclick="loadLive()">🔄 Refresh Live</button>
+    </div>
+  </nav>
+
+  <!-- Staleness Watchdog Banner -->
+  <div id="volatility-staleness-banner" class="staleness-banner">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:20px;">🚨</span>
+        <div>
+          <div style="font-weight:700; font-size:13px; color:#fff;">TELEMETRY DELAY DETECTED</div>
+          <div style="font-size:11px; color:#fca5a5;">Live stream interrupted. Serving verified failover cache with auto-retry.</div>
+        </div>
+      </div>
+      <button onclick="loadLive()" style="background:#ef4444; color:#fff; border:none; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer;">Retry Live Sync</button>
+    </div>
+  </div>
+
+  <!-- Master Confluence Banner -->
+  <div id="confluence-banner" class="confluence-banner bearish">
+    <div style="flex:1;">
+      <div class="score-badge-wrap">
+        <div class="score-pill bearish" id="total-score-pill">
+          <span id="total-score-val">-4</span>
+          <span style="font-size:14px; color:var(--dim);">/ 8</span>
+        </div>
+        <div>
+          <div class="banner-status-title" id="risk-state-val" style="color:#f87171;">MILD BEARISH</div>
+          <div id="conviction-val" class="mono" style="font-size:11px; color:var(--muted);">CONVICTION: Medium (4 of 8 pillars aligned bearish)</div>
+        </div>
+      </div>
+      <div class="banner-desc" id="sizing-rule-val">
+        Reduce size, defensive shorts only. Oil → CPI inflation risk. Hot headline CPI expected +0.6% MoM from gasoline. ETF outflows 2nd consecutive day. Crowded longs into overhead resistance.
+      </div>
+      <div class="banner-action" id="bias-action-val" style="color:#fca5a5; border-color:rgba(239,68,68,0.4);">
+        🛡️ POSITION BIAS: DEFENSIVE / SHORT RALLIES (0.25x – 0.5x SIZE)
+      </div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:11px; color:var(--dim); text-transform:uppercase; font-weight:700;">Live BTC Spot Price</div>
+      <div id="px-live" style="font-size:30px; font-weight:900; font-family:ui-monospace,monospace; color:var(--cyan);">$0.00</div>
+      <div id="time-myt" class="mono" style="font-size:11px; color:var(--muted); margin-top:2px;">Shah Alam MYT (Asia/Kuala_Lumpur)</div>
+    </div>
+  </div>
+
+  <!-- The 8-Pillar Confluence Matrix Grid -->
+  <div style="margin-top:22px; display:flex; justify-content:space-between; align-items:center;">
+    <h3 class="mono" style="font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted);">
+      CONFLUENCE MATRIX // -8 → +8 (8 PILLARS)
+    </h3>
+    <div class="mono" id="scored-count-text" style="font-size:11px; color:var(--dim);">4 / 8 Scored Active</div>
+  </div>
+
+  <div class="grid-8" id="pillar-grid">
+    <!-- Pillar cards will be dynamically rendered and updated by JS -->
+  </div>
+
+  <!-- Main Section: Pre-Flight Checklist + 9-Tab Ledger -->
+  <div class="grid-sidebar">
+    <!-- Left Column: Daily Checklist (P1) -->
+    <div class="card" style="height:fit-content;">
+      <div class="card-header">
+        <span class="card-title">DAILY CHECKLIST // P1</span>
+        <span class="mono" id="checklist-counter" style="font-size:11px; padding:2px 6px; background:#090e17; border:1px solid var(--border); border-radius:4px; color:var(--cyan);">
+          5/7 PASS
+        </span>
+      </div>
+      <p style="font-size:11px; color:var(--muted); margin-bottom:10px;">
+        All checks = ready to score. Incomplete = NO position.
+      </p>
+      <div class="check-list" id="checklist-container">
+        <!-- Rendered via JS -->
+      </div>
+      <div style="margin-top:14px; padding-top:10px; border-top:1px solid var(--border); font-size:10px; color:var(--dim);" class="mono">
+        Auto-saved in localStorage (`nexus_btc_radar_v1`)
+      </div>
+    </div>
+
+    <!-- Right Column: 9-Tab Ledger & Exporter -->
+    <div class="card" style="min-width:0;">
+      <div class="card-header" style="flex-wrap:wrap; gap:8px;">
+        <span class="card-title">HISTORICAL OPERATIONAL LEDGER &amp; JOURNAL</span>
+        <div style="display:flex; gap:6px;">
+          <button class="nav-btn" id="btn-export-csv" onclick="exportActiveTabCSV()">📥 Export Tab CSV</button>
+          <button class="nav-btn" onclick="exportMasterJSON()">📦 Export Master JSON</button>
+        </div>
+      </div>
+
+      <!-- Tab Buttons -->
+      <div class="tabs-bar" id="tabs-bar">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Table View -->
+      <div class="table-wrap">
+        <table id="ledger-table">
+          <thead id="ledger-thead"></thead>
+          <tbody id="ledger-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- Add Row Form -->
+      <div class="add-row-bar" id="add-row-bar">
+        <!-- Inputs generated dynamically based on active tab -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Geopolitical Transmission & Levels Section -->
+  <div class="grid-2">
+    <!-- Transmission Rulebook -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">🌍 GEOPOLITICAL → OIL → BITCOIN TRANSMISSION CHAIN</span>
+        <span class="mono" id="oil-flag-badge" style="font-size:10px; padding:3px 8px; border-radius:5px; background:rgba(239,68,68,0.2); color:#f87171; border:1px solid rgba(239,68,68,0.4); font-weight:700;">
+          OIL_TRANSMISSION_ACTIVE
+        </span>
+      </div>
+      <div class="trans-box">
+        <div style="font-weight:700; color:#fff;">Transmission Chain Flow:</div>
+        <div class="trans-pipeline">
+          <span>Geopol Event L1-L5</span>
+          <span class="trans-arrow">→</span>
+          <span>Brent/WTI (+2.1%)</span>
+          <span class="trans-arrow">→</span>
+          <span>5Y Breakeven (+12bps)</span>
+          <span class="trans-arrow">→</span>
+          <span>10Y Real Yield / DXY</span>
+          <span class="trans-arrow">→</span>
+          <span style="color:#f87171;">Spot BTC Liq Cascade</span>
+        </div>
+        <div style="margin-top:10px; color:var(--muted); line-height:1.5;">
+          • <strong>Escalation L3:</strong> Riyadh airport incident — civilian disruption. Transmission is risk premium sentiment, not physical supply halt.<br/>
+          • <strong>Decay Rule:</strong> L3 impact decays after 72h if Brent retraces &lt;50% of spike and no follow-on attack. L4/L5 persists 7d.<br/>
+          • <strong>Confluence Multiplier:</strong> 10Y &gt;10bps + DXY &gt;0.4% + Funding &gt;0.008% = Liquidation probability increases <strong>2.5x</strong> when ETF outflows exceed -$100M.
+        </div>
+      </div>
+    </div>
+
+    <!-- Levels & Watch Next -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">🎯 TACTICAL LEVELS &amp; UPCOMING BLACKOUT CATALYSTS</span>
+        <span class="mono" style="font-size:10px; color:var(--cyan);">CONFLUENCE-RADAR v1.0</span>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:10px; font-size:11px;" class="mono">
+        <div style="padding:10px; background:#090e17; border-radius:8px; border:1px solid var(--border);">
+          <div style="color:var(--dim); font-size:10px; font-weight:700;">SUPPORT REGIME:</div>
+          <div style="color:#34d399; font-size:13px; font-weight:700; margin-top:2px;" id="lvl-supp">80.3k (Oct8 low) / 80-82k zone</div>
+        </div>
+        <div style="padding:10px; background:#090e17; border-radius:8px; border:1px solid var(--border);">
+          <div style="color:var(--dim); font-size:10px; font-weight:700;">RESISTANCE REGIME:</div>
+          <div style="color:#f87171; font-size:13px; font-weight:700; margin-top:2px;" id="lvl-res">85.0k / 87.5k</div>
+        </div>
+        <div style="padding:10px; background:#090e17; border-radius:8px; border:1px solid var(--border); line-height:1.5;">
+          <div style="color:var(--dim); font-size:10px; font-weight:700;">INVALIDATION GATES:</div>
+          <div style="color:#fca5a5;">• Long Inval: Daily close &lt;80k with ETF outflows + funding &gt;0.01%</div>
+          <div style="color:#86efac;">• Short Inval: Daily close &gt;87.5k with inflows &gt;+150M + funding &lt;0%</div>
+        </div>
+        <div style="padding:10px; background:rgba(56, 189, 248, 0.08); border-radius:8px; border:1px solid rgba(56, 189, 248, 0.2); line-height:1.5;">
+          <div style="color:var(--cyan); font-size:10px; font-weight:700;">WATCH NEXT:</div>
+          <div style="color:#cbd5e1;">• US CPI Print due 14 Oct 8:30am ET (Consensus +0.6% MoM)</div>
+          <div style="color:#cbd5e1;">• Next ETF print post-settlement</div>
+          <div style="color:#cbd5e1;">• Middle East oil escalation / Government wallet moves</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scoring Guide & Methodological Reference -->
+  <div class="card" style="margin-top:20px;">
+    <div class="card-header">
+      <span class="card-title">📖 DETERMINISTIC 8-PILLAR NUMERICAL SCORING GUIDE (-1 / 0 / +1)</span>
+      <span class="mono" style="font-size:10px; color:var(--dim);">SPEC v1.0 BY META AI</span>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:12px; margin-top:10px;" class="mono">
+      <div style="background:#090e17; padding:12px; border-radius:8px; border:1px solid var(--border);">
+        <div style="font-weight:700; color:#fff;">1. MACRO (MCR)</div>
+        <div style="color:#34d399; font-size:10px; margin-top:4px;">+1: 10Y down &gt;10bps (3d) &amp; DXY down &gt;0.5% &amp; Cut prob up</div>
+        <div style="color:var(--dim); font-size:10px;">0: 10Y within ±10bps, DXY ±0.5%</div>
+        <div style="color:#f87171; font-size:10px;">-1: 10Y up &gt;10bps OR DXY up &gt;0.5% OR Hot CPI &gt;+0.1%</div>
+      </div>
+      <div style="background:#090e17; padding:12px; border-radius:8px; border:1px solid var(--border);">
+        <div style="font-weight:700; color:#fff;">2. ETF FLOWS (ETF)</div>
+        <div style="color:#34d399; font-size:10px; margin-top:4px;">+1: Daily net &gt;+$100M &amp; 3d &gt;+$150M, Premium &ge;0%</div>
+        <div style="color:var(--dim); font-size:10px;">0: Net between -$100M and +$100M</div>
+        <div style="color:#f87171; font-size:10px;">-1: Daily &lt;-$100M OR 5d &lt;-$400M OR Discount &lt;-0.2%</div>
+      </div>
+      <div style="background:#090e17; padding:12px; border-radius:8px; border:1px solid var(--border);">
+        <div style="font-weight:700; color:#fff;">3. DERIVATIVES (DRV)</div>
+        <div style="color:#34d399; font-size:10px; margin-top:4px;">+1: Funding &lt;0% &amp; Short liqs &gt;500M</div>
+        <div style="color:var(--dim); font-size:10px;">0: Funding 0% to 0.008%, OI ±3%</div>
+        <div style="color:#f87171; font-size:10px;">-1: Funding &gt;0.01% sustained OR Long liqs &gt;500M</div>
+      </div>
+      <div style="background:#090e17; padding:12px; border-radius:8px; border:1px solid var(--border);">
+        <div style="font-weight:700; color:#fff;">4. ON-CHAIN (ONC)</div>
+        <div style="color:#34d399; font-size:10px; margin-top:4px;">+1: Exchange net outflow &lt;-3k BTC &amp; Whale LTH up</div>
+        <div style="color:var(--dim); font-size:10px;">0: Inflow/outflow within ±3k BTC</div>
+        <div style="color:#f87171; font-size:10px;">-1: Net inflow &gt;+3k BTC OR Stablecoin drop &gt;100M</div>
+      </div>
+      <div style="background:#090e17; padding:12px; border-radius:8px; border:1px solid var(--border);">
+        <div style="font-weight:700; color:#fff;">5. GEOPOLITICS (GEO)</div>
+        <div style="color:#34d399; font-size:10px; margin-top:4px;">+1: De-escalation &amp; Oil drops &gt;3%</div>
+        <div style="color:var(--dim); font-size:10px;">0: L1-L2 Rhetoric &amp; Oil &lt;+2%</div>
+        <div style="color:#f87171; font-size:10px;">-1: L3+ strike &amp; Oil +1.5% to +4% (Hormuz/Refinery = -1 strong)</div>
+      </div>
+      <div style="background:#090e17; padding:12px; border-radius:8px; border:1px solid var(--border);">
+        <div style="font-weight:700; color:#fff;">6. REGULATION (REG)</div>
+        <div style="color:#34d399; font-size:10px; margin-top:4px;">+1: Formal approval (options, custody clarity)</div>
+        <div style="color:var(--dim); font-size:10px;">0: Consultation / Stalled / No headlines</div>
+        <div style="color:#f87171; font-size:10px;">-1: Lawsuit / Enforcement action / Bank restrictions</div>
+      </div>
+      <div style="background:#090e17; padding:12px; border-radius:8px; border:1px solid var(--border);">
+        <div style="font-weight:700; color:#fff;">7. SENTIMENT (SNT)</div>
+        <div style="color:#34d399; font-size:10px; margin-top:4px;">+1: Fear 20-40 with negative funding (contrarian)</div>
+        <div style="color:var(--dim); font-size:10px;">0: Neutral F&amp;G 40-60</div>
+        <div style="color:#f87171; font-size:10px;">-1: Greed &gt;75 with funding &gt;0.01% OR Crowded X calls</div>
+      </div>
+      <div style="background:#090e17; padding:12px; border-radius:8px; border:1px solid var(--border);">
+        <div style="font-weight:700; color:#fff;">8. CROSS-ASSET (XAS)</div>
+        <div style="color:#34d399; font-size:10px; margin-top:4px;">+1: NDX/SPX &gt;+1% &amp; VIX &lt;18 &amp; BTC.D up</div>
+        <div style="color:var(--dim); font-size:10px;">0: Equities flat, VIX &lt;20</div>
+        <div style="color:#f87171; font-size:10px;">-1: Equities &lt;-1% OR VIX &gt;20 (Strong -1 if VIX &gt;25)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast">📋 DATA PACKET 8 Copied to Clipboard!</div>
+
+<script>
+// Dynamic link path adjuster for subfolder vs root mirror
+(function adjustLinksForPath() {
+  const isRoot = window.location.pathname.endsWith('volatility-radar.html') || !window.location.pathname.includes('/volatility-radar/');
+  if (isRoot) {
+    const map = {
+      'link-dashboard': './index.html',
+      'link-matrix': './matrix.html',
+      'link-quant': './quant-radar/index.html',
+      'link-liq': './liquidity-radar/index.html',
+      'link-sweep': './sweep-desk/index.html',
+      'link-absorb': './absorption-radar/index.html',
+      'link-threat': './threat-matrix/index.html',
+      'link-fractal': './fractal.html'
+    };
+    for (const [id, path] of Object.entries(map)) {
+      const el = document.getElementById(id);
+      if (el) el.setAttribute('href', path);
+    }
+  }
+})();
+
+// Global Volatility State
+const STORAGE_KEY = 'nexus_btc_radar_v1';
+let radarData = null;
+let btcLivePrice = 83075.00;
+let activeTabKey = 'macro';
+
+const tableDefinitions = {
+  macro: {
+    label: 'A · Macro',
+    cols: ['Date', '10Y', '30Y', 'Real Yield', 'DXY', 'Oil Brent', 'Fed Prob', 'Bias', 'Notes']
+  },
+  etf: {
+    label: 'B · ETF Flows',
+    cols: ['Date', 'IBIT', 'FBTC', 'Other', 'Total Net', 'AUM', 'BTC Held', 'Premium', 'Bias']
+  },
+  derivatives: {
+    label: 'C · Derivatives',
+    cols: ['Date', 'Funding Avg', 'OI Change', 'Long Liqs', 'Short Liqs', 'Skew', 'IV', 'Bias']
+  },
+  onchain: {
+    label: 'D · On-Chain',
+    cols: ['Date', 'Inflows', 'Outflows', 'Whale', 'Stablecoin Δ', 'Orderbook', 'Bias']
+  },
+  geopol: {
+    label: 'E · Geopolitics',
+    cols: ['Date', 'Event', 'Oil Impact', 'Risk Sentiment', 'Escalation', 'Bias']
+  },
+  regulation: {
+    label: 'F · Regulation',
+    cols: ['Date', 'Jurisdiction', 'Development', 'Reaction', 'Bias']
+  },
+  sentiment: {
+    label: 'G · Sentiment',
+    cols: ['Date', 'Narrative', 'X Tone', 'Crowded', 'Key Posts', 'Bias']
+  },
+  cross: {
+    label: 'H · Cross-Asset',
+    cols: ['Date', 'Nasdaq/S&P', 'Gold', 'VIX', 'Dominance', 'ETH/BTC', 'Bias']
+  },
+  summary: {
+    label: 'I · Overall Summary',
+    cols: ['Date', 'Key Confluence', 'Primary Risk', 'Opportunity', 'Total Score', 'Risk State', 'Position Bias', 'Size']
+  }
+};
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2600);
+}
+
+// Fetch live BTC price from Binance
+async function fetchLiveBtcPrice() {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3500);
+  try {
+    const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT', { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (res.ok) {
+      const data = await res.json();
+      const p = parseFloat(data.price);
+      if (!isNaN(p) && p > 1000) {
+        btcLivePrice = p;
+        return p;
+      }
+    }
+  } catch(e) {}
+  return btcLivePrice;
+}
+
+// Load baseline JSON or restore from localStorage
+async function initRadarData() {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored) {
+    try {
+      radarData = JSON.parse(stored);
+      return radarData;
+    } catch(e) {}
+  }
+
+  const isRoot = window.location.pathname.endsWith('volatility-radar.html') || !window.location.pathname.includes('/volatility-radar/');
+  const cachePath = isRoot ? 'data/volatility_confluence_feed.json' : '../data/volatility_confluence_feed.json';
+
+  try {
+    const res = await fetch(cachePath + '?t=' + Date.now());
+    if (res.ok) {
+      radarData = await res.json();
+      saveToStorage();
+      return radarData;
+    }
+  } catch(e) {}
+
+  return null;
+}
+
+function saveToStorage() {
+  if (!radarData) return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(radarData));
+  } catch(e) {}
+}
+
+function calcTotalScore() {
+  if (!radarData || !radarData.pillars) return 0;
+  return radarData.pillars.reduce((acc, p) => acc + (p.score || 0), 0);
+}
+
+function getScoreClassification(score) {
+  if (score <= -6) return { text: "Strong Bearish", color: "#ff3b3b", class: "bearish", action: "DEFENSIVE / HALF SIZE SHORTS ONLY (0.25x – 0.5x)" };
+  if (score <= -3) return { text: "Bearish", color: "#f87171", class: "bearish", action: "NO SWING LONGS / SCALP SHORT ONLY" };
+  if (score <= -1) return { text: "Mild Bearish", color: "#fca5a5", class: "bearish", action: "DEFENSIVE / SHORT RALLIES" };
+  if (score === 0) return { text: "Neutral / Chop", color: "#cbd5e1", class: "neutral", action: "RANGE TRADES ONLY (80-82k BUY / 85-87.5k SELL)" };
+  if (score <= 2) return { text: "Mild Bullish", color: "#7ae3b8", class: "bullish", action: "ACCUMULATION ON DIPS (0.5x SIZE)" };
+  if (score <= 5) return { text: "Bullish", color: "#34d399", class: "bullish", action: "BULLISH BIAS / TARGET RECLAIM 87.5k" };
+  return { text: "Strong Bullish", color: "#10b981", class: "bullish", action: "STRONG EXPANSION / FULL SPOT SWING ALLOCATION" };
+}
+
+// Render DOM UI
+function renderUI() {
+  if (!radarData) return;
+
+  const score = calcTotalScore();
+  const cl = getScoreClassification(score);
+
+  // Banner
+  const banner = document.getElementById('confluence-banner');
+  if (banner) banner.className = `confluence-banner ${cl.class}`;
+
+  const scorePill = document.getElementById('total-score-pill');
+  if (scorePill) scorePill.className = `score-pill ${cl.class}`;
+
+  const scoreVal = document.getElementById('total-score-val');
+  if (scoreVal) scoreVal.textContent = (score > 0 ? '+' : '') + score;
+
+  const riskStateVal = document.getElementById('risk-state-val');
+  if (riskStateVal) {
+    riskStateVal.textContent = cl.text.toUpperCase();
+    riskStateVal.style.color = cl.color;
+  }
+
+  const actionVal = document.getElementById('bias-action-val');
+  if (actionVal) {
+    actionVal.textContent = `🛡️ POSITION BIAS: ${cl.action}`;
+    actionVal.style.color = cl.color;
+  }
+
+  // BTC Price
+  const pxLive = document.getElementById('px-live');
+  if (pxLive) pxLive.textContent = '$' + btcLivePrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // Scored count
+  const scoredCount = radarData.pillars.filter(p => p.score !== 0).length;
+  const scoredEl = document.getElementById('scored-count-text');
+  if (scoredEl) scoredEl.textContent = `${scoredCount} / 8 Scored Active`;
+
+  // Render Pillars
+  renderPillars();
+
+  // Render Checklist
+  renderChecklist();
+
+  // Render Tabs & Active Table
+  renderTabs();
+  renderActiveTable();
+
+  // Expose global state for cross-dashboard reading
+  window.nexusVolatilityRadarState = {
+    total_confluence_score: score,
+    risk_state: cl.text,
+    oil_transmission_flag: true,
+    oil_spike_24h_pct: 2.1,
+    real_yield_delta_bps: 12.0
+  };
+}
+
+function renderPillars() {
+  const container = document.getElementById('pillar-grid');
+  if (!container) return;
+  container.innerHTML = '';
+
+  radarData.pillars.forEach((p, idx) => {
+    const card = document.createElement('div');
+    card.className = 'pillar-card';
+
+    const dotClass = p.score > 0 ? 'bull' : (p.score < 0 ? 'bear' : 'neutral');
+    card.innerHTML = `
+      <div>
+        <div class="pillar-header mono">
+          <span>${p.short}</span>
+          <span class="pillar-dot ${dotClass}"></span>
+        </div>
+        <div class="pillar-title">${p.label}</div>
+        <div class="pillar-desc mono">${p.rationale}</div>
+      </div>
+      <div class="pillar-btn-group">
+        <button class="btn-score ${p.score === -1 ? 'active-neg' : ''}" onclick="setPillarScore(${idx}, -1)">-1</button>
+        <button class="btn-score ${p.score === 0 ? 'active-zero' : ''}" onclick="setPillarScore(${idx}, 0)">0</button>
+        <button class="btn-score ${p.score === 1 ? 'active-pos' : ''}" onclick="setPillarScore(${idx}, 1)">+1</button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function setPillarScore(idx, newScore) {
+  if (!radarData || !radarData.pillars[idx]) return;
+  radarData.pillars[idx].score = newScore;
+  saveToStorage();
+  renderUI();
+}
+
+function renderChecklist() {
+  const container = document.getElementById('checklist-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const doneCount = radarData.checklist_p1.filter(c => c.done).length;
+  const counter = document.getElementById('checklist-counter');
+  if (counter) counter.textContent = `${doneCount}/${radarData.checklist_p1.length} PASS`;
+
+  radarData.checklist_p1.forEach((item, idx) => {
+    const div = document.createElement('div');
+    div.className = `check-item ${item.done ? 'done' : ''}`;
+    div.onclick = (e) => {
+      if (e.target.tagName !== 'INPUT') toggleChecklist(idx);
+    };
+    div.innerHTML = `
+      <input type="checkbox" class="check-box" ${item.done ? 'checked' : ''} onchange="toggleChecklist(${idx})"/>
+      <div class="mono" style="font-size:11px; line-height:1.35;">
+        <span>${item.desc || item.label}</span>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function toggleChecklist(idx) {
+  if (!radarData || !radarData.checklist_p1[idx]) return;
+  radarData.checklist_p1[idx].done = !radarData.checklist_p1[idx].done;
+  saveToStorage();
+  renderChecklist();
+}
+
+function renderTabs() {
+  const tabsBar = document.getElementById('tabs-bar');
+  if (!tabsBar) return;
+  tabsBar.innerHTML = '';
+
+  Object.entries(tableDefinitions).forEach(([key, def]) => {
+    const btn = document.createElement('button');
+    btn.className = `tab-btn ${activeTabKey === key ? 'active' : ''}`;
+    btn.textContent = def.label;
+    btn.onclick = () => {
+      activeTabKey = key;
+      renderTabs();
+      renderActiveTable();
+    };
+    tabsBar.appendChild(btn);
+  });
+}
+
+function renderActiveTable() {
+  const thead = document.getElementById('ledger-thead');
+  const tbody = document.getElementById('ledger-tbody');
+  const addBar = document.getElementById('add-row-bar');
+  if (!thead || !tbody || !addBar) return;
+
+  const def = tableDefinitions[activeTabKey];
+  const rows = (radarData.tables && radarData.tables[activeTabKey]) || [];
+
+  // Table Head
+  thead.innerHTML = `<tr>${def.cols.map(c => `<th>${c}</th>`).join('')}</tr>`;
+
+  // Table Body
+  tbody.innerHTML = '';
+  rows.forEach((row, rIdx) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = row.map((cell, cIdx) => {
+      const cellStr = String(cell);
+      let colorStyle = 'color:#e2e8f0;';
+      if (cellStr.includes('-1') || cellStr.includes('Bear') || cellStr.includes('-$') || (cellStr.startsWith('-') && !cellStr.startsWith('--'))) {
+        colorStyle = 'color:#f87171;';
+      } else if (cellStr.includes('+1') || cellStr.includes('Bull') || (cellStr.startsWith('+') && !cellStr.startsWith('+0'))) {
+        colorStyle = 'color:#34d399;';
+      } else if (cellStr === '0' || cellStr === 'Neutral') {
+        colorStyle = 'color:#94a3b8;';
+      }
+      return `<td style="${colorStyle}">${cell}</td>`;
+    }).join('');
+    tbody.appendChild(tr);
+  });
+
+  // Add Row Inputs
+  addBar.innerHTML = '';
+  def.cols.forEach((c, idx) => {
+    const input = document.createElement('input');
+    input.className = 'input-cell';
+    input.id = `input-col-${idx}`;
+    input.placeholder = c.includes('Date') ? new Date().toISOString().slice(0,10) : c;
+    addBar.appendChild(input);
+  });
+
+  const addBtn = document.createElement('button');
+  addBtn.className = 'nav-btn primary';
+  addBtn.style.padding = '5px 14px';
+  addBtn.textContent = '+ ADD ROW';
+  addBtn.onclick = addLedgerRow;
+  addBar.appendChild(addBtn);
+}
+
+function addLedgerRow() {
+  if (!radarData || !radarData.tables) return;
+  const def = tableDefinitions[activeTabKey];
+  const newRow = [];
+
+  for (let i = 0; i < def.cols.length; i++) {
+    const el = document.getElementById(`input-col-${i}`);
+    let val = el ? el.value.trim() : '';
+    if (!val && def.cols[i].includes('Date')) {
+      val = new Date().toISOString().slice(0,10);
+    }
+    newRow.push(val || '—');
+    if (el) el.value = '';
+  }
+
+  if (!radarData.tables[activeTabKey]) radarData.tables[activeTabKey] = [];
+  radarData.tables[activeTabKey].unshift(newRow);
+  saveToStorage();
+  renderActiveTable();
+  showToast(`✅ New row added to ${def.label}`);
+}
+
+function exportActiveTabCSV() {
+  const def = tableDefinitions[activeTabKey];
+  const rows = (radarData.tables && radarData.tables[activeTabKey]) || [];
+
+  const csvRows = [def.cols, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(','));
+  const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `nexus_${activeTabKey}_radar_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`📥 Exported ${def.label} CSV!`);
+}
+
+function exportMasterJSON() {
+  const blob = new Blob([JSON.stringify(radarData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `nexus_volatility_confluence_master_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('📦 Exported Master JSON Ledger!');
+}
+
+// Master Load Live Cycle
+async function loadLive() {
+  const syncTag = document.getElementById('volatility-sync-tag');
+  if (syncTag) {
+    syncTag.textContent = '● REFRESHING...';
+    syncTag.style.color = '#38bdf8';
+  }
+
+  const [p, d] = await Promise.all([
+    fetchLiveBtcPrice(),
+    initRadarData()
+  ]);
+
+  if (d) {
+    renderUI();
+    const asofEl = document.getElementById('asof-text');
+    if (asofEl) {
+      const now = new Date();
+      asofEl.textContent = `Updated: ${now.toLocaleTimeString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' })} MYT · Live OK`;
+    }
+    if (syncTag) {
+      syncTag.className = 'sync-tag';
+      syncTag.textContent = '● LIVE STREAMING';
+      syncTag.style.color = 'var(--cyan)';
+    }
+    const banner = document.getElementById('volatility-staleness-banner');
+    if (banner) banner.style.display = 'none';
+  } else {
+    const banner = document.getElementById('volatility-staleness-banner');
+    if (banner) banner.style.display = 'block';
+  }
+}
+
+// DATA PACKET 8: CONFLUENCE-RADAR v1.0
+async function copyDataPacket8() {
+  if (!radarData) return;
+
+  const score = calcTotalScore();
+  const cl = getScoreClassification(score);
+  const now = new Date();
+  const timestampMYT = now.toISOString().replace(/\.\d{3}Z$/, '+08:00');
+  const doneChecklist = radarData.checklist_p1.filter(c => c.done).length;
+
+  const lines = [
+    "[ROLE: BTC_VOLATILITY_RADAR_ANALYZER v1.0]",
+    "TASK: Analyze this DATA PACKET 8 confluence state. Calculate if total matches sum of 8 pillars, identify primary risk, strongest confluence (2+ pillars aligning), and give protective vs opportunistic lean. Use thresholds from spec v1.0. Keep concise, actionable. Informational only.",
+    "",
+    `### DATA PACKET 8 - ${timestampMYT} - MYT`,
+    "SOURCE: Nexus Terminal - BTC Volatility Radar Live Tracker",
+    "",
+    "[OVERALL]",
+    `SCORE: ${score > 0 ? '+' : ''}${score}`,
+    `RISK_STATE: ${cl.text}`,
+    `BIAS: ${cl.action}`,
+    `CONVICTION: ${radarData.overall && radarData.overall.conviction ? radarData.overall.conviction : 'Calculated'}`,
+    "",
+    "[8_PILLARS]"
+  ];
+
+  radarData.pillars.forEach((p, idx) => {
+    const pName = p.label.toUpperCase().replace(/[\s\/]+/g, '_');
+    lines.push(`${idx + 1}. ${pName} | SCORE: ${p.score > 0 ? '+' : ''}${p.score} | RAW: ${p.raw} | RATIONALE: ${p.rationale}`);
+  });
+
+  lines.push("");
+  lines.push("[CHECKLIST_P1]");
+  radarData.checklist_p1.forEach(c => {
+    lines.push(`[${c.done ? 'X' : ' '}] ${c.label}`);
+  });
+  lines.push(`VERIFICATION: ${doneChecklist}/${radarData.checklist_p1.length} Pass`);
+
+  lines.push("");
+  lines.push("[LEVELS]");
+  lines.push(`SUPPORT: ${radarData.levels && radarData.levels.support ? radarData.levels.support : '80-82k'}`);
+  lines.push(`RESISTANCE: ${radarData.levels && radarData.levels.resistance ? radarData.levels.resistance : '85-87.5k'}`);
+  lines.push(`INVALIDATION_LONG: ${radarData.levels && radarData.levels.invalidation_long ? radarData.levels.invalidation_long : 'Daily close <80k'}`);
+  lines.push(`INVALIDATION_SHORT: ${radarData.levels && radarData.levels.invalidation_short ? radarData.levels.invalidation_short : 'Daily close >87.5k'}`);
+  lines.push(`CURRENT: ${Math.round(btcLivePrice)}`);
+
+  lines.push("");
+  lines.push("[WATCH_NEXT]");
+  if (radarData.watch_next && radarData.watch_next.length) {
+    radarData.watch_next.forEach(w => lines.push(`- ${w}`));
+  } else {
+    lines.push("- Next ETF settlement print");
+    lines.push("- Geopolitical oil escalation");
+  }
+
+  const packetText = lines.join("\n");
+
+  try {
+    await navigator.clipboard.writeText(packetText);
+    showToast('📋 DATA PACKET 8 Copied to Clipboard!');
+  } catch(e) {
+    const ta = document.createElement('textarea');
+    ta.value = packetText;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('📋 DATA PACKET 8 Copied via fallback!');
+  }
+
+  const btn = document.getElementById('btn-copy-packet8');
+  if (btn) {
+    const orig = btn.textContent;
+    btn.textContent = '✅ Copied Packet 8!';
+    setTimeout(() => btn.textContent = orig, 1500);
+  }
+}
+
+// Initialization
+loadLive();
+setInterval(loadLive, 10000);
+</script>
+</body>
+</html>

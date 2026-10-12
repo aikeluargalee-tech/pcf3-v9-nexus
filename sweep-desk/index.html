@@ -349,6 +349,7 @@
       <a href="../liquidity-radar/" id="link-liq">Liquidity Radar</a> |
       <a href="../absorption-radar/" id="link-absorb">Absorption Radar</a> |
       <a href="../threat-matrix/" id="link-threat">Threat Matrix</a> |
+      <a href="../volatility-radar/" id="link-volatility">Volatility Radar</a> |
       <a href="../fractal.html" id="link-fractal">Fractal Lab</a>
     </div>
     <div class="nav-links">
@@ -991,6 +992,8 @@ async function loadLive() {
   if (linkAbsorb) linkAbsorb.href = prefix + 'absorption-radar/';
   const linkThreat = document.getElementById('link-threat');
   if (linkThreat) linkThreat.href = prefix + 'threat-matrix/';
+  const linkVolatility = document.getElementById('link-volatility');
+  if (linkVolatility) linkVolatility.href = prefix + 'volatility-radar/';
 
   let klinesSuccess = false;
   let isCacheFallback = false;

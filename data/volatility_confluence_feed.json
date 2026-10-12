@@ -1,0 +1,146 @@
+{
+  "version": "1.0.0",
+  "asof": "2026-10-12T00:00:00Z",
+  "source": "Nexus Terminal — BTC Volatility Radar Live Tracker (CONFLUENCE-RADAR v1.0)",
+  "overall": {
+    "score": -4,
+    "risk_state": "Mild Bearish",
+    "bias": "Defensive / Short Rallies",
+    "conviction": "Medium (4 of 8 pillars aligned bearish)",
+    "sizing_rule": "Reduce size, defensive shorts only. Oil → CPI risk."
+  },
+  "pillars": [
+    {
+      "id": "macro",
+      "label": "Macro",
+      "short": "MCR",
+      "score": -1,
+      "raw": "10Y=4.62% (+8bps d/d), DXY=104.8 (+0.4%), FedHoldProb=82%->76%",
+      "rationale": "Hot headline CPI expected +0.6% MoM from gasoline, yields up, hold odds dropping"
+    },
+    {
+      "id": "etf",
+      "label": "ETF Flows",
+      "short": "ETF",
+      "score": -1,
+      "raw": "Net=-244M (IBIT -120M, FBTC -80M), 5d=-681M, Premium=-0.15%",
+      "rationale": "2nd consecutive outflow, largest single day -485M Oct 7"
+    },
+    {
+      "id": "derivatives",
+      "label": "Derivatives",
+      "short": "DRV",
+      "score": -1,
+      "raw": "Funding=+0.012% avg, OI=+4.2%, LongLiq=1.17B (Oct6-8)",
+      "rationale": "Crowded longs, rising OI into resistance"
+    },
+    {
+      "id": "onchain",
+      "label": "On-Chain",
+      "short": "ONC",
+      "score": 0,
+      "raw": "NetExFlow=+1.2k BTC inflow, Whale=Neutral, Stablecoin=+20M",
+      "rationale": "Balanced, slight distribution"
+    },
+    {
+      "id": "geopolitics",
+      "label": "Geopolitics / Security",
+      "short": "GEO",
+      "score": -1,
+      "raw": "Event=Riyadh_KingKhalid_Airport_Attack, Escalation=L3, Oil=Brent 103.2 (+2.1%)",
+      "rationale": "Oil risk premium up, civilian airport closed"
+    },
+    {
+      "id": "regulation",
+      "label": "Regulation",
+      "short": "REG",
+      "score": 0,
+      "raw": "CLARITY Act stalled, SEC/CFTC consultation ongoing",
+      "rationale": "No new shock, background uncertainty"
+    },
+    {
+      "id": "sentiment",
+      "label": "Sentiment",
+      "short": "SNT",
+      "score": 0,
+      "raw": "F&G=42, X_Tone=Mixed/Consolidation, Crowded=No",
+      "rationale": "82.5-83.2k weekend chop"
+    },
+    {
+      "id": "cross",
+      "label": "Cross-Asset",
+      "short": "XAS",
+      "score": 0,
+      "raw": "Nasdaq=-0.3%, VIX=18.2, BTC.D=52.1%",
+      "rationale": "Mild risk-off, no breakdown"
+    }
+  ],
+  "checklist_p1": [
+    { "id": "etf_net", "label": "ETF_Net_Flows_Checked", "desc": "ETF net flows — IBIT/FBTC/Total + premium", "done": true },
+    { "id": "funding_oi", "label": "Funding_OI_Liq_Checked", "desc": "Funding rates + OI delta + skew/IV", "done": true },
+    { "id": "yields_oil", "label": "Yields_DXY_Oil_Checked", "desc": "10Y / 30Y yields + real yields + DXY + Brent", "done": true },
+    { "id": "x_scan", "label": "X_HighSignal_Scan_Checked", "desc": "High-signal X scan — narrative & key posts", "done": false },
+    { "id": "price_levels", "label": "Price_vs_Levels_Checked", "desc": "BTC vs key levels — 80-82k supp / 85-87.5k res", "done": true },
+    { "id": "exchange_flows", "label": "Exchange_Flows_Checked", "desc": "Exchange net inflows/outflows + Whale LTH delta", "done": true },
+    { "id": "options_skew", "label": "Options_Skew_Checked", "desc": "Options skew & 25-delta risk reversals", "done": false }
+  ],
+  "levels": {
+    "support": "80.3k (Oct8 low) / 80-82k zone",
+    "resistance": "85.0k / 87.5k",
+    "invalidation_long": "Daily close <80k with ETF outflows + funding >0.01%",
+    "invalidation_short": "Daily close >87.5k with inflows >+150M + funding <0%",
+    "current_benchmark": 83075
+  },
+  "watch_next": [
+    "CPI Sep due 14 Oct 8:30am ET (Consensus +0.6% MoM headline / +0.2% core)",
+    "Next US ETF net flow print post-settlement",
+    "Middle East oil escalation / Government seizure wallet movements"
+  ],
+  "tables": {
+    "macro": [
+      ["2026-10-10", "10Y 4.62%", "4.91%", "2.15%", "104.8", "103.2 (+2.1%)", "76%", "-1", "Yields and DXY squeezing risk assets post-airport attack"],
+      ["2026-10-08", "10Y 4.58%", "4.88%", "2.11%", "104.6", "101.8 (+1.7%)", "80%", "-1", "CPI expectation front-running; Brent crossing $100"],
+      ["2026-10-06", "10Y 4.52%", "4.82%", "2.08%", "104.2", "100.1", "84%", "0", "Consensus +0.6% MoM headline / +0.2% core pending"]
+    ],
+    "etf": [
+      ["2026-10-09", "+35M", "-10M", "-4M", "+21M", "105.4B", "~910k", "-0.05%", "0"],
+      ["2026-10-08", "-95M", "-70M", "-79M", "-244M", "105.2B", "~908k", "-0.12%", "-1"],
+      ["2026-10-07", "-210M", "-150M", "-127M", "-487M", "105.8B", "~911k", "-0.18%", "-1"]
+    ],
+    "derivatives": [
+      ["2026-10-10", "+0.007% avg", "-1.5%", "$180M", "$210M", "Neutral", "56%", "0"],
+      ["2026-10-08", "+0.012% avg", "+4.2%", "$650M", "$120M", "Bearish", "62%", "-1"],
+      ["2026-10-06", "+0.009% avg", "+2.1%", "$320M", "$80M", "Neutral", "58%", "0"]
+    ],
+    "onchain": [
+      ["2026-10-10", "+1.1k BTC", "-3.9k BTC", "Whale accum (+0.12% 7d)", "+80M", "Bid heavy 81k-82k", "+1"],
+      ["2026-10-08", "+2.8k BTC", "-1.6k BTC", "Whale slight accum", "+20M", "Ask heavy 84k-85k", "0"],
+      ["2026-10-07", "+5.4k BTC", "-1.2k BTC", "Whale neutral", "+5M", "Thin bids", "-1"]
+    ],
+    "geopol": [
+      ["2026-10-11", "Saudi coalition vows response, US weighs stance", "+0.5%", "Risk-off", "Level 3/5", "-1"],
+      ["2026-10-10", "Riyadh King Khalid Airport bombing (12 dead, civilian airport closed)", "+2.1% (Brent $103.2)", "Risk-off", "Level 3/5", "-1"],
+      ["2026-10-08", "Houthi missile barrage toward Southern Saudi", "+1.2% (Brent $101.8)", "Cautious", "Level 2/5", "0"]
+    ],
+    "regulation": [
+      ["2026-10-09", "EU", "MiCA stablecoin compliance milestone update", "Neutral", "0"],
+      ["2026-10-08", "US", "CFTC proposes non-intermediated leveraged spot path", "Mild positive", "0"],
+      ["2026-10-05", "US", "CLARITY Act stalled in committee, motion to reconsider", "Muted negative", "0"]
+    ],
+    "sentiment": [
+      ["2026-10-11", "Weekend consolidation 82.5k-83.2k", "Mixed / waiting for Monday open", "false", "@traderflow: 81k must hold", "0"],
+      ["2026-10-09", "Recovery attempt after long wipeout", "Mixed recovery hope", "false", "@macroscope: watch CPI print", "0"],
+      ["2026-10-07", "Liquidation cascade panic ($1.17B longs wiped)", "Fear / liquidation shock", "false", "@whalespot: largest ETF outflow", "-1"]
+    ],
+    "cross": [
+      ["2026-10-11", "NDX -0.3% / SPX -0.1%", "Gold 2,674 (+0.3%)", "18.2", "52.1%", "0.0398", "0"],
+      ["2026-10-09", "NDX +0.4% / SPX +0.3%", "Gold 2,668 (flat)", "17.8", "51.9%", "0.0401", "0"],
+      ["2026-10-07", "NDX -0.8% / SPX -0.5%", "Gold 2,660 (+0.6%)", "19.5", "52.3%", "0.0408", "-1"]
+    ],
+    "summary": [
+      ["2026-10-11", "Fading cross-asset shock; awaiting US CPI", "CPI shock >0.6% MoM", "Scalp range 80k-85k", "-2", "Mild Bearish", "Defensive / Half Size", "0.5x"],
+      ["2026-10-10", "ETF outflow + Geopol L3 + Deriv crowded", "Brent >105 / 10Y >4.70%", "Hedge spot longs", "-4", "Mild Bearish", "Defensive / Short Rallies", "0.25x"],
+      ["2026-10-08", "ETF -$487M + $1.17B Long liquidation + Oil spike", "Cascading liquidation to $80k", "Reclaim 85k-87.5k shelf", "-5", "Strong Bearish", "Capital Preservation / Shorts", "0.25x"]
+    ]
+  }
+}
