@@ -1192,8 +1192,8 @@ async function fetchWithMirrors(primaryUrls, fallbackLocalUrl) {
   for (const url of primaryUrls) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
-      const res = await fetch(url, { cache: 'no-store', signal: controller.signal });
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
+      const res = await fetch(url, { signal: controller.signal });
       clearTimeout(timeoutId);
       if (res.ok) {
         const data = await res.json();
@@ -1228,9 +1228,7 @@ async function fetchAndComputeAll() {
   try {
     // A. 1D Daily Klines
     const dRes = await fetchWithMirrors([
-      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250',
-      'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250',
-      'https://api1.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250'
+      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250'
     ], prefix + 'data/btc_daily_klines.json');
 
     if (dRes.data) {
@@ -1248,8 +1246,7 @@ async function fetchAndComputeAll() {
 
     // B. 1W Weekly Klines
     const wRes = await fetchWithMirrors([
-      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=100',
-      'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=100'
+      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=100'
     ], prefix + 'data/btc_weekly_klines.json');
 
     if (wRes.data) {
