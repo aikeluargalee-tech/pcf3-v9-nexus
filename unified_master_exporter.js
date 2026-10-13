@@ -330,6 +330,13 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
   4. Next Catalysts to Watch: (Macro dates, yield thresholds, level reclaim triggers)
 - Begin with a short Data Freshness Note stating whether inputs are LIVE, CACHED, or DEGRADED.
 
+6. EXTERNAL VERIFICATION (if web access is available):
+- Cross-check the Desk 7 macro gate inputs (US 10Y yield, SPX/RSP breadth ratio, MSTR drawdown, and event calendar dates) against contemporaneous public market sources.
+- Treat differences under ~1% as normal intraday rounding noise.
+- List any material discrepancies in a brief table: | Metric | Dossier Value | Public Market Value | Source |.
+- Do not unilaterally alter the posture ruling based on a discrepancy alone; state whether the CRIMSON gate still holds under verified inputs.
+- If web search is unavailable in your environment, state explicitly: "External search unavailable; evaluating dossier telemetry as unverified timestamped inputs."
+
 --- DOSSIER BEGINS BELOW ---`;
 
   // --- CORE EXPORTER ENGINE ---
@@ -765,7 +772,7 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       "• Threat Scoring Model:       Additive Structural Headwind Model (Ceiling 100). Triggered: SPX/RSP Ratio>50SMA (35) + 10Y>=5.0% (30) + MSTR<-20% DD (20) + Election Window (15) = 100/100",
       `• SPX / RSP Breadth Ratio:    SPX $${spxPrice} / RSP $${rspPrice} (Ratio vs 50 SMA: ${breadthRatioDiff} [TECH CONCENTRATION]) [Source: Yahoo ^GSPC / RSP]`,
       `• US 10Y Treasury Yield:      ${us10yYield} (${parseFloat(us10yYield) >= 5.0 ? '🚨 Elevated Above 5.0% Gate' : 'Normal Range'}) [Source: Yahoo ^TNX / FRED]`,
-      "• MSTR / BTC Momentum Canary: MSTR $154.34 (-25.7% from high) [Bearish Momentum Divergence Active] [Source: Nasdaq MSTR]",
+      "• MSTR / BTC Momentum Canary: MSTR $154.34 (-25.7% from split-adj cycle high of $207.70) [Bearish Momentum Divergence Active] [Source: Nasdaq MSTR]",
       "• Election Volatility Window: ACTIVE (Catalysts: CPI Oct 15 [5d], NFP Nov 1 [22d], US Election Nov 5 [26d], FOMC Nov 6 [27d])",
       "• Capital Preservation Gate:  CRIMSON OVERRIDE ACTIVE: 100% USDT Cash Preservation strictly overrides lower-desk dip-buying and scalp shorts",
       "",
@@ -801,6 +808,7 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       "3. HIERARCHY OF PRECEDENCE: When Threat Matrix is 100/100 (CRIMSON Gate), DMRA 100% USDT Capital Preservation strictly overrides BOTH spot-long dip-buying (Desk 3/4) AND scalp shorting (Desk 8). Absolute capital preservation is authoritative. No leverage or directional positions permitted.",
       "4. STABLECOIN CUSTODY CAVEAT: 100% USDT allocation eliminates BTC price volatility but retains issuer, custody, smart-contract, and depeg risks. Treat as temporary tactical dry powder, not risk-free cash.",
       "5. ACTIONABLE BOTTOM LINE: State recommended posture (Preservation / Scalp / Full), exact invalidation stop, and next structural trigger level.",
+      "6. EXTERNAL VERIFICATION: Where browsing is available, cross-check Desk 7 gate inputs (10Y yield, SPX, MSTR, event calendar) within ~1% tolerance, tabularize any material differences, and confirm if CRIMSON gate remains binding.",
       "================================================================================",
       "END OF 9-DESK UNIFIED MASTER TELEMETRY DOSSIER"
     ];

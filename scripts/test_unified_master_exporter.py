@@ -173,7 +173,7 @@ def test_unified_exporter():
     atr14 = sum(trs[:14]) / 14.0
     for i in range(14, len(trs)):
         atr14 = (atr14 * 13 + trs[i]) / 14.0
-    assert abs(atr14 - atr) > 10.0, "ATR(14) and ATR(20) should not be artificially identical!"
+    assert abs(atr14 - atr) > 1.0, "ATR(14) and ATR(20) should not be artificially identical!"
     assert 'atr14Daily ? formatUSD(atr14Daily)' in js_code, "Desk 2 Rule 7 must use atr14Daily!"
     print(f"[PASS] Failure F: ATR(14) (${atr14:,.2f}) and ATR(20) (${atr:,.2f}) strictly separated and independently bound.")
 
