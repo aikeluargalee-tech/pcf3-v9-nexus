@@ -70,12 +70,15 @@
    */
   function resolveLocalUrl(relativePath) {
     if (typeof window === 'undefined') return relativePath;
-    const cleanPath = relativePath.replace(/^\.?\//, '');
+    const cleanPath = relativePath.replace(/^(\.\/|\/)/, '');
 
     // Reliably anchor to repository root across root and subfolder paths
     let repoBase = window.location.origin;
+    if (!repoBase || repoBase === 'null') {
+      return relativePath;
+    }
     const pathParts = window.location.pathname.split('/').filter(Boolean);
-    if (pathParts.length > 0 && window.location.hostname.endsWith('github.io')) {
+    if (pathParts.length > 0 && (window.location.hostname.endsWith('github.io') || window.location.pathname.includes('pcf3-v9-nexus'))) {
       repoBase += '/' + pathParts[0] + '/';
     } else {
       let dir = window.location.pathname;
@@ -103,11 +106,12 @@
         const isExternal = rawUrl.startsWith('http://') || rawUrl.startsWith('https://');
         const url = isExternal ? rawUrl : resolveLocalUrl(rawUrl);
 
+        // Generous timeout for local JSON assets so 50KB files never abort on mobile / slow Wi-Fi
+        const effectiveTimeout = isExternal ? timeoutMs : Math.max(timeoutMs, 3500);
+
         const ctrl = new AbortController();
-        const tid = setTimeout(() => ctrl.abort(), timeoutMs);
-        const fetchOpts = isExternal 
-          ? { signal: ctrl.signal } 
-          : { cache: 'no-store', signal: ctrl.signal };
+        const tid = setTimeout(() => ctrl.abort(), effectiveTimeout);
+        const fetchOpts = { signal: ctrl.signal };
         const res = await fetch(url, fetchOpts);
         clearTimeout(tid);
 
@@ -311,38 +315,40 @@
       hour12: false
     }) + ' MYT';
 
-    // 1. Parallel execution across all data venues
-    let [tickerData, bookData, dailyKlines, fourHourKlines, volFeed, threatFeed, rawPacket] = await Promise.all([
+    // 1. Parallel execution across all data venues (including local fallback in parallel)
+    let [tickerData, bookData, liveDailyKlines, repoDailyKlines, fourHourKlines, volFeed, threatFeed, rawPacket] = await Promise.all([
       fetchWithWaterfall(VENUES.ticker, true),
       fetchWithWaterfall(VENUES.book, true),
-      fetchWithWaterfall(VENUES.dailyKlines, true),
+      fetchWithWaterfall(VENUES.dailyKlines, true, 2000),
+      fetchWithWaterfall(VENUES.dailyKlinesFallback, true, 3500),
       fetchWithWaterfall(VENUES.fourHourKlines, true),
-      fetchWithWaterfall(VENUES.volatilityFeed, true),
-      fetchWithWaterfall(VENUES.threatFeed, true),
-      fetchWithWaterfall(VENUES.masterPacket, false)
+      fetchWithWaterfall(VENUES.volatilityFeed, true, 3500),
+      fetchWithWaterfall(VENUES.threatFeed, true, 3500),
+      fetchWithWaterfall(VENUES.masterPacket, false, 3500)
     ]);
 
     // Strong 3-tier last-known-good cache for daily klines (Desk 3 reliability)
+    let dailyKlines = null;
     let klineSource = 'LIVE';
     let klineCacheAge = null;
-    if (Array.isArray(dailyKlines) && dailyKlines.length >= 200) {
-      saveKlineCache(dailyKlines);
+
+    if (Array.isArray(liveDailyKlines) && liveDailyKlines.length >= 200) {
+      dailyKlines = liveDailyKlines;
+      saveKlineCache(liveDailyKlines);
       klineSource = 'LIVE';
     } else {
       const cached = loadKlineCache();
-      if (cached) {
+      if (cached && Array.isArray(cached.data) && cached.data.length >= 200) {
         dailyKlines = cached.data;
         klineSource = 'CACHED';
         klineCacheAge = formatCacheAge(cached.ageMs);
+      } else if (Array.isArray(repoDailyKlines) && repoDailyKlines.length >= 200) {
+        dailyKlines = repoDailyKlines;
+        saveKlineCache(repoDailyKlines);
+        klineSource = 'CACHED';
+        klineCacheAge = 'Repo Snapshot';
       } else {
-        const repoSnapshot = await fetchWithWaterfall(VENUES.dailyKlinesFallback, true);
-        if (Array.isArray(repoSnapshot) && repoSnapshot.length >= 200) {
-          dailyKlines = repoSnapshot;
-          klineSource = 'CACHED';
-          klineCacheAge = 'Repo Snapshot';
-        } else {
-          klineSource = 'UNAVAILABLE';
-        }
+        klineSource = 'UNAVAILABLE';
       }
     }
 
@@ -826,6 +832,30 @@
       }
     }
   };
+
+  // Proactive background pre-warm on page load so localStorage is never cold
+  if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+    const preWarmKlines = async () => {
+      try {
+        const live = await fetchWithWaterfall(VENUES.dailyKlines, true, 2000);
+        if (Array.isArray(live) && live.length >= 200) {
+          saveKlineCache(live);
+          return;
+        }
+        if (!loadKlineCache()) {
+          const snapshot = await fetchWithWaterfall(VENUES.dailyKlinesFallback, true, 3500);
+          if (Array.isArray(snapshot) && snapshot.length >= 200) {
+            saveKlineCache(snapshot);
+          }
+        }
+      } catch (_) {}
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => setTimeout(preWarmKlines, 600));
+    } else {
+      setTimeout(preWarmKlines, 600);
+    }
+  }
 
   // Expose generator function for automated testing and node/headless verification
   if (typeof module !== 'undefined' && module.exports) {
