@@ -107,7 +107,7 @@
         const url = isExternal ? rawUrl : resolveLocalUrl(rawUrl);
 
         // Generous timeout for local JSON assets so 50KB files never abort on mobile / slow Wi-Fi
-        const effectiveTimeout = isExternal ? timeoutMs : Math.max(timeoutMs, 3500);
+        const effectiveTimeout = isExternal ? timeoutMs : Math.max(timeoutMs, 4500);
 
         const ctrl = new AbortController();
         const tid = setTimeout(() => ctrl.abort(), effectiveTimeout);
@@ -320,11 +320,11 @@
       fetchWithWaterfall(VENUES.ticker, true),
       fetchWithWaterfall(VENUES.book, true),
       fetchWithWaterfall(VENUES.dailyKlines, true, 2000),
-      fetchWithWaterfall(VENUES.dailyKlinesFallback, true, 3500),
+      fetchWithWaterfall(VENUES.dailyKlinesFallback, true, 4500),
       fetchWithWaterfall(VENUES.fourHourKlines, true),
-      fetchWithWaterfall(VENUES.volatilityFeed, true, 3500),
-      fetchWithWaterfall(VENUES.threatFeed, true, 3500),
-      fetchWithWaterfall(VENUES.masterPacket, false, 3500)
+      fetchWithWaterfall(VENUES.volatilityFeed, true, 4500),
+      fetchWithWaterfall(VENUES.threatFeed, true, 4500),
+      fetchWithWaterfall(VENUES.masterPacket, false, 4500)
     ]);
 
     // Strong 3-tier last-known-good cache for daily klines (Desk 3 reliability)
@@ -843,7 +843,7 @@
           return;
         }
         if (!loadKlineCache()) {
-          const snapshot = await fetchWithWaterfall(VENUES.dailyKlinesFallback, true, 3500);
+          const snapshot = await fetchWithWaterfall(VENUES.dailyKlinesFallback, true, 4500);
           if (Array.isArray(snapshot) && snapshot.length >= 200) {
             saveKlineCache(snapshot);
           }
