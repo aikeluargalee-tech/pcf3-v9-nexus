@@ -301,6 +301,37 @@
     return `${m}m ago`;
   }
 
+  // --- MASTER LLM ARBITRATION PROMPT (prepended to every copy) ---
+  const ARBITRATION_PROMPT = `You are a Senior Quantitative Risk Arbitrator & Bitcoin Market Microstructure Specialist.
+Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal. Analyze the telemetry using the strict 5-step institutional protocol below:
+
+### PROTOCOL & RULES OF ENGAGEMENT:
+1. OPERATIONAL INTEGRITY CHECK:
+- Check the header audit. Is telemetry FULLY OPERATIONAL, CACHED, or DEGRADED?
+- If Technical Indicator Engine is DEGRADED / PENDING, do not invent Desk 3 values; state that the technical confluence is not evaluable.
+- Reject any hallucinated numbers; evaluate only what is reported.
+
+2. CONFLUENCE VS. CONTRADICTION AUDIT:
+- Identify the tension between Technical Indicators (Desk 3 USSM v1.0 dip-buying, Desk 6 Absorption) versus Macro Risk (Desk 7 Threat Matrix 100/100, Desk 8 Volatility -3/8, US 10Y yields).
+
+3. HIERARCHY OF PRECEDENCE (MANDATORY GATE):
+- Check Desk 7: If Threat Matrix is 100/100 (CRIMSON Gate), DMRA 100% USDT Capital Preservation strictly overrides BOTH spot-long dip-buying (Desk 3/4) AND scalp shorting (Desk 8).
+- Under CRIMSON status, directional exposure is 0.00x. No leverage or swing buying permitted.
+- Do not qualify the override with “unless the technicals look attractive.” The gate is binding.
+
+4. CUSTODY & REGIME RISKS:
+- Address the stablecoin custody caveat (USDT regulatory, depeg, and issuer risk as tactical dry powder).
+
+5. ACTIONABLE EXECUTIVE BRIEFING:
+- Output your response in this exact 4-part format:
+  1. Executive Posture Ruling: (100% Cash Preservation / Defensive Scalp / Trend Execution)
+  2. Cross-Desk Conflict Breakdown: (Where models disagree and why)
+  3. Key Structural Levels: (Invalidation stop, current floor defense, overhead liquidity magnet)
+  4. Next Catalysts to Watch: (Macro dates, yield thresholds, level reclaim triggers)
+- Begin with a short Data Freshness Note stating whether inputs are LIVE, CACHED, or DEGRADED.
+
+--- DOSSIER BEGINS BELOW ---`;
+
   // --- CORE EXPORTER ENGINE ---
   async function generateUnifiedMasterPacket() {
     const timestampUtc = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
@@ -774,7 +805,7 @@
       "END OF 9-DESK UNIFIED MASTER TELEMETRY DOSSIER"
     ];
 
-    return lines.join("\n");
+    return ARBITRATION_PROMPT + "\n\n" + lines.join("\n");
   }
 
   // --- GLOBAL ATTACHMENT WITH VISUAL FEEDBACK ---
