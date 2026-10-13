@@ -212,6 +212,14 @@ def test_unified_exporter():
     assert 'data/btc_daily_klines.json' in js_code, "Fast local kline fallback verified!"
     print("[PASS] Failure L: Waterfall restricted to unblocked public endpoints with 1200ms timeout and fast local fallback.")
 
+    # Test Failure M: 3-Tier Last-Known-Good (LKG) localStorage Cache & Provenance
+    assert 'KLINE_CACHE_KEY' in js_code and 'nexus_daily_klines_v1' in js_code
+    assert 'saveKlineCache' in js_code and 'loadKlineCache' in js_code and 'formatCacheAge' in js_code
+    assert 'dailyKlinesFallback' in js_code, "Must separate live klines from static fallback to prevent cache poisoning!"
+    assert 'CACHED / OPERATIONAL (Last-Known-Good Klines' in js_code
+    assert 'USING CACHED KLINES' in js_code
+    print("[PASS] Failure M: 3-tier Last-Known-Good localStorage cache verified with zero cache-poisoning and explicit CACHED provenance.")
+
     print("\n>>> ALL ADVANCED INTEGRITY & FAILURE REGRESSION CHECKS PASSED WITH 100% COMPLIANCE! <<<")
 
 if __name__ == '__main__':

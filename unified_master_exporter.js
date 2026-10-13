@@ -39,7 +39,9 @@
       'https://data-api.binance.vision/api/v3/ticker/bookTicker?symbol=BTCUSDT'
     ],
     dailyKlines: [
-      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250',
+      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250'
+    ],
+    dailyKlinesFallback: [
       './data/btc_daily_klines.json',
       'data/btc_daily_klines.json'
     ],
@@ -261,6 +263,40 @@
     return '$' + Number(val).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
   }
 
+  // --- LAST-KNOWN-GOOD KLINE CACHE (localStorage) ---
+  const KLINE_CACHE_KEY = 'nexus_daily_klines_v1';
+  const KLINE_CACHE_MAX_AGE_MS = 48 * 60 * 60 * 1000; // 48 hours
+
+  function saveKlineCache(klines) {
+    if (typeof localStorage === 'undefined' || !Array.isArray(klines) || klines.length < 200) return;
+    try {
+      const payload = { ts: Date.now(), data: klines };
+      localStorage.setItem(KLINE_CACHE_KEY, JSON.stringify(payload));
+    } catch (e) { /* quota or private mode */ }
+  }
+
+  function loadKlineCache() {
+    if (typeof localStorage === 'undefined') return null;
+    try {
+      const raw = localStorage.getItem(KLINE_CACHE_KEY);
+      if (!raw) return null;
+      const payload = JSON.parse(raw);
+      if (!payload || !Array.isArray(payload.data) || payload.data.length < 200) return null;
+      const age = Date.now() - (payload.ts || 0);
+      if (age > KLINE_CACHE_MAX_AGE_MS) return null;
+      return { data: payload.data, ageMs: age, ts: payload.ts };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function formatCacheAge(ageMs) {
+    const h = Math.floor(ageMs / 3600000);
+    const m = Math.floor((ageMs % 3600000) / 60000);
+    if (h > 0) return `${h}h ${m}m ago`;
+    return `${m}m ago`;
+  }
+
   // --- CORE EXPORTER ENGINE ---
   async function generateUnifiedMasterPacket() {
     const timestampUtc = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
@@ -276,7 +312,7 @@
     }) + ' MYT';
 
     // 1. Parallel execution across all data venues
-    const [tickerData, bookData, dailyKlines, fourHourKlines, volFeed, threatFeed, rawPacket] = await Promise.all([
+    let [tickerData, bookData, dailyKlines, fourHourKlines, volFeed, threatFeed, rawPacket] = await Promise.all([
       fetchWithWaterfall(VENUES.ticker, true),
       fetchWithWaterfall(VENUES.book, true),
       fetchWithWaterfall(VENUES.dailyKlines, true),
@@ -285,6 +321,30 @@
       fetchWithWaterfall(VENUES.threatFeed, true),
       fetchWithWaterfall(VENUES.masterPacket, false)
     ]);
+
+    // Strong 3-tier last-known-good cache for daily klines (Desk 3 reliability)
+    let klineSource = 'LIVE';
+    let klineCacheAge = null;
+    if (Array.isArray(dailyKlines) && dailyKlines.length >= 200) {
+      saveKlineCache(dailyKlines);
+      klineSource = 'LIVE';
+    } else {
+      const cached = loadKlineCache();
+      if (cached) {
+        dailyKlines = cached.data;
+        klineSource = 'CACHED';
+        klineCacheAge = formatCacheAge(cached.ageMs);
+      } else {
+        const repoSnapshot = await fetchWithWaterfall(VENUES.dailyKlinesFallback, true);
+        if (Array.isArray(repoSnapshot) && repoSnapshot.length >= 200) {
+          dailyKlines = repoSnapshot;
+          klineSource = 'CACHED';
+          klineCacheAge = 'Repo Snapshot';
+        } else {
+          klineSource = 'UNAVAILABLE';
+        }
+      }
+    }
 
     // Parse Spot & Book (L1 Live)
     let spotPrice = 82900.0;
@@ -585,7 +645,7 @@
       "SYSTEM OPERATIONAL INTEGRITY & CLEARANCE AUDIT:",
       `• Spot Stream Telemetry:      ${isLiveTicker ? 'ONLINE (Real-Time Binance Ticker Active)' : 'DEGRADED (Daily Kline Close Fallback)'}`,
       `• Order Book Depth Telemetry: ${isLiveBook ? 'ONLINE (Top-of-Book Depth Active)' : 'OFFLINE / RATE-LIMITED (Depth Feed Disconnected)'}`,
-      `• Technical Indicator Engine: ${quantEvaluable ? 'FULLY OPERATIONAL (250D Klines Bound & Evaluated)' : 'DEGRADED / PENDING (Kline Telemetry Offline)'}`,
+      `• Technical Indicator Engine: ${quantEvaluable ? (klineSource === 'CACHED' ? `CACHED / OPERATIONAL (Last-Known-Good Klines ${klineCacheAge || 'recent'})` : 'FULLY OPERATIONAL (250D Klines Bound & Evaluated)') : 'DEGRADED / PENDING (Kline Telemetry Offline)'}`,
       `• Macro Risk Engines:         OPERATIONAL (Threat Matrix 100/100 • Volatility Radar -3/8 Bound)`,
       `• Strategy Precedence Gate:   ENFORCED (CRIMSON 100% Cash Preservation Overrides Lower Desks)`,
       `• Operational Clearance:      ${overallClearance}`,
@@ -631,7 +691,7 @@
       `• Composite Signal State:     ${compositeSignalDisplay}`,
       `• Quant Stop Boundary (2.5x): ${initStop ? formatUSD(initStop) : 'N/A'} (-${stopDist ? (stopDist / spotPrice * 100).toFixed(2) : '0'}%)`,
       `• Profit Trailing Trigger:    ${trailTrigger ? formatUSD(trailTrigger) : 'N/A'} (+2.0x ATR)`,
-      "• Calculation Standard:       Binance BTCUSDT 1D • 250 Completed Daily Candles • Wilder Smoothing Standard",
+      `• Calculation Standard:       Binance BTCUSDT 1D • 250 Completed Daily Candles • Wilder Smoothing Standard${klineSource === 'CACHED' ? ' • USING CACHED KLINES (' + (klineCacheAge || 'recent') + ')' : ''}`,
       "",
       "--------------------------------------------------------------------------------",
       "DESK 4: LIQUIDITY RADAR (SPOT SWING PROTOCOL v2.0 & ORDER DEPTH)",
