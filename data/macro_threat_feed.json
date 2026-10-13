@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "asof": "2026-10-13T19:39:12Z",
+  "asof": "2026-10-13T23:31:16Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
@@ -39,18 +39,18 @@
   },
   "modules": {
     "module_a_breadth": {
-      "spx_price": 7810.39,
-      "spx_change_24h": -0.11,
+      "spx_price": 7807.24,
+      "spx_change_24h": -0.15,
       "spx_ath": 5790.2,
       "spx_distance_ath_pct": -0.13,
-      "rsp_price": 213.49,
-      "rsp_change_24h": 0.55,
+      "rsp_price": 213.3,
+      "rsp_change_24h": 0.46,
       "rsp_52w_high": 174.5,
       "rsp_distance_high_pct": -3.48,
-      "ratio_raw": 36.584,
+      "ratio_raw": 36.602,
       "ratio_normalized": 1.428,
       "ratio_50sma": 34.262,
-      "ratio_sma_diff_pct": 6.78,
+      "ratio_sma_diff_pct": 6.83,
       "divergence_flag": "CRITICAL BREADTH DIVERGENCE: TECH CONCENTRATION MIRAGE",
       "fractal_note": "Fewer than 10 mega-caps propping up headline index. 2008 double-bottom breakout similarity active."
     },
@@ -66,8 +66,8 @@
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity."
     },
     "module_c_mstr": {
-      "price": 151.46,
-      "change_24h_pct": -7.96,
+      "price": 152.18,
+      "change_24h_pct": -7.52,
       "cycle_high": 1999.99,
       "distance_from_high_pct": -25.72,
       "daily_rsi": 41.2,
@@ -120,8 +120,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 83136.7,
-      "change_24h_pct": 0.72,
+      "spot_price": 83118.06,
+      "change_24h_pct": 0.69,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -591,13 +591,13 @@
     },
     {
       "date": "2026-10-13",
-      "spx": 7810.39,
-      "rsp": 213.49,
-      "ratio": 36.584,
+      "spx": 7807.24,
+      "rsp": 213.3,
+      "ratio": 36.602,
       "sma50": 34.262,
       "us10y": 5.217,
-      "mstr": 151.5,
-      "btc": 83137.0
+      "mstr": 152.2,
+      "btc": 83118.0
     }
   ]
 }
