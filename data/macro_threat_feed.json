@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "asof": "2026-10-14T12:30:02Z",
+  "asof": "2026-10-14T14:11:30Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
@@ -21,7 +21,7 @@
         "points": 30,
         "max": 30,
         "triggered": true,
-        "reason": "10Y Treasury Yield at 5.217% >= 5.00% toxic threshold"
+        "reason": "10Y Treasury Yield at 5.293% >= 5.00% toxic threshold"
       },
       "mstr_bearish_divergence": {
         "points": 20,
@@ -39,23 +39,23 @@
   },
   "modules": {
     "module_a_breadth": {
-      "spx_price": 7805.45,
-      "spx_change_24h": -0.17,
+      "spx_price": 7754.74,
+      "spx_change_24h": -0.6,
       "spx_ath": 5790.2,
       "spx_distance_ath_pct": -0.13,
-      "rsp_price": 213.3,
-      "rsp_change_24h": 0.46,
+      "rsp_price": 211.74,
+      "rsp_change_24h": 0.54,
       "rsp_52w_high": 174.5,
       "rsp_distance_high_pct": -3.48,
-      "ratio_raw": 36.594,
+      "ratio_raw": 36.624,
       "ratio_normalized": 1.428,
       "ratio_50sma": 34.31,
-      "ratio_sma_diff_pct": 6.66,
+      "ratio_sma_diff_pct": 6.74,
       "divergence_flag": "CRITICAL BREADTH DIVERGENCE: TECH CONCENTRATION MIRAGE",
       "fractal_note": "Fewer than 10 mega-caps propping up headline index. 2008 double-bottom breakout similarity active."
     },
     "module_b_yield": {
-      "yield_pct": 5.217,
+      "yield_pct": 5.293,
       "change_30d_bps": 42.0,
       "danger_threshold_pct": 5.0,
       "caution_threshold_pct": 4.25,
@@ -66,8 +66,8 @@
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity."
     },
     "module_c_mstr": {
-      "price": 152.18,
-      "change_24h_pct": -7.52,
+      "price": 145.83,
+      "change_24h_pct": -4.92,
       "cycle_high": 312.71,
       "distance_from_high_pct": -51.34,
       "summary": "MSTR $152.18 (-51.3% from 52W high of $312.71) [Bearish Momentum Divergence Active]",
@@ -128,8 +128,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 83801.19,
-      "change_24h_pct": 1.07,
+      "spot_price": 82087.17,
+      "change_24h_pct": -1.0,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -609,13 +609,13 @@
     },
     {
       "date": "2026-10-14",
-      "spx": 7805.45,
-      "rsp": 213.3,
-      "ratio": 36.594,
+      "spx": 7754.74,
+      "rsp": 211.74,
+      "ratio": 36.624,
       "sma50": 34.31,
-      "us10y": 5.217,
-      "mstr": 152.2,
-      "btc": 83801.0
+      "us10y": 5.293,
+      "mstr": 145.8,
+      "btc": 82087.0
     }
   ]
 }
