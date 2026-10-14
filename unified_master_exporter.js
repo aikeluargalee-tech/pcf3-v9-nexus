@@ -9,7 +9,7 @@
  * MULTI-TIER PROVENANCE ARCHITECTURE:
  * [L1: LIVE STREAM]:        Binance Spot, Bid/Ask Book, 250 Daily Klines, 90 4H Klines
  * [L2: DERIVED INDICATORS]: 200 SMA, 21 EMA, Wilder RSI 14, Wilder ATR 20, 50-Bin POC (Live In-Browser)
- * [L3: ON-CHAIN & MACRO]:   STH Cost Floor ($81,842), US 10Y Yield (5.244%), SPX, Volatility Radar (-3/8)
+ * [L3: ON-CHAIN & MACRO]:   STH Cost Floor ($74,468 [BlockHorizon Core UTXO]), US 10Y Yield (5.217%), SPX, Volatility Radar (-3/8)
  * [L4: STRATEGY & MODELS]:  USSM v1.0 Swing Rules, SMC Sweeps, DMRA Cash Gate, March 2023 Fractal Study
  */
 
@@ -77,11 +77,14 @@
     if (typeof window === 'undefined') return relativePath;
     const cleanPath = relativePath.replace(/^(\.\/|\/)/, '');
 
+    // If opened via file:/// protocol, browser security blocks relative fetch.
+    // Gracefully anchor to live GitHub Pages production repo so local double-click testing works!
+    if (window.location.protocol === 'file:' || !window.location.origin || window.location.origin === 'null') {
+      return `https://aikeluargalee-tech.github.io/pcf3-v9-nexus/${cleanPath}?t=${Date.now()}`;
+    }
+
     // Reliably anchor to repository root across root and subfolder paths
     let repoBase = window.location.origin;
-    if (!repoBase || repoBase === 'null') {
-      return relativePath;
-    }
     const pathParts = window.location.pathname.split('/').filter(Boolean);
     if (pathParts.length > 0 && (window.location.hostname.endsWith('github.io') || window.location.pathname.includes('pcf3-v9-nexus'))) {
       repoBase += '/' + pathParts[0] + '/';
@@ -660,7 +663,7 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
     // 6. Compute Macro Threat Matrix (L3 Telemetry)
     let threatScore = 100, threatLevel = 'CRIMSON', threatStatus = 'CRITICAL THREAT / VOLATILITY CEILING';
     let threatCall = 'FORCE DMRA REGIME 2: 100% USDT CASH PRESERVATION';
-    let spxPrice = '7,811.54', rspPrice = '213.04', breadthRatioDiff = '+7.17%', us10yYield = '5.244%';
+    let spxPrice = '7,805.45', rspPrice = '213.30', breadthRatioDiff = '+6.66%', us10yYield = '5.217%';
     if (threatFeed && threatFeed.composite_threat) {
       threatScore = threatFeed.composite_threat.score || threatScore;
       threatLevel = threatFeed.composite_threat.level || threatLevel;
@@ -668,13 +671,13 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       threatCall = threatFeed.composite_threat.tactical_call || threatCall;
       if (threatFeed.modules) {
         if (threatFeed.modules.module_a_breadth) {
-          spxPrice = Number(threatFeed.modules.module_a_breadth.spx_price || 7811.54).toLocaleString();
-          rspPrice = Number(threatFeed.modules.module_a_breadth.rsp_price || 213.04).toLocaleString();
+          spxPrice = Number(threatFeed.modules.module_a_breadth.spx_price || 7805.45).toLocaleString();
+          rspPrice = Number(threatFeed.modules.module_a_breadth.rsp_price || 213.30).toLocaleString();
           breadthRatioDiff = (threatFeed.modules.module_a_breadth.ratio_sma_diff_pct >= 0 ? '+' : '') +
-            Number(threatFeed.modules.module_a_breadth.ratio_sma_diff_pct || 7.17).toFixed(2) + '%';
+            Number(threatFeed.modules.module_a_breadth.ratio_sma_diff_pct || 6.66).toFixed(2) + '%';
         }
         if (threatFeed.modules.module_b_yield) {
-          us10yYield = Number(threatFeed.modules.module_b_yield.yield_pct || 5.244).toFixed(3) + '%';
+          us10yYield = Number(threatFeed.modules.module_b_yield.yield_pct || 5.217).toFixed(3) + '%';
         }
       }
     }
@@ -727,6 +730,9 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
     let dampener = 0.50;
 
     // A. Attempt Live BlockHorizon Decrypted Feed
+    if (typeof onchainRaw === 'string') {
+      try { onchainRaw = JSON.parse(onchainRaw); } catch (e) {}
+    }
     if (onchainRaw && onchainRaw.data && onchainRaw.encrypted) {
       try {
         const decryptedChart = await decryptBlockHorizonPayload(onchainRaw.data);

@@ -241,8 +241,8 @@ def test_unified_exporter():
     # Verify index.html version reference
     with open('index.html', 'r', encoding='utf-8') as f:
         index_html = f.read()
-    assert 'unified_master_exporter.js?v=3.2.0' in index_html, "index.html must reference unified_master_exporter.js?v=3.2.0"
-    print("[PASS] index.html cache-buster successfully verified at v3.2.0.")
+    assert 'unified_master_exporter.js?v=3.2.1' in index_html, "index.html must reference unified_master_exporter.js?v=3.2.1"
+    print("[PASS] index.html cache-buster successfully verified at v3.2.1.")
 
     print("\n>>> ALL ADVANCED INTEGRITY & FAILURE REGRESSION CHECKS PASSED WITH 100% COMPLIANCE! <<<")
 
