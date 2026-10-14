@@ -1245,7 +1245,9 @@ async function fetchAndComputeAll() {
   try {
     // A. 1D Daily Klines
     const dRes = await fetchWithMirrors([
-      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=251'
+      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=251',
+      'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=251',
+      'https://api3.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=251'
     ], prefix + 'data/btc_daily_klines.json');
 
     if (dRes.data) {
@@ -1264,7 +1266,9 @@ async function fetchAndComputeAll() {
 
     // B. 1W Weekly Klines
     const wRes = await fetchWithMirrors([
-      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=101'
+      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=101',
+      'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=101',
+      'https://api3.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=101'
     ], prefix + 'data/btc_weekly_klines.json');
 
     if (wRes.data) {

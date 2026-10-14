@@ -283,11 +283,21 @@ def test_unified_exporter():
     assert 'MSTR $152.18 (-51.3% from 52W high of $312.71)' in js_code, "Must have updated 52W high MSTR metrics!"
     print("[PASS] Failure T: 2026 economic calendar, MSTR 52W high, and 4H kline 2500ms waterfall timeout verified.")
 
+    # Test Failure U: Multi-Mirror Redundancy & Zero-Mock Provenance Disclosure
+    assert "'https://api.binance.com/api/v3/ticker/bookTicker?symbol=BTCUSDT'" in js_code
+    assert "'https://api3.binance.com/api/v3/ticker/bookTicker?symbol=BTCUSDT'" in js_code
+    assert "'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=251'" in js_code
+    assert "'https://api3.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=251'" in js_code
+    assert 'https://aikeluargalee-tech.github.io/pcf3-v9-nexus/data/btc_daily_klines.json' in js_code
+    assert 'fetchWithWaterfall(VENUES.dailyKlines, true, 3000)' in js_code
+    assert 'OPERATIONAL DATA MODE:' in js_code and 'ZERO_MOCK_VERIFIED' in js_code
+    print("[PASS] Failure U: Multi-mirror book/kline redundancy and zero-mock empirical provenance verified.")
+
     # Verify index.html version reference
     with open('index.html', 'r', encoding='utf-8') as f:
         index_html = f.read()
-    assert 'unified_master_exporter.js?v=3.2.3' in index_html, "index.html must reference unified_master_exporter.js?v=3.2.3"
-    print("[PASS] index.html cache-buster successfully verified at v3.2.3.")
+    assert 'unified_master_exporter.js?v=3.2.4' in index_html, "index.html must reference unified_master_exporter.js?v=3.2.4"
+    print("[PASS] index.html cache-buster successfully verified at v3.2.4.")
 
     print("\n>>> ALL ADVANCED INTEGRITY & FAILURE REGRESSION CHECKS PASSED WITH 100% COMPLIANCE! <<<")
 

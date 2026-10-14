@@ -818,7 +818,10 @@ async function fetchAndCompute() {
 
   const endpoints = [
     { url: 'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=251', isLive: true },
-    { url: prefix + 'data/btc_daily_klines.json', isLive: false }
+    { url: 'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=251', isLive: true },
+    { url: 'https://api3.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=251', isLive: true },
+    { url: prefix + 'data/btc_daily_klines.json', isLive: false },
+    { url: 'https://aikeluargalee-tech.github.io/pcf3-v9-nexus/data/btc_daily_klines.json', isLive: false }
   ];
 
   let raw = null;
