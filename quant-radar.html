@@ -792,6 +792,22 @@ function showToast(msg) {
   setTimeout(() => { t.style.display = 'none'; }, 3200);
 }
 
+// Strips the unclosed (in-progress) forming candle from Binance klines
+function stripUnclosedCandles(rawKlines, nowMs = Date.now()) {
+  if (!Array.isArray(rawKlines) || rawKlines.length === 0) return rawKlines;
+  const cleaned = rawKlines.slice();
+  while (cleaned.length > 0) {
+    const lastBar = cleaned[cleaned.length - 1];
+    const closeTimeMs = Array.isArray(lastBar) ? Number(lastBar[6]) : (lastBar && lastBar.closeTime ? Number(lastBar.closeTime) : NaN);
+    if (Number.isFinite(closeTimeMs) && closeTimeMs > nowMs) {
+      cleaned.pop();
+    } else {
+      break;
+    }
+  }
+  return cleaned;
+}
+
 // 1. Fetch Binance Daily Klines (250 limit) with Multi-Mirror Fallback
 async function fetchAndCompute() {
   const refreshBtn = document.getElementById('btn-refresh');
@@ -801,7 +817,7 @@ async function fetchAndCompute() {
   const prefix = isSubfolder ? '../' : './';
 
   const endpoints = [
-    { url: 'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250', isLive: true },
+    { url: 'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=251', isLive: true },
     { url: prefix + 'data/btc_daily_klines.json', isLive: false }
   ];
 
@@ -848,8 +864,15 @@ async function fetchAndCompute() {
     quantData.isLive = sourceIsLive;
     quantData.lastSyncTime = new Date();
 
+    // Latest real-time tick from newest bar (even if unclosed)
+    const latestRawBar = raw[raw.length - 1];
+    quantData.currentPrice = parseFloat(latestRawBar[4]);
+
+    // Strip forming candle to guarantee indicator mathematical purity
+    const completedRaw = stripUnclosedCandles(raw);
+
     // Parse Candles
-    quantData.candles = raw.map(k => ({
+    quantData.candles = completedRaw.map(k => ({
       openTime: parseInt(k[0]),
       open: parseFloat(k[1]),
       high: parseFloat(k[2]),
@@ -861,7 +884,6 @@ async function fetchAndCompute() {
 
     const closes = quantData.candles.map(c => c.close);
     const N = closes.length;
-    quantData.currentPrice = closes[N - 1];
 
     // Compute Indicators
     computeIndicators(quantData.candles);
@@ -949,14 +971,22 @@ function computeIndicators(candles) {
   }
   avgGain /= 14;
   avgLoss /= 14;
-  let rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
-  quantData.rsi14[14] = 100 - (100 / (1 + rs));
+  if (avgLoss === 0) {
+    quantData.rsi14[14] = avgGain === 0 ? 50.0 : 100.0;
+  } else {
+    let rs = avgGain / avgLoss;
+    quantData.rsi14[14] = 100.0 - (100.0 / (1.0 + rs));
+  }
 
   for (let i = 14; i < gains.length; i++) {
     avgGain = (avgGain * 13 + gains[i]) / 14;
     avgLoss = (avgLoss * 13 + losses[i]) / 14;
-    rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
-    quantData.rsi14[i + 1] = 100 - (100 / (1 + rs));
+    if (avgLoss === 0) {
+      quantData.rsi14[i + 1] = avgGain === 0 ? 50.0 : 100.0;
+    } else {
+      let rs = avgGain / avgLoss;
+      quantData.rsi14[i + 1] = 100.0 - (100.0 / (1.0 + rs));
+    }
   }
 
   // 4. ATR 20 (Wilder's Smoothing)
@@ -975,7 +1005,7 @@ function computeIndicators(candles) {
     quantData.atr20[i + 1] = currAtr;
   }
 
-  // 5. POC_30D (Volume Profile over last 30 daily candles)
+  // 5. POC_30D (Volume Profile over last 30 daily candles with exact proportional overlap)
   const last30 = candles.slice(-30);
   let minLow = Infinity, maxHigh = -Infinity;
   last30.forEach(c => {
@@ -995,10 +1025,12 @@ function computeIndicators(candles) {
     } else {
       const startBin = Math.min(numBins - 1, Math.max(0, Math.floor((l - minLow) / binWidth)));
       const endBin = Math.min(numBins - 1, Math.max(0, Math.floor((h - minLow) / binWidth)));
-      const count = Math.max(1, endBin - startBin + 1);
-      const volPerBin = v / count;
+      const range = h - l;
       for (let b = startBin; b <= endBin; b++) {
-        binVolumes[b] += volPerBin;
+        const binLow = minLow + b * binWidth;
+        const binHigh = binLow + binWidth;
+        const overlap = Math.max(0, Math.min(h, binHigh) - Math.max(l, binLow));
+        binVolumes[b] += v * (overlap / range);
       }
     }
   });

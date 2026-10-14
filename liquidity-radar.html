@@ -1067,6 +1067,22 @@ function fmtNum(n, d = 2) {
   return (n !== null && !isNaN(n)) ? Number(n).toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d }) : '—';
 }
 
+// Strips the unclosed (in-progress) forming candle from Binance klines
+function stripUnclosedCandles(rawKlines, nowMs = Date.now()) {
+  if (!Array.isArray(rawKlines) || rawKlines.length === 0) return rawKlines;
+  const cleaned = rawKlines.slice();
+  while (cleaned.length > 0) {
+    const lastBar = cleaned[cleaned.length - 1];
+    const closeTimeMs = Array.isArray(lastBar) ? Number(lastBar[6]) : (lastBar && lastBar.closeTime ? Number(lastBar.closeTime) : NaN);
+    if (Number.isFinite(closeTimeMs) && closeTimeMs > nowMs) {
+      cleaned.pop();
+    } else {
+      break;
+    }
+  }
+  return cleaned;
+}
+
 // 1. Technical Indicators & Data Calculations
 function computeSMA(arr, period) {
   if (!arr || arr.length < period) return null;
@@ -1096,7 +1112,7 @@ function computeWilderRSI(arr, period = 14) {
     avgLoss = (avgLoss * (period - 1) + loss) / period;
   }
 
-  if (avgLoss === 0) return 100;
+  if (avgLoss === 0) return avgGain === 0 ? 50.0 : 100.0;
   const rs = avgGain / avgLoss;
   return 100 - (100 / (1 + rs));
 }
@@ -1143,10 +1159,11 @@ function computeVolumeProfile30D(candles) {
     } else {
       const startIdx = Math.min(BINS - 1, Math.max(0, Math.floor((c.low - minL) / binSize)));
       const endIdx = Math.min(BINS - 1, Math.max(0, Math.floor((c.high - minL) / binSize)));
-      const count = (endIdx - startIdx) + 1;
-      const volPerBin = vol / count;
       for (let i = startIdx; i <= endIdx; i++) {
-        volBins[i] += volPerBin;
+        const binLow = minL + i * binSize;
+        const binHigh = binLow + binSize;
+        const overlap = Math.max(0, Math.min(c.high, binHigh) - Math.max(c.low, binLow));
+        volBins[i] += vol * (overlap / rng);
       }
     }
   });
@@ -1228,12 +1245,13 @@ async function fetchAndComputeAll() {
   try {
     // A. 1D Daily Klines
     const dRes = await fetchWithMirrors([
-      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250'
+      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=251'
     ], prefix + 'data/btc_daily_klines.json');
 
     if (dRes.data) {
       if (dRes.isLive) hasLiveApi = true;
-      protocolData.candles1D = dRes.data.map(k => ({
+      const clean1D = stripUnclosedCandles(dRes.data);
+      protocolData.candles1D = clean1D.map(k => ({
         openTime: k[0],
         open: parseFloat(k[1]),
         high: parseFloat(k[2]),
@@ -1246,11 +1264,12 @@ async function fetchAndComputeAll() {
 
     // B. 1W Weekly Klines
     const wRes = await fetchWithMirrors([
-      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=100'
+      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=101'
     ], prefix + 'data/btc_weekly_klines.json');
 
     if (wRes.data) {
-      protocolData.candles1W = wRes.data.map(k => ({
+      const clean1W = stripUnclosedCandles(wRes.data);
+      protocolData.candles1W = clean1W.map(k => ({
         openTime: k[0],
         open: parseFloat(k[1]),
         high: parseFloat(k[2]),
@@ -1263,12 +1282,13 @@ async function fetchAndComputeAll() {
 
     // C. 4H Klines
     const h4Res = await fetchWithMirrors([
-      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=50',
-      'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=50'
+      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=51',
+      'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=51'
     ], prefix + 'data/btc_4h_klines.json');
 
     if (h4Res.data) {
-      protocolData.candles4H = h4Res.data.map(k => ({
+      const clean4H = stripUnclosedCandles(h4Res.data);
+      protocolData.candles4H = clean4H.map(k => ({
         openTime: k[0],
         open: parseFloat(k[1]),
         high: parseFloat(k[2]),

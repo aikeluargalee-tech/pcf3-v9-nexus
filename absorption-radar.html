@@ -1193,18 +1193,35 @@ async function loadLive() {
   let klinesSuccess = false;
   let isCacheFallback = false;
 
+// Strips the unclosed (in-progress) forming candle from Binance klines
+function stripUnclosedCandles(rawKlines, nowMs = Date.now()) {
+  if (!Array.isArray(rawKlines) || rawKlines.length === 0) return rawKlines;
+  const cleaned = rawKlines.slice();
+  while (cleaned.length > 0) {
+    const lastBar = cleaned[cleaned.length - 1];
+    const closeTimeMs = Array.isArray(lastBar) ? Number(lastBar[6]) : (lastBar && lastBar.closeTime ? Number(lastBar.closeTime) : NaN);
+    if (Number.isFinite(closeTimeMs) && closeTimeMs > nowMs) {
+      cleaned.pop();
+    } else {
+      break;
+    }
+  }
+  return cleaned;
+}
+
   // 1. Multi-Mirror Daily Klines
   const dailyMirrors = [
-    'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=120',
-    'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=120',
-    'https://api1.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=120'
+    'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=121',
+    'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=121',
+    'https://api1.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=121'
   ];
 
   for (const url of dailyMirrors) {
     try {
       const dailyRaw = await fetchWithTimeout(url, 3500);
       if (Array.isArray(dailyRaw) && dailyRaw.length >= 30) {
-        appState.dailyCandles = dailyRaw.map(r => ({
+        const cleanDaily = stripUnclosedCandles(dailyRaw);
+        appState.dailyCandles = cleanDaily.map(r => ({
           t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5]
         }));
         klinesSuccess = true;
@@ -1215,16 +1232,17 @@ async function loadLive() {
 
   // 2. Multi-Mirror 4H Klines
   const h4Mirrors = [
-    'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=120',
-    'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=120',
-    'https://api1.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=120'
+    'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=121',
+    'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=121',
+    'https://api1.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=121'
   ];
 
   for (const url of h4Mirrors) {
     try {
       const h4Raw = await fetchWithTimeout(url, 3500);
       if (Array.isArray(h4Raw) && h4Raw.length >= 30) {
-        appState.h4Candles = h4Raw.map(r => ({
+        const cleanH4 = stripUnclosedCandles(h4Raw);
+        appState.h4Candles = cleanH4.map(r => ({
           t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5]
         }));
         break;
