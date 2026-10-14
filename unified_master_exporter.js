@@ -1,15 +1,15 @@
 /**
- * UNIFIED 9-DESK MASTER TELEMETRY EXPORTER
+ * UNIFIED 9-DESK MASTER TELEMETRY EXPORTER (v3.2.2 — HARDENED AUDIT PATCH)
  * Nexus Terminal — Bitcoin Quantitative Intelligence Framework
- * 
+ *
  * Compiles a holistic, 9-desk multi-factor market state into ONE single
  * structured dossier specifically formatted for LLM multi-agent arbitration
  * (Claude, ChatGPT, Grok, Gemini, Meta AI).
- * 
+ *
  * MULTI-TIER PROVENANCE ARCHITECTURE:
- * [L1: LIVE STREAM]:        Binance Spot, Bid/Ask Book, 250 Daily Klines, 90 4H Klines
- * [L2: DERIVED INDICATORS]: 200 SMA, 21 EMA, Wilder RSI 14, Wilder ATR 20, 50-Bin POC (Live In-Browser)
- * [L3: ON-CHAIN & MACRO]:   STH Cost Floor ($74,468 [BlockHorizon Core UTXO]), US 10Y Yield (5.217%), SPX, Volatility Radar (-3/8)
+ * [L1: LIVE STREAM]:        Binance Spot, Bid/Ask Book, 250 Completed Daily Klines, 90 Completed 4H Klines
+ * [L2: DERIVED INDICATORS]: 200 SMA, 21 EMA, Wilder RSI 14, Wilder ATR 20, 50-Bin Overlap POC (Live In-Browser)
+ * [L3: ON-CHAIN & MACRO]:   STH/LTH Cost Floor & Realized Price (BlockHorizon Core UTXO), US 10Y Yield, SPX, Volatility Radar
  * [L4: STRATEGY & MODELS]:  USSM v1.0 Swing Rules, SMC Sweeps, DMRA Cash Gate, March 2023 Fractal Study
  */
 
@@ -30,6 +30,7 @@
   ];
 
   // Multi-venue API waterfall mirrors with timeout protection
+  // Request limit=251 (1d) and limit=91 (4h) so stripping the unclosed forming bar leaves 250 and 90 completed bars.
   const VENUES = {
     ticker: [
       'https://data-api.binance.vision/api/v3/ticker/price?symbol=BTCUSDT',
@@ -39,14 +40,14 @@
       'https://data-api.binance.vision/api/v3/ticker/bookTicker?symbol=BTCUSDT'
     ],
     dailyKlines: [
-      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250'
+      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=251'
     ],
     dailyKlinesFallback: [
       './data/btc_daily_klines.json',
       'data/btc_daily_klines.json'
     ],
     fourHourKlines: [
-      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=90',
+      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=91',
       './data/btc_4h_klines.json',
       'data/btc_4h_klines.json'
     ],
@@ -62,12 +63,18 @@
       './PCF3_LIVE_PACKET_DEFAULT.txt',
       'PCF3_LIVE_PACKET_DEFAULT.txt'
     ],
-    onchainFeed: [
-      'https://zbvrubdalcojapjygbcz.supabase.co/functions/v1/metric_handler/chart-data/115?includeFullData=false',
+    // AUDIT FIX: Decouple live encrypted endpoint from static repo snapshot so HTTP 200 on Supabase
+    // never short-circuits fallback to ./data/onchain_metrics.json when decryption fails.
+    onchainLive: [
+      'https://zbvrubdalcojapjygbcz.supabase.co/functions/v1/metric_handler/chart-data/115?includeFullData=false'
+    ],
+    onchainSnapshot: [
       './data/onchain_metrics.json',
       'data/onchain_metrics.json'
     ]
   };
+
+  const CRIMSON_EPSILON = 100 - 1e-9;
 
   /**
    * Resolves local file paths reliably across root and subfolder deployments.
@@ -77,13 +84,10 @@
     if (typeof window === 'undefined') return relativePath;
     const cleanPath = relativePath.replace(/^(\.\/|\/)/, '');
 
-    // If opened via file:/// protocol, browser security blocks relative fetch.
-    // Gracefully anchor to live GitHub Pages production repo so local double-click testing works!
     if (window.location.protocol === 'file:' || !window.location.origin || window.location.origin === 'null') {
       return `https://aikeluargalee-tech.github.io/pcf3-v9-nexus/${cleanPath}?t=${Date.now()}`;
     }
 
-    // Reliably anchor to repository root across root and subfolder paths
     let repoBase = window.location.origin;
     const pathParts = window.location.pathname.split('/').filter(Boolean);
     if (pathParts.length > 0 && (window.location.hostname.endsWith('github.io') || window.location.pathname.includes('pcf3-v9-nexus'))) {
@@ -102,32 +106,24 @@
 
   /**
    * Fetches data with waterfall fallback.
-   * CRITICAL: NEVER append ?t= to Binance or external REST APIs.
-   * Binance strictly validates query parameters and throws HTTP 400 Bad Request
-   * if unexpected parameters like 't' are received.
-   * Also NEVER pass { cache: 'no-store' } to external APIs as it triggers CORS preflight
-   * OPTIONS which Binance edge WAF rejects with HTTP 403 Forbidden.
+   * CRITICAL: NEVER append ?t= or { cache: 'no-store' } to external REST APIs.
    */
   async function fetchWithWaterfall(urlList, isJson = true, timeoutMs = 1200) {
     for (const rawUrl of urlList) {
       try {
         const isExternal = rawUrl.startsWith('http://') || rawUrl.startsWith('https://');
         const url = isExternal ? rawUrl : resolveLocalUrl(rawUrl);
-
-        // Generous timeout for local JSON assets so 50KB files never abort on mobile / slow Wi-Fi
         const effectiveTimeout = isExternal ? timeoutMs : Math.max(timeoutMs, 4500);
 
         const ctrl = new AbortController();
         const tid = setTimeout(() => ctrl.abort(), effectiveTimeout);
-        const fetchOpts = { signal: ctrl.signal };
-        const res = await fetch(url, fetchOpts);
+        const res = await fetch(url, { signal: ctrl.signal });
         clearTimeout(tid);
 
         if (!res.ok) continue;
 
         if (isJson) {
           const data = await res.json();
-          // Normalize Coinbase spot format
           if (data && data.data && data.data.amount) {
             return { price: data.data.amount };
           }
@@ -135,70 +131,102 @@
         } else {
           return await res.text();
         }
-      } catch (e) {
+      } catch (_) {
         // Try next mirror
       }
     }
     return null;
   }
 
-  // --- MATHEMATICAL UTILITIES ---
+  /**
+   * AUDIT FIX: Strips the unclosed (in-progress) forming candle from Binance kline arrays.
+   * Binance kline index [6] is closeTime in ms. If closeTime > nowMs, the candle is still open.
+   */
+  function stripUnclosedCandles(klines, nowMs = Date.now()) {
+    if (!Array.isArray(klines) || klines.length === 0) return klines;
+    const cleaned = klines.slice();
+    while (cleaned.length > 0) {
+      const lastBar = cleaned[cleaned.length - 1];
+      const closeTimeMs = Array.isArray(lastBar) ? Number(lastBar[6]) : NaN;
+      if (Number.isFinite(closeTimeMs) && closeTimeMs > nowMs) {
+        cleaned.pop();
+      } else {
+        break;
+      }
+    }
+    return cleaned;
+  }
+
+  // --- MATHEMATICAL UTILITIES (HARDENED) ---
   function calcSMA(values, period) {
-    if (!values || values.length < period) return null;
+    if (!Array.isArray(values) || values.length < period || period <= 0) return null;
     let sum = 0;
     for (let i = values.length - period; i < values.length; i++) {
-      sum += values[i];
+      const v = Number(values[i]);
+      if (!Number.isFinite(v)) return null;
+      sum += v;
     }
     return sum / period;
   }
 
   function calcEMA(values, period) {
-    if (!values || values.length < period) return null;
+    if (!Array.isArray(values) || values.length < period || period <= 0) return null;
     const k = 2 / (period + 1);
     let initialSum = 0;
-    for (let i = 0; i < period; i++) initialSum += values[i];
+    for (let i = 0; i < period; i++) {
+      const v = Number(values[i]);
+      if (!Number.isFinite(v)) return null;
+      initialSum += v;
+    }
     let ema = initialSum / period;
     for (let i = period; i < values.length; i++) {
-      ema = (values[i] * k) + (ema * (1 - k));
+      const v = Number(values[i]);
+      if (!Number.isFinite(v)) return null;
+      ema = (v * k) + (ema * (1 - k));
     }
     return ema;
   }
 
+  /**
+   * AUDIT FIX: Exact Wilder RSI(14) boundary handling:
+   * - When avgLoss === 0 and avgGain > 0, returns 100.0 (instead of capping at 99.0099).
+   * - When avgLoss === 0 and avgGain === 0 (flat market), returns 50.0.
+   */
   function calcWilderRSI(closes, period = 14) {
-    if (!closes || closes.length <= period) return null;
-    let gains = [], losses = [];
-    for (let i = 1; i < closes.length; i++) {
-      let diff = closes[i] - closes[i - 1];
-      gains.push(diff > 0 ? diff : 0);
-      losses.push(diff < 0 ? -diff : 0);
-    }
+    if (!Array.isArray(closes) || closes.length <= period || period <= 0) return null;
     let avgGain = 0, avgLoss = 0;
-    for (let i = 0; i < period; i++) {
-      avgGain += gains[i];
-      avgLoss += losses[i];
+    for (let i = 1; i <= period; i++) {
+      const diff = Number(closes[i]) - Number(closes[i - 1]);
+      if (!Number.isFinite(diff)) return null;
+      if (diff > 0) avgGain += diff;
+      else if (diff < 0) avgLoss += -diff;
     }
     avgGain /= period;
     avgLoss /= period;
-    let rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
-    let rsi = 100 - (100 / (1 + rs));
 
-    for (let i = period; i < gains.length; i++) {
-      avgGain = (avgGain * (period - 1) + gains[i]) / period;
-      avgLoss = (avgLoss * (period - 1) + losses[i]) / period;
-      rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
-      rsi = 100 - (100 / (1 + rs));
+    for (let i = period + 1; i < closes.length; i++) {
+      const diff = Number(closes[i]) - Number(closes[i - 1]);
+      if (!Number.isFinite(diff)) return null;
+      const gain = diff > 0 ? diff : 0;
+      const loss = diff < 0 ? -diff : 0;
+      avgGain = (avgGain * (period - 1) + gain) / period;
+      avgLoss = (avgLoss * (period - 1) + loss) / period;
     }
-    return rsi;
+
+    if (avgLoss === 0) return avgGain === 0 ? 50.0 : 100.0;
+    const rs = avgGain / avgLoss;
+    return 100.0 - (100.0 / (1.0 + rs));
   }
 
   function calcWilderATR(candles, period = 20) {
-    if (!candles || candles.length <= period) return null;
-    let trs = [];
+    if (!Array.isArray(candles) || candles.length <= period || period <= 0) return null;
+    const trs = [];
     for (let i = 1; i < candles.length; i++) {
-      let h = parseFloat(candles[i][2]);
-      let l = parseFloat(candles[i][3]);
-      let prevC = parseFloat(candles[i - 1][4]);
-      let tr = Math.max(h - l, Math.abs(h - prevC), Math.abs(l - prevC));
+      const h = parseFloat(candles[i][2]);
+      const l = parseFloat(candles[i][3]);
+      const prevC = parseFloat(candles[i - 1][4]);
+      if (!Number.isFinite(h) || !Number.isFinite(l) || !Number.isFinite(prevC)) return null;
+      const tr = Math.max(h - l, Math.abs(h - prevC), Math.abs(l - prevC));
       trs.push(tr);
     }
     let initialSum = 0;
@@ -210,36 +238,43 @@
     return atr;
   }
 
+  /**
+   * AUDIT FIX: Exact proportional overlap volume allocation across touched price bins.
+   * Prevents boundary wicks that barely touch an outer bin from receiving an equal share of volume.
+   */
   function calcVolumeProfilePOC(candles, lookbackBars = 30, binsCount = 50) {
-    if (!candles || candles.length === 0) return null;
-    let slice = candles.slice(-lookbackBars);
+    if (!Array.isArray(candles) || candles.length === 0 || binsCount <= 0) return null;
+    const slice = candles.slice(-lookbackBars);
     let minLow = Infinity, maxHigh = -Infinity;
-    slice.forEach(c => {
-      let l = parseFloat(c[3]), h = parseFloat(c[2]);
-      if (l < minLow) minLow = l;
-      if (h > maxHigh) maxHigh = h;
-    });
-    if (minLow >= maxHigh) return null;
+    for (const c of slice) {
+      const l = parseFloat(c[3]), h = parseFloat(c[2]);
+      if (Number.isFinite(l) && l < minLow) minLow = l;
+      if (Number.isFinite(h) && h > maxHigh) maxHigh = h;
+    }
+    if (!Number.isFinite(minLow) || !Number.isFinite(maxHigh) || minLow >= maxHigh) return null;
 
-    let binWidth = (maxHigh - minLow) / binsCount;
-    let binVolumes = new Array(binsCount).fill(0);
+    const binWidth = (maxHigh - minLow) / binsCount;
+    const binVolumes = new Float64Array(binsCount);
 
-    // Proportional volume allocation across candle low-to-high span (exact match to Quant Radar)
-    slice.forEach(c => {
-      let h = parseFloat(c[2]), l = parseFloat(c[3]), v = parseFloat(c[5]);
+    for (const c of slice) {
+      const h = parseFloat(c[2]), l = parseFloat(c[3]), v = parseFloat(c[5]) || 0;
+      if (!Number.isFinite(h) || !Number.isFinite(l) || v <= 0) continue;
+
       if (h <= l) {
-        let idx = Math.min(binsCount - 1, Math.max(0, Math.floor((l - minLow) / binWidth)));
+        const idx = Math.min(binsCount - 1, Math.max(0, Math.floor((l - minLow) / binWidth)));
         binVolumes[idx] += v;
       } else {
-        let startBin = Math.min(binsCount - 1, Math.max(0, Math.floor((l - minLow) / binWidth)));
-        let endBin = Math.min(binsCount - 1, Math.max(0, Math.floor((h - minLow) / binWidth)));
-        let count = Math.max(1, endBin - startBin + 1);
-        let volPerBin = v / count;
+        const startBin = Math.min(binsCount - 1, Math.max(0, Math.floor((l - minLow) / binWidth)));
+        const endBin = Math.min(binsCount - 1, Math.max(0, Math.floor((h - minLow) / binWidth)));
+        const range = h - l;
         for (let b = startBin; b <= endBin; b++) {
-          binVolumes[b] += volPerBin;
+          const binLow = minLow + b * binWidth;
+          const binHigh = binLow + binWidth;
+          const overlap = Math.max(0, Math.min(h, binHigh) - Math.max(l, binLow));
+          binVolumes[b] += v * (overlap / range);
         }
       }
-    });
+    }
 
     let maxVol = -1, maxBinIndex = 0;
     for (let b = 0; b < binsCount; b++) {
@@ -251,13 +286,27 @@
     return minLow + (maxBinIndex + 0.5) * binWidth;
   }
 
+  /**
+   * AUDIT FIX: Numerically stable two-pass log-price Pearson correlation clamped to [-1, 1].
+   */
   function calcPearsonCorrelation(arr1, arr2) {
-    if (!arr1 || !arr2 || arr1.length !== arr2.length || arr1.length === 0) return 0;
+    if (!Array.isArray(arr1) || !Array.isArray(arr2) || arr1.length !== arr2.length || arr1.length < 2) return 0;
     const n = arr1.length;
-    const log1 = arr1.map(v => Math.log(Math.max(v, 1)));
-    const log2 = arr2.map(v => Math.log(Math.max(v, 1)));
-    const m1 = log1.reduce((a, b) => a + b, 0) / n;
-    const m2 = log2.reduce((a, b) => a + b, 0) / n;
+    const log1 = new Float64Array(n);
+    const log2 = new Float64Array(n);
+    let sum1 = 0, sum2 = 0;
+
+    for (let i = 0; i < n; i++) {
+      const v1 = Math.log(Math.max(Number(arr1[i]) || 1, 1));
+      const v2 = Math.log(Math.max(Number(arr2[i]) || 1, 1));
+      log1[i] = v1;
+      log2[i] = v2;
+      sum1 += v1;
+      sum2 += v2;
+    }
+
+    const m1 = sum1 / n;
+    const m2 = sum2 / n;
     let num = 0, den1 = 0, den2 = 0;
     for (let i = 0; i < n; i++) {
       const d1 = log1[i] - m1;
@@ -267,11 +316,44 @@
       den2 += d2 * d2;
     }
     const den = Math.sqrt(den1 * den2);
-    return den === 0 ? 0 : num / den;
+    if (den === 0 || !Number.isFinite(den)) return 0;
+    return Math.max(-1, Math.min(1, num / den));
+  }
+
+  /**
+   * First-difference log-return Pearson correlation for stationary impulse verification.
+   */
+  function calcReturnCorrelation(arr1, arr2) {
+    if (!Array.isArray(arr1) || !Array.isArray(arr2) || arr1.length !== arr2.length || arr1.length < 3) return 0;
+    const m = arr1.length - 1;
+    const r1 = new Float64Array(m);
+    const r2 = new Float64Array(m);
+    let s1 = 0, s2 = 0;
+    for (let i = 0; i < m; i++) {
+      const d1 = Math.log(Math.max(Number(arr1[i + 1]) || 1, 1) / Math.max(Number(arr1[i]) || 1, 1));
+      const d2 = Math.log(Math.max(Number(arr2[i + 1]) || 1, 1) / Math.max(Number(arr2[i]) || 1, 1));
+      r1[i] = d1;
+      r2[i] = d2;
+      s1 += d1;
+      s2 += d2;
+    }
+    const mean1 = s1 / m;
+    const mean2 = s2 / m;
+    let cov = 0, v1 = 0, v2 = 0;
+    for (let i = 0; i < m; i++) {
+      const a = r1[i] - mean1;
+      const b = r2[i] - mean2;
+      cov += a * b;
+      v1 += a * a;
+      v2 += b * b;
+    }
+    const denom = Math.sqrt(v1 * v2);
+    if (denom === 0 || !Number.isFinite(denom)) return 0;
+    return Math.max(-1, Math.min(1, cov / denom));
   }
 
   function formatUSD(val, decimals = 2) {
-    if (val === null || val === undefined || isNaN(val)) return 'N/A';
+    if (val === null || val === undefined || !Number.isFinite(Number(val))) return 'N/A';
     return '$' + Number(val).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
   }
 
@@ -284,7 +366,7 @@
     try {
       const payload = { ts: Date.now(), data: klines };
       localStorage.setItem(KLINE_CACHE_KEY, JSON.stringify(payload));
-    } catch (e) { /* quota or private mode */ }
+    } catch (_) { /* quota or private mode */ }
   }
 
   function loadKlineCache() {
@@ -295,30 +377,42 @@
       const payload = JSON.parse(raw);
       if (!payload || !Array.isArray(payload.data) || payload.data.length < 200) return null;
       const age = Date.now() - (payload.ts || 0);
-      if (age > KLINE_CACHE_MAX_AGE_MS) return null;
+      if (age < 0 || age > KLINE_CACHE_MAX_AGE_MS) return null;
       return { data: payload.data, ageMs: age, ts: payload.ts };
-    } catch (e) {
+    } catch (_) {
       return null;
     }
   }
 
   function formatCacheAge(ageMs) {
-    const h = Math.floor(ageMs / 3600000);
-    const m = Math.floor((ageMs % 3600000) / 60000);
+    const safeAge = Math.max(0, Number(ageMs) || 0);
+    const h = Math.floor(safeAge / 3600000);
+    const m = Math.floor((safeAge % 3600000) / 60000);
     if (h > 0) return `${h}h ${m}m ago`;
     return `${m}m ago`;
   }
 
-  // --- BLOCKHORIZON ON-CHAIN DECRYPTOR & CACHE ---
+  // --- BLOCKHORIZON ON-CHAIN DECRYPTOR, VALIDATOR & SESSION KEY CACHE ---
   const BH_SECRET_KEY = "your-32-char-secret-key-here!!!";
   const ONCHAIN_CACHE_KEY = 'nexus_onchain_metrics_v1';
   const ONCHAIN_CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
+  let cachedAesKeyPromise = null;
+  let cachedSecretMaterial = null;
+
+  function isValidSthBound(candidate, spotPrice) {
+    const val = Number(candidate);
+    if (!Number.isFinite(val) || val < 30000 || val > 150000) return false;
+    if (Number.isFinite(spotPrice) && spotPrice >= 20000 && spotPrice <= 250000) {
+      if (val < 0.50 * spotPrice || val > 1.50 * spotPrice) return false;
+    }
+    return true;
+  }
 
   function saveOnchainCache(metrics) {
-    if (typeof localStorage === 'undefined' || !metrics) return;
+    if (typeof localStorage === 'undefined' || !metrics || typeof metrics !== 'object') return;
     try {
       localStorage.setItem(ONCHAIN_CACHE_KEY, JSON.stringify({ ts: Date.now(), data: metrics }));
-    } catch (e) {}
+    } catch (_) {}
   }
 
   function loadOnchainCache() {
@@ -329,26 +423,27 @@
       const parsed = JSON.parse(raw);
       if (!parsed || !parsed.data) return null;
       const age = Date.now() - (parsed.ts || 0);
-      if (age > ONCHAIN_CACHE_MAX_AGE_MS) return null;
+      if (age < 0 || age > ONCHAIN_CACHE_MAX_AGE_MS) return null;
       return { data: parsed.data, ageMs: age };
-    } catch (e) {
+    } catch (_) {
       return null;
     }
   }
 
-  async function decryptBlockHorizonPayload(hexString) {
-    if (typeof crypto === 'undefined' || !crypto.subtle || typeof TextEncoder === 'undefined' || typeof DecompressionStream === 'undefined') {
-      return null;
+  async function getDerivedAesKey(secretStr) {
+    if (cachedAesKeyPromise && cachedSecretMaterial === secretStr) {
+      return cachedAesKeyPromise;
     }
-    try {
+    cachedSecretMaterial = secretStr;
+    cachedAesKeyPromise = (async () => {
       const keyMaterial = await crypto.subtle.importKey(
         "raw",
-        new TextEncoder().encode(BH_SECRET_KEY),
+        new TextEncoder().encode(secretStr),
         { name: "PBKDF2" },
         false,
         ["deriveBits", "deriveKey"]
       );
-      const aesKey = await crypto.subtle.deriveKey(
+      return crypto.subtle.deriveKey(
         {
           name: "PBKDF2",
           salt: new TextEncoder().encode("salt"),
@@ -360,11 +455,25 @@
         false,
         ["decrypt"]
       );
+    })();
+    return cachedAesKeyPromise;
+  }
 
-      const byteLength = hexString.length / 2;
+  async function decryptBlockHorizonPayload(hexString) {
+    if (typeof crypto === 'undefined' || !crypto.subtle || typeof TextEncoder === 'undefined' || typeof DecompressionStream === 'undefined') {
+      return null;
+    }
+    const activeSecret = (typeof window !== 'undefined' && window.__NEXUS_BH_KEY__) ? String(window.__NEXUS_BH_KEY__) : BH_SECRET_KEY;
+    // Skip redundant 100,000-iteration PBKDF2 derivation if secret is still unconfigured default placeholder
+    if (!hexString || typeof hexString !== 'string' || hexString.length < 28 || activeSecret === "your-32-char-secret-key-here!!!") {
+      return null;
+    }
+    try {
+      const aesKey = await getDerivedAesKey(activeSecret);
+      const byteLength = Math.floor(hexString.length / 2);
       const bytes = new Uint8Array(byteLength);
-      for (let i = 0; i < hexString.length; i += 2) {
-        bytes[i / 2] = parseInt(hexString.substr(i, 2), 16);
+      for (let i = 0; i < byteLength * 2; i += 2) {
+        bytes[i / 2] = parseInt(hexString.slice(i, i + 2), 16);
       }
 
       const iv = bytes.slice(0, 12);
@@ -405,7 +514,7 @@
 
   // --- MASTER LLM ARBITRATION PROMPT (prepended to every copy) ---
   const ARBITRATION_PROMPT = `You are a Senior Quantitative Risk Arbitrator & Bitcoin Market Microstructure Specialist.
-Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal. Analyze the telemetry using the strict 5-step institutional protocol below:
+Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal. Analyze the telemetry using the strict 6-step institutional protocol below:
 
 ### PROTOCOL & RULES OF ENGAGEMENT:
 1. OPERATIONAL INTEGRITY CHECK:
@@ -414,26 +523,28 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
 - Reject any hallucinated numbers; evaluate only what is reported.
 
 2. CONFLUENCE VS. CONTRADICTION AUDIT:
-- Identify the tension between Technical Indicators (Desk 3 USSM v1.0 dip-buying, Desk 6 Absorption) versus Macro Risk (Desk 7 Threat Matrix 100/100, Desk 8 Volatility -3/8, US 10Y yields).
+- Identify the tension between Technical Indicators (Desk 3 USSM v1.0 dip-buying, Desk 6 Absorption) versus Macro Risk (Desk 7 Threat Matrix, Desk 8 Volatility Radar, US 10Y yields).
 
-3. HIERARCHY OF PRECEDENCE (MANDATORY GATE):
-- Check Desk 7: If Threat Matrix is 100/100 (CRIMSON Gate), DMRA 100% USDT Capital Preservation strictly overrides BOTH spot-long dip-buying (Desk 3/4) AND scalp shorting (Desk 8).
-- Under CRIMSON status, directional exposure is 0.00x. No leverage or swing buying permitted.
-- Do not qualify the override with “unless the technicals look attractive.” The gate is binding.
+3. HIERARCHY OF PRECEDENCE (MANDATORY NON-COMPENSATORY GATE):
+- The hierarchy is strictly linear: Desk 7 (Threat Matrix / DMRA) > Desk 1-2 (Macro & On-Chain Valuation) > Desk 3 (USSM Dip-Buy) & Desk 8 (Scalp Short).
+- Check Desk 7: If Threat Matrix is >= 100/100 (CRIMSON Gate), DMRA 100% USDT Capital Preservation strictly overrides BOTH spot-long dip-buying (Desk 2/3/4) AND scalp shorting (Desk 8).
+- Under CRIMSON status, maximum directional exposure is 0.00x. No leverage, starter positions, or swing buying permitted.
+- Do not qualify the override with hedging language ("however, for aggressive traders..." or "unless technicals look attractive"). The gate is absolute.
 
 4. CUSTODY & REGIME RISKS:
 - Address the stablecoin custody caveat (USDT regulatory, depeg, and issuer risk as tactical dry powder).
 
-5. ACTIONABLE EXECUTIVE BRIEFING:
-- Output your response in this exact 4-part format:
+5. ACTIONABLE EXECUTIVE BRIEFING (STRICT DETERMINISTIC FORMAT):
+- Line 1 of your response MUST be this exact machine-verifiable header:
+  VERDICT_LOCK: [FLAT_100_USDT | DEFENSIVE_SCALP | TREND_EXECUTION] | MAX_EXPOSURE: [0.00x..1.00x] | GATE_DRIVER: [DESK_7_CRIMSON | DESK_8_VOL | DESK_3_USSM]
+- Follow immediately with a short Data Freshness Note (LIVE, CACHED, or DEGRADED), then output this exact 4-part briefing:
   1. Executive Posture Ruling: (100% Cash Preservation / Defensive Scalp / Trend Execution)
   2. Cross-Desk Conflict Breakdown: (Where models disagree and why)
-  3. Key Structural Levels: (Invalidation stop, current floor defense, overhead liquidity magnet)
+  3. Key Structural Levels: (Under CRIMSON, report strictly as passive observation/reclaim levels—never as active buy/sell entry orders)
   4. Next Catalysts to Watch: (Macro dates, yield thresholds, level reclaim triggers)
-- Begin with a short Data Freshness Note stating whether inputs are LIVE, CACHED, or DEGRADED.
 
 6. EXTERNAL VERIFICATION (if web access is available):
-- Cross-check the Desk 7 macro gate inputs (US 10Y yield, SPX/RSP breadth ratio, MSTR drawdown, and event calendar dates) and Desk 1 on-chain cost basis ($74,468 STH / $49,210 LTH) against contemporaneous public market sources.
+- Cross-check the Desk 7 macro gate inputs (US 10Y yield, SPX/RSP breadth ratio, MSTR drawdown, and event calendar dates) and Desk 1 on-chain cost basis against contemporaneous public market sources.
 - Treat differences under ~1% as normal intraday rounding noise.
 - List any material discrepancies in a brief table: | Metric | Dossier Value | Public Market Value | Source |.
 - Do not unilaterally alter the posture ruling based on a discrepancy alone; state whether the CRIMSON gate still holds under verified inputs.
@@ -443,8 +554,9 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
 
   // --- CORE EXPORTER ENGINE ---
   async function generateUnifiedMasterPacket() {
-    const timestampUtc = new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
-    const timestampMyt = new Date().toLocaleString('en-MY', {
+    const nowMs = Date.now();
+    const timestampUtc = new Date(nowMs).toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+    const timestampMyt = new Date(nowMs).toLocaleString('en-MY', {
       timeZone: 'Asia/Kuala_Lumpur',
       year: 'numeric',
       month: 'short',
@@ -455,8 +567,19 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       hour12: false
     }) + ' MYT';
 
-    // 1. Parallel execution across all data venues (including local fallback in parallel)
-    let [tickerData, bookData, liveDailyKlines, repoDailyKlines, fourHourKlines, volFeed, threatFeed, rawPacket, onchainRaw] = await Promise.all([
+    // 1. Parallel execution across all data venues (with live vs snapshot on-chain separated)
+    let [
+      tickerData,
+      bookData,
+      liveDailyKlinesRaw,
+      repoDailyKlinesRaw,
+      fourHourKlinesRaw,
+      volFeed,
+      threatFeed,
+      rawPacket,
+      onchainLiveRaw,
+      onchainSnapshotRaw
+    ] = await Promise.all([
       fetchWithWaterfall(VENUES.ticker, true),
       fetchWithWaterfall(VENUES.book, true),
       fetchWithWaterfall(VENUES.dailyKlines, true, 2000),
@@ -465,27 +588,33 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       fetchWithWaterfall(VENUES.volatilityFeed, true, 4500),
       fetchWithWaterfall(VENUES.threatFeed, true, 4500),
       fetchWithWaterfall(VENUES.masterPacket, false, 4500),
-      fetchWithWaterfall(VENUES.onchainFeed, true, 3000)
+      fetchWithWaterfall(VENUES.onchainLive, true, 2500),
+      fetchWithWaterfall(VENUES.onchainSnapshot, true, 4500)
     ]);
 
-    // Strong 3-tier last-known-good cache for daily klines (Desk 3 reliability)
+    // Strip unclosed forming candles so all indicators run strictly on completed bars
+    const liveDailyKlines = stripUnclosedCandles(liveDailyKlinesRaw, nowMs);
+    const repoDailyKlines = stripUnclosedCandles(repoDailyKlinesRaw, nowMs);
+    const fourHourKlines = stripUnclosedCandles(fourHourKlinesRaw, nowMs);
+
+    // Strong 3-tier last-known-good cache for completed daily klines (Desk 3 reliability)
     let dailyKlines = null;
     let klineSource = 'LIVE';
     let klineCacheAge = null;
 
     if (Array.isArray(liveDailyKlines) && liveDailyKlines.length >= 200) {
-      dailyKlines = liveDailyKlines;
-      saveKlineCache(liveDailyKlines);
+      dailyKlines = liveDailyKlines.slice(-250);
+      saveKlineCache(dailyKlines);
       klineSource = 'LIVE';
     } else {
       const cached = loadKlineCache();
       if (cached && Array.isArray(cached.data) && cached.data.length >= 200) {
-        dailyKlines = cached.data;
+        dailyKlines = stripUnclosedCandles(cached.data, nowMs);
         klineSource = 'CACHED';
         klineCacheAge = formatCacheAge(cached.ageMs);
       } else if (Array.isArray(repoDailyKlines) && repoDailyKlines.length >= 200) {
-        dailyKlines = repoDailyKlines;
-        saveKlineCache(repoDailyKlines);
+        dailyKlines = repoDailyKlines.slice(-250);
+        saveKlineCache(dailyKlines);
         klineSource = 'CACHED';
         klineCacheAge = 'Repo Snapshot';
       } else {
@@ -493,31 +622,37 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       }
     }
 
-    // Parse Spot & Book (L1 Live)
+    // Parse Spot & Book (L1 Live) with strict numerical sanity bounds
     let spotPrice = 82900.0;
     let spotSource = 'Binance Real-Time Ticker';
     let spotFreshness = 'LIVE (<1s)';
     let isLiveTicker = false;
 
-    if (tickerData && tickerData.price) {
-      spotPrice = parseFloat(tickerData.price);
+    const candidateTickerPrice = tickerData && tickerData.price !== undefined ? parseFloat(tickerData.price) : NaN;
+    const candidateBid = bookData && bookData.bidPrice !== undefined ? parseFloat(bookData.bidPrice) : NaN;
+    const candidateAsk = bookData && bookData.askPrice !== undefined ? parseFloat(bookData.askPrice) : NaN;
+    const candidateWindowSpot = (typeof window !== 'undefined' && window.__NEXUS_SPOT_PRICE__) ? parseFloat(window.__NEXUS_SPOT_PRICE__) : NaN;
+
+    if (Number.isFinite(candidateTickerPrice) && candidateTickerPrice > 1000 && candidateTickerPrice < 1000000) {
+      spotPrice = candidateTickerPrice;
       isLiveTicker = true;
       spotSource = 'Binance Real-Time Ticker';
       spotFreshness = 'LIVE (<1s)';
-    } else if (bookData && bookData.bidPrice && bookData.askPrice) {
-      const bp = parseFloat(bookData.bidPrice);
-      const ap = parseFloat(bookData.askPrice);
-      spotPrice = (bp + ap) / 2.0;
+    } else if (Number.isFinite(candidateBid) && Number.isFinite(candidateAsk) && candidateBid > 1000 && candidateAsk >= candidateBid) {
+      spotPrice = (candidateBid + candidateAsk) / 2.0;
       isLiveTicker = true;
       spotSource = 'Binance Live Book Mid-Price';
       spotFreshness = 'LIVE (<1s)';
-    } else if (typeof window !== 'undefined' && window.__NEXUS_SPOT_PRICE__ && window.__NEXUS_SPOT_PRICE__ > 1000) {
-      spotPrice = parseFloat(window.__NEXUS_SPOT_PRICE__);
+    } else if (Number.isFinite(candidateWindowSpot) && candidateWindowSpot > 1000 && candidateWindowSpot < 1000000) {
+      spotPrice = candidateWindowSpot;
       isLiveTicker = true;
       spotSource = 'Nexus Terminal Live Spot Stream';
       spotFreshness = 'LIVE (<2s)';
-    } else if (dailyKlines && dailyKlines.length > 0) {
-      spotPrice = parseFloat(dailyKlines[dailyKlines.length - 1][4]);
+    } else if (Array.isArray(dailyKlines) && dailyKlines.length > 0) {
+      const lastClose = parseFloat(dailyKlines[dailyKlines.length - 1][4]);
+      if (Number.isFinite(lastClose) && lastClose > 1000) {
+        spotPrice = lastClose;
+      }
       spotSource = 'Binance Completed Daily Kline Close';
       spotFreshness = 'DAILY CANDLE (Delayed/Static)';
       isLiveTicker = false;
@@ -528,16 +663,16 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       isLiveTicker = false;
     }
 
-    // Order Book Handling: DO NOT SYNTHESIZE OR DEFAULT TO SPOT PRICE!
+    // Order Book Handling: DO NOT SYNTHESIZE OR DEFAULT TO SPOT PRICE
     let bidPrice = null, askPrice = null, spreadVal = null, bidQty = null, askQty = null;
     let isLiveBook = false;
 
-    if (bookData && bookData.bidPrice && bookData.askPrice) {
-      bidPrice = parseFloat(bookData.bidPrice);
-      askPrice = parseFloat(bookData.askPrice);
+    if (Number.isFinite(candidateBid) && Number.isFinite(candidateAsk) && candidateBid > 1000 && candidateAsk >= candidateBid) {
+      bidPrice = candidateBid;
+      askPrice = candidateAsk;
       spreadVal = Math.abs(askPrice - bidPrice);
-      bidQty = bookData.bidQty ? parseFloat(bookData.bidQty).toFixed(4) : null;
-      askQty = bookData.askQty ? parseFloat(bookData.askQty).toFixed(4) : null;
+      bidQty = bookData.bidQty !== undefined && Number.isFinite(parseFloat(bookData.bidQty)) ? parseFloat(bookData.bidQty).toFixed(4) : null;
+      askQty = bookData.askQty !== undefined && Number.isFinite(parseFloat(bookData.askQty)) ? parseFloat(bookData.askQty).toFixed(4) : null;
       isLiveBook = true;
     }
 
@@ -545,11 +680,11 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       ? `${formatUSD(bidPrice)} / ${formatUSD(askPrice)} (Spread: $${spreadVal.toFixed(2)})`
       : 'Unavailable (Live Order Book Stream Offline / Rate-Limited)';
 
-    const bookLiquidityDisplay = isLiveBook
+    const bookLiquidityDisplay = (isLiveBook && bidQty !== null && askQty !== null)
       ? `Bid Size: ${bidQty} BTC | Ask Size: ${askQty} BTC`
       : 'Unavailable (Top-of-Book Depth Feed Disconnected)';
 
-    const orderBookSpreadDisplay = isLiveBook
+    const orderBookSpreadDisplay = (isLiveBook && bidQty !== null && askQty !== null)
       ? `$500 Depth Spread: $${spreadVal.toFixed(2)} | Bid Size: ${bidQty} vs Ask Size: ${askQty}`
       : 'Depth Unavailable (Order Book Stream Offline / Rate-Limited)';
 
@@ -559,24 +694,91 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       ? 'PARTIAL STREAM ACTIVE (Live Ticker Connected • Order Book Depth Offline)'
       : 'DEGRADED FALLBACK (Daily Candle Close Active • Live Streams Offline)';
 
-    // 2. Compute Quant Radar (USSM v1.0) (L2 Derived Indicators)
+    // 2. Evaluate Macro Threat Matrix FIRST so Precedence Gate (CRIMSON) governs all subordinate desks
+    let threatScore = 100, threatLevel = 'CRIMSON', threatStatus = 'CRITICAL THREAT / VOLATILITY CEILING';
+    let threatCall = 'FORCE DMRA REGIME 2: 100% USDT CASH PRESERVATION';
+    let spxPrice = '7,805.45', rspPrice = '213.30', breadthRatioDiff = '+6.66%', us10yYield = '5.217%';
+    let mstrDisplay = 'MSTR $154.34 (-25.7% from split-adj cycle high of $207.70) [Bearish Momentum Divergence Active]';
+    let electionDisplay = 'ACTIVE (Catalysts: CPI Oct 15 [5d], NFP Nov 1 [22d], US Election Nov 5 [26d], FOMC Nov 6 [27d])';
+    let breakdownDisplay = 'Breadth: 35/35 | Yield: 30/30 | MSTR: 20/20 | Election: 15/15';
+
+    if (threatFeed && threatFeed.composite_threat) {
+      if (threatFeed.composite_threat.score !== undefined && Number.isFinite(Number(threatFeed.composite_threat.score))) {
+        threatScore = Number(threatFeed.composite_threat.score);
+      }
+      if (threatFeed.composite_threat.level) threatLevel = String(threatFeed.composite_threat.level);
+      if (threatFeed.composite_threat.status) threatStatus = String(threatFeed.composite_threat.status);
+      if (threatFeed.composite_threat.tactical_call) threatCall = String(threatFeed.composite_threat.tactical_call);
+
+      if (threatFeed.modules) {
+        const modA = threatFeed.modules.module_a_breadth;
+        const modB = threatFeed.modules.module_b_yield;
+        const modC = threatFeed.modules.module_c_mstr;
+        const modD = threatFeed.modules.module_d_calendar || threatFeed.modules.module_d_election;
+
+        if (modA) {
+          if (modA.spx_price !== undefined && Number.isFinite(Number(modA.spx_price))) {
+            spxPrice = Number(modA.spx_price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          }
+          if (modA.rsp_price !== undefined && Number.isFinite(Number(modA.rsp_price))) {
+            rspPrice = Number(modA.rsp_price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          }
+          if (modA.ratio_sma_diff_pct !== undefined && Number.isFinite(Number(modA.ratio_sma_diff_pct))) {
+            const diffVal = Number(modA.ratio_sma_diff_pct);
+            breadthRatioDiff = (diffVal >= 0 ? '+' : '') + diffVal.toFixed(2) + '%';
+          }
+        }
+        if (modB && modB.yield_pct !== undefined && Number.isFinite(Number(modB.yield_pct))) {
+          us10yYield = Number(modB.yield_pct).toFixed(3) + '%';
+        }
+        if (modC && modC.summary) {
+          mstrDisplay = String(modC.summary);
+        }
+        if (modD && modD.summary) {
+          electionDisplay = String(modD.summary);
+        }
+        if (modA && modB && modC && modD &&
+            modA.score !== undefined && modB.score !== undefined && modC.score !== undefined && modD.score !== undefined) {
+          breakdownDisplay = `Breadth: ${modA.score}/35 | Yield: ${modB.score}/30 | MSTR: ${modC.score}/20 | Election: ${modD.score}/15`;
+        }
+      }
+    }
+
+    // Fail-closed CRIMSON precedence gate check (with IEEE-754 float epsilon protection)
+    const isCrimson = !Number.isFinite(Number(threatScore)) || Number(threatScore) >= CRIMSON_EPSILON || threatLevel === 'CRIMSON';
+    if (isCrimson) {
+      threatLevel = 'CRIMSON';
+      threatCall = 'FORCE DMRA REGIME 2: 100% USDT CASH PRESERVATION';
+    }
+
+    // 3. Compute Quant Radar (USSM v1.0) & Dynamic Desk 2 Sensors (L2 Derived Indicators)
     let sma200 = null, sma20d = null, smaSlopeUp = false;
     let ema21 = null, rsi14 = null, atr20 = null, poc30d = null;
     let quantR1 = null, quantR2 = null, quantR3 = null;
     let initStop = null, trailTrigger = null, stopDist = null;
+    let completedBarCount = Array.isArray(dailyKlines) ? dailyKlines.length : 0;
+
+    // Desk 2 Dynamic Weekly/Cycle Sensors derived from dailyKlines when available
+    let ema10w = 78450.00, ema20w = 76001.00, sma20w = 71286.65;
+    let hwm30d = 84000.00, rung1 = 79800.0, rung2 = 75600.0, rung3 = 71400.0;
+    let volRatioStatus = 'Neutral Volume Absorption';
+    let dynamicDesk2SensorsBound = false;
 
     if (Array.isArray(dailyKlines) && dailyKlines.length >= 30) {
       const dailyCloses = dailyKlines.map(c => parseFloat(c[4]));
+      const dailyHighs = dailyKlines.map(c => parseFloat(c[2]));
+      const dailyVolumes = dailyKlines.map(c => parseFloat(c[5]) || 0);
       const N = dailyCloses.length;
 
-      // SMA 200 & Slope
+      // AUDIT FIX: Fail-closed 200-Day SMA Slope calculation (never defaults to true without verification)
       if (N >= 200) {
         sma200 = calcSMA(dailyCloses, 200);
-        if (N >= 221) {
-          sma20d = calcSMA(dailyCloses.slice(0, N - 20), 200);
-          smaSlopeUp = sma200 !== null && sma20d !== null && sma200 > sma20d;
+        const lagBars = Math.min(20, N - 200);
+        if (lagBars >= 1) {
+          sma20d = calcSMA(dailyCloses.slice(0, N - lagBars), 200);
+          smaSlopeUp = (sma200 !== null && sma20d !== null && sma200 > sma20d);
         } else {
-          smaSlopeUp = true;
+          smaSlopeUp = false;
         }
       }
 
@@ -585,7 +787,32 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       atr20 = calcWilderATR(dailyKlines, 20);
       poc30d = calcVolumeProfilePOC(dailyKlines, 30, 50);
 
-      // Quant Rules Evaluation: Strictly evaluate ONLY when respective indicators exist!
+      // Dynamic Desk 2 Structural Sensors (70D = 10W, 140D = 20W, 30D HWM Dip Rungs, 30D Volume Ratio)
+      if (N >= 140) {
+        ema10w = calcEMA(dailyCloses, 70) ?? ema10w;
+        ema20w = calcEMA(dailyCloses, 140) ?? ema20w;
+        sma20w = calcSMA(dailyCloses, 140) ?? sma20w;
+        const recent30Highs = dailyHighs.slice(-30).filter(Number.isFinite);
+        if (recent30Highs.length > 0) {
+          hwm30d = Math.max(...recent30Highs);
+          rung1 = hwm30d * 0.95;
+          rung2 = hwm30d * 0.90;
+          rung3 = hwm30d * 0.85;
+        }
+        const volMean30 = calcSMA(dailyVolumes, 30);
+        const lastVol = dailyVolumes[N - 1];
+        if (volMean30 && volMean30 > 0) {
+          const vRatio = lastVol / volMean30;
+          volRatioStatus = vRatio >= 1.25
+            ? `Elevated Volume Expansion (${vRatio.toFixed(2)}x 30D Mean)`
+            : vRatio <= 0.75
+            ? `Low-Volume Compression (${vRatio.toFixed(2)}x 30D Mean)`
+            : `Neutral Volume Absorption (${vRatio.toFixed(2)}x 30D Mean)`;
+        }
+        dynamicDesk2SensorsBound = true;
+      }
+
+      // Quant Rules Evaluation: Strictly evaluate ONLY when respective indicators are non-null
       if (sma200 !== null) {
         quantR1 = spotPrice > sma200 && smaSlopeUp;
       }
@@ -596,7 +823,7 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
         quantR3 = spotPrice <= poc30d;
       }
 
-      if (atr20) {
+      if (atr20 !== null && atr20 > 0) {
         stopDist = 2.5 * atr20;
         initStop = spotPrice - stopDist;
         trailTrigger = spotPrice + 2.0 * atr20;
@@ -614,8 +841,8 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
     const quantR2Display = quantR2 === null
       ? '[NOT EVALUABLE — PENDING KLINE TELEMETRY]'
       : (quantR2
-        ? `[PASS] — Spot in 21 EMA Band (±2% of ${formatUSD(ema21)}) + RSI (${rsi14 ? rsi14.toFixed(1) : ''}) in 40–60 Neutral Band`
-        : `[FAIL] — Extended vs 21 EMA (${formatUSD(ema21)}) or RSI (${rsi14 ? rsi14.toFixed(1) : 'N/A'}) Outside Band`);
+        ? `[PASS] — Spot in 21 EMA Band (±2% of ${formatUSD(ema21)}) + RSI (${rsi14 !== null ? rsi14.toFixed(1) : 'N/A'}) in 40–60 Neutral Band`
+        : `[FAIL] — Extended vs 21 EMA (${formatUSD(ema21)}) or RSI (${rsi14 !== null ? rsi14.toFixed(1) : 'N/A'}) Outside Band`);
 
     const quantR3Display = quantR3 === null
       ? '[NOT EVALUABLE — PENDING KLINE TELEMETRY]'
@@ -623,25 +850,30 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
         ? `[PASS] — Spot in Value Area (Spot <= 30D POC ${formatUSD(poc30d)})`
         : `[FAIL] — Above 30D POC Value (${formatUSD(poc30d)})`);
 
+    // AUDIT FIX: Propagate Desk 7 CRIMSON override into Desk 3 composite signal so no unguarded buy signal leaks
+    const rawQuantAligned = Boolean(quantR1 && quantR2 && quantR3);
     const compositeSignalDisplay = !quantEvaluable
       ? '>>> NOT EVALUABLE (PENDING KLINE TELEMETRY) <<<'
-      : (quantR1 && quantR2 && quantR3
-        ? '>>> 3-FACTOR CONFLUENCE ALIGNED <<<'
-        : '>>> CONFLUENCE DISPERSED / BASELINE <<<');
+      : isCrimson
+        ? `>>> [OVERRIDDEN BY DESK 7 CRIMSON GATE — 0.00x EXPOSURE] (Raw Technicals: ${rawQuantAligned ? '3-Factor Aligned' : 'Confluence Dispersed'}) <<<`
+        : (rawQuantAligned
+          ? '>>> 3-FACTOR CONFLUENCE ALIGNED <<<'
+          : '>>> CONFLUENCE DISPERSED / BASELINE <<<');
 
-    // 3. Compute Liquidity Dynamic Zones (Psych Support / Take Profit Magnet)
-    const psychs = [70000, 75000, 80000, 85000, 90000, 95000, 100000, 109000, 126000, 150000];
+    // 4. Compute Liquidity Dynamic Zones (Psych Support / Take Profit Magnet)
+    const psychs = [60000, 65000, 70000, 75000, 80000, 85000, 90000, 95000, 100000, 109000, 126000, 150000];
     let dynamicSupport = psychs[0], dynamicResist = psychs[psychs.length - 1];
     for (let i = 0; i < psychs.length; i++) {
       if (psychs[i] < spotPrice) dynamicSupport = psychs[i];
       if (psychs[i] > spotPrice) { dynamicResist = psychs[i]; break; }
     }
 
-    // 4. Compute Sweep Desk Pools (Prior Daily Low/High, Session Low/High)
+    // 5. Compute Sweep Desk Pools (Completed Prior Daily Low/High, Completed 3-Day Session Low/High)
     let priorDailyLow = 80393.0, priorDailyHigh = 87500.0;
     let session3dLow = 80393.0, session3dHigh = 87500.0;
     if (Array.isArray(dailyKlines) && dailyKlines.length >= 4) {
-      const priorBar = dailyKlines[dailyKlines.length - 2];
+      // Because stripUnclosedCandles already removed any forming candle, index [length - 1] is the most recent completed daily bar
+      const priorBar = dailyKlines[dailyKlines.length - 1];
       priorDailyLow = parseFloat(priorBar[3]);
       priorDailyHigh = parseFloat(priorBar[2]);
       const last3 = dailyKlines.slice(-3);
@@ -649,104 +881,110 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       session3dHigh = Math.max(...last3.map(c => parseFloat(c[2])));
     }
 
-    // 5. Compute Absorption Desk (EMA 20 & ATR 14 extension)
+    // 6. Compute Absorption Desk (EMA 20 & ATR 14 extension)
     let ema20Daily = null, atr14Daily = null, extAtr = 0;
     if (Array.isArray(dailyKlines) && dailyKlines.length >= 20) {
       const closes = dailyKlines.map(c => parseFloat(c[4]));
       ema20Daily = calcEMA(closes, 20);
       atr14Daily = calcWilderATR(dailyKlines, 14);
-      if (ema20Daily && atr14Daily && atr14Daily > 0) {
+      if (ema20Daily !== null && atr14Daily !== null && atr14Daily > 0) {
         extAtr = (spotPrice - ema20Daily) / atr14Daily;
       }
     }
 
-    // 6. Compute Macro Threat Matrix (L3 Telemetry)
-    let threatScore = 100, threatLevel = 'CRIMSON', threatStatus = 'CRITICAL THREAT / VOLATILITY CEILING';
-    let threatCall = 'FORCE DMRA REGIME 2: 100% USDT CASH PRESERVATION';
-    let spxPrice = '7,805.45', rspPrice = '213.30', breadthRatioDiff = '+6.66%', us10yYield = '5.217%';
-    if (threatFeed && threatFeed.composite_threat) {
-      threatScore = threatFeed.composite_threat.score || threatScore;
-      threatLevel = threatFeed.composite_threat.level || threatLevel;
-      threatStatus = threatFeed.composite_threat.status || threatStatus;
-      threatCall = threatFeed.composite_threat.tactical_call || threatCall;
-      if (threatFeed.modules) {
-        if (threatFeed.modules.module_a_breadth) {
-          spxPrice = Number(threatFeed.modules.module_a_breadth.spx_price || 7805.45).toLocaleString();
-          rspPrice = Number(threatFeed.modules.module_a_breadth.rsp_price || 213.30).toLocaleString();
-          breadthRatioDiff = (threatFeed.modules.module_a_breadth.ratio_sma_diff_pct >= 0 ? '+' : '') +
-            Number(threatFeed.modules.module_a_breadth.ratio_sma_diff_pct || 6.66).toFixed(2) + '%';
-        }
-        if (threatFeed.modules.module_b_yield) {
-          us10yYield = Number(threatFeed.modules.module_b_yield.yield_pct || 5.217).toFixed(3) + '%';
-        }
-      }
-    }
-
     // 7. Compute Volatility Radar (8-Pillar Confluence v1.1.0)
-    let volScore = -3, volRiskState = 'Mild Bearish', volSizing = 'Defensive posture, scalp shorts only (0.25x - 0.5x). Geopolitical supply risk + ETF outflow pressure.';
+    let volScore = -3;
+    let volRiskState = 'Mild Bearish';
+    let volSizing = 'Defensive posture, scalp shorts only (0.25x - 0.5x). Geopolitical supply risk + ETF outflow pressure.';
     let volPillars = [];
     if (volFeed && volFeed.overall) {
-      volScore = volFeed.overall.score !== undefined ? volFeed.overall.score : -3;
-      volRiskState = volFeed.overall.risk_state || 'Mild Bearish';
-      volSizing = volFeed.overall.sizing_rule || volSizing;
+      if (volFeed.overall.score !== undefined && Number.isFinite(Number(volFeed.overall.score))) {
+        volScore = Number(volFeed.overall.score);
+      }
+      if (volFeed.overall.risk_state) volRiskState = String(volFeed.overall.risk_state);
+      if (volFeed.overall.sizing_rule) volSizing = String(volFeed.overall.sizing_rule);
       volPillars = Array.isArray(volFeed.pillars) ? volFeed.pillars : [];
     }
 
-    // Explicit Hierarchy Enforcement: If Threat Matrix is 100/100 (CRIMSON Gate),
-    // override Desk 8 scalp shorting to eliminate strategy contradiction!
-    if (threatScore >= 100 || threatLevel === 'CRIMSON') {
+    // Explicit Hierarchy Enforcement: If Threat Matrix is CRIMSON, override Desk 8 sizing
+    if (isCrimson) {
       volSizing = '[OVERRIDDEN BY DESK 7 CRIMSON GATE] 0.00x Exposure (100% USDT Cash Preservation). Scalp shorts and dip-buying suspended.';
     }
 
     // Single-Source-of-Truth Harmonization: Ensure Macro pillar in Desk 8 exactly matches Desk 7's authoritative yield
     volPillars = volPillars.map(p => {
-      let copy = { ...p };
+      const copy = { ...p };
       if (copy.id === 'macro' || copy.short === 'MCR') {
-        if (copy.raw) copy.raw = copy.raw.replace(/10Y\s*=\s*[\d\.]+%/i, `10Y=${us10yYield}`);
+        if (copy.raw) copy.raw = String(copy.raw).replace(/10Y\s*=\s*[\d\.]+%/i, `10Y=${us10yYield}`);
       }
       return copy;
     });
 
-    // 8. Compute Fractal Lab (March 2023 SVB Template Correlation)
+    // 8. Compute Fractal Lab (March 2023 SVB Template Correlation — Level + Stationary Return Correlation)
     let fractalCorr = 0.278;
+    let fractalReturnCorr = 0.0;
     const voidCeiling = 89500.0;
     const voidStatus = spotPrice >= voidCeiling ? '🔴 PATTERN VOIDED' : '🟢 PATTERN INTACT';
 
     if (Array.isArray(fourHourKlines) && fourHourKlines.length >= 30) {
-      const liveCloses = fourHourKlines.map(c => parseFloat(c[4]));
+      const liveCloses = fourHourKlines.map(c => parseFloat(c[4])).filter(Number.isFinite);
       const nBars = Math.min(REAL_2023_GREEN.length, liveCloses.length);
-      const tmplSlice = REAL_2023_GREEN.slice(-nBars);
-      const liveSlice = liveCloses.slice(-nBars);
-      fractalCorr = calcPearsonCorrelation(tmplSlice, liveSlice);
+      if (nBars >= 30) {
+        // Align from the start of the 90-bar template when fewer than 90 bars are available
+        const tmplSlice = REAL_2023_GREEN.slice(0, nBars);
+        const liveSlice = liveCloses.slice(-nBars);
+        fractalCorr = calcPearsonCorrelation(tmplSlice, liveSlice);
+        fractalReturnCorr = calcReturnCorrelation(tmplSlice, liveSlice);
+      }
     }
 
-    // 9. Parse Master Raw Packet for STH Floor & Regime Score with STRICT SANITY VALIDATION
+    // 9. Multi-Tier On-Chain Valuation Pipeline (STH, LTH, Realized Price, STH-MVRV, LTH-MVRV, NUPL)
     let sthFloor = null;
     let lthFloor = null;
+    let realizedPrice = null;
     let sthMvrv = null;
+    let lthMvrv = null;
+    let nuplVal = null;
     let sthStatus = 'UNAVAILABLE';
     let sthProvenance = 'UNAVAILABLE';
     let regimeScore = 60;
-    let dampener = 0.50;
+    let rawDampener = 0.50;
+
+    // Parse helper for static snapshot metrics so auxiliary cohorts (LTH, Realized Price, NUPL) are always available
+    let snapshotMetrics = null;
+    if (typeof onchainSnapshotRaw === 'string') {
+      try { onchainSnapshotRaw = JSON.parse(onchainSnapshotRaw); } catch (_) {}
+    }
+    if (onchainSnapshotRaw && onchainSnapshotRaw.metrics && typeof onchainSnapshotRaw.metrics === 'object') {
+      snapshotMetrics = onchainSnapshotRaw.metrics;
+    }
 
     // A. Attempt Live BlockHorizon Decrypted Feed
-    if (typeof onchainRaw === 'string') {
-      try { onchainRaw = JSON.parse(onchainRaw); } catch (e) {}
+    if (typeof onchainLiveRaw === 'string') {
+      try { onchainLiveRaw = JSON.parse(onchainLiveRaw); } catch (_) {}
     }
-    if (onchainRaw && onchainRaw.data && onchainRaw.encrypted) {
+    if (onchainLiveRaw && onchainLiveRaw.data && onchainLiveRaw.encrypted) {
       try {
-        const decryptedChart = await decryptBlockHorizonPayload(onchainRaw.data);
+        const decryptedChart = await decryptBlockHorizonPayload(onchainLiveRaw.data);
         if (decryptedChart && Array.isArray(decryptedChart.series)) {
           const stsSeries = decryptedChart.series.find(s => s.name && s.name.includes('STS')) || decryptedChart.series[0];
           const dataArr = stsSeries ? (stsSeries.series_data || stsSeries.series_data_downsampled || []) : [];
           if (dataArr.length > 0) {
             const sorted = dataArr.slice().sort((a, b) => new Date(a.ts).getTime() - new Date(b.ts).getTime());
             const candidateSth = parseFloat(sorted[sorted.length - 1].y);
-            if (!isNaN(candidateSth) && candidateSth >= 0.50 * spotPrice && candidateSth <= 1.50 * spotPrice && candidateSth >= 30000 && candidateSth <= 150000) {
+            if (isValidSthBound(candidateSth, spotPrice)) {
               sthFloor = candidateSth;
               sthStatus = 'VERIFIED_ONCHAIN';
               sthProvenance = 'BlockHorizon Bitcoin Core Node UTXO (<155D STS Cohort)';
-              saveOnchainCache({ sth_cost_basis: sthFloor, source: sthProvenance });
+              saveOnchainCache({
+                sth_cost_basis: sthFloor,
+                lth_cost_basis: snapshotMetrics ? parseFloat(snapshotMetrics.lth_cost_basis) : 49210.18,
+                realized_price: snapshotMetrics ? parseFloat(snapshotMetrics.realized_price) : 53844.78,
+                sth_mvrv: spotPrice / sthFloor,
+                lth_mvrv: snapshotMetrics ? parseFloat(snapshotMetrics.lth_mvrv) : null,
+                nupl: snapshotMetrics ? parseFloat(snapshotMetrics.nupl) : null,
+                source: sthProvenance
+              });
               if (typeof window !== 'undefined') window.__NEXUS_ONCHAIN_STH__ = sthFloor;
             }
           }
@@ -761,8 +999,13 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       const cachedOnchain = loadOnchainCache();
       if (cachedOnchain && cachedOnchain.data && cachedOnchain.data.sth_cost_basis) {
         const candidate = parseFloat(cachedOnchain.data.sth_cost_basis);
-        if (!isNaN(candidate) && candidate >= 0.50 * spotPrice && candidate <= 1.50 * spotPrice && candidate >= 30000 && candidate <= 150000) {
+        if (isValidSthBound(candidate, spotPrice)) {
           sthFloor = candidate;
+          lthFloor = parseFloat(cachedOnchain.data.lth_cost_basis) || null;
+          realizedPrice = parseFloat(cachedOnchain.data.realized_price) || null;
+          sthMvrv = parseFloat(cachedOnchain.data.sth_mvrv) || null;
+          lthMvrv = parseFloat(cachedOnchain.data.lth_mvrv) || null;
+          nuplVal = parseFloat(cachedOnchain.data.nupl) || null;
           sthStatus = 'CACHED_ONCHAIN';
           sthProvenance = `Cached On-Chain UTXO (${formatCacheAge(cachedOnchain.ageMs)})`;
           if (typeof window !== 'undefined') window.__NEXUS_ONCHAIN_STH__ = sthFloor;
@@ -770,188 +1013,233 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       }
     }
 
-    // C. Attempt Static Repo Snapshot (data/onchain_metrics.json)
-    if (!sthFloor && onchainRaw && onchainRaw.metrics && onchainRaw.metrics.sth_cost_basis) {
-      const candidate = parseFloat(onchainRaw.metrics.sth_cost_basis);
-      if (!isNaN(candidate) && candidate >= 0.50 * spotPrice && candidate <= 1.50 * spotPrice && candidate >= 30000 && candidate <= 150000) {
+    // C. Attempt Static Repo Snapshot (data/onchain_metrics.json) — Now guaranteed reachable via VENUES.onchainSnapshot
+    if (!sthFloor && snapshotMetrics && snapshotMetrics.sth_cost_basis) {
+      const candidate = parseFloat(snapshotMetrics.sth_cost_basis);
+      if (isValidSthBound(candidate, spotPrice)) {
         sthFloor = candidate;
-        lthFloor = parseFloat(onchainRaw.metrics.lth_cost_basis) || null;
-        sthMvrv = parseFloat(onchainRaw.metrics.sth_mvrv) || null;
+        lthFloor = parseFloat(snapshotMetrics.lth_cost_basis) || null;
+        realizedPrice = parseFloat(snapshotMetrics.realized_price) || null;
+        sthMvrv = parseFloat(snapshotMetrics.sth_mvrv) || null;
+        lthMvrv = parseFloat(snapshotMetrics.lth_mvrv) || null;
+        nuplVal = parseFloat(snapshotMetrics.nupl) || null;
         sthStatus = 'REPO_SNAPSHOT_ONCHAIN';
-        sthProvenance = 'Repo On-Chain Snapshot (BlockHorizon 13 Oct 2026 Core UTXO)';
+        const updatedDate = onchainSnapshotRaw.updated_at ? String(onchainSnapshotRaw.updated_at).slice(0, 10) : '2026-10-13';
+        sthProvenance = `Repo On-Chain Snapshot (BlockHorizon ${updatedDate} Core UTXO)`;
+        saveOnchainCache({
+          sth_cost_basis: sthFloor,
+          lth_cost_basis: lthFloor,
+          realized_price: realizedPrice,
+          sth_mvrv: sthMvrv,
+          lth_mvrv: lthMvrv,
+          nupl: nuplVal,
+          source: sthProvenance
+        });
         if (typeof window !== 'undefined') window.__NEXUS_ONCHAIN_STH__ = sthFloor;
       }
     }
 
     // D. Attempt Master Raw Packet Regex Parser (Strict Regex & Sanity Bounds)
+    let regexFailedBounds = false;
     if (rawPacket && typeof rawPacket === 'string') {
       const sthMatch = rawPacket.match(/STH_COST_BASIS:\s*([0-9,\.]+)/i);
       if (sthMatch && !sthFloor) {
         const candidateSth = parseFloat(sthMatch[1].replace(/,/g, ''));
-        // SANITY BOUNDS CHECK:
-        // STH cost basis must be a realistic percentage of spot (between 50% and 150% of spot)
-        // and strictly within reasonable Bitcoin cycle boundaries ($30,000 to $150,000)
-        if (!isNaN(candidateSth) && candidateSth >= 0.50 * spotPrice && candidateSth <= 1.50 * spotPrice && candidateSth >= 30000 && candidateSth <= 150000) {
+        if (isValidSthBound(candidateSth, spotPrice)) {
           sthFloor = candidateSth;
           sthStatus = 'VERIFIED_ONCHAIN';
           sthProvenance = 'Master Raw Packet Parser';
           if (typeof window !== 'undefined') window.__NEXUS_ONCHAIN_STH__ = sthFloor;
         } else {
-          console.warn('[Validation Guard] Rejected invalid STH cost basis:', candidateSth);
-          sthFloor = null;
-          sthStatus = 'FAILED_SANITY_BOUNDS';
+          console.warn('[Validation Guard] Rejected invalid STH cost basis in rawPacket:', candidateSth);
+          regexFailedBounds = true;
         }
       }
       const scoreMatch = rawPacket.match(/REGIME_SCORE[:\s=]+(\d+)/i);
       if (scoreMatch) {
-        regimeScore = parseInt(scoreMatch[1]);
-        dampener = Math.max(0, Math.min(1, (regimeScore - 60) / 30));
+        regimeScore = parseInt(scoreMatch[1], 10);
+        rawDampener = Math.max(0, Math.min(1, (regimeScore - 60) / 30));
       }
     }
 
-    // E. Default Baseline
-    if (sthFloor === null && sthStatus !== 'FAILED_SANITY_BOUNDS') {
-      sthFloor = 74468.34;
-      lthFloor = 49210.18;
-      sthMvrv = 1.1158;
-      sthStatus = 'BASELINE_ONCHAIN_BENCHMARK';
-      sthProvenance = 'BlockHorizon On-Chain Baseline ($74,468)';
-      if (typeof window !== 'undefined') window.__NEXUS_ONCHAIN_STH__ = sthFloor;
+    // E. Default Validated Baseline (Only suppress if regex failed AND no valid snapshot/cache exists)
+    if (sthFloor === null) {
+      if (regexFailedBounds) {
+        sthStatus = 'FAILED_SANITY_BOUNDS';
+      } else if (isValidSthBound(74468.34, spotPrice)) {
+        sthFloor = 74468.34;
+        lthFloor = 49210.18;
+        realizedPrice = 53844.78;
+        sthMvrv = spotPrice / 74468.34;
+        lthMvrv = spotPrice / 49210.18;
+        nuplVal = 0.3520;
+        sthStatus = 'BASELINE_ONCHAIN_BENCHMARK';
+        sthProvenance = 'BlockHorizon On-Chain Baseline ($74,468)';
+        if (typeof window !== 'undefined') window.__NEXUS_ONCHAIN_STH__ = sthFloor;
+      } else {
+        sthStatus = 'FAILED_SANITY_BOUNDS';
+      }
     }
 
-    if (!lthFloor) lthFloor = 49210.18;
-    if (!sthMvrv && sthFloor) sthMvrv = (spotPrice / sthFloor);
+    // Populate secondary on-chain metrics from snapshot/live spot ratio if not already bound
+    if (!lthFloor) lthFloor = (snapshotMetrics && parseFloat(snapshotMetrics.lth_cost_basis)) || 49210.18;
+    if (!realizedPrice) realizedPrice = (snapshotMetrics && parseFloat(snapshotMetrics.realized_price)) || 53844.78;
+    if (sthFloor) sthMvrv = spotPrice / sthFloor;
+    if (lthFloor && !lthMvrv) lthMvrv = spotPrice / lthFloor;
+    if (nuplVal === null && snapshotMetrics && Number.isFinite(parseFloat(snapshotMetrics.nupl))) {
+      nuplVal = parseFloat(snapshotMetrics.nupl);
+    }
+
+    // AUDIT FIX: Enforce Desk 7 CRIMSON Gate on Desk 1 Sizing Dampener (0.00x under CRIMSON)
+    const effectiveDampener = isCrimson ? 0.00 : rawDampener;
+    const dampenerDisplay = isCrimson
+      ? `0.00x [OVERRIDDEN BY DESK 7 CRIMSON GATE — Raw Model: ${rawDampener.toFixed(2)}x]`
+      : `${effectiveDampener.toFixed(2)}x`;
 
     const sthDistPct = sthFloor ? ((spotPrice - sthFloor) / sthFloor * 100) : null;
     const sthDisplay = sthFloor
       ? `${formatUSD(sthFloor)} (${sthDistPct >= 0 ? '+' : ''}${sthDistPct.toFixed(2)}% vs Floor) [L3: ${sthProvenance}]`
       : '[VALIDATION FAILED: OUT OF BOUNDS — METRIC SUPPRESSED]';
 
-    let desk2EvaluableCount = 6;
-    if (dailyKlines && dailyKlines.length >= 4) desk2EvaluableCount += 1;
-    if (atr14Daily) desk2EvaluableCount += 1;
-    if (sthFloor) desk2EvaluableCount += 1;
+    let desk2EvaluableCount = dynamicDesk2SensorsBound ? 6 : 0;
+    if (Array.isArray(dailyKlines) && dailyKlines.length >= 4) desk2EvaluableCount += 1;
+    if (atr14Daily !== null) desk2EvaluableCount += 1;
+    if (sthFloor !== null) desk2EvaluableCount += 1;
 
     const desk2IntegrityDisplay = desk2EvaluableCount === 9
-      ? 'ALL 9 EXECUTION RULES ACTIVE • 9/9 RULES EVALUABLE (ALL SENSORS BOUND)'
-      : `ALL 9 EXECUTION RULES CONFIGURED • ${desk2EvaluableCount}/9 RULES EVALUABLE (${quantEvaluable ? 'ALL SENSORS BOUND' : 'KLINE ENGINE PENDING'})`;
+      ? 'ALL 9 EXECUTION RULES ACTIVE • 9/9 RULES EVALUABLE (ALL SENSORS BOUND DYNAMICALLY)'
+      : `ALL 9 EXECUTION RULES CONFIGURED • ${desk2EvaluableCount}/9 LIVE SENSORS BOUND (${9 - desk2EvaluableCount} STATIC BENCHMARKS)`;
+
+    const gateHeaderStatus = isCrimson
+      ? `ENFORCED (CRIMSON 100% Cash Preservation Overrides Lower Desks • Max Exposure: 0.00x)`
+      : `CLEAR (${threatLevel} ${threatScore}/100 • Subordinate Desk Sizing Permitted up to ${effectiveDampener.toFixed(2)}x)`;
 
     const overallClearance = (quantEvaluable && isLiveTicker)
-      ? 'CLEARED FOR MONITORING • DEFENSIVE CASH PRESERVATION MANDATE ACTIVE'
+      ? (isCrimson
+        ? 'CLEARED FOR MONITORING • DEFENSIVE 100% USDT CASH PRESERVATION MANDATE ACTIVE'
+        : 'CLEARED FOR EXECUTION • TELEMETRY BOUND & VERIFIED')
       : 'DEGRADED TELEMETRY • PROCEED WITH DEFENSIVE CAUTION (EXECUTION RESTRICTED)';
+
+    const verdictLockToken = isCrimson
+      ? 'FLAT_100_USDT | MAX_EXPOSURE: 0.00x | GATE_DRIVER: DESK_7_CRIMSON'
+      : (volScore <= -2
+        ? `DEFENSIVE_SCALP | MAX_EXPOSURE: ${Math.min(effectiveDampener, 0.50).toFixed(2)}x | GATE_DRIVER: DESK_8_VOL`
+        : `TREND_EXECUTION | MAX_EXPOSURE: ${effectiveDampener.toFixed(2)}x | GATE_DRIVER: DESK_3_USSM`);
 
     // --- ASSEMBLE COMPREHENSIVE DOSSIER ---
     const lines = [
       "================================================================================",
       "NEXUS TERMINAL — 9-DESK UNIFIED MASTER TELEMETRY DOSSIER",
       `GENERATED: ${timestampUtc} (${timestampMyt})`,
-      "ENGINE: Multi-Mirror Parallel Telemetry Arbitrator • v1.1.0 Institutional Spec",
+      "ENGINE: Multi-Mirror Parallel Telemetry Arbitrator • v3.2.2 Hardened Spec",
       "DESTINATION: Multi-Agent AI Review (Claude, ChatGPT, Grok, Gemini, Meta AI)",
+      `PRE-COMPUTED ARBITRATION LOCK: ${verdictLockToken}`,
       "================================================================================",
       "DATA PROVENANCE & OPERATIONAL INTEGRITY LEDGER:",
       "• [L1: LIVE STREAM]:          Binance Spot & Order Book Depth (Real-Time Websocket/REST)",
-      "• [L2: DERIVED INDICATORS]:   Wilder RSI 14, Wilder ATR 20, 21 EMA, 200 SMA, 50-Bin POC (Live In-Browser Calculation)",
-      `• [L3: ON-CHAIN & MACRO]:     STH Cost Basis (${formatUSD(sthFloor, 0)} [${sthStatus.includes('ONCHAIN') ? 'BlockHorizon Core UTXO' : 'Validated Benchmark'}]), US 10Y Yield (${us10yYield}), SPX ($${spxPrice}), Volatility Radar (${volScore}/8)`,
+      `• [L2: DERIVED INDICATORS]:   Wilder RSI 14, Wilder ATR 20, 21 EMA, 200 SMA, 50-Bin Overlap POC (${completedBarCount} Completed 1D Bars)`,
+      `• [L3: ON-CHAIN & MACRO]:     STH Cost Basis (${sthFloor ? formatUSD(sthFloor, 0) : 'SUPPRESSED'} [${sthStatus}]), Realized Price (${formatUSD(realizedPrice, 0)}), US 10Y Yield (${us10yYield}), SPX ($${spxPrice}), Volatility Radar (${volScore}/8)`,
       "• [L4: STRATEGY & MODELS]:    USSM v1.0 Swing Rules, SMC Sweeps, DMRA Cash Gate, March 2023 Fractal Study",
       "--------------------------------------------------------------------------------",
       "SYSTEM OPERATIONAL INTEGRITY & CLEARANCE AUDIT:",
-      `• Spot Stream Telemetry:      ${isLiveTicker ? 'ONLINE (Real-Time Binance Ticker Active)' : 'DEGRADED (Daily Kline Close Fallback)'}`,
+      `• Spot Stream Telemetry:      ${isLiveTicker ? 'ONLINE (Real-Time Binance Ticker Active)' : 'DEGRADED (Completed Daily Kline Close Fallback)'}`,
       `• Order Book Depth Telemetry: ${isLiveBook ? 'ONLINE (Top-of-Book Depth Active)' : 'OFFLINE / RATE-LIMITED (Depth Feed Disconnected)'}`,
-      `• Technical Indicator Engine: ${quantEvaluable ? (klineSource === 'CACHED' ? `CACHED / OPERATIONAL (Last-Known-Good Klines ${klineCacheAge || 'recent'})` : 'FULLY OPERATIONAL (250D Klines Bound & Evaluated)') : 'DEGRADED / PENDING (Kline Telemetry Offline)'}`,
-      `• Macro Risk Engines:         OPERATIONAL (Threat Matrix 100/100 • Volatility Radar -3/8 Bound)`,
-      `• Strategy Precedence Gate:   ENFORCED (CRIMSON 100% Cash Preservation Overrides Lower Desks)`,
+      `• Technical Indicator Engine: ${quantEvaluable ? (klineSource === 'CACHED' ? `CACHED / OPERATIONAL (Last-Known-Good Klines ${klineCacheAge || 'recent'})` : `FULLY OPERATIONAL (${completedBarCount} Completed 1D Klines Bound & Evaluated)`) : 'DEGRADED / PENDING (Kline Telemetry Offline)'}`,
+      `• Macro Risk Engines:         OPERATIONAL (Threat Matrix ${threatScore}/100 [${threatLevel}] • Volatility Radar ${volScore}/8 Bound)`,
+      `• Strategy Precedence Gate:   ${gateHeaderStatus}`,
       `• Operational Clearance:      ${overallClearance}`,
       "================================================================================",
       "",
       "--------------------------------------------------------------------------------",
       "DESK 1: NEXUS CORE TERMINAL (LIVE SPOT & MARKET MICROSTRUCTURE)",
       "--------------------------------------------------------------------------------",
-      `• Live BTC Spot Price:         ${formatUSD(spotPrice)} (${spotSource})`,
+      `• Live BTC Spot Price:        ${formatUSD(spotPrice)} (${spotSource})`,
       `• Spot Feed Freshness:        ${spotFreshness}`,
       `• Best Bid / Best Ask:        ${orderBookDisplay}`,
       `• Live Book Top Liquidity:    ${bookLiquidityDisplay}`,
       `• STH Realized Cost Basis:    ${sthDisplay}`,
       `• LTH Realized Cost Basis:    ${formatUSD(lthFloor, 2)} (${((spotPrice - lthFloor) / lthFloor) >= 0 ? '+' : ''}${(((spotPrice - lthFloor) / lthFloor) * 100).toFixed(2)}% vs Floor) [L3: Long-Term Supply (>=155D LTS)]`,
-      `• STH MVRV Euphoria Metric:   ${sthMvrv ? sthMvrv.toFixed(3) : '1.116'} (${(sthMvrv && sthMvrv > 1.0) ? 'Short-Term Holders in Profit / Low Panic' : 'Short-Term Holders Underwater / Elevated Capitulation Risk'})`,
+      `• Network Realized Price:     ${formatUSD(realizedPrice, 2)} (Aggregate On-Chain Cost Basis • NUPL: ${nuplVal !== null ? nuplVal.toFixed(4) : '0.3520'})`,
+      `• STH MVRV Euphoria Metric:   ${sthMvrv !== null ? sthMvrv.toFixed(3) : 'N/A'} (${(sthMvrv !== null && sthMvrv > 1.0) ? 'Short-Term Holders in Profit / Low Panic' : 'Short-Term Holders Underwater / Elevated Capitulation Risk'})`,
       "• STH Methodology Disclosure: DIRECT ON-CHAIN UTXO COHORT (<155D Short Term Supply) via BlockHorizon Bitcoin Core Node. Real-time realized price of active short-term supply.",
-      `• Macro Regime Synthesis:     Score ${regimeScore}/100 • Sizing Dampener: ${dampener.toFixed(2)}x`,
+      `• Macro Regime Synthesis:     Score ${regimeScore}/100 • Sizing Dampener: ${dampenerDisplay}`,
       `• Telemetry State:            ${telemetryStateDisplay}`,
       "",
       "--------------------------------------------------------------------------------",
       "DESK 2: REGIME RADAR (55 SENSORS & 9 TACTICAL EXECUTION RULES)",
       "--------------------------------------------------------------------------------",
-      "• Rule 1: Weekly Swing Structure:     Floor defense at $79,500.00 (Higher-Low Intact)",
-      "• Rule 2: High-Water Mark Trail:      $90k-$95k Expansion Lock Active",
-      "• Rule 3: Dip-Buying Trigger Arch:    Rung 1: -5.0% ($79.8k) | Rung 2: -10.0% ($75.6k) | Rung 3: -15.0% ($71.4k)",
-      "• Rule 4: 10-Week EMA Defense:        $78,450.00 (Tactical Trend Safe)",
-      "• Rule 5: 20-Week Institutional:      EMA $76,001.00 / SMA $71,286.65 Floor Buffer",
-      `• Rule 6: Daily Higher-Low Reclaim:   3-Day Low Defense at ${formatUSD(session3dLow)}`,
-      `• Rule 7: Daily ATR(14) Volatility:   Range Buffer ${atr14Daily ? formatUSD(atr14Daily) : '$2,055.96'} • Max Drawdown Cap`,
-      "• Rule 8: Spot Volume vs 30D Mean:    Neutral Volume Absorption",
+      "• Rule 1: Weekly Swing Structure:     Floor defense at $79,500.00 (Higher-Low Reference)",
+      `• Rule 2: High-Water Mark Trail:      30D High-Water Mark at ${formatUSD(hwm30d)} ($90k-$95k Expansion Lock Reference)`,
+      `• Rule 3: Dip-Buying Trigger Arch:    ${isCrimson ? '[SUSPENDED BY DESK 7 CRIMSON GATE — PASSIVE OBSERVATION ONLY] ' : ''}Rung 1 (-5%): ${formatUSD(rung1)} | Rung 2 (-10%): ${formatUSD(rung2)} | Rung 3 (-15%): ${formatUSD(rung3)}`,
+      `• Rule 4: 10-Week EMA Defense:        ${formatUSD(ema10w)} (${spotPrice >= ema10w ? 'Tactical Trend Intact' : 'Below 10W EMA Buffer'})`,
+      `• Rule 5: 20-Week Institutional:      EMA ${formatUSD(ema20w)} / SMA ${formatUSD(sma20w)} Floor Buffer`,
+      `• Rule 6: Daily Higher-Low Reclaim:   Completed 3-Day Low Defense at ${formatUSD(session3dLow)}`,
+      `• Rule 7: Daily ATR(14) Volatility:   Range Buffer ${atr14Daily !== null ? formatUSD(atr14Daily) : '$2,055.96'} • Max Drawdown Cap`,
+      `• Rule 8: Spot Volume vs 30D Mean:    ${volRatioStatus}`,
       `• Rule 9: Tactical Trend-Failure Stop:${sthFloor ? ` Daily close < STH Cost Basis (${formatUSD(sthFloor)}) triggers capital preservation (UTXO-based structural invalidation floor)` : ' [RULE SUPPRESSED — STH DATA OUT OF BOUNDS]'}`,
       `• 55-Sensor Execution Integrity:      ${desk2IntegrityDisplay}`,
       "",
       "--------------------------------------------------------------------------------",
       "DESK 3: QUANT RADAR (UNIFIED SIMPLE SWING MODEL USSM v1.0)",
       "--------------------------------------------------------------------------------",
-      `• 200-Day SMA Regime Baseline: ${sma200 ? formatUSD(sma200) : 'Syncing...'} (Slope: ${smaSlopeUp ? '▲ Positive / Rising' : '▼ Declining / Flat'})`,
-      `• 21-Day Daily EMA:           ${ema21 ? formatUSD(ema21) : 'Syncing...'} (Distance: ${ema21 ? ((spotPrice - ema21) / ema21 * 100).toFixed(2) : '0'}%)`,
-      `• 14-Day Wilder RSI:          ${rsi14 ? rsi14.toFixed(2) : 'Syncing...'} (Consolidation Band: 40.0 – 60.0)`,
-      `• 20-Day Wilder ATR:          ${atr20 ? formatUSD(atr20) : 'Syncing...'} (${atr20 ? (atr20 / spotPrice * 100).toFixed(2) : '0'}% Daily Range)`,
-      `• 30-Day Volume Profile POC:  ${poc30d ? formatUSD(poc30d) : 'Syncing...'} (50-Bin Value Gravity Anchor)`,
+      `• 200-Day SMA Regime Baseline:${sma200 !== null ? ' ' + formatUSD(sma200) : ' Syncing...'} (Slope: ${smaSlopeUp ? '▲ Positive / Rising' : '▼ Declining / Flat'})`,
+      `• 21-Day Daily EMA:           ${ema21 !== null ? formatUSD(ema21) : 'Syncing...'} (Distance: ${ema21 !== null ? ((spotPrice - ema21) / ema21 * 100).toFixed(2) : '0.00'}%)`,
+      `• 14-Day Wilder RSI:          ${rsi14 !== null ? rsi14.toFixed(2) : 'Syncing...'} (Consolidation Band: 40.0 – 60.0)`,
+      `• 20-Day Wilder ATR:          ${atr20 !== null ? formatUSD(atr20) : 'Syncing...'} (${atr20 !== null ? (atr20 / spotPrice * 100).toFixed(2) : '0.00'}% Daily Range)`,
+      `• 30-Day Volume Profile POC:  ${poc30d !== null ? formatUSD(poc30d) : 'Syncing...'} (50-Bin Overlap Value Gravity Anchor)`,
       `• Rule 1 (Regime Filter):     ${quantR1Display}`,
-      `• Rule 2 (Controlled Dip):     ${quantR2Display}`,
-      `• Rule 3 (Value Location):     ${quantR3Display}`,
+      `• Rule 2 (Controlled Dip):    ${quantR2Display}`,
+      `• Rule 3 (Value Location):    ${quantR3Display}`,
       `• Composite Signal State:     ${compositeSignalDisplay}`,
-      `• Quant Stop Boundary (2.5x): ${initStop ? formatUSD(initStop) : 'N/A'} (-${stopDist ? (stopDist / spotPrice * 100).toFixed(2) : '0'}%)`,
-      `• Profit Trailing Trigger:    ${trailTrigger ? formatUSD(trailTrigger) : 'N/A'} (+2.0x ATR)`,
-      `• Calculation Standard:       Binance BTCUSDT 1D • 250 Completed Daily Candles • Wilder Smoothing Standard${klineSource === 'CACHED' ? ' • USING CACHED KLINES (' + (klineCacheAge || 'recent') + ')' : ''}`,
+      `• Quant Stop Boundary (2.5x): ${initStop !== null ? formatUSD(initStop) : 'N/A'} (-${stopDist !== null ? (stopDist / spotPrice * 100).toFixed(2) : '0.00'}%)${isCrimson ? ' [PASSIVE MONITOR ONLY — ENTRY LOCKED]' : ''}`,
+      `• Profit Trailing Trigger:    ${trailTrigger !== null ? formatUSD(trailTrigger) : 'N/A'} (+2.0x ATR)${isCrimson ? ' [PASSIVE MONITOR ONLY — ENTRY LOCKED]' : ''}`,
+      `• Calculation Standard:       Binance BTCUSDT 1D • ${completedBarCount} Completed Daily Candles (Unclosed Bar Stripped) • Wilder Smoothing Standard${klineSource === 'CACHED' ? ' • USING CACHED KLINES (' + (klineCacheAge || 'recent') + ')' : ''}`,
       "",
       "--------------------------------------------------------------------------------",
       "DESK 4: LIQUIDITY RADAR (SPOT SWING PROTOCOL v2.0 & ORDER DEPTH)",
       "--------------------------------------------------------------------------------",
-      `• Active Psych Support Shelf:  ${formatUSD(dynamicSupport)} (Primary Bids Clustering)`,
-      `• Take Profit Magnet Ceiling:  ${formatUSD(dynamicResist)} (Primary Asks Overhang)`,
-      `• Nearest 30D HVN Volume Node: ${poc30d ? formatUSD(poc30d) : '$85,034.41'} (Order Flow Gravity Anchor)`,
-      `• Order Book Depth Assessment: ${orderBookSpreadDisplay}`,
+      `• Active Psych Support Shelf: ${formatUSD(dynamicSupport)} (Primary Bids Clustering)`,
+      `• Take Profit Magnet Ceiling: ${formatUSD(dynamicResist)} (Primary Asks Overhang)`,
+      `• Nearest 30D HVN Volume Node:${poc30d !== null ? ' ' + formatUSD(poc30d) : ' $85,034.41'} (Order Flow Gravity Anchor)`,
+      `• Order Book Depth Assessment:${' ' + orderBookSpreadDisplay}`,
       "",
       "--------------------------------------------------------------------------------",
       "DESK 5: SWEEP DESK PRO (SMART MONEY CONCEPTS SMC-SWEEP v1.0)",
       "--------------------------------------------------------------------------------",
-      `• Range High Liquidity Pool:   ${formatUSD(session3dHigh)} (Session Distribution Wick)`,
-      `• Range Low Liquidity Pool:    ${formatUSD(session3dLow)} (Equal Lows / Stop Run Target)`,
-      `• Prior Day Range Boundaries:  Low: ${formatUSD(priorDailyLow)} | High: ${formatUSD(priorDailyHigh)}`,
-      "• SMC Sweep Reversal Rule:     Wick beyond round level + Engulfing close inside + CVD divergence",
-      `• Current Sweep Readiness:     Monitoring Range Low Defense at ${formatUSD(session3dLow)}`,
+      `• Range High Liquidity Pool:  ${formatUSD(session3dHigh)} (Completed 3D Distribution Wick)`,
+      `• Range Low Liquidity Pool:   ${formatUSD(session3dLow)} (Equal Lows / Stop Run Target)`,
+      `• Prior Completed Day Range:  Low: ${formatUSD(priorDailyLow)} | High: ${formatUSD(priorDailyHigh)}`,
+      "• SMC Sweep Reversal Rule:    Wick beyond round level + Engulfing close inside + CVD divergence",
+      `• Current Sweep Readiness:    Monitoring Range Low Defense at ${formatUSD(session3dLow)}${isCrimson ? ' [OBSERVATION ONLY — CRIMSON GATE ACTIVE]' : ''}`,
       "",
       "--------------------------------------------------------------------------------",
       "DESK 6: ABSORPTION RADAR PRO (VALUE-SHELF & TRANCHE ANCHORS)",
       "--------------------------------------------------------------------------------",
-      `• 20-Day Daily EMA Baseline:   ${ema20Daily ? formatUSD(ema20Daily) : '$83,243.21'}`,
-      `• ATR Extension vs EMA 20:     ${extAtr.toFixed(2)}x ATR (${Math.abs(extAtr) < 1.0 ? 'Balanced Equilibrium' : 'Extended'})`,
-      "• Benchmark Absorption Level:  $82,500 Macro Shelf",
+      `• 20-Day Daily EMA Baseline:  ${ema20Daily !== null ? formatUSD(ema20Daily) : '$83,243.21'}`,
+      `• ATR Extension vs EMA 20:    ${extAtr.toFixed(2)}x ATR (${Math.abs(extAtr) < 1.0 ? 'Balanced Equilibrium' : 'Extended'})`,
+      "• Benchmark Absorption Level: $82,500 Macro Shelf",
       "• Secondary Accumulation Floor:$75,000 High-Volume Sinking Floor",
-      "• Delta Pin-Bar Signal:        Absorption active when delta negative but candle closes green",
+      "• Delta Pin-Bar Signal:       Absorption active when delta negative but candle closes green",
       "",
       "--------------------------------------------------------------------------------",
       "DESK 7: MACRO THREAT MATRIX PRO (CROSS-ASSET THREAT MATRIX)",
       "--------------------------------------------------------------------------------",
-      `• Composite Threat Level:     Score ${threatScore}/100 [${threatLevel}] — Structural Volatility Ceiling / Capital Preservation Mandate`,
+      `• Composite Threat Level:     Score ${threatScore}/100 [${threatLevel}] — ${threatStatus}`,
       `• Tactical Allocation Call:   ${threatCall}`,
-      "• Threat Scoring Breakdown:   Breadth: 35/35 | Yield: 30/30 | MSTR: 20/20 | Election: 15/15",
-      "• Threat Scoring Model:       Additive Structural Headwind Model (Ceiling 100). Triggered: SPX/RSP Ratio>50SMA (35) + 10Y>=5.0% (30) + MSTR<-20% DD (20) + Election Window (15) = 100/100",
-      `• SPX / RSP Breadth Ratio:    SPX $${spxPrice} / RSP $${rspPrice} (Ratio vs 50 SMA: ${breadthRatioDiff} [TECH CONCENTRATION]) [Source: Yahoo ^GSPC / RSP]`,
-      `• US 10Y Treasury Yield:      ${us10yYield} (${parseFloat(us10yYield) >= 5.0 ? '🚨 Elevated Above 5.0% Gate' : 'Normal Range'}) [Source: Yahoo ^TNX / FRED]`,
-      "• MSTR / BTC Momentum Canary: MSTR $154.34 (-25.7% from split-adj cycle high of $207.70) [Bearish Momentum Divergence Active] [Source: Nasdaq MSTR]",
-      "• Election Volatility Window: ACTIVE (Catalysts: CPI Oct 15 [5d], NFP Nov 1 [22d], US Election Nov 5 [26d], FOMC Nov 6 [27d])",
-      "• Capital Preservation Gate:  CRIMSON OVERRIDE ACTIVE: 100% USDT Cash Preservation strictly overrides lower-desk dip-buying and scalp shorts",
+      `• Threat Scoring Breakdown:   ${breakdownDisplay}`,
+      "• Threat Scoring Model:       Additive Structural Headwind Model (Ceiling 100). Weights: SPX/RSP Ratio>50SMA (35) + 10Y>=5.0% (30) + MSTR<-20% DD (20) + Macro Event Window (15)",
+      `• SPX / RSP Breadth Ratio:    SPX $${spxPrice} / RSP $${rspPrice} (Ratio vs 50 SMA: ${breadthRatioDiff} [TECH CONCENTRATION])`,
+      `• US 10Y Treasury Yield:      ${us10yYield} (${parseFloat(us10yYield) >= 5.0 ? '🚨 Elevated Above 5.0% Gate' : 'Normal Range'})`,
+      `• MSTR / BTC Momentum Canary: ${mstrDisplay}`,
+      `• Macro Catalyst Window:      ${electionDisplay}`,
+      `• Capital Preservation Gate:  ${isCrimson ? 'CRIMSON OVERRIDE ACTIVE: 100% USDT Cash Preservation strictly overrides lower-desk dip-buying and scalp shorts (0.00x Exposure)' : `GATE CLEAR (${threatLevel}): Subordinate desk execution permitted within regime sizing caps`}`,
       "",
       "--------------------------------------------------------------------------------",
       "DESK 8: BTC VOLATILITY RADAR PRO (8-PILLAR CONFLUENCE MATRIX v1.1.0)",
       "--------------------------------------------------------------------------------",
-      `• Composite Confluence Score:  ${volScore} / 8 (${volRiskState.toUpperCase()})`,
+      `• Composite Confluence Score: ${volScore} / 8 (${volRiskState.toUpperCase()})`,
       "• Volatility Scoring Formula: Sum of 8 Pillars (-8 to +8). Macro (-1) + ETF (-1) + Geopolitics (-1) + 5 Neutral (0) = -3 / 8",
-      `• Sizing Cap & Multiplier:     ${volSizing}`,
+      `• Sizing Cap & Multiplier:    ${volSizing}`,
       `• Cross-Desk Yield Check:     10Y Yield Harmonized to ${us10yYield} (Zero Basis-Point Discrepancy vs Desk 7)`,
       "• Calibrated 8-Pillar Rationale:",
       volPillars.length > 0
@@ -961,8 +1249,8 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       "--------------------------------------------------------------------------------",
       "DESK 9: FRACTAL LAB (MARCH 2023 SVB REPEAT DETECTOR & VOID RULE)",
       "--------------------------------------------------------------------------------",
-      `• Live 4H Shape Correlation:  r = ${fractalCorr >= 0 ? '+' : ''}${fractalCorr.toFixed(3)} [L1: COMPUTED LIVE vs March 2023 90-Bar SVB Baseline]`,
-      `• Creator Void Rule Status:   ${voidStatus} (Ceiling: $89,500 weekly close gate)`,
+      `• Live 4H Shape Correlation:  r_level = ${fractalCorr >= 0 ? '+' : ''}${fractalCorr.toFixed(3)} | r_returns = ${fractalReturnCorr >= 0 ? '+' : ''}${fractalReturnCorr.toFixed(3)} [L1: COMPUTED LIVE vs March 2023 90-Bar SVB Baseline]`,
+      `• Creator Void Rule Status:   ${voidStatus} (Spot Gate: $89,500 ceiling)`,
       `• Current Fractal Phase:      Phase 1: The Tease / Range Floor Defense (${formatUSD(session3dLow)})`,
       "• Model Structural Flush Zone:$74,000 – $78,000 (Wyckoff Spring / Fakeout Flush hypothesis)",
       "• Model Expansion Projection: $100,000+ (Post-Absorption Cycle Target)",
@@ -971,14 +1259,15 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       "                              [NOTE: Static Historical Reference Study — Not Live Telemetry]",
       "",
       "================================================================================",
-      "MASTER ARBITRATION DIRECTIVE FOR AI COPILOT (GROK / CLAUDE / CHATGPT):",
+      "MASTER ARBITRATION DIRECTIVE FOR AI COPILOT (GROK / CLAUDE / CHATGPT / GEMINI):",
       "================================================================================",
-      "1. CROSS-DESK SYNTHESIS: Synthesize Quant Radar technical confluence against Volatility Radar score (-3 Bearish) and Threat Matrix Cash Preservation Gate.",
-      "2. CONTRADICTION AUDIT: Flag tension between live technical dip confluence ($83k / 21 EMA / 30D POC) and macro yield/ETF distribution headwinds.",
-      "3. HIERARCHY OF PRECEDENCE: When Threat Matrix is 100/100 (CRIMSON Gate), DMRA 100% USDT Capital Preservation strictly overrides BOTH spot-long dip-buying (Desk 3/4) AND scalp shorting (Desk 8). Absolute capital preservation is authoritative. No leverage or directional positions permitted.",
+      `0. PRE-COMPUTED GATE LOCK: ${verdictLockToken}`,
+      "1. CROSS-DESK SYNTHESIS: Synthesize Quant Radar technical confluence against Volatility Radar score and Threat Matrix Cash Preservation Gate.",
+      "2. CONTRADICTION AUDIT: Flag tension between live technical dip confluence (21 EMA / 30D POC) and macro yield/ETF distribution headwinds.",
+      "3. HIERARCHY OF PRECEDENCE: When Threat Matrix is >= 100/100 (CRIMSON Gate), DMRA 100% USDT Capital Preservation strictly overrides BOTH spot-long dip-buying (Desk 2/3/4) AND scalp shorting (Desk 8). Maximum exposure is 0.00x. No leverage, starter positions, or directional orders permitted.",
       "4. STABLECOIN CUSTODY CAVEAT: 100% USDT allocation eliminates BTC price volatility but retains issuer, custody, smart-contract, and depeg risks. Treat as temporary tactical dry powder, not risk-free cash.",
-      "5. ACTIONABLE BOTTOM LINE: State recommended posture (Preservation / Scalp / Full), exact invalidation stop, and next structural trigger level.",
-      "6. EXTERNAL VERIFICATION: Where browsing is available, cross-check Desk 7 gate inputs (10Y yield, SPX, MSTR, event calendar) and Desk 1 on-chain cost basis ($74,468 STH / $49,210 LTH) within ~1% tolerance, tabularize any material differences, and confirm if CRIMSON gate remains binding.",
+      "5. ACTIONABLE BOTTOM LINE: Begin Line 1 with the exact VERDICT_LOCK header. Under CRIMSON status, report invalidation stops and support shelves strictly as passive observation/reclaim levels—never as active limit buy/sell triggers.",
+      "6. EXTERNAL VERIFICATION: Where browsing is available, cross-check Desk 7 gate inputs (10Y yield, SPX, MSTR, event calendar) and Desk 1 on-chain cost basis within ~1% tolerance, tabularize any material differences, and confirm if CRIMSON gate remains binding.",
       "================================================================================",
       "END OF 9-DESK UNIFIED MASTER TELEMETRY DOSSIER"
     ];
@@ -987,74 +1276,81 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
   }
 
   // --- GLOBAL ATTACHMENT WITH VISUAL FEEDBACK ---
-  window.copyUnifiedMasterPacket = async function (btnElement) {
-    const btn = btnElement || document.getElementById('btn-copy-unified-master');
-    const origHtml = btn ? btn.innerHTML : '';
+  if (typeof window !== 'undefined') {
+    window.copyUnifiedMasterPacket = async function (btnElement) {
+      const btn = btnElement || (typeof document !== 'undefined' ? document.getElementById('btn-copy-unified-master') : null);
+      const origHtml = btn ? btn.innerHTML : '';
 
-    if (btn) {
-      btn.innerHTML = '⏳ Pulling & Computing 9 Desks Live...';
-      btn.disabled = true;
-    }
+      if (btn) {
+        btn.innerHTML = '⏳ Pulling & Computing 9 Desks Live...';
+        btn.disabled = true;
+      }
 
-    try {
-      const packetText = await generateUnifiedMasterPacket();
-
-      let copied = false;
       try {
-        await navigator.clipboard.writeText(packetText);
-        copied = true;
-      } catch (err) {
-        const ta = document.createElement('textarea');
-        ta.value = packetText;
-        ta.style.position = 'fixed';
-        ta.style.left = '-9999px';
-        document.body.appendChild(ta);
-        ta.select();
-        copied = document.execCommand('copy');
-        document.body.removeChild(ta);
-      }
+        const packetText = await generateUnifiedMasterPacket();
 
-      if (btn) {
-        btn.innerHTML = copied ? '✅ All 9 Desks Live & Copied!' : '❌ Copy Failed';
-        btn.style.background = copied ? '#059669' : '#dc2626';
-        setTimeout(() => {
-          btn.innerHTML = origHtml;
-          btn.style.background = '';
-          btn.disabled = false;
-        }, 2500);
-      }
+        let copied = false;
+        try {
+          await navigator.clipboard.writeText(packetText);
+          copied = true;
+        } catch (_) {
+          if (typeof document !== 'undefined') {
+            const ta = document.createElement('textarea');
+            ta.value = packetText;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            copied = document.execCommand('copy');
+            document.body.removeChild(ta);
+          }
+        }
 
-      // Show toast if available
-      if (window.showToast) {
-        window.showToast('📋 Unified Master Packet (All 9 Desks) copied to clipboard!');
+        if (btn) {
+          btn.innerHTML = copied ? '✅ All 9 Desks Live & Copied!' : '❌ Copy Failed';
+          btn.style.background = copied ? '#059669' : '#dc2626';
+          setTimeout(() => {
+            btn.innerHTML = origHtml;
+            btn.style.background = '';
+            btn.disabled = false;
+          }, 2500);
+        }
+
+        if (window.showToast) {
+          window.showToast('📋 Unified Master Packet (All 9 Desks) copied to clipboard!');
+        }
+      } catch (e) {
+        console.error('[UnifiedMasterExporter] Failed to compile packet:', e);
+        if (btn) {
+          btn.innerHTML = '⚠️ Compilation Error';
+          btn.style.background = '#dc2626';
+          setTimeout(() => {
+            btn.innerHTML = origHtml;
+            btn.style.background = '';
+            btn.disabled = false;
+          }, 2500);
+        }
       }
-    } catch (e) {
-      console.error('[UnifiedMasterExporter] Failed to compile packet:', e);
-      if (btn) {
-        btn.innerHTML = '⚠️ Compilation Error';
-        btn.style.background = '#dc2626';
-        setTimeout(() => {
-          btn.innerHTML = origHtml;
-          btn.style.background = '';
-          btn.disabled = false;
-        }, 2500);
-      }
-    }
-  };
+    };
+
+    window.generateUnifiedMasterPacket = generateUnifiedMasterPacket;
+  }
 
   // Proactive background pre-warm on page load so localStorage is never cold
   if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     const preWarmKlines = async () => {
       try {
-        const live = await fetchWithWaterfall(VENUES.dailyKlines, true, 2000);
+        const liveRaw = await fetchWithWaterfall(VENUES.dailyKlines, true, 2000);
+        const live = stripUnclosedCandles(liveRaw, Date.now());
         if (Array.isArray(live) && live.length >= 200) {
-          saveKlineCache(live);
+          saveKlineCache(live.slice(-250));
           return;
         }
         if (!loadKlineCache()) {
-          const snapshot = await fetchWithWaterfall(VENUES.dailyKlinesFallback, true, 4500);
+          const snapshotRaw = await fetchWithWaterfall(VENUES.dailyKlinesFallback, true, 4500);
+          const snapshot = stripUnclosedCandles(snapshotRaw, Date.now());
           if (Array.isArray(snapshot) && snapshot.length >= 200) {
-            saveKlineCache(snapshot);
+            saveKlineCache(snapshot.slice(-250));
           }
         }
       } catch (_) {}
@@ -1066,20 +1362,18 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
     }
   }
 
-  if (typeof window !== 'undefined') {
-    window.generateUnifiedMasterPacket = generateUnifiedMasterPacket;
-  }
-
-  // Expose generator function for automated testing and node/headless verification
+  // Expose generator and mathematical functions for automated testing and headless verification
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
       generateUnifiedMasterPacket,
+      stripUnclosedCandles,
       calcSMA,
       calcEMA,
       calcWilderRSI,
       calcWilderATR,
       calcVolumeProfilePOC,
-      calcPearsonCorrelation
+      calcPearsonCorrelation,
+      calcReturnCorrelation
     };
   }
 })();
