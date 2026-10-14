@@ -68,45 +68,53 @@
     "module_c_mstr": {
       "price": 152.18,
       "change_24h_pct": -7.52,
-      "cycle_high": 1999.99,
-      "distance_from_high_pct": -25.72,
+      "cycle_high": 312.71,
+      "distance_from_high_pct": -51.34,
+      "summary": "MSTR $152.18 (-51.3% from 52W high of $312.71) [Bearish Momentum Divergence Active]",
       "daily_rsi": 41.2,
       "rolling_corr_btc_30d": 0.842,
-      "support_shelf": 1420.0,
-      "resistance_gate": 1750.0,
+      "support_shelf": 142.0,
+      "resistance_gate": 175.0,
       "status": "BEARISH DIVERGENCE / SQUEEZE WARNING",
       "color": "amber",
       "interpretation": "MSTR is the high-beta sentiment canary for BTC. Structural failure to reclaim May highs precedes crypto spot corrections."
     },
     "module_d_seasonality": {
-      "cycle_name": "US Presidential Election Volatility Window",
+      "cycle_name": "US Midterm Election & Macro Volatility Window",
       "status": "ELEVATED VOLATILITY RISK",
+      "summary": "ACTIVE (Catalysts: CPI Oct 14 [Today], Retail Sales/PPI Oct 15 [1d], FOMC Oct 28 [14d], Midterms Nov 3 [20d], NFP Nov 6 [23d])",
       "historical_lag_rule": "Crypto takes 3-6x longer than equities to recover from macro election and yield volatility shocks.",
       "dry_powder_instruction": "Preserve 100% USDT cash for deep demand shelves during post-shock liquidation cascades.",
       "catalysts": [
         {
-          "event": "US CPI Inflation Print",
+          "event": "US September CPI Inflation Print",
+          "date": "2026-10-14",
+          "days_away": 0,
+          "impact": "CRITICAL"
+        },
+        {
+          "event": "US Retail Sales & PPI Print",
           "date": "2026-10-15",
-          "days_away": 5,
+          "days_away": 1,
           "impact": "HIGH"
-        },
-        {
-          "event": "US Non-Farm Payrolls (NFP)",
-          "date": "2026-11-01",
-          "days_away": 22,
-          "impact": "HIGH"
-        },
-        {
-          "event": "US Presidential Election",
-          "date": "2026-11-05",
-          "days_away": 26,
-          "impact": "EXTREME"
         },
         {
           "event": "US FOMC Rate Decision",
-          "date": "2026-11-06",
-          "days_away": 27,
+          "date": "2026-10-28",
+          "days_away": 14,
           "impact": "CRITICAL"
+        },
+        {
+          "event": "US Midterm Election",
+          "date": "2026-11-03",
+          "days_away": 20,
+          "impact": "EXTREME"
+        },
+        {
+          "event": "US Non-Farm Payrolls (NFP)",
+          "date": "2026-11-06",
+          "days_away": 23,
+          "impact": "HIGH"
         }
       ]
     },

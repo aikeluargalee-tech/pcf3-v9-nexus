@@ -277,11 +277,17 @@ def test_unified_exporter():
     assert '[OVERRIDDEN BY DESK 7 CRIMSON GATE' in js_code and '0.00x EXPOSURE' in js_code
     print("[PASS] Failure S: Fail-closed CRIMSON lock strictly suppresses Desk 1 dampener (0.00x), Desk 3 confluence, and requires VERDICT_LOCK token.")
 
+    # Test Failure T: 2026 Macro Calendar Synchronization & 4H Waterfall Timeout
+    assert 'module_d_seasonality' in js_code, "Must parse module_d_seasonality in threat feed!"
+    assert 'fetchWithWaterfall(VENUES.fourHourKlines, true, 2500)' in js_code, "4H klines timeout must be 2500ms!"
+    assert 'MSTR $152.18 (-51.3% from 52W high of $312.71)' in js_code, "Must have updated 52W high MSTR metrics!"
+    print("[PASS] Failure T: 2026 economic calendar, MSTR 52W high, and 4H kline 2500ms waterfall timeout verified.")
+
     # Verify index.html version reference
     with open('index.html', 'r', encoding='utf-8') as f:
         index_html = f.read()
-    assert 'unified_master_exporter.js?v=3.2.2' in index_html, "index.html must reference unified_master_exporter.js?v=3.2.2"
-    print("[PASS] index.html cache-buster successfully verified at v3.2.2.")
+    assert 'unified_master_exporter.js?v=3.2.3' in index_html, "index.html must reference unified_master_exporter.js?v=3.2.3"
+    print("[PASS] index.html cache-buster successfully verified at v3.2.3.")
 
     print("\n>>> ALL ADVANCED INTEGRITY & FAILURE REGRESSION CHECKS PASSED WITH 100% COMPLIANCE! <<<")
 
