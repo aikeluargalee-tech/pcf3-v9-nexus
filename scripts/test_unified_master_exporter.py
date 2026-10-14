@@ -220,6 +220,30 @@ def test_unified_exporter():
     assert 'USING CACHED KLINES' in js_code
     print("[PASS] Failure M: 3-tier Last-Known-Good localStorage cache verified with zero cache-poisoning and explicit CACHED provenance.")
 
+    # Test Failure N: BlockHorizon Live On-Chain UTXO Pipeline & Multi-Tier Fallback
+    assert 'onchainFeed' in js_code, "Must declare onchainFeed in VENUES!"
+    assert 'decryptBlockHorizonPayload' in js_code, "Must implement in-browser WebCrypto decryptor!"
+    assert 'ONCHAIN_CACHE_KEY' in js_code and 'nexus_onchain_metrics_v1' in js_code
+    assert 'saveOnchainCache' in js_code and 'loadOnchainCache' in js_code
+    assert 'LTH Realized Cost Basis' in js_code
+    assert 'STH MVRV Euphoria Metric' in js_code
+
+    with open('data/onchain_metrics.json', 'r', encoding='utf-8') as f:
+        onchain_snapshot = json.load(f)
+    assert 'metrics' in onchain_snapshot
+    m_sth = onchain_snapshot['metrics']['sth_cost_basis']
+    m_lth = onchain_snapshot['metrics']['lth_cost_basis']
+    assert 30000 <= m_sth <= 150000, f"STH cost basis out of bounds: {m_sth}"
+    assert 20000 <= m_lth <= 100000, f"LTH cost basis out of bounds: {m_lth}"
+    assert m_sth > m_lth, f"STH cost basis should exceed LTH cost basis: {m_sth} vs {m_lth}"
+    print(f"[PASS] Failure N: BlockHorizon on-chain UTXO pipeline verified (STH ${m_sth:,.2f} / LTH ${m_lth:,.2f}) with 3-tier fallback.")
+
+    # Verify index.html version reference
+    with open('index.html', 'r', encoding='utf-8') as f:
+        index_html = f.read()
+    assert 'unified_master_exporter.js?v=3.2.0' in index_html, "index.html must reference unified_master_exporter.js?v=3.2.0"
+    print("[PASS] index.html cache-buster successfully verified at v3.2.0.")
+
     print("\n>>> ALL ADVANCED INTEGRITY & FAILURE REGRESSION CHECKS PASSED WITH 100% COMPLIANCE! <<<")
 
 if __name__ == '__main__':

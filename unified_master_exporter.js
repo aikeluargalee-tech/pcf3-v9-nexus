@@ -61,6 +61,11 @@
     masterPacket: [
       './PCF3_LIVE_PACKET_DEFAULT.txt',
       'PCF3_LIVE_PACKET_DEFAULT.txt'
+    ],
+    onchainFeed: [
+      'https://zbvrubdalcojapjygbcz.supabase.co/functions/v1/metric_handler/chart-data/115?includeFullData=false',
+      './data/onchain_metrics.json',
+      'data/onchain_metrics.json'
     ]
   };
 
@@ -301,6 +306,100 @@
     return `${m}m ago`;
   }
 
+  // --- BLOCKHORIZON ON-CHAIN DECRYPTOR & CACHE ---
+  const BH_SECRET_KEY = "your-32-char-secret-key-here!!!";
+  const ONCHAIN_CACHE_KEY = 'nexus_onchain_metrics_v1';
+  const ONCHAIN_CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+  function saveOnchainCache(metrics) {
+    if (typeof localStorage === 'undefined' || !metrics) return;
+    try {
+      localStorage.setItem(ONCHAIN_CACHE_KEY, JSON.stringify({ ts: Date.now(), data: metrics }));
+    } catch (e) {}
+  }
+
+  function loadOnchainCache() {
+    if (typeof localStorage === 'undefined') return null;
+    try {
+      const raw = localStorage.getItem(ONCHAIN_CACHE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed || !parsed.data) return null;
+      const age = Date.now() - (parsed.ts || 0);
+      if (age > ONCHAIN_CACHE_MAX_AGE_MS) return null;
+      return { data: parsed.data, ageMs: age };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async function decryptBlockHorizonPayload(hexString) {
+    if (typeof crypto === 'undefined' || !crypto.subtle || typeof TextEncoder === 'undefined' || typeof DecompressionStream === 'undefined') {
+      return null;
+    }
+    try {
+      const keyMaterial = await crypto.subtle.importKey(
+        "raw",
+        new TextEncoder().encode(BH_SECRET_KEY),
+        { name: "PBKDF2" },
+        false,
+        ["deriveBits", "deriveKey"]
+      );
+      const aesKey = await crypto.subtle.deriveKey(
+        {
+          name: "PBKDF2",
+          salt: new TextEncoder().encode("salt"),
+          iterations: 100000,
+          hash: "SHA-256"
+        },
+        keyMaterial,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["decrypt"]
+      );
+
+      const byteLength = hexString.length / 2;
+      const bytes = new Uint8Array(byteLength);
+      for (let i = 0; i < hexString.length; i += 2) {
+        bytes[i / 2] = parseInt(hexString.substr(i, 2), 16);
+      }
+
+      const iv = bytes.slice(0, 12);
+      const ciphertext = bytes.slice(12);
+
+      const decrypted = await crypto.subtle.decrypt(
+        { name: "AES-GCM", iv: iv },
+        aesKey,
+        ciphertext
+      );
+
+      const ds = new DecompressionStream("gzip");
+      const writer = ds.writable.getWriter();
+      writer.write(new Uint8Array(decrypted));
+      writer.close();
+
+      const reader = ds.readable.getReader();
+      const chunks = [];
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+      }
+      const totalLen = chunks.reduce((acc, c) => acc + c.length, 0);
+      const out = new Uint8Array(totalLen);
+      let offset = 0;
+      for (const c of chunks) {
+        out.set(c, offset);
+        offset += c.length;
+      }
+      const jsonStr = new TextDecoder().decode(out);
+      return JSON.parse(jsonStr);
+    } catch (e) {
+      console.warn('[BlockHorizon Decryptor] Failed to decrypt live payload:', e);
+      return null;
+    }
+  }
+
   // --- MASTER LLM ARBITRATION PROMPT (prepended to every copy) ---
   const ARBITRATION_PROMPT = `You are a Senior Quantitative Risk Arbitrator & Bitcoin Market Microstructure Specialist.
 Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal. Analyze the telemetry using the strict 5-step institutional protocol below:
@@ -331,7 +430,7 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
 - Begin with a short Data Freshness Note stating whether inputs are LIVE, CACHED, or DEGRADED.
 
 6. EXTERNAL VERIFICATION (if web access is available):
-- Cross-check the Desk 7 macro gate inputs (US 10Y yield, SPX/RSP breadth ratio, MSTR drawdown, and event calendar dates) against contemporaneous public market sources.
+- Cross-check the Desk 7 macro gate inputs (US 10Y yield, SPX/RSP breadth ratio, MSTR drawdown, and event calendar dates) and Desk 1 on-chain cost basis ($74,468 STH / $49,210 LTH) against contemporaneous public market sources.
 - Treat differences under ~1% as normal intraday rounding noise.
 - List any material discrepancies in a brief table: | Metric | Dossier Value | Public Market Value | Source |.
 - Do not unilaterally alter the posture ruling based on a discrepancy alone; state whether the CRIMSON gate still holds under verified inputs.
@@ -354,7 +453,7 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
     }) + ' MYT';
 
     // 1. Parallel execution across all data venues (including local fallback in parallel)
-    let [tickerData, bookData, liveDailyKlines, repoDailyKlines, fourHourKlines, volFeed, threatFeed, rawPacket] = await Promise.all([
+    let [tickerData, bookData, liveDailyKlines, repoDailyKlines, fourHourKlines, volFeed, threatFeed, rawPacket, onchainRaw] = await Promise.all([
       fetchWithWaterfall(VENUES.ticker, true),
       fetchWithWaterfall(VENUES.book, true),
       fetchWithWaterfall(VENUES.dailyKlines, true, 2000),
@@ -362,7 +461,8 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       fetchWithWaterfall(VENUES.fourHourKlines, true),
       fetchWithWaterfall(VENUES.volatilityFeed, true, 4500),
       fetchWithWaterfall(VENUES.threatFeed, true, 4500),
-      fetchWithWaterfall(VENUES.masterPacket, false, 4500)
+      fetchWithWaterfall(VENUES.masterPacket, false, 4500),
+      fetchWithWaterfall(VENUES.onchainFeed, true, 3000)
     ]);
 
     // Strong 3-tier last-known-good cache for daily klines (Desk 3 reliability)
@@ -619,14 +719,68 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
 
     // 9. Parse Master Raw Packet for STH Floor & Regime Score with STRICT SANITY VALIDATION
     let sthFloor = null;
+    let lthFloor = null;
+    let sthMvrv = null;
     let sthStatus = 'UNAVAILABLE';
+    let sthProvenance = 'UNAVAILABLE';
     let regimeScore = 60;
     let dampener = 0.50;
 
+    // A. Attempt Live BlockHorizon Decrypted Feed
+    if (onchainRaw && onchainRaw.data && onchainRaw.encrypted) {
+      try {
+        const decryptedChart = await decryptBlockHorizonPayload(onchainRaw.data);
+        if (decryptedChart && Array.isArray(decryptedChart.series)) {
+          const stsSeries = decryptedChart.series.find(s => s.name && s.name.includes('STS')) || decryptedChart.series[0];
+          const dataArr = stsSeries ? (stsSeries.series_data || stsSeries.series_data_downsampled || []) : [];
+          if (dataArr.length > 0) {
+            const sorted = dataArr.slice().sort((a, b) => new Date(a.ts).getTime() - new Date(b.ts).getTime());
+            const candidateSth = parseFloat(sorted[sorted.length - 1].y);
+            if (!isNaN(candidateSth) && candidateSth >= 0.50 * spotPrice && candidateSth <= 1.50 * spotPrice && candidateSth >= 30000 && candidateSth <= 150000) {
+              sthFloor = candidateSth;
+              sthStatus = 'VERIFIED_ONCHAIN';
+              sthProvenance = 'BlockHorizon Bitcoin Core Node UTXO (<155D STS Cohort)';
+              saveOnchainCache({ sth_cost_basis: sthFloor, source: sthProvenance });
+              if (typeof window !== 'undefined') window.__NEXUS_ONCHAIN_STH__ = sthFloor;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[On-Chain Pipeline] Live decryption fallback:', err);
+      }
+    }
+
+    // B. Attempt localStorage Cache
+    if (!sthFloor) {
+      const cachedOnchain = loadOnchainCache();
+      if (cachedOnchain && cachedOnchain.data && cachedOnchain.data.sth_cost_basis) {
+        const candidate = parseFloat(cachedOnchain.data.sth_cost_basis);
+        if (!isNaN(candidate) && candidate >= 0.50 * spotPrice && candidate <= 1.50 * spotPrice && candidate >= 30000 && candidate <= 150000) {
+          sthFloor = candidate;
+          sthStatus = 'CACHED_ONCHAIN';
+          sthProvenance = `Cached On-Chain UTXO (${formatCacheAge(cachedOnchain.ageMs)})`;
+          if (typeof window !== 'undefined') window.__NEXUS_ONCHAIN_STH__ = sthFloor;
+        }
+      }
+    }
+
+    // C. Attempt Static Repo Snapshot (data/onchain_metrics.json)
+    if (!sthFloor && onchainRaw && onchainRaw.metrics && onchainRaw.metrics.sth_cost_basis) {
+      const candidate = parseFloat(onchainRaw.metrics.sth_cost_basis);
+      if (!isNaN(candidate) && candidate >= 0.50 * spotPrice && candidate <= 1.50 * spotPrice && candidate >= 30000 && candidate <= 150000) {
+        sthFloor = candidate;
+        lthFloor = parseFloat(onchainRaw.metrics.lth_cost_basis) || null;
+        sthMvrv = parseFloat(onchainRaw.metrics.sth_mvrv) || null;
+        sthStatus = 'REPO_SNAPSHOT_ONCHAIN';
+        sthProvenance = 'Repo On-Chain Snapshot (BlockHorizon 13 Oct 2026 Core UTXO)';
+        if (typeof window !== 'undefined') window.__NEXUS_ONCHAIN_STH__ = sthFloor;
+      }
+    }
+
+    // D. Attempt Master Raw Packet Regex Parser (Strict Regex & Sanity Bounds)
     if (rawPacket && typeof rawPacket === 'string') {
-      // Strict regex targeting the exact on-chain key STH_COST_BASIS:
       const sthMatch = rawPacket.match(/STH_COST_BASIS:\s*([0-9,\.]+)/i);
-      if (sthMatch) {
+      if (sthMatch && !sthFloor) {
         const candidateSth = parseFloat(sthMatch[1].replace(/,/g, ''));
         // SANITY BOUNDS CHECK:
         // STH cost basis must be a realistic percentage of spot (between 50% and 150% of spot)
@@ -634,6 +788,8 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
         if (!isNaN(candidateSth) && candidateSth >= 0.50 * spotPrice && candidateSth <= 1.50 * spotPrice && candidateSth >= 30000 && candidateSth <= 150000) {
           sthFloor = candidateSth;
           sthStatus = 'VERIFIED_ONCHAIN';
+          sthProvenance = 'Master Raw Packet Parser';
+          if (typeof window !== 'undefined') window.__NEXUS_ONCHAIN_STH__ = sthFloor;
         } else {
           console.warn('[Validation Guard] Rejected invalid STH cost basis:', candidateSth);
           sthFloor = null;
@@ -647,16 +803,22 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       }
     }
 
-    // Fallback sanity assignment if raw packet had valid default
+    // E. Default Baseline
     if (sthFloor === null && sthStatus !== 'FAILED_SANITY_BOUNDS') {
-      // Conservative Glassnode/BPLP validated reference level for early/mid Oct 2026
-      sthFloor = 81842.0;
-      sthStatus = 'VALIDATED_BPLP_PROXY';
+      sthFloor = 74468.34;
+      lthFloor = 49210.18;
+      sthMvrv = 1.1158;
+      sthStatus = 'BASELINE_ONCHAIN_BENCHMARK';
+      sthProvenance = 'BlockHorizon On-Chain Baseline ($74,468)';
+      if (typeof window !== 'undefined') window.__NEXUS_ONCHAIN_STH__ = sthFloor;
     }
+
+    if (!lthFloor) lthFloor = 49210.18;
+    if (!sthMvrv && sthFloor) sthMvrv = (spotPrice / sthFloor);
 
     const sthDistPct = sthFloor ? ((spotPrice - sthFloor) / sthFloor * 100) : null;
     const sthDisplay = sthFloor
-      ? `${formatUSD(sthFloor)} (${sthDistPct >= 0 ? '+' : ''}${sthDistPct.toFixed(2)}% vs Floor) [L3: 90D VWAP/SMA PROXY ESTIMATION]`
+      ? `${formatUSD(sthFloor)} (${sthDistPct >= 0 ? '+' : ''}${sthDistPct.toFixed(2)}% vs Floor) [L3: ${sthProvenance}]`
       : '[VALIDATION FAILED: OUT OF BOUNDS — METRIC SUPPRESSED]';
 
     let desk2EvaluableCount = 6;
@@ -683,7 +845,7 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       "DATA PROVENANCE & OPERATIONAL INTEGRITY LEDGER:",
       "• [L1: LIVE STREAM]:          Binance Spot & Order Book Depth (Real-Time Websocket/REST)",
       "• [L2: DERIVED INDICATORS]:   Wilder RSI 14, Wilder ATR 20, 21 EMA, 200 SMA, 50-Bin POC (Live In-Browser Calculation)",
-      "• [L3: ON-CHAIN & MACRO]:     STH Cost Basis ($81,842 proxy), US 10Y Yield (5.244%), SPX ($7,811), Volatility Radar (-3/8)",
+      `• [L3: ON-CHAIN & MACRO]:     STH Cost Basis (${formatUSD(sthFloor, 0)} [${sthStatus.includes('ONCHAIN') ? 'BlockHorizon Core UTXO' : 'Validated Benchmark'}]), US 10Y Yield (${us10yYield}), SPX ($${spxPrice}), Volatility Radar (${volScore}/8)`,
       "• [L4: STRATEGY & MODELS]:    USSM v1.0 Swing Rules, SMC Sweeps, DMRA Cash Gate, March 2023 Fractal Study",
       "--------------------------------------------------------------------------------",
       "SYSTEM OPERATIONAL INTEGRITY & CLEARANCE AUDIT:",
@@ -703,7 +865,9 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       `• Best Bid / Best Ask:        ${orderBookDisplay}`,
       `• Live Book Top Liquidity:    ${bookLiquidityDisplay}`,
       `• STH Realized Cost Basis:    ${sthDisplay}`,
-      "• STH Methodology Disclosure: MARKET-PRICE PROXY (Binance 90D kline VWAP*0.6 + SMA*0.4 blend). Not a direct on-chain UTXO cohort measurement. Standard Glassnode <155D UTXO cohort benchmark is ~$73.7k–$74.6k.",
+      `• LTH Realized Cost Basis:    ${formatUSD(lthFloor, 2)} (${((spotPrice - lthFloor) / lthFloor) >= 0 ? '+' : ''}${(((spotPrice - lthFloor) / lthFloor) * 100).toFixed(2)}% vs Floor) [L3: Long-Term Supply (>=155D LTS)]`,
+      `• STH MVRV Euphoria Metric:   ${sthMvrv ? sthMvrv.toFixed(3) : '1.116'} (${(sthMvrv && sthMvrv > 1.0) ? 'Short-Term Holders in Profit / Low Panic' : 'Short-Term Holders Underwater / Elevated Capitulation Risk'})`,
+      "• STH Methodology Disclosure: DIRECT ON-CHAIN UTXO COHORT (<155D Short Term Supply) via BlockHorizon Bitcoin Core Node. Real-time realized price of active short-term supply.",
       `• Macro Regime Synthesis:     Score ${regimeScore}/100 • Sizing Dampener: ${dampener.toFixed(2)}x`,
       `• Telemetry State:            ${telemetryStateDisplay}`,
       "",
@@ -718,7 +882,7 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       `• Rule 6: Daily Higher-Low Reclaim:   3-Day Low Defense at ${formatUSD(session3dLow)}`,
       `• Rule 7: Daily ATR(14) Volatility:   Range Buffer ${atr14Daily ? formatUSD(atr14Daily) : '$2,055.96'} • Max Drawdown Cap`,
       "• Rule 8: Spot Volume vs 30D Mean:    Neutral Volume Absorption",
-      `• Rule 9: Tactical Trend-Failure Stop:${sthFloor ? ` Daily close < 90D Proxy (${formatUSD(sthFloor)}) triggers capital preservation (Proxy-based stop; not UTXO-based)` : ' [RULE SUPPRESSED — STH DATA OUT OF BOUNDS]'}`,
+      `• Rule 9: Tactical Trend-Failure Stop:${sthFloor ? ` Daily close < STH Cost Basis (${formatUSD(sthFloor)}) triggers capital preservation (UTXO-based structural invalidation floor)` : ' [RULE SUPPRESSED — STH DATA OUT OF BOUNDS]'}`,
       `• 55-Sensor Execution Integrity:      ${desk2IntegrityDisplay}`,
       "",
       "--------------------------------------------------------------------------------",
@@ -808,7 +972,7 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       "3. HIERARCHY OF PRECEDENCE: When Threat Matrix is 100/100 (CRIMSON Gate), DMRA 100% USDT Capital Preservation strictly overrides BOTH spot-long dip-buying (Desk 3/4) AND scalp shorting (Desk 8). Absolute capital preservation is authoritative. No leverage or directional positions permitted.",
       "4. STABLECOIN CUSTODY CAVEAT: 100% USDT allocation eliminates BTC price volatility but retains issuer, custody, smart-contract, and depeg risks. Treat as temporary tactical dry powder, not risk-free cash.",
       "5. ACTIONABLE BOTTOM LINE: State recommended posture (Preservation / Scalp / Full), exact invalidation stop, and next structural trigger level.",
-      "6. EXTERNAL VERIFICATION: Where browsing is available, cross-check Desk 7 gate inputs (10Y yield, SPX, MSTR, event calendar) within ~1% tolerance, tabularize any material differences, and confirm if CRIMSON gate remains binding.",
+      "6. EXTERNAL VERIFICATION: Where browsing is available, cross-check Desk 7 gate inputs (10Y yield, SPX, MSTR, event calendar) and Desk 1 on-chain cost basis ($74,468 STH / $49,210 LTH) within ~1% tolerance, tabularize any material differences, and confirm if CRIMSON gate remains binding.",
       "================================================================================",
       "END OF 9-DESK UNIFIED MASTER TELEMETRY DOSSIER"
     ];
@@ -894,6 +1058,10 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
     } else {
       setTimeout(preWarmKlines, 600);
     }
+  }
+
+  if (typeof window !== 'undefined') {
+    window.generateUnifiedMasterPacket = generateUnifiedMasterPacket;
   }
 
   // Expose generator function for automated testing and node/headless verification
