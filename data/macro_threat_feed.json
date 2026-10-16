@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "asof": "2026-10-16T07:40:37Z",
+  "asof": "2026-10-16T12:51:03Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
@@ -21,7 +21,7 @@
         "points": 30,
         "max": 30,
         "triggered": true,
-        "reason": "10Y Treasury Yield at 5.089% >= 5.00% toxic threshold"
+        "reason": "10Y Treasury Yield at 5.094% >= 5.00% toxic threshold"
       },
       "mstr_bearish_divergence": {
         "points": 20,
@@ -55,7 +55,7 @@
       "fractal_note": "Fewer than 10 mega-caps propping up headline index. 2008 double-bottom breakout similarity active."
     },
     "module_b_yield": {
-      "yield_pct": 5.089,
+      "yield_pct": 5.094,
       "change_30d_bps": 42.0,
       "danger_threshold_pct": 5.0,
       "caution_threshold_pct": 4.25,
@@ -128,8 +128,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 82024.09,
-      "change_24h_pct": 0.32,
+      "spot_price": 81978.87,
+      "change_24h_pct": 0.26,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -633,9 +633,9 @@
       "rsp": 215.0,
       "ratio": 36.019,
       "sma50": 34.389,
-      "us10y": 5.089,
+      "us10y": 5.094,
       "mstr": 151.3,
-      "btc": 82024.0
+      "btc": 81979.0
     }
   ]
 }
