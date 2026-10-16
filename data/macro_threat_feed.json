@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "asof": "2026-10-16T02:13:57Z",
+  "asof": "2026-10-16T07:40:37Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
@@ -49,8 +49,8 @@
       "rsp_distance_high_pct": -3.48,
       "ratio_raw": 36.019,
       "ratio_normalized": 1.428,
-      "ratio_50sma": 34.328,
-      "ratio_sma_diff_pct": 4.92,
+      "ratio_50sma": 34.389,
+      "ratio_sma_diff_pct": 4.74,
       "divergence_flag": "CRITICAL BREADTH DIVERGENCE: TECH CONCENTRATION MIRAGE",
       "fractal_note": "Fewer than 10 mega-caps propping up headline index. 2008 double-bottom breakout similarity active."
     },
@@ -128,8 +128,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 82073.86,
-      "change_24h_pct": 0.38,
+      "spot_price": 82024.09,
+      "change_24h_pct": 0.32,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -632,10 +632,10 @@
       "spx": 7744.06,
       "rsp": 215.0,
       "ratio": 36.019,
-      "sma50": 34.328,
+      "sma50": 34.389,
       "us10y": 5.089,
       "mstr": 151.3,
-      "btc": 82074.0
+      "btc": 82024.0
     }
   ]
 }
