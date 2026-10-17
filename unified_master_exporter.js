@@ -85,10 +85,18 @@
       './data/onchain_metrics.json',
       'data/onchain_metrics.json',
       'https://aikeluargalee-tech.github.io/pcf3-v9-nexus/data/onchain_metrics.json'
+    ],
+    weeklyKlines: [
+      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=60',
+      'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=60',
+      'https://api3.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=60',
+      './data/btc_weekly_klines.json',
+      'data/btc_weekly_klines.json',
+      'https://aikeluargalee-tech.github.io/pcf3-v9-nexus/data/btc_weekly_klines.json'
     ]
   };
 
-  const CRIMSON_EPSILON = 100 - 1e-9;
+  const CRIMSON_EPSILON = 66 - 1e-9;
 
   /**
    * Resolves local file paths reliably across root and subfolder deployments.
@@ -588,6 +596,7 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       liveDailyKlinesRaw,
       repoDailyKlinesRaw,
       fourHourKlinesRaw,
+      weeklyKlinesRaw,
       volFeed,
       threatFeed,
       rawPacket,
@@ -599,6 +608,7 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       fetchWithWaterfall(VENUES.dailyKlines, true, 3000),
       fetchWithWaterfall(VENUES.dailyKlinesFallback, true, 4500),
       fetchWithWaterfall(VENUES.fourHourKlines, true, 2500),
+      fetchWithWaterfall(VENUES.weeklyKlines, true, 3000),
       fetchWithWaterfall(VENUES.volatilityFeed, true, 4500),
       fetchWithWaterfall(VENUES.threatFeed, true, 4500),
       fetchWithWaterfall(VENUES.masterPacket, false, 4500),
@@ -610,6 +620,7 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
     const liveDailyKlines = stripUnclosedCandles(liveDailyKlinesRaw, nowMs);
     const repoDailyKlines = stripUnclosedCandles(repoDailyKlinesRaw, nowMs);
     const fourHourKlines = stripUnclosedCandles(fourHourKlinesRaw, nowMs);
+    const weeklyKlines = stripUnclosedCandles(weeklyKlinesRaw, nowMs);
 
     // Strong 3-tier last-known-good cache for completed daily klines (Desk 3 reliability)
     let dailyKlines = null;
@@ -804,11 +815,20 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       atr20 = calcWilderATR(dailyKlines, 20);
       poc30d = calcVolumeProfilePOC(dailyKlines, 30, 50);
 
-      // Dynamic Desk 2 Structural Sensors (70D = 10W, 140D = 20W, 30D HWM Dip Rungs, 30D Volume Ratio)
-      if (N >= 140) {
+      // Dynamic Desk 2 Structural Sensors (True 1W Klines: 10W EMA, 20W EMA, 20W SMA, 30D HWM Dip Rungs, 30D Volume Ratio)
+      if (Array.isArray(weeklyKlines) && weeklyKlines.length >= 20) {
+        const weeklyCloses = weeklyKlines.map(c => parseFloat(c[4])).filter(Number.isFinite);
+        if (weeklyCloses.length >= 20) {
+          ema10w = calcEMA(weeklyCloses, 10) ?? ema10w;
+          ema20w = calcEMA(weeklyCloses, 20) ?? ema20w;
+          sma20w = calcSMA(weeklyCloses, 20) ?? sma20w;
+        }
+      } else if (N >= 140) {
         ema10w = calcEMA(dailyCloses, 70) ?? ema10w;
         ema20w = calcEMA(dailyCloses, 140) ?? ema20w;
         sma20w = calcSMA(dailyCloses, 140) ?? sma20w;
+      }
+      if (N >= 30) {
         const recent30Highs = dailyHighs.slice(-30).filter(Number.isFinite);
         if (recent30Highs.length > 0) {
           hwm30d = Math.max(...recent30Highs);

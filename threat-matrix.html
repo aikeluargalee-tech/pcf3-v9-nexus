@@ -569,7 +569,7 @@
     <div class="card">
       <div class="card-header">
         <span class="card-title">🛡️ Composite Macro Threat Synthesis Gate</span>
-        <span class="card-pill toxic">SCORE: 85/100</span>
+        <span class="card-pill toxic" id="gate-score-pill">SCORE: 85/100</span>
       </div>
       <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">
         Quantitative risk points breakdown. A score &ge; 66% triggers an automatic veto across all lower-level swing models.
@@ -577,35 +577,35 @@
       <ul class="gate-checklist">
         <li class="gate-item">
           <div class="gate-label">
-            <span style="color:#f87171;">●</span>
+            <span id="gate-dot-a" style="color:#f87171;">●</span>
             <span>Module A: SPX/RSP Breadth Divergence Active</span>
           </div>
-          <span class="gate-status-badge crimson">+35 PTS (TRIGGERED)</span>
+          <span class="gate-status-badge crimson" id="gate-badge-a">+35 PTS (TRIGGERED)</span>
         </li>
         <li class="gate-item">
           <div class="gate-label">
-            <span style="color:#f87171;">●</span>
+            <span id="gate-dot-b" style="color:#f87171;">●</span>
             <span>Module B: US 10Y Yield &ge; 5.00% Toxic Level</span>
           </div>
-          <span class="gate-status-badge crimson">+30 PTS (TRIGGERED)</span>
+          <span class="gate-status-badge crimson" id="gate-badge-b">+30 PTS (TRIGGERED)</span>
         </li>
         <li class="gate-item">
           <div class="gate-label">
-            <span style="color:#fbbf24;">●</span>
+            <span id="gate-dot-c" style="color:#fbbf24;">●</span>
             <span>Module C: MSTR Bearish Momentum Divergence</span>
           </div>
-          <span class="gate-status-badge amber">+20 PTS (TRIGGERED)</span>
+          <span class="gate-status-badge amber" id="gate-badge-c">+20 PTS (TRIGGERED)</span>
         </li>
         <li class="gate-item">
           <div class="gate-label">
-            <span style="color:#fbbf24;">●</span>
+            <span id="gate-dot-d" style="color:#fbbf24;">●</span>
             <span>Module D: Pre-Election / High Volatility Window</span>
           </div>
-          <span class="gate-status-badge amber">+15 PTS (TRIGGERED)</span>
+          <span class="gate-status-badge amber" id="gate-badge-d">+15 PTS (TRIGGERED)</span>
         </li>
       </ul>
-      <div style="margin-top:14px; padding:10px; background:rgba(239,68,68,0.1); border-radius:8px; border:1px solid rgba(239,68,68,0.3); font-size:11px; color:#fca5a5;">
-        <strong>Total Threat Score: 85% (Crimson)</strong> &mdash; Overrides and overrides Quant Radar, Liquidity Radar, Sweep Desk, and Absorption Radar. Do not execute spot entries.
+      <div id="gate-summary-box" style="margin-top:14px; padding:10px; background:rgba(239,68,68,0.1); border-radius:8px; border:1px solid rgba(239,68,68,0.3); font-size:11px; color:#fca5a5;">
+        <strong>Total Threat Score: 85% (Crimson)</strong> &mdash; Overrides Quant Radar, Liquidity Radar, Sweep Desk, and Absorption Radar. Do not execute spot entries.
       </div>
     </div>
 
@@ -727,31 +727,31 @@
       <ul class="gate-checklist">
         <li class="gate-item">
           <div class="gate-label">
-            <span style="color:#f87171;">✗</span>
+            <span id="reentry-icon-1" style="color:#f87171;">✗</span>
             <span>US 10Y Yield drops below 5.000% (Ideally &lt; 4.250%)</span>
           </div>
-          <span class="gate-status-badge crimson">FAIL (5.284%)</span>
+          <span class="gate-status-badge crimson" id="reentry-badge-1">FAIL (5.284%)</span>
         </li>
         <li class="gate-item">
           <div class="gate-label">
-            <span style="color:#f87171;">✗</span>
+            <span id="reentry-icon-2" style="color:#f87171;">✗</span>
             <span>SPX/RSP Ratio mean-reverts below its 50-Day SMA</span>
           </div>
-          <span class="gate-status-badge crimson">FAIL (+2.13% DIVERGENCE)</span>
+          <span class="gate-status-badge crimson" id="reentry-badge-2">FAIL (+2.13% DIVERGENCE)</span>
         </li>
         <li class="gate-item">
           <div class="gate-label">
-            <span style="color:#f87171;">✗</span>
+            <span id="reentry-icon-3" style="color:#f87171;">✗</span>
             <span>MSTR reclaims key resistance ($1,750+) on daily close</span>
           </div>
-          <span class="gate-status-badge crimson">FAIL ($1,485.50)</span>
+          <span class="gate-status-badge crimson" id="reentry-badge-3">FAIL ($1,485.50)</span>
         </li>
         <li class="gate-item">
           <div class="gate-label">
-            <span style="color:#f87171;">✗</span>
-            <span>BTC reclaims &amp; confirms HTF support shelf ($65,200)</span>
+            <span id="reentry-icon-4" style="color:#f87171;">✗</span>
+            <span id="reentry-label-4">BTC reclaims &amp; confirms HTF support shelf (STH Cost Basis)</span>
           </div>
-          <span class="gate-status-badge crimson">FAIL (SUB-$63K)</span>
+          <span class="gate-status-badge crimson" id="reentry-badge-4">CHECKING...</span>
         </li>
       </ul>
     </div>
@@ -814,7 +814,8 @@
 
 // Global telemetry state
 let macroTelemetry = null;
-let btcLivePrice = 62840.00;
+let btcLivePrice = 84500.00;
+let sthFloorPrice = 91852.00;
 let lastSuccessfulFetch = null;
 
 function showToast(msg) {
@@ -825,31 +826,60 @@ function showToast(msg) {
   setTimeout(() => toast.classList.remove('show'), 2600);
 }
 
-// Fetch live BTC price with timeout
+// Fetch live BTC price with multi-mirror fallback
 async function fetchLiveBtcPrice() {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 3500);
+  const mirrors = [
+    'https://data-api.binance.vision/api/v3/ticker/price?symbol=BTCUSDT',
+    'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT',
+    'https://api1.binance.com/api/v3/ticker/price?symbol=BTCUSDT'
+  ];
+  for (const url of mirrors) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    try {
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const data = await res.json();
+        const p = parseFloat(data.price);
+        if (!isNaN(p) && p > 1000) {
+          btcLivePrice = p;
+          return p;
+        }
+      }
+    } catch(e) {
+      clearTimeout(timeoutId);
+    }
+  }
   try {
-    const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT', { signal: controller.signal });
-    clearTimeout(timeoutId);
-    if (res.ok) {
-      const data = await res.json();
-      const p = parseFloat(data.price);
-      if (!isNaN(p) && p > 1000) {
-        btcLivePrice = p;
-        return p;
+    const isRoot = window.location.pathname.endsWith('threat-matrix.html') || !window.location.pathname.includes('/threat-matrix/');
+    const klinePath = isRoot ? 'data/btc_daily_klines.json' : '../data/btc_daily_klines.json';
+    const kRes = await fetch(klinePath + '?t=' + Date.now());
+    if (kRes.ok) {
+      const kData = await kRes.json();
+      if (Array.isArray(kData) && kData.length > 0) {
+        const p = parseFloat(kData[kData.length - 1][4]);
+        if (!isNaN(p) && p > 1000) btcLivePrice = p;
       }
     }
-  } catch(e) {
-    // Graceful fallback to cached btc price
-  }
+  } catch (e) {}
   return btcLivePrice;
 }
 
-// Fetch macro telemetry with failover
+// Fetch macro telemetry with failover + STH Cost Basis
 async function fetchMacroTelemetry() {
   const isRoot = window.location.pathname.endsWith('threat-matrix.html') || !window.location.pathname.includes('/threat-matrix/');
   const cachePath = isRoot ? 'data/macro_threat_feed.json' : '../data/macro_threat_feed.json';
+  const onchainPath = isRoot ? 'data/onchain_metrics.json' : '../data/onchain_metrics.json';
+
+  try {
+    const ocRes = await fetch(onchainPath + '?t=' + Date.now());
+    if (ocRes.ok) {
+      const ocData = await ocRes.json();
+      const sth = parseFloat((ocData.metrics && ocData.metrics.sth_cost_basis) || ocData.sth_cost_basis || (ocData.latest && ocData.latest.sth_realized_price));
+      if (!isNaN(sth) && sth > 10000) sthFloorPrice = sth;
+    }
+  } catch (e) {}
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 4000);
@@ -874,7 +904,8 @@ function renderUI(data, btcPrice) {
 
   // Banner & Master Score
   const comp = data.composite_threat || {};
-  const score = comp.score || 85;
+  const score = comp.score !== undefined ? comp.score : 85;
+  const level = comp.level || (score >= 66 ? 'CRIMSON' : (score >= 35 ? 'AMBER' : 'EMERALD'));
   const scoreEl = document.getElementById('threat-score');
   if (scoreEl) scoreEl.textContent = score + '%';
 
@@ -901,7 +932,7 @@ function renderUI(data, btcPrice) {
   if (valRatio) valRatio.textContent = (modA.ratio_raw || 34.34).toFixed(2) + 'x';
   const subRatio = document.getElementById('sub-ratio');
   if (subRatio) {
-    subRatio.textContent = `SPX $${(modA.spx_price || 5782).toLocaleString()} · RSP $${(modA.rsp_price || 168.4).toFixed(2)} · +${modA.ratio_sma_diff_pct || 2.13}% vs 50SMA`;
+    subRatio.textContent = `SPX $${(modA.spx_price || 5782).toLocaleString()} · RSP $${(modA.rsp_price || 168.4).toFixed(2)} · ${(modA.ratio_sma_diff_pct >= 0 ? '+' : '')}${(modA.ratio_sma_diff_pct ?? 2.13).toFixed(2)}% vs 50SMA`;
   }
 
   // Module B: Yield
@@ -909,14 +940,69 @@ function renderUI(data, btcPrice) {
   const valYield = document.getElementById('val-yield');
   if (valYield) valYield.textContent = (modB.yield_pct || 5.284).toFixed(3) + '%';
   const subYield = document.getElementById('sub-yield');
-  if (subYield) subYield.textContent = `+${modB.change_30d_bps || 42} bps 30d · Danger Gate: >${(modB.danger_threshold_pct || 5.0).toFixed(3)}%`;
+  if (subYield) subYield.textContent = `${(modB.change_30d_bps >= 0 ? '+' : '')}${modB.change_30d_bps ?? 42} bps 30d · Danger Gate: >${(modB.danger_threshold_pct || 5.0).toFixed(3)}%`;
 
   // Module C: MSTR
   const modC = (data.modules && data.modules.module_c_mstr) || {};
   const valMstr = document.getElementById('val-mstr');
   if (valMstr) valMstr.textContent = '$' + (modC.price || 1485.50).toLocaleString(undefined, { minimumFractionDigits: 2 });
   const subMstr = document.getElementById('sub-mstr');
-  if (subMstr) subMstr.textContent = `${modC.distance_from_high_pct || -25.7}% from Cycle High ($${modC.cycle_high || 1999}) · RSI ${modC.daily_rsi || 41.2}`;
+  if (subMstr) subMstr.textContent = `${modC.distance_from_high_pct ?? -25.7}% from Cycle High ($${modC.cycle_high || 1999}) · RSI ${modC.daily_rsi || 41.2}`;
+
+  const modD = (data.modules && data.modules.module_d_seasonality) || {};
+
+  // Update Synthesis Gate Card dynamically
+  const gateScorePill = document.getElementById('gate-score-pill');
+  if (gateScorePill) {
+    gateScorePill.textContent = `SCORE: ${score}/100`;
+    gateScorePill.className = 'card-pill ' + (score >= 66 ? 'toxic' : (score >= 35 ? 'warning' : 'safe'));
+  }
+  const updateGateRow = (suffix, trig, pts, activeClass) => {
+    const dot = document.getElementById('gate-dot-' + suffix);
+    const badge = document.getElementById('gate-badge-' + suffix);
+    if (dot) dot.style.color = trig ? (activeClass === 'crimson' ? '#f87171' : '#fbbf24') : '#34d399';
+    if (badge) {
+      badge.className = 'gate-status-badge ' + (trig ? activeClass : 'emerald');
+      badge.textContent = trig ? `+${pts} PTS (TRIGGERED)` : `0 PTS (CLEAR)`;
+    }
+  };
+  updateGateRow('a', Boolean(modA.triggered), 35, 'crimson');
+  updateGateRow('b', Boolean(modB.triggered), 30, 'crimson');
+  updateGateRow('c', Boolean(modC.triggered), 20, 'amber');
+  updateGateRow('d', Boolean(modD.triggered), 15, 'amber');
+
+  const gateSummary = document.getElementById('gate-summary-box');
+  if (gateSummary) {
+    gateSummary.innerHTML = `<strong>Total Threat Score: ${score}% (${level})</strong> &mdash; ${comp.execution_instruction || 'Monitor macro conditions.'}`;
+  }
+
+  // Update Invalidation & Safe Re-entry Gates Checklist dynamically
+  const setReentryRow = (idx, pass, passText, failText) => {
+    const iconEl = document.getElementById('reentry-icon-' + idx);
+    const badgeEl = document.getElementById('reentry-badge-' + idx);
+    if (iconEl) {
+      iconEl.textContent = pass ? '✓' : '✗';
+      iconEl.style.color = pass ? '#34d399' : '#f87171';
+    }
+    if (badgeEl) {
+      badgeEl.className = 'gate-status-badge ' + (pass ? 'emerald' : 'crimson');
+      badgeEl.textContent = pass ? passText : failText;
+    }
+  };
+  const yPct = modB.yield_pct !== undefined ? modB.yield_pct : 5.284;
+  const rDiff = modA.ratio_sma_diff_pct !== undefined ? modA.ratio_sma_diff_pct : 2.13;
+  const mPrice = modC.price !== undefined ? modC.price : 1485.50;
+  const mTarget = (modC.cycle_high || 2000) * 0.875;
+  const btcPass = btcPrice >= sthFloorPrice;
+
+  setReentryRow(1, yPct < 5.0, `PASS (${yPct.toFixed(3)}%)`, `FAIL (${yPct.toFixed(3)}%)`);
+  setReentryRow(2, rDiff <= 0, `PASS (${rDiff.toFixed(2)}% VS SMA)`, `FAIL (+${rDiff.toFixed(2)}% DIVERGENCE)`);
+  setReentryRow(3, !modC.triggered || mPrice >= mTarget, `PASS ($${mPrice.toFixed(2)})`, `FAIL ($${mPrice.toFixed(2)})`);
+  const rLabel4 = document.getElementById('reentry-label-4');
+  if (rLabel4) {
+    rLabel4.textContent = `BTC reclaims & confirms HTF support shelf ($${Math.round(sthFloorPrice).toLocaleString()} STH Floor)`;
+  }
+  setReentryRow(4, btcPass, `PASS ($${Math.round(btcPrice).toLocaleString()})`, `FAIL ($${Math.round(btcPrice).toLocaleString()} < $${Math.round(sthFloorPrice).toLocaleString()})`);
 
   // Time & Watchdog status
   const asofText = document.getElementById('asof-text');
@@ -1129,17 +1215,25 @@ async function copyDataPacket7() {
   const mtech = (d.modules && d.modules.tech_overextension) || {};
   const btcContext = (d.modules && d.modules.btc_context) || {};
 
+  const yPct = mb.yield_pct !== undefined ? mb.yield_pct : 5.284;
+  const rDiff = ma.ratio_sma_diff_pct !== undefined ? ma.ratio_sma_diff_pct : 2.13;
+  const mPrice = mc.price !== undefined ? mc.price : 1485.50;
+  const chk1 = yPct < 5.0 ? '[PASS]' : '[FAIL]';
+  const chk2 = rDiff <= 0 ? '[PASS]' : '[FAIL]';
+  const chk3 = (!mc.triggered || mPrice >= (mc.cycle_high || 2000) * 0.875) ? '[PASS]' : '[FAIL]';
+  const chk4 = btcLivePrice >= sthFloorPrice ? '[PASS]' : '[FAIL]';
+
   const lines = [
     "================================================================================",
     "DATA PACKET 7 (MACRO-THREAT v1.0) — CAPITAL PRESERVATION & LIQUIDITY GATE",
     "Generated By: Nexus Terminal — Macro Threat Matrix Pro",
     `Timestamp: ${new Date().toISOString()}`,
-    `Benchmark BTC Spot: $${btcLivePrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+    `Benchmark BTC Spot: $${btcLivePrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (STH Floor: $${Math.round(sthFloorPrice).toLocaleString()})`,
     "================================================================================",
     "",
     "[1] MASTER COMPOSITE MACRO THREAT SCORE & REGIME GATE",
     "--------------------------------------------------------------------------------",
-    `Composite Threat Score : ${c.score || 85}/100 [${c.level || 'CRIMSON'}]`,
+    `Composite Threat Score : ${c.score !== undefined ? c.score : 85}/100 [${c.level || 'CRIMSON'}]`,
     `Tactical Threat Status : ${c.status || 'CRITICAL THREAT / SQUEEZE IMMINENT'}`,
     `Master Regime Mandate  : ${c.tactical_call || 'FORCE DMRA REGIME 2: 100% USDT CASH PRESERVATION'}`,
     `Execution Instruction  : ${c.execution_instruction || 'HALT ALL SPOT DIP-BUYING ACROSS ALL MODELS.'}`,
@@ -1150,20 +1244,20 @@ async function copyDataPacket7() {
     `  • S&P 500 (SPX) Price  : $${(ma.spx_price || 5782.76).toLocaleString()} (${ma.spx_change_24h || '+0.62'}% 24h, ${ma.spx_distance_ath_pct || '-0.13'}% from ATH)`,
     `  • Equal-Weight (RSP)   : $${(ma.rsp_price || 168.42).toFixed(2)} (${ma.rsp_change_24h || '-0.38'}% 24h, ${ma.rsp_distance_high_pct || '-3.48'}% from 52w High)`,
     `  • SPX / RSP Ratio      : ${(ma.ratio_raw || 34.335).toFixed(3)}x (Normalized: ${(ma.ratio_normalized || 1.428).toFixed(3)}x)`,
-    `  • 50-Day Ratio SMA     : ${(ma.ratio_50sma || 33.620).toFixed(3)} (Divergence: +${(ma.ratio_sma_diff_pct || 2.13).toFixed(2)}%)`,
+    `  • 50-Day Ratio SMA     : ${(ma.ratio_50sma || 33.620).toFixed(3)} (Divergence: ${(rDiff >= 0 ? '+' : '')}${rDiff.toFixed(2)}%)`,
     `  • Diagnostic Flag      : ${ma.divergence_flag || 'CRITICAL BREADTH DIVERGENCE: TECH CONCENTRATION MIRAGE'}`,
     `  • 2008 Comparison      : ${ma.fractal_note || 'Fewer than 10 mega-caps propping index; 2008 double-bottom similarity active.'}`,
     "",
     "MODULE B: US 10-YEAR TREASURY YIELD RADAR (TNX / US10Y)",
-    `  • US 10Y Yield Level   : ${(mb.yield_pct || 5.284).toFixed(3)}% (+${(mb.change_30d_bps || 42.0).toFixed(1)} bps 30d delta)`,
-    `  • Toxic Danger Gate    : >${(mb.danger_threshold_pct || 5.000).toFixed(3)}% [CURRENTLY VIOLATED BY +${(mb.danger_zone_distance_bps || 3.4).toFixed(1)} BPS]`,
+    `  • US 10Y Yield Level   : ${yPct.toFixed(3)}% (${(mb.change_30d_bps >= 0 ? '+' : '')}${(mb.change_30d_bps ?? 42.0).toFixed(1)} bps 30d delta)`,
+    `  • Toxic Danger Gate    : >${(mb.danger_threshold_pct || 5.000).toFixed(3)}% [Delta vs Gate: ${(mb.danger_zone_distance_bps ?? 3.4).toFixed(1)} BPS]`,
     `  • Classification State : ${mb.status || 'TOXIC'} — ${mb.status_label || 'YIELD ANOMALY / LIQUIDITY SQUEEZE ACTIVE'}`,
     `  • Cost of Capital Rationale: ${mb.cost_of_capital_impact || 'Elevated yields suppress valuation multiples and drain spot liquidity.'}`,
     "",
     "MODULE C: MICROSTRATEGY (MSTR) PROXY DIVERGENCE & SQUEEZE TRACKER",
-    `  • MSTR Share Price     : $${(mc.price || 1485.50).toFixed(2)} (${mc.change_24h_pct || '-1.85'}% 24h)`,
-    `  • 2024 Cycle High Gate : $${(mc.cycle_high || 1999.99).toFixed(2)} (Distance: ${(mc.distance_from_high_pct || -25.72).toFixed(2)}%)`,
-    `  • Daily RSI & Momentum : RSI ${(mc.daily_rsi || 41.2).toFixed(1)} (Bearish Momentum Divergence Confirmed)`,
+    `  • MSTR Share Price     : $${mPrice.toFixed(2)} (${mc.change_24h_pct || '-1.85'}% 24h)`,
+    `  • 2024 Cycle High Gate : $${(mc.cycle_high || 1999.99).toFixed(2)} (Distance: ${(mc.distance_from_high_pct ?? -25.72).toFixed(2)}%)`,
+    `  • Daily RSI & Momentum : RSI ${(mc.daily_rsi || 41.2).toFixed(1)} (${mc.triggered ? 'Bearish Momentum Divergence Confirmed' : 'Aligned with BTC'})`,
     `  • 30D Rolling BTC Corr : ${(mc.rolling_corr_btc_30d || 0.842).toFixed(3)} (High beta canary status active)`,
     `  • Proxy Status         : ${mc.status || 'BEARISH DIVERGENCE / SQUEEZE WARNING'}`,
     "",
@@ -1188,10 +1282,10 @@ async function copyDataPacket7() {
     "[4] TACTICAL SPOT SWING RE-ENTRY & INVALIDATION CHECKLIST",
     "--------------------------------------------------------------------------------",
     "Spot swing accumulation remains STRICTLY VETOED until all 4 criteria clear:",
-    "  [FAIL] 1. US 10Y Yield drops below 5.000% (Ideally < 4.250%)",
-    "  [FAIL] 2. SPX/RSP Ratio mean-reverts below its 50-day moving average",
-    "  [FAIL] 3. MSTR structurally reclaims cycle resistance ($1,750+) on daily close",
-    "  [FAIL] 4. BTC reclaims and confirms daily close above $65,200",
+    `  ${chk1} 1. US 10Y Yield drops below 5.000% (Current: ${yPct.toFixed(3)}%)`,
+    `  ${chk2} 2. SPX/RSP Ratio mean-reverts below its 50-day moving average (Current: ${(rDiff >= 0 ? '+' : '')}${rDiff.toFixed(2)}%)`,
+    `  ${chk3} 3. MSTR structurally reclaims cycle resistance ($1,750+) on daily close (Current: $${mPrice.toFixed(2)})`,
+    `  ${chk4} 4. BTC reclaims and confirms daily close above STH Cost Basis ($${Math.round(sthFloorPrice).toLocaleString()}, Current: $${Math.round(btcLivePrice).toLocaleString()})`,
     "",
     "================================================================================",
     "END OF DATA PACKET 7 (MACRO-THREAT v1.0)",

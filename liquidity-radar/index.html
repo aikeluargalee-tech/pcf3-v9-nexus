@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0">
   <title>Liquidity Radar — Bitcoin Spot Order Flow, 4H Sweeps, Institutional ETF Flows &amp; 3-Bucket Model</title>
   <meta name="description" content="Liquidity Radar maps multi-timeframe Bitcoin spot liquidity sweeps, 4H BOS/CHoCH market structure, institutional ETF flows, and the 3-Bucket Capital Architecture (PFC-SSP v2.0). Strictly educational telemetry.">
-  <link rel="canonical" href="../liquidity-radar.html">
+  <link rel="canonical" href="./liquidity-radar.html">
 
   <!-- Open Graph -->
   <meta property="og:title" content="Liquidity Radar — Bitcoin Spot Order Book Depth &amp; Volume Profiles">
@@ -617,16 +617,16 @@
       </div>
       <div class="nav-links">
         <button class="nav-btn primary" onclick="copyDataPacket4()" id="btn-copy-data-4">📋 Copy Data Packet 4</button>
-        <a href="../matrix.html" class="nav-btn" id="link-matrix" style="color:#38bdf8; border-color:#0284c7; font-weight:700;">🌐 Regime Radar ↗</a>
-        <a href="../quant-radar/" class="nav-btn" id="link-simple" style="color:#10b981; border-color:#059669; font-weight:700;">⚡ Quant Radar ↗</a>
-        <a href="../sweep-desk/" class="nav-btn" id="link-sweep" style="color:#38bdf8; border-color:#0284c7; font-weight:700;">🎯 Sweep Desk ↗</a>
-        <a href="../absorption-radar/" class="nav-btn" id="link-absorb" style="color:#c084fc; border-color:#a855f7; font-weight:700;">🧲 Absorption Radar ↗</a>
-        <a href="../threat-matrix/" class="nav-btn" id="link-threat" style="color:#f87171; border-color:#ef4444; font-weight:700;">⚠️ Threat Matrix ↗</a>
-        <a href="../volatility-radar/" class="nav-btn" id="link-volatility" style="color:#facc15; border-color:#eab308; font-weight:700;">⚡ Volatility Radar ↗</a>
-        <a href="../methodology.html" class="nav-btn" style="color:#fbbf24; border-color:#d97706; font-weight:700;">📚 Methodology ↗</a>
-        <a href="../about.html" class="nav-btn" style="color:#cbd5e1; border-color:#334155; font-weight:600;">ℹ️ About</a>
-        <a href="../fractal.html" class="nav-btn" id="link-fractal">🧪 Fractal Lab</a>
-        <a href="../index.html" class="nav-btn" id="link-dashboard">Nexus Terminal</a>
+        <a href="./matrix.html" class="nav-btn" id="link-matrix" style="color:#38bdf8; border-color:#0284c7; font-weight:700;">🌐 Regime Radar ↗</a>
+        <a href="./quant-radar/" class="nav-btn" id="link-simple" style="color:#10b981; border-color:#059669; font-weight:700;">⚡ Quant Radar ↗</a>
+        <a href="./sweep-desk/" class="nav-btn" id="link-sweep" style="color:#38bdf8; border-color:#0284c7; font-weight:700;">🎯 Sweep Desk ↗</a>
+        <a href="./absorption-radar/" class="nav-btn" id="link-absorb" style="color:#c084fc; border-color:#a855f7; font-weight:700;">🧲 Absorption Radar ↗</a>
+        <a href="./threat-matrix/" class="nav-btn" id="link-threat" style="color:#f87171; border-color:#ef4444; font-weight:700;">⚠️ Threat Matrix ↗</a>
+        <a href="./volatility-radar/" class="nav-btn" id="link-volatility" style="color:#facc15; border-color:#eab308; font-weight:700;">⚡ Volatility Radar ↗</a>
+        <a href="./methodology.html" class="nav-btn" style="color:#fbbf24; border-color:#d97706; font-weight:700;">📚 Methodology ↗</a>
+        <a href="./about.html" class="nav-btn" style="color:#cbd5e1; border-color:#334155; font-weight:600;">ℹ️ About</a>
+        <a href="./fractal.html" class="nav-btn" id="link-fractal">🧪 Fractal Lab</a>
+        <a href="./index.html" class="nav-btn" id="link-dashboard">Nexus Terminal</a>
         <button class="nav-btn refresh-btn" onclick="fetchAndComputeAll()" id="btn-refresh">🔄 Refresh Live</button>
       </div>
     </nav>
@@ -1067,6 +1067,22 @@ function fmtNum(n, d = 2) {
   return (n !== null && !isNaN(n)) ? Number(n).toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d }) : '—';
 }
 
+// Strips the unclosed (in-progress) forming candle from Binance klines
+function stripUnclosedCandles(rawKlines, nowMs = Date.now()) {
+  if (!Array.isArray(rawKlines) || rawKlines.length === 0) return rawKlines;
+  const cleaned = rawKlines.slice();
+  while (cleaned.length > 0) {
+    const lastBar = cleaned[cleaned.length - 1];
+    const closeTimeMs = Array.isArray(lastBar) ? Number(lastBar[6]) : (lastBar && lastBar.closeTime ? Number(lastBar.closeTime) : NaN);
+    if (Number.isFinite(closeTimeMs) && closeTimeMs > nowMs) {
+      cleaned.pop();
+    } else {
+      break;
+    }
+  }
+  return cleaned;
+}
+
 // 1. Technical Indicators & Data Calculations
 function computeSMA(arr, period) {
   if (!arr || arr.length < period) return null;
@@ -1096,7 +1112,7 @@ function computeWilderRSI(arr, period = 14) {
     avgLoss = (avgLoss * (period - 1) + loss) / period;
   }
 
-  if (avgLoss === 0) return 100;
+  if (avgLoss === 0) return avgGain === 0 ? 50.0 : 100.0;
   const rs = avgGain / avgLoss;
   return 100 - (100 / (1 + rs));
 }
@@ -1143,10 +1159,11 @@ function computeVolumeProfile30D(candles) {
     } else {
       const startIdx = Math.min(BINS - 1, Math.max(0, Math.floor((c.low - minL) / binSize)));
       const endIdx = Math.min(BINS - 1, Math.max(0, Math.floor((c.high - minL) / binSize)));
-      const count = (endIdx - startIdx) + 1;
-      const volPerBin = vol / count;
       for (let i = startIdx; i <= endIdx; i++) {
-        volBins[i] += volPerBin;
+        const binLow = minL + i * binSize;
+        const binHigh = binLow + binSize;
+        const overlap = Math.max(0, Math.min(c.high, binHigh) - Math.max(c.low, binLow));
+        volBins[i] += vol * (overlap / rng);
       }
     }
   });
@@ -1228,12 +1245,15 @@ async function fetchAndComputeAll() {
   try {
     // A. 1D Daily Klines
     const dRes = await fetchWithMirrors([
-      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=250'
+      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=251',
+      'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=251',
+      'https://api3.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=251'
     ], prefix + 'data/btc_daily_klines.json');
 
     if (dRes.data) {
       if (dRes.isLive) hasLiveApi = true;
-      protocolData.candles1D = dRes.data.map(k => ({
+      const clean1D = stripUnclosedCandles(dRes.data);
+      protocolData.candles1D = clean1D.map(k => ({
         openTime: k[0],
         open: parseFloat(k[1]),
         high: parseFloat(k[2]),
@@ -1246,11 +1266,14 @@ async function fetchAndComputeAll() {
 
     // B. 1W Weekly Klines
     const wRes = await fetchWithMirrors([
-      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=100'
+      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=101',
+      'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=101',
+      'https://api3.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=101'
     ], prefix + 'data/btc_weekly_klines.json');
 
     if (wRes.data) {
-      protocolData.candles1W = wRes.data.map(k => ({
+      const clean1W = stripUnclosedCandles(wRes.data);
+      protocolData.candles1W = clean1W.map(k => ({
         openTime: k[0],
         open: parseFloat(k[1]),
         high: parseFloat(k[2]),
@@ -1263,12 +1286,13 @@ async function fetchAndComputeAll() {
 
     // C. 4H Klines
     const h4Res = await fetchWithMirrors([
-      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=50',
-      'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=50'
+      'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=51',
+      'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=51'
     ], prefix + 'data/btc_4h_klines.json');
 
     if (h4Res.data) {
-      protocolData.candles4H = h4Res.data.map(k => ({
+      const clean4H = stripUnclosedCandles(h4Res.data);
+      protocolData.candles4H = clean4H.map(k => ({
         openTime: k[0],
         open: parseFloat(k[1]),
         high: parseFloat(k[2]),
@@ -1447,11 +1471,14 @@ function evaluateProtocolModel() {
 
   // 4 Engines Checks:
   // Check 1: Bull Regime (50W + 200D + DXY + ETF 7D)
-  const r1_50w = (protocolData.sma50w && spot > protocolData.sma50w);
-  const r1_200d = (protocolData.sma200d && protocolData.sma200dPrev20 && protocolData.sma200d > protocolData.sma200dPrev20);
-  const r1_dxy = (protocolData.dxyVal < 103 || protocolData.dxy1dChange <= 0);
-  const r1_etf = (protocolData.etfFlow7d > 0);
-  const engineA_Bull = (r1_50w && r1_200d && r1_dxy && r1_etf);
+  const r1_50w = Boolean(protocolData.sma50w && spot > protocolData.sma50w);
+  const r1_200d = Boolean(protocolData.sma200d && protocolData.sma200dPrev20 && protocolData.sma200d > protocolData.sma200dPrev20);
+  const r1_dxy = Boolean(protocolData.dxyVal < 103 || protocolData.dxy1dChange <= 0);
+  const r1_etf = Boolean(protocolData.etfFlow7d > 0);
+  const regimeBaseline = (r1_50w && r1_200d && r1_dxy);
+  const engineA_Bull = (regimeBaseline && r1_etf);
+  protocolData.regimeBaseline = regimeBaseline;
+  protocolData.engineA_Bull = engineA_Bull;
 
   // Check 2: Buy Zone & Sweep
   const nearPoc = protocolData.poc30d && (spot <= protocolData.poc30d * 1.02);
@@ -1473,7 +1500,7 @@ function evaluateProtocolModel() {
 
   // Total Score (0 - 6)
   let score = 0;
-  if (r1_50w && r1_200d && r1_dxy) score++; // Regime baseline
+  if (regimeBaseline) score++; // Regime baseline
   if (engineB_Zone) score++;
   if (engineC_Trigger) score++;
   if (engineD_Deriv) score++;
@@ -1541,13 +1568,14 @@ function renderUI() {
   etfEl.style.color = etf7d >= 0 ? 'var(--emerald-bright)' : 'var(--amber-bright)';
 
   const fBadge = document.getElementById('f-badge');
-  const isBull = (protocolData.sma50w && spot > protocolData.sma50w && slope200d > 0);
-  if (isBull && etf7d >= 0) {
+  const isBull = Boolean(protocolData.regimeBaseline);
+  const isFullBull = Boolean(protocolData.engineA_Bull);
+  if (isFullBull) {
     fBadge.className = 'status-badge pass';
-    fBadge.textContent = '🟢 BULL REGIME INTACT';
+    fBadge.textContent = '🟢 BULL REGIME INTACT (4/4)';
   } else if (isBull) {
     fBadge.className = 'status-badge wait';
-    fBadge.textContent = '🟡 REGIME MIXED (ETF OUTFLOW DRAG)';
+    fBadge.textContent = '🟡 REGIME BASELINE (3/4 · ETF OUTFLOW DRAG)';
   } else {
     fBadge.className = 'status-badge fail';
     fBadge.textContent = '🔴 DEFENSIVE REGIME';
@@ -1586,7 +1614,7 @@ function renderUI() {
   hBadge.textContent = triggerReady ? '🟢 TRIGGER CONDITION ALIGNED' : '🟡 AWAITING 4H SWEEP';
 
   // Card D — Scores
-  document.getElementById('i-sc-1').textContent = isBull ? '1 / 1 (Pass)' : '0 / 1 (Fail)';
+  document.getElementById('i-sc-1').textContent = isFullBull ? '1 / 1 (Pass · 4/4)' : (isBull ? '1 / 1 (Baseline 3/4 · ETF Drag)' : '0 / 1 (Fail)');
   document.getElementById('i-sc-2').textContent = atGoodZone ? '1 / 1 (Pass)' : '0 / 1 (Fail)';
   document.getElementById('i-sc-3').textContent = (protocolData.sweepDetected ? '1 / 1 (Pass)' : '0 / 1 (Neutral)');
   document.getElementById('i-sc-4').textContent = (fr !== null && fr <= 0.0001) ? '1 / 1 (Pass)' : '0 / 1 (Elevated)';
@@ -1623,8 +1651,8 @@ function renderUI() {
   }
 
   // Checklist
-  document.getElementById('chk-regime').className = 'check-status ' + (isBull ? 'pass' : 'fail');
-  document.getElementById('chk-regime').textContent = isBull ? 'PASS' : 'FAIL';
+  document.getElementById('chk-regime').className = 'check-status ' + (isFullBull ? 'pass' : (isBull ? 'wait' : 'fail'));
+  document.getElementById('chk-regime').textContent = isFullBull ? 'PASS (4/4)' : (isBull ? '3/4 (ETF DRAG)' : 'FAIL');
 
   document.getElementById('chk-zone').className = 'check-status ' + (atGoodZone ? 'pass' : 'wait');
   document.getElementById('chk-zone').textContent = atGoodZone ? 'IN ZONE' : 'ABOVE POC';
@@ -1812,13 +1840,13 @@ document.addEventListener('DOMContentLoaded', () => {
 <!-- Global Standard Compliance Footer -->
 <footer style="max-width:1600px; margin:40px auto 0 auto; padding:24px 24px 0 24px; border-top:1px solid var(--border-color); display:flex; flex-direction:column; gap:16px; text-align:center; font-size:12px; color:var(--text-muted);">
   <div style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap;">
-    <a href="../index.html" style="color:var(--text-secondary); text-decoration:none;">Nexus Terminal</a>
-    <a href="../methodology.html" style="color:#38bdf8; text-decoration:none;">Methodology Guide</a>
-    <a href="../about.html" style="color:var(--text-secondary); text-decoration:none;">About</a>
-    <a href="../disclaimer.html" style="color:#f59e0b; text-decoration:none; font-weight:600;">Financial &amp; Risk Disclaimer</a>
-    <a href="../privacy-policy.html" style="color:var(--text-secondary); text-decoration:none;">Privacy Policy</a>
-    <a href="../terms.html" style="color:var(--text-secondary); text-decoration:none;">Terms of Service</a>
-    <a href="../contact.html" style="color:var(--text-secondary); text-decoration:none;">Contact</a>
+    <a href="./index.html" style="color:var(--text-secondary); text-decoration:none;">Nexus Terminal</a>
+    <a href="./methodology.html" style="color:#38bdf8; text-decoration:none;">Methodology Guide</a>
+    <a href="./about.html" style="color:var(--text-secondary); text-decoration:none;">About</a>
+    <a href="./disclaimer.html" style="color:#f59e0b; text-decoration:none; font-weight:600;">Financial &amp; Risk Disclaimer</a>
+    <a href="./privacy-policy.html" style="color:var(--text-secondary); text-decoration:none;">Privacy Policy</a>
+    <a href="./terms.html" style="color:var(--text-secondary); text-decoration:none;">Terms of Service</a>
+    <a href="./contact.html" style="color:var(--text-secondary); text-decoration:none;">Contact</a>
   </div>
   <div>Liquidity Radar maps independent spot order flow telemetry, Point of Control (POC), and High Volume Nodes. Strictly educational telemetry — not investment advice.</div>
   <div>&copy; 2026 Nexus Terminal Research. All rights reserved.</div>

@@ -1,10 +1,10 @@
 {
   "version": "1.0.0",
-  "asof": "2026-10-17T02:06:44Z",
+  "asof": "2026-10-17T04:35:17Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
-    "score": 100,
+    "score": 85,
     "max_score": 100,
     "status": "CRITICAL THREAT / SQUEEZE IMMINENT",
     "level": "CRIMSON",
@@ -27,13 +27,13 @@
         "points": 20,
         "max": 20,
         "triggered": true,
-        "reason": "MSTR failing to reclaim cycle highs; momentum squeeze and RSI divergence"
+        "reason": "MSTR 24h (-11.35%) lagging BTC (-1.99%); bearish momentum divergence active"
       },
       "seasonality_election_window": {
-        "points": 15,
+        "points": 0,
         "max": 15,
-        "triggered": true,
-        "reason": "US Election volatility cycle active; crypto recovery lag warning in effect"
+        "triggered": false,
+        "reason": "No HIGH/EXTREME/CRITICAL scheduled macro catalysts within the next 7 days"
       }
     }
   },
@@ -49,8 +49,8 @@
       "rsp_distance_high_pct": -3.48,
       "ratio_raw": 35.777,
       "ratio_normalized": 1.428,
-      "ratio_50sma": 34.38,
-      "ratio_sma_diff_pct": 4.06,
+      "ratio_50sma": 34.436,
+      "ratio_sma_diff_pct": 3.89,
       "divergence_flag": "CRITICAL BREADTH DIVERGENCE: TECH CONCENTRATION MIRAGE",
       "fractal_note": "Fewer than 10 mega-caps propping up headline index. 2008 double-bottom breakout similarity active."
     },
@@ -95,25 +95,25 @@
         {
           "event": "US Retail Sales & PPI Print",
           "date": "2026-10-15",
-          "days_away": 1,
+          "days_away": 0,
           "impact": "HIGH"
         },
         {
           "event": "US FOMC Rate Decision",
           "date": "2026-10-28",
-          "days_away": 14,
+          "days_away": 11,
           "impact": "CRITICAL"
         },
         {
           "event": "US Midterm Election",
           "date": "2026-11-03",
-          "days_away": 20,
+          "days_away": 17,
           "impact": "EXTREME"
         },
         {
           "event": "US Non-Farm Payrolls (NFP)",
           "date": "2026-11-06",
-          "days_away": 23,
+          "days_away": 20,
           "impact": "HIGH"
         }
       ]
@@ -128,8 +128,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 81476.64,
-      "change_24h_pct": -1.95,
+      "spot_price": 81438.34,
+      "change_24h_pct": -1.99,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -642,10 +642,10 @@
       "spx": 7659.44,
       "rsp": 214.09,
       "ratio": 35.777,
-      "sma50": 34.38,
+      "sma50": 34.436,
       "us10y": 5.098,
       "mstr": 136.8,
-      "btc": 81477.0
+      "btc": 81438.0
     }
   ]
 }

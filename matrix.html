@@ -1929,7 +1929,19 @@
     }
   }
 
-  function evaluateActiveConfig(packetText, liveSpot) {
+  function applyCrimsonOverrideIfNeeded(diag, macroThreat) {
+    if (!macroThreat || !macroThreat.composite_threat) return diag;
+    var comp = macroThreat.composite_threat;
+    var score = comp.score || 0;
+    if (comp.level === 'CRIMSON' || score >= 66) {
+      diag.directive = '🚨 [CRIMSON GATE OVERRIDE: 0.0x CASH MANDATE] ' + diag.directive;
+      diag.sizing = '• <strong style="color:#F87171;">Macro Threat Gate Veto (' + score + '/100 CRIMSON):</strong> New spot buying capped at <strong>0.0x (DMRA Cash Gate Active)</strong>.<br>' + diag.sizing;
+      diag.reasons.unshift('Macro Threat Matrix is CRIMSON (' + score + '/100) — overrides lower-level buy signals to 0.0x cash');
+    }
+    return diag;
+  }
+
+  function evaluateActiveConfig(packetText, liveSpot, macroThreat) {
     var txt = packetText || '';
     var spot = (typeof liveSpot === 'number' && liveSpot > 1000) ? liveSpot : (parseVal(txt, 'SPOT:') || 82625.01);
     var vwap = parseVal(txt, 'Daily_VWAP:') || 82381.29;
@@ -1946,7 +1958,7 @@
     // Config E: Cascade
     if (oiChg <= -5.0 && funding < -0.015) {
       highlightRow('row-config-e');
-      return {
+      return applyCrimsonOverrideIfNeeded({
         config: 'Config E',
         title: 'Active Crash / Waterfall Dump',
         color: 'red',
@@ -1959,13 +1971,13 @@
           'Forced margin liquidations active; spot order book void'
         ],
         nextWatch: 'Watch for price stabilizing into a horizontal floor and buyers absorbing the bottom (Config F).'
-      };
+      }, macroThreat);
     }
 
     // Config B: Leveraged Fragility
     if (funding >= 0.025 || oiChg >= 7.0) {
       highlightRow('row-config-b');
-      return {
+      return applyCrimsonOverrideIfNeeded({
         config: 'Config B',
         title: 'Overextended / Borrowed Money Bubble',
         color: 'amber',
@@ -1978,13 +1990,13 @@
           'Price is vulnerable to a sudden long squeeze flush'
         ],
         nextWatch: 'Watch for a sudden sharp rejection that wipes out greedy longs into a Config E cascade.'
-      };
+      }, macroThreat);
     }
 
     // Config D: Masked Fragility
     if (spot >= vwap && cvdSlope < 0 && funding >= 0.015) {
       highlightRow('row-config-d');
-      return {
+      return applyCrimsonOverrideIfNeeded({
         config: 'Config D',
         title: 'Sneaky Distribution (Whale Offloading)',
         color: 'red',
@@ -1997,13 +2009,13 @@
           'High risk of a sudden structural rug-pull'
         ],
         nextWatch: 'A break below Daily VWAP will confirm distribution and trigger a sell-off.'
-      };
+      }, macroThreat);
     }
 
     // Config J: Bear Trap
     if (spot >= vwap && funding <= -0.015 && oiChg > 2.0) {
       highlightRow('row-config-j');
-      return {
+      return applyCrimsonOverrideIfNeeded({
         config: 'Config J',
         title: 'Bear Trap Reclaim (Squeezing Bears)',
         color: 'green',
@@ -2016,13 +2028,13 @@
           'Institutions absorbed all the panic selling'
         ],
         nextWatch: 'Forced short covering can trigger an explosive short squeeze rally (Config G).'
-      };
+      }, macroThreat);
     }
 
     // Config A: Healthy Bull
     if (spot >= vwap && cvdSlope >= 0 && funding >= 0.001 && funding <= 0.018) {
       highlightRow('row-config-a');
-      return {
+      return applyCrimsonOverrideIfNeeded({
         config: 'Config A',
         title: 'Healthy Bull (Real Cash Accumulation)',
         color: 'green',
@@ -2036,12 +2048,12 @@
           'No dangerous speculative leverage bubble'
         ],
         nextWatch: 'Watch if interest fees heat up above 0.025% and leverage spikes above 7% (signals shift into Config B bubble).'
-      };
+      }, macroThreat);
     }
 
     // Default: Config C / F Base
     highlightRow('row-config-c');
-    return {
+    return applyCrimsonOverrideIfNeeded({
       config: 'Config C / F',
       title: 'Healthy Base Building (Smart Money Accumulating)',
       color: 'cyan',
@@ -2054,7 +2066,7 @@
         'Wild volatility has compressed into a quiet, solid foundation'
       ],
       nextWatch: 'If price breaks out above the ceiling with strong spot cash volume, we upgrade immediately to 🟢 <strong>Healthy Bull (Full Buy)</strong>.'
-    };
+    }, macroThreat);
   }
 
   function renderRadarUI(diag, timestampStr, packetAgeMin) {
@@ -2112,6 +2124,47 @@
       var packetRes = await fetch('PCF3_LIVE_PACKET_DEFAULT.txt?t=' + Date.now(), { cache: 'no-store' });
       var packetTxt = await packetRes.text();
 
+      var macroThreatData = null;
+      try {
+        var mtRes = await fetch('data/macro_threat_feed.json?t=' + Date.now(), { cache: 'no-store' });
+        if (mtRes.ok) macroThreatData = await mtRes.json();
+      } catch(eMt) {}
+
+      var weeklyMetrics = {};
+      try {
+        var wkRaw = null;
+        try {
+          var wkRes = await fetch('https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=60');
+          if (wkRes.ok) wkRaw = await wkRes.json();
+        } catch(eWk1) {}
+        if (!Array.isArray(wkRaw) || wkRaw.length < 20) {
+          var wkFallback = await fetch('data/btc_weekly_klines.json?t=' + Date.now());
+          if (wkFallback.ok) wkRaw = await wkFallback.json();
+        }
+        if (Array.isArray(wkRaw) && wkRaw.length >= 20) {
+          var nowMs = Date.now();
+          var compWk = [];
+          for (var wi = 0; wi < wkRaw.length; wi++) {
+            var vc = validateCandle(wkRaw[wi]);
+            if (vc && (nowMs > vc.closeTime || wi < wkRaw.length - 1)) compWk.push(vc);
+          }
+          if (compWk.length >= 20) {
+            weeklyMetrics.ema10w = calcEMA(compWk, 10);
+            weeklyMetrics.ema20w = calcEMA(compWk, 20);
+            var last20Wk = compWk.slice(-20);
+            var sum20Wk = 0;
+            for (var si = 0; si < last20Wk.length; si++) sum20Wk += last20Wk[si].close;
+            weeklyMetrics.sma20w = sum20Wk / last20Wk.length;
+            var last12Wk = compWk.slice(-12);
+            var pkClose = -1;
+            for (var pi = 0; pi < last12Wk.length; pi++) {
+              if (last12Wk[pi].close > pkClose) pkClose = last12Wk[pi].close;
+            }
+            if (pkClose > 0) weeklyMetrics.peakWeeklyClose = pkClose;
+          }
+        }
+      } catch(eWk) {}
+
       // Check packet age
       var tsMatch = packetTxt.match(/TIMESTAMP_UTC:\s*([^\s|]+)/i);
       var packetAgeMin = 0;
@@ -2159,9 +2212,9 @@
         }
       } catch(e3) {}
 
-      var diag = evaluateActiveConfig(packetTxt, liveSpot);
+      var diag = evaluateActiveConfig(packetTxt, liveSpot, macroThreatData);
       renderRadarUI(diag, new Date().toLocaleTimeString(), packetAgeMin);
-      updateTelemetryLiveValues(packetTxt, liveSpot, liveSpotVol, liveSpotQuoteVol, liveCvd, liveTakerRatio, liveSpotLow, liveSpotHigh);
+      updateTelemetryLiveValues(packetTxt, liveSpot, liveSpotVol, liveSpotQuoteVol, liveCvd, liveTakerRatio, liveSpotLow, liveSpotHigh, weeklyMetrics);
     } catch(err) {
       console.warn('Packet fetch failed', err);
     } finally {
@@ -2169,8 +2222,9 @@
     }
   }
 
-  function updateTelemetryLiveValues(packetTxt, liveSpot, liveSpotVol, liveSpotQuoteVol, liveCvd, liveTakerRatio, liveSpotLow, liveSpotHigh) {
+  function updateTelemetryLiveValues(packetTxt, liveSpot, liveSpotVol, liveSpotQuoteVol, liveCvd, liveTakerRatio, liveSpotLow, liveSpotHigh, weeklyMetrics) {
     var txt = packetTxt || '';
+    var wk = weeklyMetrics || {};
     var spot = (typeof liveSpot === 'number' && liveSpot > 1000) ? liveSpot : (parseVal(txt, 'SPOT:') || 82625.01);
     var vwap = parseVal(txt, 'Daily_VWAP:') || 82381.29;
     var weeklyVwap = parseVal(txt, 'Weekly_VWAP:') || 83990.41;
@@ -2194,15 +2248,15 @@
     var distSth = ((spot - sthCost) / sthCost * 100);
     var hlFloor = 79500.00;
     var distFloor = ((spot - hlFloor) / hlFloor * 100);
-    var ema10w = 78450.00;
+    var ema10w = wk.ema10w || 78450.00;
     var dist10w = ((spot - ema10w) / ema10w * 100);
-    var peakWeeklyClose = 86530.00;
+    var peakWeeklyClose = wk.peakWeeklyClose || 86530.00;
     var drawdownPeak = ((spot - peakWeeklyClose) / peakWeeklyClose * 100);
-    var rung1Price = peakWeeklyClose * 0.95; // $82,203.50
-    var rung2Price = peakWeeklyClose * 0.90; // $77,877.00
-    var rung3Price = peakWeeklyClose * 0.85; // $73,550.50
-    var ema20w = parseVal(txt, 'Above 20W') || 76001.00;
-    var sma20w = 71286.65;
+    var rung1Price = peakWeeklyClose * 0.95;
+    var rung2Price = peakWeeklyClose * 0.90;
+    var rung3Price = peakWeeklyClose * 0.85;
+    var ema20w = wk.ema20w || parseVal(txt, 'Above 20W') || 76001.00;
+    var sma20w = wk.sma20w || 71286.65;
     var dist20wEma = ((spot - ema20w) / ema20w * 100);
     var dist20wSma = ((spot - sma20w) / sma20w * 100);
     var atrPctLive = (dailyAtr / spot * 100);
@@ -2625,22 +2679,22 @@
       if (elTelemetryStatusPill) { elTelemetryStatusPill.className = 'telemetry-status-pill red'; elTelemetryStatusPill.textContent = '🚨 RUNG 3 ACTIVE'; }
     }
 
-    // Tactical Row 4: 10-Week EMA ($78,450.00)
+    // Tactical Row 4: 10-Week EMA
     var elTacEma10Diff = document.getElementById('tactical-ema10w-diff');
     if (elTacEma10Diff) elTacEma10Diff.innerHTML = 'Spot is <strong style="color:' + (dist10w >= 0 ? '#34D399' : '#F87171') + '">' + (dist10w >= 0 ? '+' : '') + dist10w.toFixed(2) + '%</strong> ' + (dist10w >= 0 ? 'above' : 'below') + ' 10W EMA';
     var elTacEma10Pill = document.getElementById('tactical-ema10w-pill');
     var elTacEma10Note = document.getElementById('tactical-ema10w-note');
     if (spot >= ema10w) {
       if (elTacEma10Pill) { elTacEma10Pill.className = 'telemetry-status-pill green'; elTacEma10Pill.textContent = '🟢 TREND DEFENSE SAFE'; }
-      if (elTacEma10Note) elTacEma10Note.textContent = 'Close < $78.4k required to fail (+' + dist10w.toFixed(1) + '% buffer)';
+      if (elTacEma10Note) elTacEma10Note.textContent = 'Close < $' + (ema10w / 1000).toFixed(1) + 'k required to fail (+' + dist10w.toFixed(1) + '% buffer)';
     } else {
       if (elTacEma10Pill) { elTacEma10Pill.className = 'telemetry-status-pill red'; elTacEma10Pill.textContent = '🚨 10W EMA BREACHED'; }
       if (elTacEma10Note) elTacEma10Note.textContent = 'Tactical trend defense violated (' + dist10w.toFixed(1) + '%)';
     }
 
-    // Tactical Row 5: 20-Week EMA ($76,001.00) & 20W SMA ($71,286.65)
+    // Tactical Row 5: 20-Week EMA & 20W SMA
     var elTacEma20Diff = document.getElementById('tactical-ema20w-diff');
-    if (elTacEma20Diff) elTacEma20Diff.innerHTML = '20W SMA: $71,286.65 (Spot <strong style="color:' + (dist20wSma >= 0 ? '#34D399' : '#F87171') + '">' + (dist20wSma >= 0 ? '+' : '') + dist20wSma.toFixed(1) + '%</strong> above)';
+    if (elTacEma20Diff) elTacEma20Diff.innerHTML = '20W SMA: $' + sma20w.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' (Spot <strong style="color:' + (dist20wSma >= 0 ? '#34D399' : '#F87171') + '">' + (dist20wSma >= 0 ? '+' : '') + dist20wSma.toFixed(1) + '%</strong> ' + (dist20wSma >= 0 ? 'above' : 'below') + ')';
     var elTacEma20Pill = document.getElementById('tactical-ema20w-pill');
     var elTacEma20Note = document.getElementById('tactical-ema20w-note');
     if (spot >= ema20w) {

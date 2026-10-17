@@ -908,18 +908,22 @@ def detect_structure(closes, highs, lows, lookback=20):
             if swing_lows[i] > swing_lows[i-1]: hl+=1
             else: ll+=1
     overall_up=recent_closes[-1] > recent_closes[0]; overall_down=recent_closes[-1] < recent_closes[0]
-    if hh>=2 and hl>=2 and overall_up:
+    last_sh_up = (len(swing_highs)>=2 and swing_highs[-1] > swing_highs[-2])
+    last_sl_up = (len(swing_lows)>=2 and swing_lows[-1] > swing_lows[-2])
+    last_sh_down = (len(swing_highs)>=2 and swing_highs[-1] < swing_highs[-2])
+    last_sl_down = (len(swing_lows)>=2 and swing_lows[-1] < swing_lows[-2])
+    if hh>=2 and hl>=2 and hh>lh and hl>ll and overall_up and last_sh_up and last_sl_up:
         return "Strong HH+HL", 20, f"HH {hh} HL {hl} overall up strong constructive"
-    elif (hh>=1 and hl>=1) or (overall_up and hh+hl>=2):
-        return "Mild HH+HL", 12, f"HH {hh} HL {hl} overall up mild constructive"
-    elif lh>=2 and ll>=2 and overall_down:
+    elif lh>=2 and ll>=2 and lh>hh and ll>hl and overall_down and last_sh_down and last_sl_down:
         return "Strong LH+LL", -20, f"LH {lh} LL {ll} overall down strong corrective"
-    elif (lh>=1 and ll>=1) or (overall_down and lh+ll>=2):
-        return "Mild LH+LL", -12, f"LH {lh} LL {ll} overall down mild corrective"
+    elif hh>lh and hl>=ll and (last_sh_up or last_sl_up) and (hh+hl>=2):
+        return "Mild HH+HL", 12, f"HH {hh} HL {hl} recent swing up mild constructive"
+    elif lh>hh and ll>=hl and (last_sh_down or last_sl_down) and (lh+ll>=2):
+        return "Mild LH+LL", -12, f"LH {lh} LL {ll} recent swing down mild corrective"
     else:
         return "Mixed", 0, f"HH {hh} HL {hl} LH {lh} LL {ll} overlapping mixed/transitional"
 
-def calculate_regime_scores(daily_closes, daily_highs, daily_lows, weekly_closes, weekly_highs, weekly_lows):
+def calculate_regime_scores(daily_closes, daily_highs, daily_lows, weekly_closes, weekly_highs, weekly_lows, sth_cost_basis=None):
     scores={}; details={}
     weekly_struct, weekly_points, weekly_detail = detect_structure(weekly_closes, weekly_highs, weekly_lows, 20)
     daily_struct, daily_points, daily_detail = detect_structure(daily_closes, daily_highs, daily_lows, 20)
@@ -988,17 +992,49 @@ def calculate_regime_scores(daily_closes, daily_highs, daily_lows, weekly_closes
         else: weekly_mom_score=0; weekly_mom_detail=f"Weekly MACD {wh:.2f} RSI {wr:.1f} Neutral = 0"
     scores["mom_macd"]=macd_score; scores["mom_rsi"]=rsi_score; scores["mom_weekly"]=weekly_mom_score; scores["mom_total"]=macd_score+rsi_score+weekly_mom_score
     details["mom_macd"]=macd_detail; details["mom_rsi"]=rsi_detail; details["mom_weekly"]=weekly_mom_detail
-    cycle_score=5; cycle_detail="Cycle Position Early recovery / Mid-expansion post $58k low to low-mid $80ks reclaimed 50-week MA first time in many months = Supportive +5 | SOURCE: Grok Current Snapshot late Sep 2026"
-    onchain_score=5; onchain_detail="On-chain / Key Levels Holding major support around low $80ks STH $81,842 + HVN $80,500 7.1% + Put Wall $75k = Supportive +5 | SOURCE: PCF3 volume profile + STH + gamma walls"
+    if sth_cost_basis is None:
+        try:
+            sth_obj, _, _ = fetch_sth_cost_basis()
+            sth_cost_basis = sth_obj.get("sth_price", 74468.34) if sth_obj else 74468.34
+        except Exception:
+            sth_cost_basis = 74468.34
+    w50_val = ema50_weekly[-1] if ema50_weekly and ema50_weekly[-1] else None
+    d200_val = ema200_daily[-1] if ema200_daily and ema200_daily[-1] else None
+    if price and w50_val and d200_val:
+        if price > w50_val and price > d200_val:
+            cycle_score = 5
+            cycle_detail = f"Cycle Position Price ${price:,.0f} Above 50W EMA (${w50_val:,.0f}) & 200D EMA (${d200_val:,.0f}) = Supportive +5"
+        elif price > d200_val or price > w50_val:
+            cycle_score = 0
+            cycle_detail = f"Cycle Position Price ${price:,.0f} Mixed between 50W EMA (${w50_val:,.0f}) & 200D EMA (${d200_val:,.0f}) = Neutral 0"
+        else:
+            cycle_score = -5
+            cycle_detail = f"Cycle Position Price ${price:,.0f} Below 50W EMA (${w50_val:,.0f}) & 200D EMA (${d200_val:,.0f}) = Bearish -5"
+    else:
+        cycle_score = 0
+        cycle_detail = "Cycle Position Insufficient EMA data = Neutral 0"
+    if price and sth_cost_basis:
+        if price >= sth_cost_basis * 1.02:
+            onchain_score = 5
+            onchain_detail = f"On-chain / Key Levels Price ${price:,.0f} Holding >2% above STH Cost Basis (${sth_cost_basis:,.0f}) = Supportive +5"
+        elif price >= sth_cost_basis * 0.98:
+            onchain_score = 0
+            onchain_detail = f"On-chain / Key Levels Price ${price:,.0f} Testing STH Cost Basis (${sth_cost_basis:,.0f} ±2%) = Neutral 0"
+        else:
+            onchain_score = -5
+            onchain_detail = f"On-chain / Key Levels Price ${price:,.0f} Below STH Cost Basis (${sth_cost_basis:,.0f}) = Underwater -5"
+    else:
+        onchain_score = 0
+        onchain_detail = "On-chain / Key Levels STH Cost Basis unavailable = Neutral 0"
     scores["context_cycle"]=cycle_score; scores["context_onchain"]=onchain_score; scores["context_total"]=cycle_score+onchain_score
     details["context_cycle"]=cycle_detail; details["context_onchain"]=onchain_detail
     total=scores["structure_total"]+scores["ma_total"]+scores["mom_total"]+scores["context_total"]
-    if total>=40: regime_3="Constructive (阳)"; bias_3="Actively seek long swings"
-    elif total>=-20: regime_3="Transitional"; bias_3="Stay light, only highest-quality setups"
-    else: regime_3="Corrective (阴)"; bias_3="Prefer cash / selective shorts / reduce risk"
+    if total>=60: regime_3="Constructive (阳)"; bias_3="Actively seek long swings (Sizing active)"
+    elif total>=35: regime_3="Transitional (中)"; bias_3="Consolidating / Wait for >=60 confluence (0.0x cash preferred)"
+    else: regime_3="Corrective / Defensive (阴)"; bias_3="Preserve cash / avoid new longs (0.0x)"
     return {"scores":scores,"details":details,"total_score":total,"regime_3":regime_3,"bias_3":bias_3,"weekly_struct":weekly_struct,"daily_struct":daily_struct}
 
-def calculate_6_regimes(adx_vals, atr_vals, atr_avg_vals, closes, ema50_vals, ema200_vals, bb_width_vals):
+def calculate_6_regimes(adx_vals, atr_vals, atr_avg_vals, closes, ema50_vals, ema200_vals, bb_width_vals, structure_total=None):
     if not adx_vals or not atr_vals or not closes:
         return {"regime_6":"MISSING","trend_vs_range":"MISSING","vol_regime":"MISSING","direction":"MISSING","adx":None,"atr_ratio":None,"bbwidth_pct":None}
     adx_now=adx_vals[-1]; atr_now=atr_vals[-1] if atr_vals[-1] else None; atr_avg_now=atr_avg_vals[-1] if atr_avg_vals and atr_avg_vals[-1] else None
@@ -1016,12 +1052,20 @@ def calculate_6_regimes(adx_vals, atr_vals, atr_avg_vals, closes, ema50_vals, em
         else: vol_regime="Normal Volatility"
     direction="MISSING"
     if price and ema50_now and ema200_now:
-        if price>ema50_now and price>ema200_now and ema50_now>ema200_now: direction="Bull Trend"
+        if price>ema50_now and price>ema200_now and ema50_now>ema200_now:
+            if structure_total is None or structure_total > 0:
+                direction="Bull Trend"
+            elif structure_total == 0:
+                direction="Macro Bull (Consolidating)"
+            else:
+                direction="Macro Bull (Daily Pullback)"
         elif price<ema50_now and price<ema200_now and ema50_now<ema200_now: direction="Bear Trend"
         else: direction="Range / Mixed"
     regime_6="MISSING"
     if trend_vs_range=="Trending" and direction=="Bull Trend":
         regime_6="Bull Impulse — high-vol bull trend explosive leg e.g. Aug 23 squeeze week" if vol_regime and "High" in vol_regime else "Grind Up — low-vol bull trend quiet accumulation buy-and-hold behavior"
+    elif trend_vs_range=="Trending" and "Macro Bull" in direction:
+        regime_6=f"Macro Bull Consolidation — Price > EMA50/200 but swing structure is {direction} — wait for HH+HL reclaim"
     elif trend_vs_range=="Trending" and direction=="Bear Trend":
         regime_6="Bear Impulse — high-vol bear trend panic legs sell rallies only" if vol_regime and "High" in vol_regime else "Grind Down — low-vol bear trend slow bleed fade bounces watch for compression"
     elif trend_vs_range=="Ranging":
@@ -1539,7 +1583,11 @@ def calc_storyline_msnr(weekly_closes, weekly_highs, weekly_lows, daily_closes, 
         s20d=sma_data.get("sma20_daily") if sma_data else None
         s10f=sma_data.get("sma10_4h") if sma_data else None
         s20f=sma_data.get("sma20_4h") if sma_data else None
-        w_bias,w_score,w_reason=tf_bias(weekly_closes, weekly_highs, weekly_lows, None, None)
+        w10_arr=sma(weekly_closes, 10) if weekly_closes and len(weekly_closes)>=10 else []
+        w20_arr=sma(weekly_closes, 20) if weekly_closes and len(weekly_closes)>=20 else []
+        s10w=w10_arr[-1] if w10_arr else None
+        s20w=sma_data.get("sma20_weekly") if sma_data and sma_data.get("sma20_weekly") else (w20_arr[-1] if w20_arr else None)
+        w_bias,w_score,w_reason=tf_bias(weekly_closes, weekly_highs, weekly_lows, s10w, s20w)
         d_bias,d_score,d_reason=tf_bias(daily_closes, daily_highs, daily_lows, s10d, s20d)
         f_bias,f_score,f_reason=tf_bias(fourh_closes, fourh_highs, fourh_lows, s10f, s20f)
         avg=w_score*0.5+d_score*0.3+f_score*0.2
@@ -2786,11 +2834,13 @@ def institutional_decision_engine(adx_data, vwap_bands, rvol_data, trio_data, re
             reasons.append(f"RVOL Time {rvol_pct:.0f}% normal")
         regime_score = regime_3_data.get('total_score', 92) if regime_3_data else 92
         regime_name = regime_6_data.get('regime_6','Bull Impulse') if regime_6_data else 'Bull Impulse'
-        if regime_score >= 70:
+        if regime_score >= 60:
             score += 1
-            reasons.append(f"Regime {regime_score}/100 Constructive {regime_name} supportive")
-        elif regime_score <= 40:
-            warnings.append(f"Regime {regime_score}/100 Corrective avoid longs")
+            reasons.append(f"Regime {regime_score}/100 Constructive (阳) {regime_name} supportive")
+        elif regime_score >= 35:
+            reasons.append(f"Regime {regime_score}/100 Transitional (中) consolidating wait for >=60 confirmation")
+        else:
+            warnings.append(f"Regime {regime_score}/100 Corrective / Defensive (阴) avoid longs")
         psych_score = 5
         if psych_score >= 3:
             score += 1
@@ -2798,20 +2848,23 @@ def institutional_decision_engine(adx_data, vwap_bands, rvol_data, trio_data, re
         trio_score = trio_data.get('trio_score', 2) if trio_data else 2
         total_possible = 5
         quality_pct = score / total_possible * 100
-        if trio_score == 3 and regime_score >= 70 and rvol_pct >= 150:
+        if trio_score == 3 and regime_score >= 60 and rvol_pct >= 150:
             if plus_di and minus_di and plus_di > minus_di:
                 action = "HIGH QUALITY LONG — Institutional Trio 3/3 + Regime Constructive + RVOL HIGH + +DI > -DI bull"
                 quality = "HIGH"
             else:
                 action = "HIGH QUALITY SETUP — Trio 3/3 + Regime Constructive + RVOL HIGH — check DI direction"
                 quality = "HIGH"
-        elif trio_score >= 2 and regime_score >= 55:
+        elif trio_score >= 2 and regime_score >= 60:
             if rvol_pct >= 150:
-                action = "MEDIUM QUALITY LONG — Trio 2/3 + RVOL HIGH + Regime Transitional/Constructive — improve entry near VWAP"
+                action = "MEDIUM QUALITY LONG — Trio 2/3 + RVOL HIGH + Regime Constructive — improve entry near VWAP"
                 quality = "MEDIUM"
             else:
-                action = "MEDIUM QUALITY — Trio 2/3 but RVOL NORMAL — wait for RVOL >150% for institutional confirmation"
+                action = "MEDIUM QUALITY — Trio 2/3 + Regime Constructive but RVOL NORMAL — wait for RVOL >150%"
                 quality = "MEDIUM"
+        elif regime_score < 60:
+            action = f"STAND ASIDE — Regime {regime_score}/100 < 60 sizing gate ({'Transitional' if regime_score >= 35 else 'Corrective'}) — wait for >=60 confirmation (0.0x cash preferred)"
+            quality = "LOW"
         elif rvol_pct and rvol_pct <= 80:
             action = "STAND ASIDE — RVOL LOW <=80% low participation chop risk — avoid entry even if ADX/VWAP good"
             quality = "LOW"
@@ -4082,38 +4135,39 @@ def fetch_ta_v47_raw(daily_closes_250, daily_highs_250, daily_lows_250, weekly_c
         if weekly_highs_100:
             ath_price = max(weekly_highs_100)
         ath_dist_pct = (spot_price - ath_price)/ath_price*100 if spot_price and ath_price else None
-        range_20d_high = max(daily_highs_250[-20:]) if daily_highs_250 and len(daily_highs_250)>=20 else None
-        range_20d_low = min(daily_lows_250[-20:]) if daily_lows_250 and len(daily_lows_250)>=20 else None
+        range_20d_high = max(daily_highs_250[-21:-1]) if daily_highs_250 and len(daily_highs_250)>=21 else (max(daily_highs_250[-20:]) if daily_highs_250 and len(daily_highs_250)>=20 else None)
+        range_20d_low = min(daily_lows_250[-21:-1]) if daily_lows_250 and len(daily_lows_250)>=21 else (min(daily_lows_250[-20:]) if daily_lows_250 and len(daily_lows_250)>=20 else None)
         range_90d_high = max(daily_highs_250[-90:]) if daily_highs_250 and len(daily_highs_250)>=90 else None
         range_90d_low = min(daily_lows_250[-90:]) if daily_lows_250 and len(daily_lows_250)>=90 else None
         prior_week_high = weekly_highs_100[-2] if weekly_highs_100 and len(weekly_highs_100)>=2 else None
         prior_week_low = weekly_lows_100[-2] if weekly_lows_100 and len(weekly_lows_100)>=2 else None
-        # Weekly EMA 20/50
+        # Weekly EMA 20/50 seeded with N-period SMA
         def ema(arr, period):
             if not arr or len(arr) < period:
                 return []
             k = 2/(period+1)
-            ema_arr = [arr[0]]
-            for p in arr[1:]:
+            seed = sum(arr[:period])/period
+            ema_arr = [None]*(period-1) + [seed]
+            for p in arr[period:]:
                 ema_arr.append(p*k + ema_arr[-1]*(1-k))
             return ema_arr
         weekly_ema20_arr = ema(weekly_closes_100, 20) if weekly_closes_100 else []
         weekly_ema50_arr = ema(weekly_closes_100, 50) if weekly_closes_100 else []
         weekly_ema20 = weekly_ema20_arr[-1] if weekly_ema20_arr else None
         weekly_ema50 = weekly_ema50_arr[-1] if weekly_ema50_arr else None
-        ema20_slope = (weekly_ema20 - weekly_ema20_arr[-6])/weekly_ema20_arr[-6]*100 if weekly_ema20_arr and len(weekly_ema20_arr)>=6 and weekly_ema20_arr[-6]!=0 else None
+        ema20_slope = (weekly_ema20 - weekly_ema20_arr[-6])/weekly_ema20_arr[-6]*100 if weekly_ema20_arr and len(weekly_ema20_arr)>=6 and weekly_ema20_arr[-6] else None
         golden_cross = weekly_ema20 and weekly_ema50 and weekly_ema20 > weekly_ema50
         # Monthly trend — use weekly closes last 4 = month proxy
-        monthly_trend = "Bull" if weekly_closes_100 and len(weekly_closes_100)>=4 and weekly_closes_100[-1] > weekly_closes_100[-5] else "Bear" if weekly_closes_100 and len(weekly_closes_100)>=4 else "MISSING"
+        monthly_trend = "Bull" if weekly_closes_100 and len(weekly_closes_100)>=5 and weekly_closes_100[-1] > weekly_closes_100[-5] else "Bear" if weekly_closes_100 and len(weekly_closes_100)>=5 else "MISSING"
         # Break + retest RAW
         break_retest_bull = False
         break_retest_bear = False
         if range_20d_high and spot_price:
-            # Break above 20D high then retested within 0.5%
-            if spot_price > range_20d_high and abs(spot_price - range_20d_high)/range_20d_high < 0.005:
+            # Break above prior 20D high or retesting prior 20D high within 0.5%
+            if spot_price > range_20d_high or abs(spot_price - range_20d_high)/range_20d_high < 0.005:
                 break_retest_bull = True
         if range_20d_low and spot_price:
-            if spot_price < range_20d_low and abs(spot_price - range_20d_low)/range_20d_low < 0.005:
+            if spot_price < range_20d_low or abs(spot_price - range_20d_low)/range_20d_low < 0.005:
                 break_retest_bear = True
         result = {
             "ath_price": ath_price,
@@ -4132,8 +4186,8 @@ def fetch_ta_v47_raw(daily_closes_250, daily_highs_250, daily_lows_250, weekly_c
             "break_retest_bull": break_retest_bull,
             "break_retest_bear": break_retest_bear,
             "timestamp": now_iso,
-            "source": "Binance daily 250 + weekly 100 klines — ATH = max weekly high — Range = max/min last 20/90 — Prior Week H/L = weekly -2 — EMA20/50 weekly — Monthly proxy last 4W",
-            "method": "ATH distance=(spot-ATH)/ATH*100 Range bounds max/min 20D 90D Prior Week High/Low weekly -2 EMA20/50 weekly EMA calculation slope=(now-5ago)/5ago*100 Golden Cross EMA20>EMA50 Monthly trend last 4W vs 5W ago Break+retest price broke high then retested within 0.5%",
+            "source": "Binance daily 250 + weekly 100 klines — ATH = max weekly high — Range = max/min prior 20/90 — Prior Week H/L = weekly -2 — EMA20/50 weekly — Monthly proxy last 4W",
+            "method": "ATH distance=(spot-ATH)/ATH*100 Range bounds max/min prior 20D 90D Prior Week High/Low weekly -2 EMA20/50 weekly EMA calculation slope=(now-5ago)/5ago*100 Golden Cross EMA20>EMA50 Monthly trend last 4W vs 5W ago Break+retest price broke high then retested within 0.5%",
             "status": "LIVE_AUTO_V47"
         }
         return result, "LIVE_AUTO_V47"
@@ -4150,7 +4204,6 @@ def fetch_scorecard_v47_raw(macro_v47, onchain_v47, derivatives_v47, ta_v47, reg
         deriv_score = 0
         ta_score = 0
         # Macro/liquidity aligned 25
-        # Check M2 YoY expanding, SPX above 200DMA, DXY not strong up, Real Yields not spiking
         if macro_v47:
             if macro_v47.get("m2_yoy_pct") and macro_v47["m2_yoy_pct"] > 0:
                 macro_score += 10
@@ -4159,21 +4212,45 @@ def fetch_scorecard_v47_raw(macro_v47, onchain_v47, derivatives_v47, ta_v47, reg
             if macro_v47.get("dxy_dist_200dma_pct") and macro_v47["dxy_dist_200dma_pct"] < 1.0:
                 macro_score += 7
         else:
-            macro_score = 12  # neutral proxy
-        # HTF trend aligned 25 — check weekly EMA20>EMA50 + monthly bull + regime constructive
+            macro_score = 12
+        # HTF trend aligned 25 — check weekly EMA20>EMA50 + monthly bull + regime constructive (>=60)
         if ta_v47 and regime_3_data:
             if ta_v47.get("golden_cross_20_50"):
                 htf_score += 10
             if ta_v47.get("monthly_trend_proxy") == "Bull":
                 htf_score += 8
-            if regime_3_data.get("total_score",0) >= 70:
+            if regime_3_data.get("total_score",0) >= 60:
                 htf_score += 7
+            elif regime_3_data.get("total_score",0) >= 35:
+                htf_score += 3
         else:
             htf_score = 15
-        # On-chain not overheated 20 — MVRV Z <5, NUPL <0.75, SOPR <1.1
-        onchain_score = 12  # proxy mid
-        # Derivatives not crowded 15 — funding not >0.05% persistently, OI/mcap <3%
-        deriv_score = 8
+        # On-chain not overheated 20 — dynamic check from onchain_v47 and regime context
+        if onchain_v47:
+            netflow_val = onchain_v47.get("exchange_netflow_btc_24h")
+            if isinstance(netflow_val, (int, float)) and netflow_val < 0:
+                onchain_score += 7
+            elif netflow_val is None or netflow_val == "MISSING":
+                onchain_score += 3
+            lth_sopr_val = onchain_v47.get("lth_sopr")
+            if isinstance(lth_sopr_val, (int, float)) and lth_sopr_val < 1.5:
+                onchain_score += 7
+            if regime_3_data and regime_3_data.get("scores", {}).get("context_onchain", 0) > 0:
+                onchain_score += 6
+            elif regime_3_data and regime_3_data.get("scores", {}).get("context_onchain", 0) == 0:
+                onchain_score += 3
+        else:
+            onchain_score = 12
+        # Derivatives not crowded 15 — dynamic check from derivatives_v47
+        if derivatives_v47:
+            fp_days = derivatives_v47.get("funding_persistence_7d_days_above_005")
+            if fp_days is None or (isinstance(fp_days, (int, float)) and fp_days <= 2):
+                deriv_score += 8
+            basis_val = derivatives_v47.get("futures_basis_3m_ann_pct")
+            if isinstance(basis_val, (int, float)) and basis_val < 14.0:
+                deriv_score += 7
+        else:
+            deriv_score = 8
         # TA trigger at level 15 — break+retest or pullback into SMA zone
         if ta_v47 and sma_data:
             if ta_v47.get("break_retest_bull") or sma_data.get("pullback_into_sma_zone"):
@@ -4470,7 +4547,8 @@ def main():
     regime_6_data = None
     if daily_closes_250 and weekly_closes_100:
         regime_3_data = calculate_regime_scores(daily_closes_250, daily_highs_250, daily_lows_250, weekly_closes_100, weekly_highs_100, weekly_lows_100)
-        regime_6_data = calculate_6_regimes(adx_daily_250, atr_daily_250, full_atr_avg_250, daily_closes_250, ema50_daily_250, ema200_daily_250, bb_width_daily_250)
+        struct_tot = regime_3_data["scores"]["structure_total"] if regime_3_data and "scores" in regime_3_data else None
+        regime_6_data = calculate_6_regimes(adx_daily_250, atr_daily_250, full_atr_avg_250, daily_closes_250, ema50_daily_250, ema200_daily_250, bb_width_daily_250, structure_total=struct_tot)
 
     # === ENHANCEMENTS  — 1 to 7 — FETCH ===
     print("Fetching Enhancement #1 CVD live via aggTrades...")

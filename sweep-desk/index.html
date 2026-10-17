@@ -694,7 +694,7 @@ function runSMCAnalysis() {
   const spot = h4[h4.length - 1][4];
   appState.spotPrice = spot;
 
-  const doneDaily = daily.slice(0, -1);
+  const doneDaily = daily;
   const priorDaily = doneDaily[doneDaily.length - 1];
   const priorWeekCandles = getPriorWeekCandles(doneDaily);
 
@@ -795,6 +795,16 @@ function runSMCAnalysis() {
   appState.tacticalAction = action;
   appState.activePool = activePool;
 
+  // Dynamic RRR Calculation: entry (active low pool or spot) -> stop (sessionLow * 0.998) vs target (opposing high pool)
+  const entryLevel = activePool ? activePool.price : spot;
+  const stopLevel = Math.min(sessionLow, entryLevel * 0.985);
+  const opposingHigh = Math.max(...evaluatedHighs.map(h => h.price), sessionHigh);
+  const riskDist = Math.max(1, entryLevel - stopLevel);
+  const rewardDist = Math.max(0, opposingHigh - entryLevel);
+  const rrrVal = rewardDist / riskDist;
+  const rrrPass = rrrVal >= CFG.RRR_MIN;
+  appState.rrrVal = rrrVal;
+
   // Checklist updates
   let score = 0;
   const setChk = (id, pass, textPass, textFail) => {
@@ -812,7 +822,7 @@ function runSMCAnalysis() {
   setChk('chk-fund', fundingOk, 'CALM', 'FROTH');
   setChk('chk-etf', !etfOutflows, 'NEUTRAL/IN', 'OUTFLOWS');
   setChk('chk-macro', !weekBroken, 'INTACT', 'BROKEN');
-  setChk('chk-rrr', true, '>= 2.5:1', '< 2.5:1');
+  setChk('chk-rrr', rrrPass, `${rrrVal.toFixed(1)}:1 (>=2.5)`, `${rrrVal.toFixed(1)}:1 (<2.5)`);
 
   appState.checklistScore = score;
   const scoreEl = document.getElementById('checklist-score');
@@ -833,10 +843,10 @@ function renderUI(sessionLow, sessionHigh, bannerClass, icon, why) {
   const banner = document.getElementById('call-banner');
   banner.className = 'call-banner ' + bannerClass;
 
-  // Flows
+  // Flows (appState.fundingRate is standardized in percentage points, e.g. 0.0050 = 0.0050%)
   const fr = appState.fundingRate;
-  document.getElementById('val-funding').textContent = fr !== null ? (fr * 100).toFixed(4) + '% per 8h' : '0.0030% (Est)';
-  document.getElementById('val-funding-ann').textContent = fr !== null ? (fr * 100 * 3 * 365).toFixed(2) + '% ann' : '3.29% ann';
+  document.getElementById('val-funding').textContent = fr !== null ? fr.toFixed(4) + '% per 8h' : '0.0030% (Est)';
+  document.getElementById('val-funding-ann').textContent = fr !== null ? (fr * 3 * 365).toFixed(2) + '% ann' : '3.29% ann';
   document.getElementById('val-oi-change').textContent = appState.oiChange24h !== null ? fmtPct(appState.oiChange24h) : '+0.02%';
   document.getElementById('val-etf').textContent = (appState.etfNet7d >= 0 ? '+' : '') + '$' + appState.etfNet7d + 'M';
   document.getElementById('val-taker-delta').textContent = (appState.takerDeltaSinceSweep >= 0 ? '+' : '') + appState.takerDeltaSinceSweep.toFixed(2) + ' BTC';
@@ -998,18 +1008,35 @@ async function loadLive() {
   let klinesSuccess = false;
   let isCacheFallback = false;
 
+// Strips the unclosed (in-progress) forming candle from Binance klines
+function stripUnclosedCandles(rawKlines, nowMs = Date.now()) {
+  if (!Array.isArray(rawKlines) || rawKlines.length === 0) return rawKlines;
+  const cleaned = rawKlines.slice();
+  while (cleaned.length > 0) {
+    const lastBar = cleaned[cleaned.length - 1];
+    const closeTimeMs = Array.isArray(lastBar) ? Number(lastBar[6]) : (lastBar && lastBar.closeTime ? Number(lastBar.closeTime) : NaN);
+    if (Number.isFinite(closeTimeMs) && closeTimeMs > nowMs) {
+      cleaned.pop();
+    } else {
+      break;
+    }
+  }
+  return cleaned;
+}
+
   // 1. Multi-Mirror 4H Klines
   const mirrors = [
-    'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=160',
-    'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=160',
-    'https://api1.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=160'
+    'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=161',
+    'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=161',
+    'https://api1.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=161'
   ];
 
   for (const url of mirrors) {
     try {
       const h4Raw = await fetchWithTimeout(url, 3500);
       if (Array.isArray(h4Raw) && h4Raw.length >= 50) {
-        appState.h4Candles = h4Raw.map(r => [+r[0], +r[1], +r[2], +r[3], +r[4], +r[5], r[9] ? +r[9] : null]);
+        const cleanH4 = stripUnclosedCandles(h4Raw);
+        appState.h4Candles = cleanH4.map(r => [+r[0], +r[1], +r[2], +r[3], +r[4], +r[5], r[9] ? +r[9] : null]);
         klinesSuccess = true;
         break;
       }
@@ -1018,16 +1045,17 @@ async function loadLive() {
 
   // 2. Multi-Mirror Daily Klines
   const dailyMirrors = [
-    'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=90',
-    'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=90',
-    'https://api1.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=90'
+    'https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=91',
+    'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=91',
+    'https://api1.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=91'
   ];
 
   for (const url of dailyMirrors) {
     try {
       const dailyRaw = await fetchWithTimeout(url, 3500);
       if (Array.isArray(dailyRaw) && dailyRaw.length >= 30) {
-        appState.dailyCandles = dailyRaw.map(r => [+r[0], +r[1], +r[2], +r[3], +r[4], +r[5], r[9] ? +r[9] : null]);
+        const cleanDaily = stripUnclosedCandles(dailyRaw);
+        appState.dailyCandles = cleanDaily.map(r => [+r[0], +r[1], +r[2], +r[3], +r[4], +r[5], r[9] ? +r[9] : null]);
         break;
       }
     } catch (e) {}
@@ -1058,17 +1086,18 @@ async function loadLive() {
       if (dCacheRes.ok) {
         const dCacheData = await dCacheRes.json();
         if (Array.isArray(dCacheData) && dCacheData.length > 0) {
-          appState.dailyCandles = dCacheData.map(r => [+r[0], +r[1], +r[2], +r[3], +r[4], +r[5], r[9] ? +r[9] : null]);
+          const cleanCacheD = stripUnclosedCandles(dCacheData);
+          appState.dailyCandles = cleanCacheD.map(r => [+r[0], +r[1], +r[2], +r[3], +r[4], +r[5], r[9] ? +r[9] : null]);
         }
       }
     } catch (e) {}
   }
 
-  // 4. Funding Rate Fetch
+  // 4. Funding Rate Fetch (standardized to percentage points, e.g. 0.0050 = 0.0050%)
   try {
     const fund = await fetchWithTimeout('https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT', 2500);
     if (fund && fund.lastFundingRate != null) {
-      appState.fundingRate = parseFloat(fund.lastFundingRate);
+      appState.fundingRate = parseFloat(fund.lastFundingRate) * 100;
     }
   } catch (e) {}
 
@@ -1103,8 +1132,8 @@ async function loadLive() {
     }
   } catch (e) {}
 
-  // Fallback defaults if still null
-  if (appState.fundingRate === null) appState.fundingRate = 0.000030;
+  // Fallback defaults if still null (in percentage points: 0.0030 = 0.0030%)
+  if (appState.fundingRate === null) appState.fundingRate = 0.0030;
   if (appState.oiChange24h === null) appState.oiChange24h = 0.024;
 
   const nowUTC = new Date().toISOString().slice(0, 16) + ' UTC';
@@ -1259,7 +1288,7 @@ async function copyDataPacket5() {
     "",
     "[2] ORDER FLOW & MACRO FILTERS",
     "--------------------------------------------------------------------------------",
-    "• Binance 8h Funding Rate:     " + (appState.fundingRate !== null ? (appState.fundingRate * 100).toFixed(4) + "%" : 'N/A'),
+    "• Binance 8h Funding Rate:     " + (appState.fundingRate !== null ? appState.fundingRate.toFixed(4) + "%" : 'N/A'),
     "• 24h Open Interest Change:    " + (appState.oiChange24h !== null ? fmtPct(appState.oiChange24h) : 'N/A'),
     "• Spot Taker CVD Since Sweep:  " + (appState.takerDeltaSinceSweep >= 0 ? '+' : '') + appState.takerDeltaSinceSweep.toFixed(2) + " BTC",
     "• Institutional 7D ETF Net:    " + (appState.etfNet7d >= 0 ? '+' : '') + "$" + appState.etfNet7d + "M",

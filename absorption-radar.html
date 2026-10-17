@@ -847,7 +847,14 @@ function runAbsorptionAnalysis() {
   const inShelf = price >= L.shelfLo && price <= L.shelfHi;
   appState.inShelf = inShelf;
 
-  const absorbPass = (hStats.wick >= 0.50 && hStats.loc >= 0.65) || (dStats.wick >= 0.50 && dStats.loc >= 0.65);
+  const hTakerDelta = (hLast.tb !== null && hLast.tb !== undefined) ? (2 * hLast.tb - hLast.v) : null;
+  const dTakerDelta = (dLast.tb !== null && dLast.tb !== undefined) ? (2 * dLast.tb - dLast.v) : null;
+  appState.takerDelta4h = hTakerDelta;
+  appState.takerDelta1d = dTakerDelta;
+  const hDeltaOk = hTakerDelta === null || hTakerDelta >= 0;
+  const dDeltaOk = dTakerDelta === null || dTakerDelta >= 0;
+
+  const absorbPass = (hStats.wick >= 0.50 && hStats.loc >= 0.65 && hDeltaOk) || (dStats.wick >= 0.50 && dStats.loc >= 0.65 && dDeltaOk);
   appState.absorbPass = absorbPass;
 
   const shelfBuyArmed = inShelf && absorbPass;
@@ -1222,7 +1229,7 @@ function stripUnclosedCandles(rawKlines, nowMs = Date.now()) {
       if (Array.isArray(dailyRaw) && dailyRaw.length >= 30) {
         const cleanDaily = stripUnclosedCandles(dailyRaw);
         appState.dailyCandles = cleanDaily.map(r => ({
-          t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5]
+          t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5], tb: r[9] !== undefined ? +r[9] : null
         }));
         klinesSuccess = true;
         break;
@@ -1243,7 +1250,7 @@ function stripUnclosedCandles(rawKlines, nowMs = Date.now()) {
       if (Array.isArray(h4Raw) && h4Raw.length >= 30) {
         const cleanH4 = stripUnclosedCandles(h4Raw);
         appState.h4Candles = cleanH4.map(r => ({
-          t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5]
+          t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5], tb: r[9] !== undefined ? +r[9] : null
         }));
         break;
       }
@@ -1259,8 +1266,9 @@ function stripUnclosedCandles(rawKlines, nowMs = Date.now()) {
       if (dRes.ok) {
         const dData = await dRes.json();
         if (Array.isArray(dData) && dData.length > 0) {
-          appState.dailyCandles = dData.map(r => ({
-            t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5]
+          const cleanD = stripUnclosedCandles(dData);
+          appState.dailyCandles = cleanD.map(r => ({
+            t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5], tb: r[9] !== undefined ? +r[9] : null
           }));
           klinesSuccess = true;
           isCacheFallback = true;
@@ -1277,8 +1285,9 @@ function stripUnclosedCandles(rawKlines, nowMs = Date.now()) {
       if (hRes.ok) {
         const hData = await hRes.json();
         if (Array.isArray(hData) && hData.length > 0) {
-          appState.h4Candles = hData.map(r => ({
-            t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5]
+          const cleanH = stripUnclosedCandles(hData);
+          appState.h4Candles = cleanH.map(r => ({
+            t: +r[0], o: +r[1], h: +r[2], l: +r[3], c: +r[4], v: +r[5], tb: r[9] !== undefined ? +r[9] : null
           }));
         }
       }
@@ -1435,8 +1444,10 @@ async function copyDataPacket6() {
     "--------------------------------------------------------------------------------",
     "• 4H Lower Wick Ratio:         " + (appState.stats4h.wick * 100).toFixed(2) + "% (Req >= 50%)",
     "• 4H Close Location:           " + (appState.stats4h.loc * 100).toFixed(2) + "% (Req >= 65% in top 35%)",
+    "• 4H Spot Taker Delta:         " + (appState.takerDelta4h !== null && appState.takerDelta4h !== undefined ? (appState.takerDelta4h >= 0 ? '+' : '') + appState.takerDelta4h.toFixed(2) + " BTC" : 'N/A'),
     "• Daily Lower Wick Ratio:      " + (appState.stats1d.wick * 100).toFixed(2) + "% (Req >= 50%)",
     "• Daily Close Location:        " + (appState.stats1d.loc * 100).toFixed(2) + "% (Req >= 65% in top 35%)",
+    "• Daily Spot Taker Delta:      " + (appState.takerDelta1d !== null && appState.takerDelta1d !== undefined ? (appState.takerDelta1d >= 0 ? '+' : '') + appState.takerDelta1d.toFixed(2) + " BTC" : 'N/A'),
     "• Daily 20-Period EMA:         " + fmt(appState.ema20),
     "• Daily 14-Period ATR:         " + fmt(appState.atr14),
     "• Normalized Extension:        " + (appState.extension >= 0 ? '+' : '') + appState.extension.toFixed(2) + " ATR",

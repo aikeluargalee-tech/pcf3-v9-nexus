@@ -10,7 +10,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
 
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://data-api.binance.vision https://api.coinbase.com https://api.binance.com https://api1.binance.com https://api3.binance.com https://api.github.com; img-src 'self' data:;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://data-api.binance.vision https://fapi.binance.com https://*.supabase.co https://api.kraken.com https://api.coinbase.com https://api.binance.com https://api1.binance.com https://api3.binance.com https://api.github.com; img-src 'self' data:;">
 
   <title>Nexus Terminal — BTC Live Order Flow &amp; Market Regime Telemetry</title>
   <meta name="description" content="Nexus Terminal is an open quantitative analytics platform for Bitcoin market microstructure, live order flow telemetry, volume profile nodes, and macro regime classification.">
@@ -119,14 +119,23 @@ function parseTelemetry(raw, liveSpot) {
   var mSTH = raw ? raw.match(/STH_COST_BASIS:\s*([0-9\.]+)/i) : null;
   res.sth = (typeof window !== 'undefined' && window.__NEXUS_ONCHAIN_STH__) ? window.__NEXUS_ONCHAIN_STH__ : (mSTH ? parseFloat(mSTH[1]) : 74468);
 
-  var mScore = raw ? raw.match(/TOTAL SCORE:\s*(\d+)\s*\/\s*100/i) : null;
-  res.regimeScore = mScore ? parseInt(mScore[1]) : 38;
+  var mScore = raw ? raw.match(/TOTAL SCORE:\s*([+\-]?\d+)\s*\/\s*100/i) : null;
+  res.regimeScore = mScore ? parseInt(mScore[1], 10) : 38;
   var mClass = raw ? raw.match(/REGIME_3_CLASSIFICATION:\s*([^\n\r|]+)/i) : null;
-  res.regimeClass = mClass ? mClass[1].trim() : "Transitional";
+  if (res.regimeScore >= 60) {
+    res.regimeClass = "Constructive (阳)";
+  } else if (res.regimeScore >= 35) {
+    res.regimeClass = "Transitional (中)";
+  } else {
+    res.regimeClass = "Corrective / Defensive (阴)";
+  }
+  if (mClass && mClass[1].trim() && !(res.regimeScore < 60 && mClass[1].indexOf("Constructive") !== -1)) {
+    res.regimeClass = mClass[1].trim();
+  }
   var mBias = raw ? raw.match(/Trading Bias:\s*([^\n\r|]+)/i) : null;
-  res.tradingBias = mBias ? mBias[1].trim() : "Stay light, only highest-quality setups";
+  res.tradingBias = mBias ? mBias[1].trim() : (res.regimeScore >= 60 ? "Constructive swing setups permissible" : "Stand aside / cash preferred (0.0x)");
   var mDir = raw ? raw.match(/DIRECTION:\s*([^\n\r|]+)/i) : null;
-  res.direction = mDir ? mDir[1].trim().split('|')[0].trim() : "Bull Trend (above EMA50)";
+  res.direction = mDir ? mDir[1].trim().split('|')[0].trim() : "Macro Bull (Consolidating)";
   var mDailyStruct = raw ? raw.match(/Daily Structure:\s*([^\n\r|]+)/i) : null;
   res.dailyStructure = mDailyStruct ? mDailyStruct[1].trim() : "Mild LH+LL";
   var mWeeklyStruct = raw ? raw.match(/Weekly Structure:\s*([^\n\r|]+)/i) : null;
@@ -134,6 +143,9 @@ function parseTelemetry(raw, liveSpot) {
 
   var mSubStruct = raw ? raw.match(/Structure Max 40.*?Subtotal\s*(-?\d+)\/40/is) : null;
   res.subStructure = mSubStruct ? mSubStruct[1] : "0";
+  if (parseInt(res.subStructure, 10) <= 0 && res.direction === "Bull Trend") {
+    res.direction = parseInt(res.subStructure, 10) === 0 ? "Macro Bull (Consolidating)" : "Macro Bull (Daily Pullback)";
+  }
   var mSubMAs = raw ? raw.match(/MAs Max 30.*?Subtotal\s*(-?\d+)\/30/is) : null;
   res.subMAs = mSubMAs ? mSubMAs[1] : "30";
   var mSubMom = raw ? raw.match(/Momentum Max 20.*?Subtotal\s*(-?\d+)\/20/is) : null;
@@ -1059,7 +1071,7 @@ w("div",{className:"card enh p-5",children:[
     ]}),
     w("div",{className:"flex justify-between",children:[
       p("span",{className:"text-[#64748b]",children:"Funding"}),
-      p("span",{className:"font-mono text-[#4ade80]",children:(te.funding*100).toFixed(4) + "% (" + (te.funding > 0.0001 ? "Bull / Normal" : "Neutral") + ")"})
+      p("span",{className:"font-mono text-[#4ade80]",children:te.funding.toFixed(4) + "% (" + (te.funding > 0.01 ? "Bull / Elevated" : "Bull / Normal") + ")"})
     ]}),
     w("div",{className:"flex justify-between",children:[
       p("span",{className:"text-[#64748b]",children:"Basis"}),
@@ -1126,7 +1138,7 @@ w("div",{className:"card bottom p-5 lg:col-span-3 md:col-span-2",children:[
       w("div",{className:"space-y-2 text-[12px] leading-[1.5]",children:[
         p("div",{children:"• Regime Score " + te.regimeScore + "/100 (" + te.regimeClass + "): " + te.tradingBias}),
         p("div",{children:"• Structure: Daily " + te.dailyStructure + ", Weekly " + te.weeklyStructure + " vs W-VWAP $" + Math.round(te.weeklyVwap||83991).toLocaleString()}),
-        p("div",{children:"• Derivatives: BTC OI " + Math.round(te.oi).toLocaleString() + " BTC, Funding " + (te.funding*100).toFixed(4) + "%"}),
+        p("div",{children:"• Derivatives: BTC OI " + Math.round(te.oi).toLocaleString() + " BTC, Funding " + te.funding.toFixed(4) + "%"}),
         p("div",{children:"• Multi-Factor Sizing: " + te.dampener + "x dampener — " + (te.regimeScore >= 60 ? "Active swing setups permissible" : "Capital preservation / cash favored")}),
         p("div",{className:"pt-2 font-semibold text-[#4ade80]",children:"→ Analysis Only — Heuristic Assistant — Not Financial Advice"})
       ]})

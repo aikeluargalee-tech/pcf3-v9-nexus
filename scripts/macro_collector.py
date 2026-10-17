@@ -147,8 +147,38 @@ def run_collector():
     # 4. Evaluate Threat Modules & Composite Score
     breadth_triggered = ratio_diff_pct > 1.0 or raw_ratio > 33.50
     yield_triggered = yield_val >= 5.000
-    mstr_triggered = True  # Bearish momentum divergence active
-    season_triggered = True # Election cycle window active
+    mstr_triggered = (mstr_chg_pct < -1.0 and btc_chg_pct > 0) or (mstr_chg_pct < btc_chg_pct - 2.0)
+
+    # Check data/events.json and module_d_seasonality catalysts for upcoming high-impact events within 7 days
+    season_triggered = False
+    events_file = os.path.join(repo_root, "data", "events.json")
+    upcoming_catalyst_names = []
+    if os.path.exists(events_file):
+        try:
+            with open(events_file, "r", encoding="utf-8") as ef:
+                ev_data = json.load(ef)
+            for ev in ev_data.get("events", []):
+                t_str = ev.get("time_utc", "")
+                if t_str:
+                    ev_dt = datetime.datetime.fromisoformat(t_str.replace("Z", "+00:00"))
+                    days_until = (ev_dt - now_utc).total_seconds() / 86400.0
+                    impact_str = str(ev.get("impact", "HIGH")).upper()
+                    if 0.0 <= days_until <= 7.0 and (ev.get("kind") == "scheduled" or impact_str in ("HIGH", "EXTREME", "CRITICAL")):
+                        season_triggered = True
+                        upcoming_catalyst_names.append(f"{ev.get('label', 'Event')} ({days_until:.1f}d)")
+        except Exception as e:
+            print(f"⚠️ Warning reading events.json: {e}")
+
+    for cat in data.get("modules", {}).get("module_d_seasonality", {}).get("catalysts", []):
+        try:
+            c_date = datetime.datetime.strptime(cat.get("date", ""), "%Y-%m-%d").replace(tzinfo=datetime.timezone.utc)
+            days_until = (c_date - now_utc).total_seconds() / 86400.0
+            cat["days_away"] = max(0, int(round(days_until)))
+            if -0.5 <= days_until <= 7.0 and str(cat.get("impact", "")).upper() in ("HIGH", "EXTREME", "CRITICAL"):
+                season_triggered = True
+                upcoming_catalyst_names.append(f"{cat.get('event', 'Catalyst')} ({int(round(days_until))}d)")
+        except Exception:
+            pass
 
     score = 0
     if breadth_triggered: score += 35
@@ -161,6 +191,17 @@ def run_collector():
     status = "CRITICAL THREAT / SQUEEZE IMMINENT" if score >= 66 else ("ELEVATED CAUTION / FRICTION" if score >= 36 else "LOW THREAT / RISK EXPANSION")
     tactical_call = "FORCE DMRA REGIME 2: 100% USDT CASH PRESERVATION" if score >= 66 else ("DEFENSIVE / HALF POSITION SIZING" if score >= 36 else "DMRA REGIME 1: SPOT SWING ACCUMULATION PERMISSIBLE")
 
+    mstr_reason = (
+        f"MSTR 24h ({mstr_chg_pct:+.2f}%) lagging BTC ({btc_chg_pct:+.2f}%); bearish momentum divergence active"
+        if mstr_triggered else
+        f"MSTR 24h ({mstr_chg_pct:+.2f}%) tracking or outperforming BTC ({btc_chg_pct:+.2f}%); no acute divergence"
+    )
+    season_reason = (
+        f"High-impact catalyst within 7d window: {', '.join(upcoming_catalyst_names[:2])}"
+        if season_triggered else
+        "No HIGH/EXTREME/CRITICAL scheduled macro catalysts within the next 7 days"
+    )
+
     # 5. Populate Modules
     data['asof'] = now_utc.strftime("%Y-%m-%dT%H:%M:%SZ")
     data['composite_threat'] = {
@@ -171,10 +212,10 @@ def run_collector():
         "tactical_call": tactical_call,
         "execution_instruction": "HALT all spot dip-buying across Quant Radar, Liquidity Radar, Sweep Desk, and Absorption Radar. Maintain 100% USDT dry powder until US 10Y pulls back below 5.0% and SPX/RSP breadth recovers." if score >= 66 else "Normal spot swing execution permissible within risk dampeners.",
         "breakdown": {
-            "spx_rsp_breadth_divergence": { "points": 35 if breadth_triggered else 0, "max": 35, "triggered": breadth_triggered, "reason": "SPX at ATH while RSP lagging down; double-bottom breakout into 2008 fractal" },
-            "us10y_elevated_yield": { "points": 30 if yield_triggered else (15 if yield_val > 4.25 else 0), "max": 30, "triggered": yield_triggered, "reason": f"10Y Treasury Yield at {yield_val:.3f}% >= 5.00% toxic threshold" },
-            "mstr_bearish_divergence": { "points": 20 if mstr_triggered else 0, "max": 20, "triggered": mstr_triggered, "reason": "MSTR failing to reclaim cycle highs; momentum squeeze and RSI divergence" },
-            "seasonality_election_window": { "points": 15 if season_triggered else 0, "max": 15, "triggered": season_triggered, "reason": "US Election volatility cycle active; crypto recovery lag warning in effect" }
+            "spx_rsp_breadth_divergence": { "points": 35 if breadth_triggered else 0, "max": 35, "triggered": breadth_triggered, "reason": "SPX at ATH while RSP lagging down; double-bottom breakout into 2008 fractal" if breadth_triggered else "SPX/RSP breadth ratio within normal bounds" },
+            "us10y_elevated_yield": { "points": 30 if yield_triggered else (15 if yield_val > 4.25 else 0), "max": 30, "triggered": yield_triggered or (yield_val > 4.25), "reason": f"10Y Treasury Yield at {yield_val:.3f}% >= 5.00% toxic threshold" if yield_triggered else f"10Y Treasury Yield at {yield_val:.3f}%" },
+            "mstr_bearish_divergence": { "points": 20 if mstr_triggered else 0, "max": 20, "triggered": mstr_triggered, "reason": mstr_reason },
+            "seasonality_election_window": { "points": 15 if season_triggered else 0, "max": 15, "triggered": season_triggered, "reason": season_reason }
         }
     }
 
@@ -191,6 +232,7 @@ def run_collector():
 
     data['modules']['module_c_mstr']['price'] = round(mstr_price, 2)
     data['modules']['module_c_mstr']['change_24h_pct'] = mstr_chg_pct
+    data['modules']['module_c_mstr']['status'] = "BEARISH DIVERGENCE / SQUEEZE WARNING" if mstr_triggered else "ALIGNED / NORMAL BETA"
 
     data['modules']['btc_context']['spot_price'] = round(btc_price, 2)
     data['modules']['btc_context']['change_24h_pct'] = btc_chg_pct
@@ -198,6 +240,21 @@ def run_collector():
     # 6. Save updated cache
     with open(feed_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=2)
+
+    # Synchronize US 10Y yield into volatility_confluence_feed.json to prevent cross-desk drift
+    vol_feed_path = os.path.join(repo_root, "data", "volatility_confluence_feed.json")
+    if os.path.exists(vol_feed_path):
+        try:
+            import re
+            with open(vol_feed_path, 'r', encoding='utf-8') as vf:
+                vdata = json.load(vf)
+            for p in vdata.get('pillars', []):
+                if p.get('id') == 'macro' and 'raw' in p:
+                    p['raw'] = re.sub(r'10Y=[0-9\.]+%', f"10Y={yield_val:.3f}%", p['raw'])
+            with open(vol_feed_path, 'w', encoding='utf-8') as vf:
+                json.dump(vdata, vf, indent=2)
+        except Exception as e:
+            print(f"⚠️ Warning syncing volatility_confluence_feed.json: {e}")
 
     print(f"\n✅ SUCCESS: data/macro_threat_feed.json successfully updated! (Score: {score}%, Asof: {data['asof']})")
 

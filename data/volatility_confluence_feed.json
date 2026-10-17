@@ -1,7 +1,7 @@
 {
   "version": "1.1.0",
   "asof": "2026-10-12T11:00:00Z",
-  "source": "Nexus Terminal — BTC Volatility Radar Live Tracker (CONFLUENCE-RADAR v1.1 - Calibrated)",
+  "source": "Nexus Terminal \u2014 BTC Volatility Radar Live Tracker (CONFLUENCE-RADAR v1.1 - Calibrated)",
   "overall": {
     "score": -3,
     "risk_state": "Mild Bearish",
@@ -15,7 +15,7 @@
       "label": "Macro",
       "short": "MCR",
       "score": -1,
-      "raw": "10Y=5.217% (+8bps d/d), DXY=104.8 (+0.4%), FedHoldProb=82%->76%",
+      "raw": "10Y=5.098% (+8bps d/d), DXY=104.8 (+0.4%), FedHoldProb=82%->76%",
       "rationale": "Headline CPI consensus +0.6% MoM from gasoline; yields up, hold odds dropping"
     },
     {
@@ -39,8 +39,8 @@
       "label": "On-Chain",
       "short": "ONC",
       "score": 0,
-      "raw": "NetExFlow=+1.2k BTC inflow (neutral ±6k band), Whale=Neutral, Stablecoin=+20M",
-      "rationale": "Inflow within routine ±6k BTC liquidity band; stablecoin supply flat"
+      "raw": "NetExFlow=+1.2k BTC inflow (neutral \u00b16k band), Whale=Neutral, Stablecoin=+20M",
+      "rationale": "Inflow within routine \u00b16k BTC liquidity band; stablecoin supply flat"
     },
     {
       "id": "geopolitics",
@@ -72,17 +72,52 @@
       "short": "XAS",
       "score": 0,
       "raw": "Nasdaq=-0.3%, VIX=18.2, BTC.D=52.1%",
-      "rationale": "Mild risk-off, equities within ±1% band, VIX <20"
+      "rationale": "Mild risk-off, equities within \u00b11% band, VIX <20"
     }
   ],
   "checklist_p1": [
-    { "id": "etf_net", "label": "ETF_Net_Flows_Checked", "desc": "ETF net flows — IBIT/FBTC/Total + premium", "done": true },
-    { "id": "funding_oi", "label": "Funding_OI_Liq_Checked", "desc": "Funding rates + OI delta + skew/IV", "done": true },
-    { "id": "yields_oil", "label": "Yields_DXY_Oil_Checked", "desc": "10Y / 30Y yields + real yields + DXY + Brent", "done": true },
-    { "id": "x_scan", "label": "X_HighSignal_Scan_Checked", "desc": "High-signal X scan — narrative & key posts", "done": false },
-    { "id": "price_levels", "label": "Price_vs_Levels_Checked", "desc": "BTC vs key levels — 80-82k supp / 85-87.5k res", "done": true },
-    { "id": "exchange_flows", "label": "Exchange_Flows_Checked", "desc": "Exchange net inflows/outflows + Whale LTH delta", "done": true },
-    { "id": "options_skew", "label": "Options_Skew_Checked", "desc": "Options skew & 25-delta risk reversals", "done": false }
+    {
+      "id": "etf_net",
+      "label": "ETF_Net_Flows_Checked",
+      "desc": "ETF net flows \u2014 IBIT/FBTC/Total + premium",
+      "done": true
+    },
+    {
+      "id": "funding_oi",
+      "label": "Funding_OI_Liq_Checked",
+      "desc": "Funding rates + OI delta + skew/IV",
+      "done": true
+    },
+    {
+      "id": "yields_oil",
+      "label": "Yields_DXY_Oil_Checked",
+      "desc": "10Y / 30Y yields + real yields + DXY + Brent",
+      "done": true
+    },
+    {
+      "id": "x_scan",
+      "label": "X_HighSignal_Scan_Checked",
+      "desc": "High-signal X scan \u2014 narrative & key posts",
+      "done": false
+    },
+    {
+      "id": "price_levels",
+      "label": "Price_vs_Levels_Checked",
+      "desc": "BTC vs key levels \u2014 80-82k supp / 85-87.5k res",
+      "done": true
+    },
+    {
+      "id": "exchange_flows",
+      "label": "Exchange_Flows_Checked",
+      "desc": "Exchange net inflows/outflows + Whale LTH delta",
+      "done": true
+    },
+    {
+      "id": "options_skew",
+      "label": "Options_Skew_Checked",
+      "desc": "Options skew & 25-delta risk reversals",
+      "done": false
+    }
   ],
   "levels": {
     "support": "80.3k (Oct8 low) / 80-82k zone",
@@ -98,49 +133,271 @@
   ],
   "tables": {
     "macro": [
-      ["2026-10-10", "10Y 4.62%", "4.91%", "2.15%", "104.8", "103.2 (+2.1%)", "76%", "-1", "Yields and DXY squeezing risk assets post-airport attack"],
-      ["2026-10-08", "10Y 4.58%", "4.88%", "2.11%", "104.6", "101.8 (+1.7%)", "80%", "-1", "CPI expectation front-running; Brent crossing $100"],
-      ["2026-10-06", "10Y 4.52%", "4.82%", "2.08%", "104.2", "100.1", "84%", "0", "Consensus +0.6% MoM headline / +0.2% core pending"]
+      [
+        "2026-10-10",
+        "10Y 4.62%",
+        "4.91%",
+        "2.15%",
+        "104.8",
+        "103.2 (+2.1%)",
+        "76%",
+        "-1",
+        "Yields and DXY squeezing risk assets post-airport attack"
+      ],
+      [
+        "2026-10-08",
+        "10Y 4.58%",
+        "4.88%",
+        "2.11%",
+        "104.6",
+        "101.8 (+1.7%)",
+        "80%",
+        "-1",
+        "CPI expectation front-running; Brent crossing $100"
+      ],
+      [
+        "2026-10-06",
+        "10Y 4.52%",
+        "4.82%",
+        "2.08%",
+        "104.2",
+        "100.1",
+        "84%",
+        "0",
+        "Consensus +0.6% MoM headline / +0.2% core pending"
+      ]
     ],
     "etf": [
-      ["2026-10-09", "+35M", "-10M", "-4M", "+21M", "105.4B", "~910k", "-0.05%", "0"],
-      ["2026-10-08", "-95M", "-70M", "-79M", "-244M", "105.2B", "~908k", "-0.12%", "-1"],
-      ["2026-10-07", "-210M", "-150M", "-127M", "-487M", "105.8B", "~911k", "-0.18%", "-1"]
+      [
+        "2026-10-09",
+        "+35M",
+        "-10M",
+        "-4M",
+        "+21M",
+        "105.4B",
+        "~910k",
+        "-0.05%",
+        "0"
+      ],
+      [
+        "2026-10-08",
+        "-95M",
+        "-70M",
+        "-79M",
+        "-244M",
+        "105.2B",
+        "~908k",
+        "-0.12%",
+        "-1"
+      ],
+      [
+        "2026-10-07",
+        "-210M",
+        "-150M",
+        "-127M",
+        "-487M",
+        "105.8B",
+        "~911k",
+        "-0.18%",
+        "-1"
+      ]
     ],
     "derivatives": [
-      ["2026-10-10", "+0.007% avg", "-1.5%", "$180M", "$210M", "Neutral", "56%", "0"],
-      ["2026-10-08", "+0.012% avg", "+4.2%", "$650M", "$120M", "Neutral (Baseline)", "62%", "0"],
-      ["2026-10-06", "+0.009% avg", "+2.1%", "$320M", "$80M", "Neutral", "58%", "0"]
+      [
+        "2026-10-10",
+        "+0.007% avg",
+        "-1.5%",
+        "$180M",
+        "$210M",
+        "Neutral",
+        "56%",
+        "0"
+      ],
+      [
+        "2026-10-08",
+        "+0.012% avg",
+        "+4.2%",
+        "$650M",
+        "$120M",
+        "Neutral (Baseline)",
+        "62%",
+        "0"
+      ],
+      [
+        "2026-10-06",
+        "+0.009% avg",
+        "+2.1%",
+        "$320M",
+        "$80M",
+        "Neutral",
+        "58%",
+        "0"
+      ]
     ],
     "onchain": [
-      ["2026-10-10", "+1.1k BTC", "-3.9k BTC", "Whale accum (+0.12% 7d)", "+80M", "Bid heavy 81k-82k", "+1"],
-      ["2026-10-08", "+2.8k BTC", "-1.6k BTC", "Whale slight accum", "+20M", "Ask heavy 84k-85k", "0"],
-      ["2026-10-07", "+5.4k BTC", "-1.2k BTC", "Whale neutral", "+5M", "Thin bids", "-1"]
+      [
+        "2026-10-10",
+        "+1.1k BTC",
+        "-3.9k BTC",
+        "Whale accum (+0.12% 7d)",
+        "+80M",
+        "Bid heavy 81k-82k",
+        "+1"
+      ],
+      [
+        "2026-10-08",
+        "+2.8k BTC",
+        "-1.6k BTC",
+        "Whale slight accum",
+        "+20M",
+        "Ask heavy 84k-85k",
+        "0"
+      ],
+      [
+        "2026-10-07",
+        "+5.4k BTC",
+        "-1.2k BTC",
+        "Whale neutral",
+        "+5M",
+        "Thin bids",
+        "-1"
+      ]
     ],
     "geopol": [
-      ["2026-10-11", "Saudi coalition vows response, US weighs stance", "+0.5%", "Risk-off", "Level 3/5", "-1"],
-      ["2026-10-10", "Riyadh King Khalid Airport bombing (12 dead, civilian airport closed)", "+2.1% (Brent $103.2)", "Risk-off", "Level 3/5", "-1"],
-      ["2026-10-08", "Houthi missile barrage toward Southern Saudi", "+1.2% (Brent $101.8)", "Cautious", "Level 2/5", "0"]
+      [
+        "2026-10-11",
+        "Saudi coalition vows response, US weighs stance",
+        "+0.5%",
+        "Risk-off",
+        "Level 3/5",
+        "-1"
+      ],
+      [
+        "2026-10-10",
+        "Riyadh King Khalid Airport bombing (12 dead, civilian airport closed)",
+        "+2.1% (Brent $103.2)",
+        "Risk-off",
+        "Level 3/5",
+        "-1"
+      ],
+      [
+        "2026-10-08",
+        "Houthi missile barrage toward Southern Saudi",
+        "+1.2% (Brent $101.8)",
+        "Cautious",
+        "Level 2/5",
+        "0"
+      ]
     ],
     "regulation": [
-      ["2026-10-09", "EU", "MiCA stablecoin compliance milestone update", "Neutral", "0"],
-      ["2026-10-08", "US", "CFTC proposes non-intermediated leveraged spot path", "Mild positive", "0"],
-      ["2026-10-05", "US", "CLARITY Act stalled in committee, motion to reconsider", "Muted negative", "0"]
+      [
+        "2026-10-09",
+        "EU",
+        "MiCA stablecoin compliance milestone update",
+        "Neutral",
+        "0"
+      ],
+      [
+        "2026-10-08",
+        "US",
+        "CFTC proposes non-intermediated leveraged spot path",
+        "Mild positive",
+        "0"
+      ],
+      [
+        "2026-10-05",
+        "US",
+        "CLARITY Act stalled in committee, motion to reconsider",
+        "Muted negative",
+        "0"
+      ]
     ],
     "sentiment": [
-      ["2026-10-11", "Weekend consolidation 82.5k-83.2k", "Mixed / waiting for Monday open", "false", "@traderflow: 81k must hold", "0"],
-      ["2026-10-09", "Recovery attempt after long wipeout", "Mixed recovery hope", "false", "@macroscope: watch CPI print", "0"],
-      ["2026-10-07", "Liquidation cascade panic ($1.17B longs wiped)", "Fear / liquidation shock", "false", "@whalespot: largest ETF outflow", "-1"]
+      [
+        "2026-10-11",
+        "Weekend consolidation 82.5k-83.2k",
+        "Mixed / waiting for Monday open",
+        "false",
+        "@traderflow: 81k must hold",
+        "0"
+      ],
+      [
+        "2026-10-09",
+        "Recovery attempt after long wipeout",
+        "Mixed recovery hope",
+        "false",
+        "@macroscope: watch CPI print",
+        "0"
+      ],
+      [
+        "2026-10-07",
+        "Liquidation cascade panic ($1.17B longs wiped)",
+        "Fear / liquidation shock",
+        "false",
+        "@whalespot: largest ETF outflow",
+        "-1"
+      ]
     ],
     "cross": [
-      ["2026-10-11", "NDX -0.3% / SPX -0.1%", "Gold 2,674 (+0.3%)", "18.2", "52.1%", "0.0398", "0"],
-      ["2026-10-09", "NDX +0.4% / SPX +0.3%", "Gold 2,668 (flat)", "17.8", "51.9%", "0.0401", "0"],
-      ["2026-10-07", "NDX -0.8% / SPX -0.5%", "Gold 2,660 (+0.6%)", "19.5", "52.3%", "0.0408", "-1"]
+      [
+        "2026-10-11",
+        "NDX -0.3% / SPX -0.1%",
+        "Gold 2,674 (+0.3%)",
+        "18.2",
+        "52.1%",
+        "0.0398",
+        "0"
+      ],
+      [
+        "2026-10-09",
+        "NDX +0.4% / SPX +0.3%",
+        "Gold 2,668 (flat)",
+        "17.8",
+        "51.9%",
+        "0.0401",
+        "0"
+      ],
+      [
+        "2026-10-07",
+        "NDX -0.8% / SPX -0.5%",
+        "Gold 2,660 (+0.6%)",
+        "19.5",
+        "52.3%",
+        "0.0408",
+        "-1"
+      ]
     ],
     "summary": [
-      ["2026-10-11", "Fading cross-asset shock; awaiting US CPI", "CPI shock >0.6% MoM", "Scalp range 80k-85k", "-2", "Mild Bearish", "Defensive / Half Size", "0.5x"],
-      ["2026-10-10", "ETF distribution + Geopol L3 (Deriv neutral)", "Brent >105 / 10Y >4.70%", "Hedge spot longs", "-3", "Mild Bearish", "Defensive / Short Rallies", "0.25x"],
-      ["2026-10-08", "ETF -$487M + $1.17B Long liquidation + Oil spike", "Cascading liquidation to $80k", "Reclaim 85k-87.5k shelf", "-5", "Strong Bearish", "Capital Preservation / Shorts", "0.25x"]
+      [
+        "2026-10-11",
+        "Fading cross-asset shock; awaiting US CPI",
+        "CPI shock >0.6% MoM",
+        "Scalp range 80k-85k",
+        "-2",
+        "Mild Bearish",
+        "Defensive / Half Size",
+        "0.5x"
+      ],
+      [
+        "2026-10-10",
+        "ETF distribution + Geopol L3 (Deriv neutral)",
+        "Brent >105 / 10Y >4.70%",
+        "Hedge spot longs",
+        "-3",
+        "Mild Bearish",
+        "Defensive / Short Rallies",
+        "0.25x"
+      ],
+      [
+        "2026-10-08",
+        "ETF -$487M + $1.17B Long liquidation + Oil spike",
+        "Cascading liquidation to $80k",
+        "Reclaim 85k-87.5k shelf",
+        "-5",
+        "Strong Bearish",
+        "Capital Preservation / Shorts",
+        "0.25x"
+      ]
     ]
   }
 }

@@ -1471,11 +1471,14 @@ function evaluateProtocolModel() {
 
   // 4 Engines Checks:
   // Check 1: Bull Regime (50W + 200D + DXY + ETF 7D)
-  const r1_50w = (protocolData.sma50w && spot > protocolData.sma50w);
-  const r1_200d = (protocolData.sma200d && protocolData.sma200dPrev20 && protocolData.sma200d > protocolData.sma200dPrev20);
-  const r1_dxy = (protocolData.dxyVal < 103 || protocolData.dxy1dChange <= 0);
-  const r1_etf = (protocolData.etfFlow7d > 0);
-  const engineA_Bull = (r1_50w && r1_200d && r1_dxy && r1_etf);
+  const r1_50w = Boolean(protocolData.sma50w && spot > protocolData.sma50w);
+  const r1_200d = Boolean(protocolData.sma200d && protocolData.sma200dPrev20 && protocolData.sma200d > protocolData.sma200dPrev20);
+  const r1_dxy = Boolean(protocolData.dxyVal < 103 || protocolData.dxy1dChange <= 0);
+  const r1_etf = Boolean(protocolData.etfFlow7d > 0);
+  const regimeBaseline = (r1_50w && r1_200d && r1_dxy);
+  const engineA_Bull = (regimeBaseline && r1_etf);
+  protocolData.regimeBaseline = regimeBaseline;
+  protocolData.engineA_Bull = engineA_Bull;
 
   // Check 2: Buy Zone & Sweep
   const nearPoc = protocolData.poc30d && (spot <= protocolData.poc30d * 1.02);
@@ -1497,7 +1500,7 @@ function evaluateProtocolModel() {
 
   // Total Score (0 - 6)
   let score = 0;
-  if (r1_50w && r1_200d && r1_dxy) score++; // Regime baseline
+  if (regimeBaseline) score++; // Regime baseline
   if (engineB_Zone) score++;
   if (engineC_Trigger) score++;
   if (engineD_Deriv) score++;
@@ -1565,13 +1568,14 @@ function renderUI() {
   etfEl.style.color = etf7d >= 0 ? 'var(--emerald-bright)' : 'var(--amber-bright)';
 
   const fBadge = document.getElementById('f-badge');
-  const isBull = (protocolData.sma50w && spot > protocolData.sma50w && slope200d > 0);
-  if (isBull && etf7d >= 0) {
+  const isBull = Boolean(protocolData.regimeBaseline);
+  const isFullBull = Boolean(protocolData.engineA_Bull);
+  if (isFullBull) {
     fBadge.className = 'status-badge pass';
-    fBadge.textContent = '🟢 BULL REGIME INTACT';
+    fBadge.textContent = '🟢 BULL REGIME INTACT (4/4)';
   } else if (isBull) {
     fBadge.className = 'status-badge wait';
-    fBadge.textContent = '🟡 REGIME MIXED (ETF OUTFLOW DRAG)';
+    fBadge.textContent = '🟡 REGIME BASELINE (3/4 · ETF OUTFLOW DRAG)';
   } else {
     fBadge.className = 'status-badge fail';
     fBadge.textContent = '🔴 DEFENSIVE REGIME';
@@ -1610,7 +1614,7 @@ function renderUI() {
   hBadge.textContent = triggerReady ? '🟢 TRIGGER CONDITION ALIGNED' : '🟡 AWAITING 4H SWEEP';
 
   // Card D — Scores
-  document.getElementById('i-sc-1').textContent = isBull ? '1 / 1 (Pass)' : '0 / 1 (Fail)';
+  document.getElementById('i-sc-1').textContent = isFullBull ? '1 / 1 (Pass · 4/4)' : (isBull ? '1 / 1 (Baseline 3/4 · ETF Drag)' : '0 / 1 (Fail)');
   document.getElementById('i-sc-2').textContent = atGoodZone ? '1 / 1 (Pass)' : '0 / 1 (Fail)';
   document.getElementById('i-sc-3').textContent = (protocolData.sweepDetected ? '1 / 1 (Pass)' : '0 / 1 (Neutral)');
   document.getElementById('i-sc-4').textContent = (fr !== null && fr <= 0.0001) ? '1 / 1 (Pass)' : '0 / 1 (Elevated)';
@@ -1647,8 +1651,8 @@ function renderUI() {
   }
 
   // Checklist
-  document.getElementById('chk-regime').className = 'check-status ' + (isBull ? 'pass' : 'fail');
-  document.getElementById('chk-regime').textContent = isBull ? 'PASS' : 'FAIL';
+  document.getElementById('chk-regime').className = 'check-status ' + (isFullBull ? 'pass' : (isBull ? 'wait' : 'fail'));
+  document.getElementById('chk-regime').textContent = isFullBull ? 'PASS (4/4)' : (isBull ? '3/4 (ETF DRAG)' : 'FAIL');
 
   document.getElementById('chk-zone').className = 'check-status ' + (atGoodZone ? 'pass' : 'wait');
   document.getElementById('chk-zone').textContent = atGoodZone ? 'IN ZONE' : 'ABOVE POC';
