@@ -1,0 +1,14 @@
+{
+  "updatedAtUtc": "2026-10-17T10:39:29.110973+00:00",
+  "spotPrice": 81647.56,
+  "verdictLock": "FLAT_100_USDT | MAX_EXPOSURE: 0.00x | GATE_DRIVER: DESK_7_CRIMSON",
+  "regimeScore": 46,
+  "regimeClass": "Transitional (\u4e2d)",
+  "threatScore": 85,
+  "threatLevel": "CRIMSON",
+  "quantAligned": true,
+  "quantPassCount": 3,
+  "sslPrice": 79800.0,
+  "bslPrice": 84146.72,
+  "sthFloor": 74468.34
+}
