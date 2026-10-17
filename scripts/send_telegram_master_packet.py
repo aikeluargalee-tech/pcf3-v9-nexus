@@ -607,9 +607,16 @@ def evaluate_decision(curr, prev, utc_hour, force_send=False):
         "hold_reasons": hold_reasons
     }
 
-def build_caption(curr, decision):
-    icon = "🚨" if decision['is_state_change'] else "🏛️"
-    title = "NEXUS URGENT STATE-CHANGE ALERT" if decision['is_state_change'] else "NEXUS 9-DESK 4H TELEMETRY BRIEFING"
+def build_caption(curr, decision, force_send=False):
+    if force_send:
+        icon = "⚡"
+        title = "NEXUS ON-DEMAND TELEMETRY DOSSIER"
+    elif decision['is_state_change']:
+        icon = "🚨"
+        title = "NEXUS URGENT STATE-CHANGE ALERT"
+    else:
+        icon = "🏛️"
+        title = "NEXUS 9-DESK 4H TELEMETRY BRIEFING"
     
     spot_str = f"${curr['spotPrice']:,.2f}" if curr['spotPrice'] else "N/A"
     sth_str = f"${curr['sthFloor']:,.0f}" if curr['sthFloor'] else "N/A"
@@ -696,8 +703,8 @@ def main():
     file_name = f"NEXUS_9DESK_MASTER_PACKET_{stamp_file}.txt"
 
     decision = evaluate_decision(curr, prev, utc_hour, force_send=force_send)
-    caption = build_caption(curr, decision)
-    silent_notification = not decision['is_actionable']
+    caption = build_caption(curr, decision, force_send=force_send)
+    silent_notification = (not decision['is_actionable']) and (not force_send)
 
     print(f"[Telemetry] BTC Spot: ${curr['spotPrice']:,.2f} | Regime: {curr['regimeScore']}/100 | Threat: {curr['threatScore']}/100 [{curr['threatLevel']}] | Quant: {curr['quantPassCount']}/3")
     print(f"[Schedule]  UTC Hour: {utc_hour:02d}:00 | 4H Close: {decision['is_4h_close']} | State Change: {decision['is_state_change']} | Force: {force_send}")

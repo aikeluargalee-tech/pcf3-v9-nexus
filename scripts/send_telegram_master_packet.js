@@ -264,11 +264,16 @@ function evaluateSmartHybridDecision(curr, prev, utcHour, forceSend) {
 /**
  * Builds the concise Telegram HTML caption (< 1,024 chars limit for sendDocument).
  */
-function buildTelegramCaption(curr, decision) {
-  const headerIcon = decision.isStateChangeAlert ? '🚨' : '🏛️';
-  const headerTitle = decision.isStateChangeAlert
-    ? 'NEXUS URGENT STATE-CHANGE ALERT'
-    : 'NEXUS 9-DESK 4H TELEMETRY BRIEFING';
+function buildTelegramCaption(curr, decision, forceSend = false) {
+  let headerIcon = '🏛️';
+  let headerTitle = 'NEXUS 9-DESK 4H TELEMETRY BRIEFING';
+  if (forceSend) {
+    headerIcon = '⚡';
+    headerTitle = 'NEXUS ON-DEMAND TELEMETRY DOSSIER';
+  } else if (decision.isStateChangeAlert) {
+    headerIcon = '🚨';
+    headerTitle = 'NEXUS URGENT STATE-CHANGE ALERT';
+  }
 
   const spotFmt = curr.spotPrice ? `$${curr.spotPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'N/A';
   const sthFmt = curr.sthFloor ? `$${Math.round(curr.sthFloor).toLocaleString('en-US')}` : 'N/A';
@@ -365,8 +370,8 @@ async function main() {
   const fileName = `NEXUS_9DESK_MASTER_PACKET_${stampFile}.txt`;
 
   const decision = evaluateSmartHybridDecision(curr, prev, utcHour, forceSend);
-  const caption = buildTelegramCaption(curr, decision);
-  const silentNotification = !decision.isActionableForLlm;
+  const caption = buildTelegramCaption(curr, decision, forceSend);
+  const silentNotification = (!decision.isActionableForLlm) && (!forceSend);
 
   console.log(`[Telemetry] BTC Spot: $${curr.spotPrice} | Regime: ${curr.regimeScore}/100 | Threat: ${curr.threatScore}/100 [${curr.threatLevel}] | Quant: ${curr.quantPassCount}/3`);
   console.log(`[Schedule]  UTC Hour: ${utcHour}:00 | 4H Close Boundary: ${decision.isFourHourBoundary} | State-Change Trigger: ${decision.isStateChangeAlert} | Force: ${forceSend}`);
