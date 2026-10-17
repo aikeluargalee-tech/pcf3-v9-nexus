@@ -296,7 +296,7 @@ def build_unified_master_dossier():
     # Parse Raw Packet for On-Chain, Regime, Derivatives, Appendix
     sth_floor = 74468.34
     regime_score = 46
-    regime_class = "Transitional (中)"
+    regime_class = "Transitional (Neutral)"
     regime_dir = "Macro Bull (Consolidating)"
     regime_bd = "Structure 0/40, MAs 30/30, Momentum 6/20, Context 10/10"
     oi_line = "94,040 BTC"
@@ -316,7 +316,10 @@ def build_unified_master_dossier():
             regime_score = int(m_score.group(1))
         m_class = re.search(r'REGIME_3_CLASSIFICATION:\s*([^\n|]+)', raw_packet)
         if m_class:
-            regime_class = m_class.group(1).strip()
+            regime_class = (m_class.group(1).strip()
+                            .replace('(中)', '(Neutral)')
+                            .replace('(阳)', '(Bullish)')
+                            .replace('(阴)', '(Defensive)'))
         m_dir = re.search(r'DIRECTION:\s*([^\n|]+)', raw_packet)
         if m_dir:
             regime_dir = m_dir.group(1).strip()

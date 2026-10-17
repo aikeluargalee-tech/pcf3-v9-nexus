@@ -89,8 +89,11 @@ function parseMasterPacketTelemetry(packetText) {
 
   const regimeLine = extractField(packetText, /• Macro Regime Synthesis:\s*([^\n]+)/i, '');
   const regimeScoreMatch = regimeLine.match(/Score\s+(\d+)\/100\s*\(([^)]+)\)/i);
-  const regimeScore = regimeScoreMatch ? parseInt(regimeScoreMatch[1], 10) : 46;
-  const regimeClass = regimeScoreMatch ? regimeScoreMatch[2].trim() : 'Transitional (中)';
+  const rawClass = regimeScoreMatch ? regimeScoreMatch[2].trim() : 'Transitional (Neutral)';
+  const regimeClass = rawClass
+    .replace(/[\(（]?中[\)）]?/g, 'Neutral')
+    .replace(/[\(（]?阳[\)）]?/g, 'Bullish')
+    .replace(/[\(（]?阴[\)）]?/g, 'Defensive');
 
   const sma200Line = extractField(packetText, /• 200-Day SMA Regime Baseline:\s*([^\n]+)/i, '');
   const sma200Match = sma200Line.match(/\$([0-9,]+\.[0-9]+)/);

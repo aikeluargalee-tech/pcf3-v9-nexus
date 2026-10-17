@@ -1038,9 +1038,9 @@ def calculate_regime_scores(daily_closes, daily_highs, daily_lows, weekly_closes
     scores["context_cycle"]=cycle_score; scores["context_onchain"]=onchain_score; scores["context_total"]=cycle_score+onchain_score
     details["context_cycle"]=cycle_detail; details["context_onchain"]=onchain_detail
     total=scores["structure_total"]+scores["ma_total"]+scores["mom_total"]+scores["context_total"]
-    if total>=60: regime_3="Constructive (阳)"; bias_3="Actively seek long swings (Sizing active)"
-    elif total>=35: regime_3="Transitional (中)"; bias_3="Consolidating / Wait for >=60 confluence (0.0x cash preferred)"
-    else: regime_3="Corrective / Defensive (阴)"; bias_3="Preserve cash / avoid new longs (0.0x)"
+    if total>=60: regime_3="Constructive (Bullish)"; bias_3="Actively seek long swings (Sizing active)"
+    elif total>=35: regime_3="Transitional (Neutral)"; bias_3="Consolidating / Wait for >=60 confluence (0.0x cash preferred)"
+    else: regime_3="Corrective / Defensive (Defensive)"; bias_3="Preserve cash / avoid new longs (0.0x)"
     return {"scores":scores,"details":details,"total_score":total,"regime_3":regime_3,"bias_3":bias_3,"weekly_struct":weekly_struct,"daily_struct":daily_struct}
 
 def calculate_6_regimes(adx_vals, atr_vals, atr_avg_vals, closes, ema50_vals, ema200_vals, bb_width_vals, structure_total=None):

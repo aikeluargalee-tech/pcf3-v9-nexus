@@ -1108,7 +1108,7 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
     }
     let regexFailedBounds = false;
     let desk1Direction = 'Macro Bull (Consolidating)';
-    let desk1RegimeClass = 'Transitional (中)';
+    let desk1RegimeClass = 'Transitional (Neutral)';
     let desk1ScoreBreakdown = 'Structure 0/40, MAs 30/30, Momentum 6/20, Context 10/10';
     let desk1OiLine = '94,131 BTC';
     let desk1FundingLine = '0.0055% (Controlled / Neutral)';
@@ -1136,7 +1136,12 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
         rawDampener = Math.max(0, Math.min(1, (regimeScore - 60) / 30));
       }
       const classMatch = rawPacket.match(/REGIME_3_CLASSIFICATION:\s*([^\n|]+)/i);
-      if (classMatch) desk1RegimeClass = classMatch[1].trim();
+      if (classMatch) {
+        desk1RegimeClass = classMatch[1].trim()
+          .replace(/[\(（]中[\)）]/g, '(Neutral)')
+          .replace(/[\(（]阳[\)）]/g, '(Bullish)')
+          .replace(/[\(（]阴[\)）]/g, '(Defensive)');
+      }
       const dirMatch = rawPacket.match(/DIRECTION:\s*([^\n|]+)/i);
       if (dirMatch) desk1Direction = dirMatch[1].trim();
       const bdMatch = rawPacket.match(/Breakdown:\s*([^\n|]+)/i);

@@ -123,14 +123,14 @@ function parseTelemetry(raw, liveSpot) {
   res.regimeScore = mScore ? parseInt(mScore[1], 10) : 38;
   var mClass = raw ? raw.match(/REGIME_3_CLASSIFICATION:\s*([^\n\r|]+)/i) : null;
   if (res.regimeScore >= 60) {
-    res.regimeClass = "Constructive (阳)";
+    res.regimeClass = "Constructive (Bullish)";
   } else if (res.regimeScore >= 35) {
-    res.regimeClass = "Transitional (中)";
+    res.regimeClass = "Transitional (Neutral)";
   } else {
-    res.regimeClass = "Corrective / Defensive (阴)";
+    res.regimeClass = "Corrective / Defensive (Defensive)";
   }
   if (mClass && mClass[1].trim() && !(res.regimeScore < 60 && mClass[1].indexOf("Constructive") !== -1)) {
-    res.regimeClass = mClass[1].trim();
+    res.regimeClass = mClass[1].trim().replace(/[\(（]中[\)）]/g, '(Neutral)').replace(/[\(（]阳[\)）]/g, '(Bullish)').replace(/[\(（]阴[\)）]/g, '(Defensive)');
   }
   var mBias = raw ? raw.match(/Trading Bias:\s*([^\n\r|]+)/i) : null;
   res.tradingBias = mBias ? mBias[1].trim() : (res.regimeScore >= 60 ? "Constructive swing setups permissible" : "Stand aside / cash preferred (0.0x)");
@@ -601,7 +601,7 @@ ORDER_BOOK_DEPTH_AROUND_PSYCH_85500: Bids 0 BTC / Asks 0 BTC ratio 999 SUPPORT_H
 --- 15. REGIME DETECTION (6-CELL & 100-POINT DASHBOARD) ---
 ADX(14) Daily: 24.2 | ATR(14) Daily: 2107.58 (Ratio 0.926x) | BBWidth(20,2) Daily: 6.940% (18th pct) | REGIME_6_CELLS (Kimi 2x3): Regime Transition — ADX 20-25 no-man's land not a regime second-signal rule applies never trade first break wait for sweep-and-reclaim or confirmed retest | DATA_STATUS: LIVE_AUTO
 DIRECTION: Macro Bull (Consolidating) | Price 81640 vs EMA50 80471 vs EMA200 74157 | Weekly Structure: Mild HH+HL | Daily Structure: Mild LH+LL | TREND_VS_RANGE: Transitional (20-25 no-man's land = regime transition, wait for second signal) | VOLATILITY_REGIME: Normal Volatility | DATA_STATUS: LIVE_AUTO
-TOTAL SCORE: 46 / 100 | REGIME_3_CLASSIFICATION: Transitional (中) | Trading Bias: Consolidating / Wait for >=60 confluence (0.0x cash preferred) | Breakdown: Structure 0/40, MAs 30/30, Momentum 6/20, Context 10/10 | DATA_STATUS: LIVE_AUTO
+TOTAL SCORE: 46 / 100 | REGIME_3_CLASSIFICATION: Transitional (Neutral) | Trading Bias: Consolidating / Wait for >=60 confluence (0.0x cash preferred) | Breakdown: Structure 0/40, MAs 30/30, Momentum 6/20, Context 10/10 | DATA_STATUS: LIVE_AUTO
   Structure Max 40: Weekly Mild HH+HL = 12 | HH 2 HL 1 recent swing up mild constructive | Daily Mild LH+LL = -12 | LH 2 LL 1 recent swing down mild corrective | Subtotal 0/40 | DATA_STATUS: LIVE_AUTO
   MAs Max 30: Price vs 50-day Price 81640 Above 50-day 80471 + Rising = +8 | Price vs 200-day Price 81640 Above 200-day 74157 + Rising = +8 | 50 vs 200 50-day 80471 > 200-day 74157 Golden Cross = +7 | Weekly MAs Weekly Price 81640 Above 20W 76313 + Above 50W 78776 Both supportive = +7 | Subtotal 30/30 | DATA_STATUS: LIVE_AUTO
   Momentum Max 20: Daily MACD Daily MACD Flat/weak [-530.6320905915328, -532.380125555581, -510.893878083554] = 0 | Daily RSI Daily RSI 46.8 ~50 = 0 | Weekly Momentum Weekly MACD 2267.11 >0 + RSI 56.6 >50 Bullish = +6 | Subtotal 6/20 | DATA_STATUS: LIVE_AUTO
