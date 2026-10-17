@@ -342,9 +342,18 @@ def fetch_json(url, timeout=12):
         return None, "MISSING", f"{url} - no requests"
     urls_to_try = [url]
     if "api.binance.com" in url:
-        urls_to_try.append(url.replace("api.binance.com", "data-api.binance.vision"))
-        urls_to_try.append(url.replace("api.binance.com", "api1.binance.com"))
-        urls_to_try.append(url.replace("api.binance.com", "api3.binance.com"))
+        urls_to_try = [
+            url.replace("api.binance.com", "data-api.binance.vision"),
+            url,
+            url.replace("api.binance.com", "api1.binance.com"),
+            url.replace("api.binance.com", "api3.binance.com")
+        ]
+    elif "data-api.binance.vision" in url:
+        urls_to_try = [
+            url,
+            url.replace("data-api.binance.vision", "api.binance.com"),
+            url.replace("data-api.binance.vision", "api3.binance.com")
+        ]
     last_err = None
     for u in urls_to_try:
         try:
@@ -452,7 +461,7 @@ def fetch_volume_profile(spot_price=None):
     if not requests:
         return None, "MISSING", "no requests"
     try:
-        url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=720"
+        url = "https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=720"
         r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
         r.raise_for_status()
         klines = r.json()
@@ -604,7 +613,7 @@ def fetch_sth_cost_basis(klines_90d=None):
 
     try:
         # Fetch 90d daily klines for proxy
-        url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=90"
+        url = "https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=90"
         r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
         r.raise_for_status()
         klines = r.json()
@@ -665,7 +674,7 @@ def fetch_order_book_depth(psych_levels=None):
         psych_levels = [80000, 81000, 82000, 85500, 86500, 90000, 100000]
 
     try:
-        url = "https://api.binance.com/api/v3/depth?symbol=BTCUSDT&limit=1000"
+        url = "https://data-api.binance.vision/api/v3/depth?symbol=BTCUSDT&limit=1000"
         r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
         r.raise_for_status()
         data = r.json()
@@ -1088,7 +1097,7 @@ def fetch_aggtrades_cvd(symbol="BTCUSDT", limit=1000):
     if not requests:
         return None, "MISSING"
     try:
-        url = f"https://api.binance.com/api/v3/aggTrades?symbol={symbol}&limit={limit}"
+        url = f"https://data-api.binance.vision/api/v3/aggTrades?symbol={symbol}&limit={limit}"
         r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
         r.raise_for_status()
         trades = r.json()
@@ -2539,7 +2548,7 @@ def fetch_rvol_time(symbol="BTCUSDT"):
         return None, "MISSING"
     try:
         # Fetch 1h klines last 500 hours (~20 days)
-        url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval=1h&limit=500"
+        url = f"https://data-api.binance.vision/api/v3/klines?symbol={symbol}&interval=1h&limit=500"
         r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
         r.raise_for_status()
         klines = r.json()
@@ -2750,7 +2759,7 @@ def fetch_rvol_history(klines_1h_500=None):
         if not requests:
             return None, "MISSING"
         if klines_1h_500 is None:
-            url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=500"
+            url = "https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=500"
             r = requests.get(url, timeout=12, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
             r.raise_for_status()
             klines_1h_500 = r.json()
@@ -3190,7 +3199,7 @@ def fetch_puell_multiple_raw(daily_closes_365=None, spot_price=None):
         if not closes:
             if requests:
                 try:
-                    url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=365"
+                    url = "https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=365"
                     r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
                     if r.status_code == 200:
                         data = r.json()
@@ -3598,7 +3607,7 @@ def fetch_pi_cycle_top_raw(daily_closes_350=None, spot_price=None):
         if not closes:
             if requests:
                 try:
-                    url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=400"
+                    url = "https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=400"
                     r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-Bot-Pi"})
                     if r.status_code == 200:
                         data = r.json()
@@ -3660,7 +3669,7 @@ def fetch_rainbow_chart_raw(daily_closes_long=None, spot_price=None):
         if not closes:
             if requests:
                 try:
-                    url = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=1000"
+                    url = "https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=1000"
                     r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-Bot-Rainbow"})
                     if r.status_code == 200:
                         data = r.json()
@@ -4465,7 +4474,7 @@ def fetch_klines_extra(symbol="BTCUSDT", interval="1d", limit=250):
     if not requests:
         return None, "MISSING"
     try:
-        url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
+        url = f"https://data-api.binance.vision/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}"
         r = requests.get(url, timeout=15, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
         r.raise_for_status()
         return r.json(), "LIVE_API"
@@ -4479,10 +4488,10 @@ def main():
     print("PCF3 PRODUCTION READY FINAL — FULL RAW...")
 
     # 1. Binance live
-    spot_data, spot_status, _ = fetch_json("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT")
-    book_data, _, _ = fetch_json("https://api.binance.com/api/v3/ticker/bookTicker?symbol=BTCUSDT")
-    spot24_data, _, _ = fetch_json("https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT")
-    klines_data, klines_status, _ = fetch_json("https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=100")
+    spot_data, spot_status, _ = fetch_json("https://data-api.binance.vision/api/v3/ticker/price?symbol=BTCUSDT")
+    book_data, _, _ = fetch_json("https://data-api.binance.vision/api/v3/ticker/bookTicker?symbol=BTCUSDT")
+    spot24_data, _, _ = fetch_json("https://data-api.binance.vision/api/v3/ticker/24hr?symbol=BTCUSDT")
+    klines_data, klines_status, _ = fetch_json("https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=100")
     oi_data, oi_status, _ = fetch_json("https://fapi.binance.com/fapi/v1/openInterest?symbol=BTCUSDT")
     prem_data, prem_status, _ = fetch_json("https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT")
     perp24_data, _, _ = fetch_json("https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=BTCUSDT")
@@ -4501,18 +4510,47 @@ def main():
     index_price = float(prem_data["indexPrice"]) if prem_data and "indexPrice" in prem_data else None
     mark_index_spread = ((mark - index_price)/index_price*100) if mark and index_price else None
 
+    # Fallback for US GitHub Actions runners where fapi.binance.com is geo-blocked (HTTP 451):
+    if funding is None or mark_index_spread is None or perp_vol is None:
+        deribit_perp, _, _ = fetch_json("https://www.deribit.com/api/v2/public/ticker?instrument_name=BTC-PERPETUAL")
+        if deribit_perp and isinstance(deribit_perp.get("result"), dict):
+            d_res = deribit_perp["result"]
+            if funding is None and d_res.get("funding_8h") is not None:
+                funding = float(d_res["funding_8h"]) * 100.0
+                prem_status = "LIVE_API_DERIBIT_PROXY"
+            if mark is None and d_res.get("mark_price") is not None:
+                mark = float(d_res["mark_price"])
+            if index_price is None and d_res.get("index_price") is not None:
+                index_price = float(d_res["index_price"])
+            if mark_index_spread is None and mark and index_price:
+                mark_index_spread = ((mark - index_price) / index_price) * 100.0
+            if perp_vol is None and isinstance(d_res.get("stats"), dict) and d_res["stats"].get("volume") is not None:
+                perp_vol = float(d_res["stats"]["volume"])
+
     # OI history
     oi_prev = None
     oi_prev_ts = None
     oi_change = None
     oi_age = "MISSING"
+    is_live_oi = oi_current is not None
     if OI_HISTORY_FILE.exists():
         try:
             with open(OI_HISTORY_FILE) as f:
                 hist = json.load(f)
                 latest = hist.get("latest", {})
-                oi_prev = latest.get("oi")
-                oi_prev_ts = latest.get("ts")
+                hist_arr = hist.get("history", [])
+                if not is_live_oi and latest.get("oi"):
+                    oi_current = float(latest.get("oi"))
+                    oi_status = "CACHED_REAL_HISTORY"
+                    if len(hist_arr) >= 2:
+                        oi_prev = float(hist_arr[-2].get("oi", oi_current))
+                        oi_prev_ts = hist_arr[-2].get("ts")
+                    else:
+                        oi_prev = oi_current
+                        oi_prev_ts = latest.get("ts")
+                else:
+                    oi_prev = latest.get("oi")
+                    oi_prev_ts = latest.get("ts")
                 if oi_prev and oi_current:
                     oi_change = (oi_current - oi_prev) / oi_prev * 100
                 if oi_prev_ts:
@@ -4525,7 +4563,7 @@ def main():
                         pass
         except:
             pass
-    if oi_current:
+    if is_live_oi and oi_current:
         try:
             hist = {}
             if OI_HISTORY_FILE.exists():
@@ -4814,7 +4852,7 @@ def main():
     if daily_closes_250 and len(daily_closes_250) < 365:
         try:
             if requests:
-                url365 = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=365"
+                url365 = "https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=365"
                 r365 = requests.get(url365, timeout=15, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
                 if r365.status_code == 200:
                     d365 = r365.json()
@@ -4824,7 +4862,7 @@ def main():
     daily_closes_400 = daily_closes_365
     try:
         if requests:
-            url400 = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=400"
+            url400 = "https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=400"
             r400 = requests.get(url400, timeout=15, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
             if r400.status_code == 200:
                 d400 = r400.json()
@@ -4834,7 +4872,7 @@ def main():
     daily_closes_1000 = daily_closes_400
     try:
         if requests:
-            url1000 = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=1000"
+            url1000 = "https://data-api.binance.vision/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=1000"
             r1000 = requests.get(url1000, timeout=15, headers={"User-Agent": "PCF3-Bot", "Cache-Control": "no-cache", "Pragma": "no-cache"})
             if r1000.status_code == 200:
                 d1000 = r1000.json()
