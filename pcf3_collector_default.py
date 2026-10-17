@@ -1190,6 +1190,22 @@ def fetch_long_short_ratios(symbol="BTCUSDT"):
                     data["global_account"] = global_acc
             except Exception:
                 pass
+        # Fallback to OKX contracts long/short account ratio if Binance & Bybit are empty:
+        if not global_acc.get("longAccount") or "error" in global_acc:
+            try:
+                okx_ls = requests.get("https://www.okx.com/api/v5/rubik/stat/contracts/long-short-account-ratio?ccy=BTC&period=5m", timeout=8, headers={"User-Agent": "PCF3-Bot"}).json()
+                if okx_ls.get("code") == "0" and okx_ls.get("data"):
+                    okx_ratio_val = float(okx_ls["data"][0][1])
+                    l_acc = okx_ratio_val / (1.0 + okx_ratio_val)
+                    s_acc = 1.0 - l_acc
+                    global_acc = {
+                        "longShortRatio": f"{okx_ratio_val:.4f}",
+                        "longAccount": f"{l_acc:.4f}",
+                        "shortAccount": f"{s_acc:.4f}"
+                    }
+                    data["global_account"] = global_acc
+            except Exception:
+                pass
         top_acc = data.get("top_account", {})
         global_pos = data.get("global_position", {})
         taker = data.get("taker_long_short", {})
