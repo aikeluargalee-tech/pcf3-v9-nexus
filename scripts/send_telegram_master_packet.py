@@ -677,7 +677,7 @@ def main():
     load_dotenv_silently()
     args = sys.argv[1:]
     is_dry_run = "--dry-run" in args
-    force_send = ("--force" in args) or (os.environ.get("FORCE_TELEGRAM_SEND") == "true")
+    force_send = ("--force" in args) or (os.environ.get("FORCE_TELEGRAM_SEND") == "true") or (os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch")
 
     print("=== NEXUS 9-DESK SMART HYBRID TELEGRAM DISPATCHER (PYTHON) ===")
     packet_text, curr = build_unified_master_dossier()

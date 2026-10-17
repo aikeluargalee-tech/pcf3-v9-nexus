@@ -352,7 +352,7 @@ async function main() {
 
   const args = process.argv.slice(2);
   const isDryRun = args.includes('--dry-run');
-  const forceSend = args.includes('--force') || process.env.FORCE_TELEGRAM_SEND === 'true';
+  const forceSend = args.includes('--force') || process.env.FORCE_TELEGRAM_SEND === 'true' || process.env.GITHUB_EVENT_NAME === 'workflow_dispatch';
 
   console.log('=== NEXUS 9-DESK SMART HYBRID TELEGRAM DISPATCHER ===');
   const packetText = await generateUnifiedMasterPacket();
