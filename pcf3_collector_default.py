@@ -4283,7 +4283,7 @@ def fetch_scorecard_v47_raw(macro_v47, onchain_v47, derivatives_v47, ta_v47, reg
         onchain_score = 0
         deriv_score = 0
         ta_score = 0
-        # Macro/liquidity aligned 25
+        # Macro/liquidity aligned 25 (penalized if 10Y TIPS real yield > 2.2% headwind)
         if macro_v47:
             if macro_v47.get("m2_yoy_pct") and macro_v47["m2_yoy_pct"] > 0:
                 macro_score += 10
@@ -4291,6 +4291,9 @@ def fetch_scorecard_v47_raw(macro_v47, onchain_v47, derivatives_v47, ta_v47, reg
                 macro_score += 8
             if macro_v47.get("dxy_dist_200dma_pct") and macro_v47["dxy_dist_200dma_pct"] < 1.0:
                 macro_score += 7
+            tips_val = macro_v47.get("tips_10y_real_yield")
+            if isinstance(tips_val, (int, float)) and tips_val > 2.2:
+                macro_score = max(0, macro_score - 5)
         else:
             macro_score = 12
         # HTF trend aligned 25 — check weekly EMA20>EMA50 + monthly bull + regime constructive (>=60)
@@ -4340,7 +4343,14 @@ def fetch_scorecard_v47_raw(macro_v47, onchain_v47, derivatives_v47, ta_v47, reg
         else:
             ta_score = 7
         total = macro_score + htf_score + onchain_score + deriv_score + ta_score
-        verdict = "Full size ≥75-80" if total >= 75 else "Half size 60-74" if total >= 60 else "No trade <60 sitting on hands is position"
+        r3_score = regime_3_data.get("total_score", 46) if regime_3_data else total
+        eff_score = min(total, r3_score)
+        if eff_score >= 75:
+            verdict = f"Full size ≥75-80 (Effective Score {eff_score}/100)"
+        elif eff_score >= 60:
+            verdict = f"Half size 60-74 (Effective Score {eff_score}/100)"
+        else:
+            verdict = f"No trade <60 — Stand Aside / Cash Preferred (0.0x)"
         result = {
             "macro_liquidity_aligned_25": macro_score,
             "htf_trend_aligned_25": htf_score,
@@ -5195,6 +5205,8 @@ def main():
                 if cum>=target:
                     break
             vah=max(inc)+100 if inc else None; val=min(inc) if inc else None
+        if 'vp_data' in locals() and vp_data and vp_data.get('poc'):
+            poc = vp_data['poc']
 
     # 10. Build packet
     def fmt(v, dec=2):
