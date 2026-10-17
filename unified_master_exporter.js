@@ -134,6 +134,16 @@
     for (const rawUrl of urlList) {
       try {
         const isExternal = rawUrl.startsWith('http://') || rawUrl.startsWith('https://');
+        if (!isExternal && typeof window === 'undefined' && typeof require === 'function') {
+          const fs = require('fs');
+          const path = require('path');
+          const cleanRel = rawUrl.replace(/^(\.\/|\/)/, '');
+          const localPath = path.resolve(process.cwd(), cleanRel);
+          if (fs.existsSync(localPath)) {
+            const rawText = fs.readFileSync(localPath, 'utf8');
+            return isJson ? JSON.parse(rawText) : rawText;
+          }
+        }
         const url = isExternal ? rawUrl : resolveLocalUrl(rawUrl);
         const effectiveTimeout = isExternal ? timeoutMs : Math.max(timeoutMs, 4500);
 

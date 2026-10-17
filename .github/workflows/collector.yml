@@ -13,8 +13,13 @@ jobs:
         with: {python-version: '3.11'}
       - run: pip install requests
       - run: python pcf3_collector_default.py
+      - run: python scripts/macro_collector.py
+      - run: python scripts/send_telegram_master_packet.py
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       - run: |
           git config user.name "pcf3-bot"
           git config user.email "bot@pcf3.local"
-          git add PCF3_LIVE_PACKET_DEFAULT.txt
-          git diff --staged --quiet || (git commit -m "auto: packet $(date -u +%Y-%m-%dT%H:%M:%SZ)" && git push)
+          git add PCF3_LIVE_PACKET_DEFAULT.txt data/macro_threat_feed.json data/volatility_confluence_feed.json data/telegram_last_state.json
+          git diff --staged --quiet || (git commit -m "auto: packet & telemetry $(date -u +%Y-%m-%dT%H:%M:%SZ)" && git push)
