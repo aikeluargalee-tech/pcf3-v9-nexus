@@ -1147,7 +1147,7 @@ Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal
       const bdMatch = rawPacket.match(/Breakdown:\s*([^\n|]+)/i);
       if (bdMatch) desk1ScoreBreakdown = bdMatch[1].trim();
       const oiMatch = rawPacket.match(/OI_current:\s*([^\n|]+)\s*\|\s*OI_CHANGE_%:\s*([^\n|]+)/i);
-      if (oiMatch) desk1OiLine = `${oiMatch[1].trim()} (Δ ${oiMatch[2].trim()})`;
+      if (oiMatch && !oiMatch[1].includes('MISSING')) desk1OiLine = `${oiMatch[1].trim()} (Δ ${oiMatch[2].trim()})`;
       const fundMatch = rawPacket.match(/Funding_Binance:\s*([^\n|]+).*?MARK_INDEX_SPREAD_%:\s*([^\n|]+)/is);
       if (fundMatch) desk1FundingLine = `Funding ${fundMatch[1].trim()} | Mark-Index Spread ${fundMatch[2].trim()}`;
       const cvdMatch = rawPacket.match(/CVD_current:\s*([^\n|]+).*?CVD_slope:\s*([^\n|]+)/is);

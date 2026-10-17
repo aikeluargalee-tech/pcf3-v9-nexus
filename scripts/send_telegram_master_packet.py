@@ -327,7 +327,7 @@ def build_unified_master_dossier():
         if m_bd:
             regime_bd = m_bd.group(1).strip()
         m_oi = re.search(r'OI_current:\s*([^\n|]+)', raw_packet)
-        if m_oi:
+        if m_oi and 'MISSING' not in m_oi.group(1):
             oi_line = m_oi.group(1).strip()
         
         start_idx = raw_packet.find('--- 1. MARKET STRUCTURE')
@@ -335,6 +335,15 @@ def build_unified_master_dossier():
             raw_appendix = raw_packet[start_idx:].strip()
         else:
             raw_appendix = raw_packet.strip()
+
+    if not oi_line or 'MISSING' in oi_line:
+        try:
+            bybit_oi = fetch_json_safe(['https://api.bybit.com/v5/market/open-interest?category=linear&symbol=BTCUSDT&intervalTime=5min'])
+            if bybit_oi and bybit_oi.get('retCode') == 0 and bybit_oi.get('result', {}).get('list'):
+                b_oi_val = float(bybit_oi['result']['list'][0]['openInterest'])
+                oi_line = f"{b_oi_val:,.2f} BTC [Bybit Linear Proxy]"
+        except Exception:
+            pass
 
     raw_dampener = max(0.0, min(1.0, (regime_score - 60) / 30.0))
     effective_dampener = 0.00 if is_crimson else raw_dampener

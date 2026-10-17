@@ -1172,6 +1172,24 @@ def fetch_long_short_ratios(symbol="BTCUSDT"):
                 data[key] = {"error": str(e)}
         # Extract latest
         global_acc = data.get("global_account", {})
+        # Fallback to Bybit linear account ratio if Binance fapi is blocked
+        if not global_acc.get("longAccount") or "error" in global_acc:
+            try:
+                bb_r = requests.get(f"https://api.bybit.com/v5/market/account-ratio?category=linear&symbol={symbol}&period=5min&limit=5", timeout=8, headers={"User-Agent": "PCF3-Bot"})
+                bb_j = bb_r.json()
+                if bb_j.get("retCode") == 0 and bb_j.get("result", {}).get("list"):
+                    item = bb_j["result"]["list"][0]
+                    buy_ratio = float(item["buyRatio"])
+                    sell_ratio = float(item["sellRatio"])
+                    ls_ratio = (buy_ratio / sell_ratio) if sell_ratio > 0 else 1.0
+                    global_acc = {
+                        "longShortRatio": f"{ls_ratio:.4f}",
+                        "longAccount": f"{buy_ratio:.4f}",
+                        "shortAccount": f"{sell_ratio:.4f}"
+                    }
+                    data["global_account"] = global_acc
+            except Exception:
+                pass
         top_acc = data.get("top_account", {})
         global_pos = data.get("global_position", {})
         taker = data.get("taker_long_short", {})
@@ -4511,7 +4529,26 @@ def main():
     mark_index_spread = ((mark - index_price)/index_price*100) if mark and index_price else None
 
     # Fallback for US GitHub Actions runners where fapi.binance.com is geo-blocked (HTTP 451):
-    if funding is None or mark_index_spread is None or perp_vol is None:
+    if oi_current is None or funding is None or mark_index_spread is None or perp_vol is None:
+        # 1. Bybit Linear BTCUSDT for open interest
+        if oi_current is None:
+            try:
+                bybit_oi_res, _, _ = fetch_json("https://api.bybit.com/v5/market/open-interest?category=linear&symbol=BTCUSDT&intervalTime=5min")
+                if bybit_oi_res and bybit_oi_res.get("retCode") == 0 and bybit_oi_res.get("result", {}).get("list"):
+                    oi_current = float(bybit_oi_res["result"]["list"][0]["openInterest"])
+                    oi_status = "LIVE_API_BYBIT_PROXY"
+            except Exception:
+                pass
+        # 2. OKX Swap BTC-USDT for open interest
+        if oi_current is None:
+            try:
+                okx_oi_res, _, _ = fetch_json("https://www.okx.com/api/v5/public/open-interest?instType=SWAP&instId=BTC-USDT-SWAP")
+                if okx_oi_res and okx_oi_res.get("code") == "0" and okx_oi_res.get("data"):
+                    oi_current = float(okx_oi_res["data"][0]["oiCcy"])
+                    oi_status = "LIVE_API_OKX_PROXY"
+            except Exception:
+                pass
+
         deribit_perp, _, _ = fetch_json("https://www.deribit.com/api/v2/public/ticker?instrument_name=BTC-PERPETUAL")
         if deribit_perp and isinstance(deribit_perp.get("result"), dict):
             d_res = deribit_perp["result"]
@@ -4526,6 +4563,9 @@ def main():
                 mark_index_spread = ((mark - index_price) / index_price) * 100.0
             if perp_vol is None and isinstance(d_res.get("stats"), dict) and d_res["stats"].get("volume") is not None:
                 perp_vol = float(d_res["stats"]["volume"])
+            if oi_current is None and d_res.get("open_interest") is not None and (mark or spot_price):
+                oi_current = float(d_res["open_interest"]) / (mark or spot_price)
+                oi_status = "LIVE_API_DERIBIT_PROXY"
 
     # OI history
     oi_prev = None
@@ -5300,10 +5340,10 @@ def main():
             daily_highs=daily_highs_250 if 'daily_highs_250' in locals() else [],
             daily_lows=daily_lows_250 if 'daily_lows_250' in locals() else [],
             daily_opens=daily_opens_250 if 'daily_opens_250' in locals() else [],
-            fourh_closes=closes_4h if 'closes_4h' in locals() else [],
-            fourh_highs=highs_4h if 'highs_4h' in locals() else [],
-            fourh_lows=lows_4h if 'lows_4h' in locals() else [],
-            fourh_opens=opens_4h if 'opens_4h' in locals() else [],
+            fourh_closes=fourh_closes_100_msnr if ('fourh_closes_100_msnr' in locals() and fourh_closes_100_msnr) else (closes_4h if 'closes_4h' in locals() else []),
+            fourh_highs=fourh_highs_100_msnr if ('fourh_highs_100_msnr' in locals() and fourh_highs_100_msnr) else (highs_4h if 'highs_4h' in locals() else []),
+            fourh_lows=fourh_lows_100_msnr if ('fourh_lows_100_msnr' in locals() and fourh_lows_100_msnr) else (lows_4h if 'lows_4h' in locals() else []),
+            fourh_opens=fourh_opens_100_msnr if ('fourh_opens_100_msnr' in locals() and fourh_opens_100_msnr) else (opens_4h if 'opens_4h' in locals() else []),
             spot_price=spot_price if 'spot_price' in locals() else None,
             psych_support=psych_support_for_topdown,
             psych_resistance=psych_resistance_for_topdown
