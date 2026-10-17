@@ -4735,20 +4735,30 @@ def main():
 
                 for entry in reversed(hist_arr):
                     try:
+                        e_oi = float(entry.get("oi"))
+                        # Guard: Discard entries from different exchange scales (e.g. OKX 30k vs Binance 94k)
+                        if abs(oi_current - e_oi) / e_oi > 0.35:
+                            continue
+                        e_src = entry.get("source")
+                        if e_src and e_src != oi_status:
+                            continue
                         ts = datetime.fromisoformat(entry.get("ts", "").replace("Z", "+00:00"))
                         diff_h = (now_dt - ts).total_seconds() / 3600
                         if oi_prev is None and 0.5 <= diff_h <= 2.0:
-                            oi_prev = float(entry.get("oi"))
+                            oi_prev = e_oi
                             oi_prev_ts = entry.get("ts")
                         if oi_24h_prev is None and 20.0 <= diff_h <= 28.0:
-                            oi_24h_prev = float(entry.get("oi"))
+                            oi_24h_prev = e_oi
                         if oi_7d_prev is None and 156.0 <= diff_h <= 180.0:
-                            oi_7d_prev = float(entry.get("oi"))
+                            oi_7d_prev = e_oi
                     except Exception:
                         continue
 
-                if oi_prev is None and latest.get("oi"):
-                    oi_prev = float(latest.get("oi"))
+                # Fallback to latest only if in same scale/source
+                l_oi = float(latest.get("oi", 0)) if latest.get("oi") else None
+                l_src = latest.get("source")
+                if oi_prev is None and l_oi and (not l_src or l_src == oi_status) and abs(oi_current - l_oi) / l_oi <= 0.35:
+                    oi_prev = l_oi
                     oi_prev_ts = latest.get("ts")
         except Exception:
             pass
@@ -4788,10 +4798,10 @@ def main():
             if OI_HISTORY_FILE.exists():
                 with open(OI_HISTORY_FILE) as f:
                     hist = json.load(f)
-            hist["latest"] = {"oi": oi_current, "ts": now_iso}
+            hist["latest"] = {"oi": oi_current, "ts": now_iso, "source": oi_status}
             h_list = hist.setdefault("history", [])
             if not h_list or h_list[-1].get("ts", "")[:16] != now_iso[:16]:
-                h_list.append({"oi": oi_current, "ts": now_iso, "price": spot_price})
+                h_list.append({"oi": oi_current, "ts": now_iso, "price": spot_price, "source": oi_status})
             hist["history"] = h_list[-200:]
             OI_HISTORY_FILE.parent.mkdir(parents=True, exist_ok=True)
             with open(OI_HISTORY_FILE, "w") as f:
