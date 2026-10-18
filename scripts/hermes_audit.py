@@ -140,8 +140,12 @@ def call_deepseek_flash(api_key, system_prompt, user_prompt, max_retries=3, time
                 choices = body.get("choices", [])
                 if choices and "message" in choices[0]:
                     content = choices[0]["message"].get("content", "").strip()
-                    print(f"✅ [HermesAgent] Successfully generated audit ({len(content)} chars)")
-                    return content
+                    if content:
+                        print(f"✅ [HermesAgent] Successfully generated audit ({len(content)} chars)")
+                        return content
+                    else:
+                        finish_reason = choices[0].get("finish_reason", "unknown")
+                        print(f"⚠️ [HermesAgent] DeepSeek returned empty content (finish_reason: {finish_reason}). Retrying...")
                 else:
                     print(f"⚠️ [HermesAgent] Unexpected response structure: {body}")
             else:
