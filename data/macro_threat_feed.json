@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "asof": "2026-10-18T11:37:12Z",
+  "asof": "2026-10-18T13:07:14Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
@@ -27,7 +27,7 @@
         "points": 20,
         "max": 20,
         "triggered": true,
-        "reason": "MSTR 24h (-11.35%) lagging BTC (+0.48%); bearish momentum divergence active"
+        "reason": "MSTR 24h (-11.35%) lagging BTC (+0.36%); bearish momentum divergence active"
       },
       "seasonality_election_window": {
         "points": 0,
@@ -65,7 +65,7 @@
       "color": "crimson",
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity.",
       "data_status": "LIVE",
-      "fetched_utc": "2026-10-18T11:37:12Z"
+      "fetched_utc": "2026-10-18T13:07:14Z"
     },
     "module_c_mstr": {
       "price": 136.83,
@@ -103,19 +103,19 @@
         {
           "event": "US FOMC Rate Decision",
           "date": "2026-10-28",
-          "days_away": 10,
+          "days_away": 9,
           "impact": "CRITICAL"
         },
         {
           "event": "US Midterm Election",
           "date": "2026-11-03",
-          "days_away": 16,
+          "days_away": 15,
           "impact": "EXTREME"
         },
         {
           "event": "US Non-Farm Payrolls (NFP)",
           "date": "2026-11-06",
-          "days_away": 19,
+          "days_away": 18,
           "impact": "HIGH"
         }
       ]
@@ -130,8 +130,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 81951.01,
-      "change_24h_pct": 0.48,
+      "spot_price": 81855.76,
+      "change_24h_pct": 0.36,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -657,7 +657,7 @@
       "sma50": 34.487,
       "us10y": 5.098,
       "mstr": 136.8,
-      "btc": 81951.0
+      "btc": 81856.0
     }
   ]
 }
