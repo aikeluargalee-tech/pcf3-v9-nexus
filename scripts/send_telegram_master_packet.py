@@ -698,20 +698,36 @@ def build_caption(curr, decision, force_send=False):
 
 def send_telegram_document(token, chat_id, packet_text, file_name, caption, silent=False):
     url = f"https://api.telegram.org/bot{token}/sendDocument"
-    files = {
-        'document': (file_name, packet_text.encode('utf-8'), 'text/plain;charset=utf-8')
-    }
-    data = {
-        'chat_id': str(chat_id),
-        'caption': caption,
-        'parse_mode': 'HTML',
-        'disable_notification': 'true' if silent else 'false'
-    }
-    resp = requests.post(url, files=files, data=data, timeout=25)
-    body = resp.json() if resp.status_code == 200 else {}
-    if resp.status_code != 200 or not body.get('ok'):
-        raise RuntimeError(f"Telegram API HTTP {resp.status_code}: {body.get('description', resp.text)}")
-    return body
+    max_retries = 3
+    last_err = None
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            files = {
+                'document': (file_name, packet_text.encode('utf-8'), 'text/plain;charset=utf-8')
+            }
+            data = {
+                'chat_id': str(chat_id),
+                'caption': caption,
+                'parse_mode': 'HTML',
+                'disable_notification': 'true' if silent else 'false'
+            }
+            resp = requests.post(url, files=files, data=data, timeout=60)
+            body = resp.json() if resp.status_code == 200 else {}
+            if resp.status_code == 200 and body.get('ok'):
+                return body
+            else:
+                err_desc = body.get('description', resp.text)
+                last_err = RuntimeError(f"Telegram API HTTP {resp.status_code}: {err_desc}")
+                print(f"⚠️ Telegram send attempt {attempt}/{max_retries} failed: {last_err}")
+        except Exception as e:
+            last_err = e
+            print(f"⚠️ Telegram network error on attempt {attempt}/{max_retries}: {e}")
+
+        if attempt < max_retries:
+            time.sleep(3 * attempt)
+
+    raise last_err
 
 def main():
     load_dotenv_silently()
