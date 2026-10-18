@@ -139,47 +139,66 @@ def call_deepseek_flash(api_key, system_prompt, user_prompt, max_retries=3, time
     return None
 
 
-def send_telegram_audit_message(token, chat_id, message_text, max_retries=3):
-    """Send formatted Telegram HTML message, falling back to plain text if needed."""
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-    
-    # Try HTML parse mode first
+def send_single_telegram_chunk(url, chat_id, chunk_text, max_retries=3):
+    """Send a single chunk with HTML mode and plain-text fallback."""
     payload = {
         "chat_id": str(chat_id),
-        "text": message_text,
+        "text": chunk_text,
         "parse_mode": "HTML",
         "disable_web_page_preview": True
     }
-    
     for attempt in range(1, max_retries + 1):
         try:
             resp = requests.post(url, json=payload, timeout=30)
             body = resp.json() if resp.status_code == 200 else {}
             if resp.status_code == 200 and body.get("ok"):
-                print("✅ [HermesAgent] Dispatched Executive Audit message to Telegram!")
                 return True
             else:
-                # If Telegram reports HTML parse error (Can't parse entities), fallback to plain text
                 err_desc = body.get("description", "")
-                print(f"⚠️ [HermesAgent] Telegram send error: {err_desc}")
                 if "parse" in err_desc.lower() or "entity" in err_desc.lower():
-                    print("⚠️ [HermesAgent] Retrying with plain text mode...")
                     payload_plain = {
                         "chat_id": str(chat_id),
-                        "text": message_text,
+                        "text": chunk_text,
                         "disable_web_page_preview": True
                     }
                     resp2 = requests.post(url, json=payload_plain, timeout=30)
                     if resp2.status_code == 200 and resp2.json().get("ok"):
-                        print("✅ [HermesAgent] Dispatched plain text audit to Telegram!")
                         return True
         except Exception as e:
             print(f"⚠️ [HermesAgent] Network error dispatching message: {e}")
-            
         if attempt < max_retries:
             time.sleep(2)
-            
     return False
+
+
+def send_telegram_audit_message(token, chat_id, message_text, max_retries=3):
+    """Send formatted Telegram message with automatic chunking if >4000 chars."""
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    
+    # Split message if it exceeds Telegram's 4,096 char limit
+    chunks = []
+    text = message_text
+    while len(text) > 4000:
+        split_idx = text.rfind("\n", 0, 4000)
+        if split_idx == -1:
+            split_idx = 4000
+        chunks.append(text[:split_idx].strip())
+        text = text[split_idx:].strip()
+    if text:
+        chunks.append(text)
+        
+    all_ok = True
+    for idx, chunk in enumerate(chunks):
+        ok = send_single_telegram_chunk(url, chat_id, chunk, max_retries=max_retries)
+        if ok:
+            print(f"✅ [HermesAgent] Dispatched Executive Audit chunk [{idx+1}/{len(chunks)}] to Telegram!")
+        else:
+            print(f"❌ [HermesAgent] Failed to dispatch chunk [{idx+1}/{len(chunks)}]")
+            all_ok = False
+        if idx < len(chunks) - 1:
+            time.sleep(1)
+            
+    return all_ok
 
 
 def run_hermes_audit(packet_text=None, pure_data_json=None, curr=None, token=None, chat_id=None, is_dry_run=False):

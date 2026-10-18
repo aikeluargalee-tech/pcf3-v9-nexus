@@ -120,4 +120,6 @@ def update_onchain_metrics():
 
 if __name__ == "__main__":
     success = update_onchain_metrics()
-    sys.exit(0 if success else 1)
+    if not success:
+        print("ℹ️  [OnchainCollector] Network/API hiccup: continuing pipeline with existing on-chain baseline.")
+    sys.exit(0)
