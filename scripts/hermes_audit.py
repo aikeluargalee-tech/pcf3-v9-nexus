@@ -46,6 +46,12 @@ Permitted Master Verdicts are strictly: BUY, HOLD, REDUCE, ABSTAIN.
 - ABSTAIN: Evidence is too incomplete, stale, or contradictory for a reliable verdict.
 Prefer NO TRADE over a weak setup. Do not assume or invent user holdings.
 
+HIERARCHY OF AUTHORITY & ALIGNMENT RULES (CHIEF RISK OFFICER VETO):
+The Risk Officer (Hermes Directive / Capital Exposure Verdict) holds absolute constitutional veto power over the Trader's Tactical Playbook:
+- If Trader wants BUY, but Risk Officer Capital Exposure is 0.00x STAND ASIDE or Threat is CRIMSON, Risk Officer VETOES the trade: Alignment Status is "⚠️ RISK OFFICER VETO". The final call is 100% USDT / 0.00x STAND ASIDE. No spot buying permitted.
+- If both Trader and Risk Officer agree (e.g. Trader says HOLD and Risk Officer says 0.00x STAND ASIDE, or Trader says BUY and Risk Officer says 1.00x RISK ON), Alignment Status is "✅ FULL CONFLUENCE".
+- The FINAL CALL must always be in clear, plain English with zero jargon explaining exactly what the user must do with their capital right now.
+
 OUTPUT FORMAT REQUIREMENTS:
 Output MUST be formatted in clean Telegram HTML format (use only <b>, </b>, <code>, </code>, <i>, </i>).
 Keep the report concise, impactful, and under 3,200 characters so it fits into one mobile chat message.
@@ -83,6 +89,13 @@ Follow this exact template:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🧠 <b>HERMES DIRECTIVE (The Risk Officer's Strategic Conviction):</b>
 "[2-3 crisp sentences stating immediate trade posture, key risks, and exact market conditions required to alter exposure.]"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 <b>THE BOTTOM LINE (Plain English Synthesis):</b>
+• <b>The Trader Wants:</b> [1 clear sentence on Trader's tactical view]
+• <b>The Risk Officer Mandates:</b> [1 clear sentence on Risk Officer's capital rule]
+• <b>Alignment Status:</b> [ <code>✅ FULL CONFLUENCE (Both agree to ...)</code> | <code>⚠️ RISK OFFICER VETO (Trader setup blocked by Risk Officer due to ...)</code> ]
+👉 <b>FINAL CALL:</b> [One definitive, plain-English sentence telling the user exactly what to do right now, e.g. "Do not buy. Stay 100% in cash/USDT on the sidelines until macro conditions improve."]
 
 IMPORTANT: Keep internal reasoning focused (under 2,000 tokens) and proceed directly to generating the complete final report with all sections fully closed.
 """
