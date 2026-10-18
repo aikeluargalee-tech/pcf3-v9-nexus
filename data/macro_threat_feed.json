@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "asof": "2026-10-17T23:38:15Z",
+  "asof": "2026-10-18T00:16:40Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
@@ -27,7 +27,7 @@
         "points": 20,
         "max": 20,
         "triggered": true,
-        "reason": "MSTR 24h (-11.35%) lagging BTC (-2.28%); bearish momentum divergence active"
+        "reason": "MSTR 24h (-11.35%) lagging BTC (-0.21%); bearish momentum divergence active"
       },
       "seasonality_election_window": {
         "points": 0,
@@ -49,8 +49,8 @@
       "rsp_distance_high_pct": -3.48,
       "ratio_raw": 35.777,
       "ratio_normalized": 1.428,
-      "ratio_50sma": 34.436,
-      "ratio_sma_diff_pct": 3.89,
+      "ratio_50sma": 34.487,
+      "ratio_sma_diff_pct": 3.74,
       "divergence_flag": "CRITICAL BREADTH DIVERGENCE: TECH CONCENTRATION MIRAGE",
       "fractal_note": "Fewer than 10 mega-caps propping up headline index. 2008 double-bottom breakout similarity active."
     },
@@ -128,8 +128,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 81201.53,
-      "change_24h_pct": -2.28,
+      "spot_price": 81393.7,
+      "change_24h_pct": -0.21,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -646,6 +646,16 @@
       "us10y": 5.098,
       "mstr": 136.8,
       "btc": 81202.0
+    },
+    {
+      "date": "2026-10-18",
+      "spx": 7659.44,
+      "rsp": 214.09,
+      "ratio": 35.777,
+      "sma50": 34.487,
+      "us10y": 5.098,
+      "mstr": 136.8,
+      "btc": 81394.0
     }
   ]
 }
