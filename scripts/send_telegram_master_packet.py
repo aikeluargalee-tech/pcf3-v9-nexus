@@ -1019,6 +1019,14 @@ def main():
         print("\n".join(json_text.splitlines()[:25]))
         print("... [truncated] ...")
         print("--- END PURE DATA JSON SNIPPET ---")
+        try:
+            try:
+                from scripts.hermes_audit import run_hermes_audit
+            except ImportError:
+                from hermes_audit import run_hermes_audit
+            run_hermes_audit(packet_text=packet_text, pure_data_json=pure_data_json, curr=curr, token=None, chat_id=None, is_dry_run=True)
+        except Exception as e:
+            print(f"⚠️ [HermesAgent] Warning running Hermes AI audit in dry-run: {e}")
         return
 
     if not decision['should_send']:
@@ -1043,6 +1051,16 @@ def main():
         print(f"✅ [TelegramDispatcher] Dispatched {json_file_name} ({len(json_text):,} bytes) to Telegram!")
     except Exception as e:
         print(f"⚠️ Warning dispatching pure data JSON: {e}")
+
+    # Dispatch Hermes AI Executive Risk Audit (DeepSeek-V4.1-Flash)
+    try:
+        try:
+            from scripts.hermes_audit import run_hermes_audit
+        except ImportError:
+            from hermes_audit import run_hermes_audit
+        run_hermes_audit(packet_text=packet_text, pure_data_json=pure_data_json, curr=curr, token=token, chat_id=chat_id, is_dry_run=is_dry_run)
+    except Exception as e:
+        print(f"⚠️ [HermesAgent] Warning running Hermes AI audit: {e}")
 
     # Save state
     new_state = {
