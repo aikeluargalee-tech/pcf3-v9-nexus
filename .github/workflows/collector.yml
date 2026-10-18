@@ -22,5 +22,5 @@ jobs:
       - run: |
           git config user.name "pcf3-bot"
           git config user.email "bot@pcf3.local"
-          git add PCF3_LIVE_PACKET_DEFAULT.txt data/macro_threat_feed.json data/volatility_confluence_feed.json data/telegram_last_state.json data/oi_history.json
+          git add PCF3_LIVE_PACKET_DEFAULT.txt data/macro_threat_feed.json data/volatility_confluence_feed.json data/telegram_last_state.json data/oi_history.json data/NEXUS_9DESK_DATA_LATEST.json
           git diff --staged --quiet || (git commit -m "auto: packet & telemetry $(date -u +%Y-%m-%dT%H:%M:%SZ)" && git push)

@@ -1,0 +1,51 @@
+{
+  "metadata": {
+    "timestamp_utc": "2026-10-18 04:55:41 UTC",
+    "version": "nexus-pure-data-v1.0",
+    "spec": "neutral_uninterpreted_telemetry"
+  },
+  "market_microstructure": {
+    "spot_price_usd": 81785.05,
+    "best_bid_usd": 81785.04,
+    "best_ask_usd": 81785.05,
+    "spread_usd": 0.01,
+    "source": "api.binance.com",
+    "status": "LIVE"
+  },
+  "technical_indicators_calculated": {
+    "sma200_daily_usd": 72464.47,
+    "sma200_slope_positive": true,
+    "ema21_daily_usd": 82669.91,
+    "rsi14_wilder": 46.24,
+    "atr20_wilder_usd": 2173.04,
+    "volume_profile_poc_30d_usd": 83954.77,
+    "range_3d_high_usd": 82940.81,
+    "range_3d_low_usd": 79800.0
+  },
+  "onchain_and_order_flow": {
+    "sth_realized_cost_basis_usd": 74468.34,
+    "open_interest_display": "30705.17 BTC",
+    "funding_rate_display": "0.0039% | Mark-Index Spread -0.0548%",
+    "spot_cvd_delta_display": "Delta +4.98 BTC | Buy/Sell Ratio 9.15",
+    "liquidation_clusters_display": "Long Liq Pocket $79,471 | Short Cluster $82k-$86k ($4.79B)"
+  },
+  "macro_threat_components": {
+    "us_10y_yield_pct": 5.098,
+    "spx_price_usd": 7659.44,
+    "rsp_price_usd": 214.09,
+    "spx_rsp_ratio": 35.7767,
+    "threat_score_components": {
+      "breadth_divergence_points": 35,
+      "yield_elevation_points": 30,
+      "mstr_divergence_points": 20,
+      "seasonality_window_points": 0,
+      "total_threat_score": 85
+    }
+  },
+  "volatility_and_institutional_flows": {
+    "volatility_score": -3,
+    "volatility_state": "BEARISH HEADWIND",
+    "etf_net_inflow_1d_usd_millions": -82.4,
+    "bollinger_bandwidth_percentile": 18
+  }
+}

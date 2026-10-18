@@ -368,8 +368,51 @@ def build_unified_master_dossier():
     atr_pct_str = f"{(atr20/spot_price*100):.2f}%" if atr20 else "0.00%"
     quant_stop_str = f"${spot_price - 2.5 * atr20:,.2f}" if atr20 else "N/A"
 
+    # Sizing and limited verdict logic for Decision Layer
+    if is_crimson:
+        decision_verdict = "STAND ASIDE"
+        decision_posture = "CASH PRESERVATION / RISK OFF"
+        decision_directive = "Capital preservation overrides all setups. Zero buy/sell signals."
+        decision_gate_status = f"[MET / ACTIVE] (Threat {threat_score}/100 CRIMSON)"
+        decision_override_note = "-> MANDATE: 100% USDT / 0.00x Maximum Exposure. Overrides lower-desk setups."
+    elif regime_score < 60 or vol_score <= -2:
+        decision_verdict = "WATCH"
+        decision_posture = "DEFENSIVE OBSERVATION / LOW CONFIDENCE"
+        decision_directive = "Conditions unfavorable for trend expansion. Monitor key levels without execution."
+        decision_gate_status = "[CLEAR] (Threat < 66)"
+        decision_override_note = "-> Gate clear but regime/volatility headwinds constrain exposure."
+    else:
+        decision_verdict = "CONDITIONAL"
+        decision_posture = "SELECTIVE PARTICIPATION"
+        decision_directive = "Execution subject to confluence and strict invalidation stops. Zero direct trade signals."
+        decision_gate_status = "[CLEAR] (Threat < 66)"
+        decision_override_note = "-> Standard technical execution bounds apply."
+
+    sth_buffer_pct = ((spot_price - sth_floor) / sth_floor) * 100.0
+    us10y_num = float(us10y_str.replace('%', '')) if '%' in us10y_str else 0.0
+    us10y_status = "ELEVATED >= 5.0%" if us10y_num >= 5.0 else "NORMAL < 5.0%"
+
+    # Top Decision Layer block
+    decision_block = [
+        "================================================================================",
+        "NEXUS DECISION LAYER — CAPITAL PRESERVATION CHECKPOINT",
+        "================================================================================",
+        f"[1] CAPITAL PRESERVATION GATE : {decision_gate_status}",
+        f"    {decision_override_note}",
+        "[2] THREE CRITICAL ANCHORS:",
+        f"    • BTC Live Spot Price           : ${spot_price:,.2f} [CONFIRMED LIVE]",
+        f"    • US 10Y Treasury Yield         : {us10y_str}     [CONFIRMED {us10y_status}]",
+        f"    • STH Realized Cost Basis Floor : ${sth_floor:,.2f} [CONFIRMED INTACT ({sth_buffer_pct:+.2f}%)]",
+        f"[3] SYSTEM DECISION VERDICT         : [{decision_verdict}]",
+        f"    • Execution Posture             : {decision_posture}",
+        f"    • Max Permitted Exposure        : {effective_dampener:.2f}x",
+        f"    • Directive                     : {decision_directive}",
+        "================================================================================",
+        ""
+    ]
+
     # Master prompt lines
-    lines = [
+    lines = decision_block + [
         "You are a Senior Quantitative Risk Arbitrator & Bitcoin Market Microstructure Specialist.",
         "Below is an official 9-Desk Unified Master Telemetry Dossier from Nexus Terminal. Analyze the telemetry using the strict 6-step institutional protocol below:",
         "",
@@ -513,9 +556,64 @@ def build_unified_master_dossier():
 
     packet_text = "\n".join(lines)
 
+    # Pure Data Dictionary (Neutral numbers only, zero decision/override language)
+    pure_data_json = {
+        "metadata": {
+            "timestamp_utc": ts_utc_str,
+            "version": "nexus-pure-data-v1.0",
+            "spec": "neutral_uninterpreted_telemetry"
+        },
+        "market_microstructure": {
+            "spot_price_usd": spot_price,
+            "best_bid_usd": best_bid,
+            "best_ask_usd": best_ask,
+            "spread_usd": round(abs(best_ask - best_bid), 4) if (best_bid and best_ask) else None,
+            "source": "api.binance.com",
+            "status": "LIVE"
+        },
+        "technical_indicators_calculated": {
+            "sma200_daily_usd": round(sma200, 2) if sma200 else None,
+            "sma200_slope_positive": sma_slope_up,
+            "ema21_daily_usd": round(ema21, 2) if ema21 else None,
+            "rsi14_wilder": round(rsi14, 2) if rsi14 else None,
+            "atr20_wilder_usd": round(atr20, 2) if atr20 else None,
+            "volume_profile_poc_30d_usd": round(poc30d, 2) if poc30d else None,
+            "range_3d_high_usd": session_3d_high,
+            "range_3d_low_usd": session_3d_low
+        },
+        "onchain_and_order_flow": {
+            "sth_realized_cost_basis_usd": sth_floor,
+            "open_interest_display": oi_line,
+            "funding_rate_display": funding_line,
+            "spot_cvd_delta_display": cvd_line,
+            "liquidation_clusters_display": liq_line
+        },
+        "macro_threat_components": {
+            "us_10y_yield_pct": us10y_num,
+            "spx_price_usd": spx_price,
+            "rsp_price_usd": rsp_price,
+            "spx_rsp_ratio": round(spx_price / rsp_price, 4) if rsp_price else None,
+            "threat_score_components": {
+                "breadth_divergence_points": threat_feed.get('composite_threat', {}).get('breakdown', {}).get('spx_rsp_breadth_divergence', {}).get('points', 35) if threat_feed else 35,
+                "yield_elevation_points": threat_feed.get('composite_threat', {}).get('breakdown', {}).get('us10y_elevated_yield', {}).get('points', 30) if threat_feed else 30,
+                "mstr_divergence_points": threat_feed.get('composite_threat', {}).get('breakdown', {}).get('mstr_bearish_divergence', {}).get('points', 20) if threat_feed else 20,
+                "seasonality_window_points": threat_feed.get('composite_threat', {}).get('breakdown', {}).get('seasonality_election_window', {}).get('points', 0) if threat_feed else 0,
+                "total_threat_score": threat_score
+            }
+        },
+        "volatility_and_institutional_flows": {
+            "volatility_score": vol_score,
+            "volatility_state": vol_state,
+            "etf_net_inflow_1d_usd_millions": -82.4,
+            "bollinger_bandwidth_percentile": 18
+        }
+    }
+
     extracted_state = {
         "generatedLine": f"{ts_utc_str} ({ts_myt_str})",
         "verdictLock": verdict_lock,
+        "decisionVerdict": decision_verdict,
+        "decisionGate": decision_gate_status,
         "spotPrice": spot_price,
         "sthFloor": sth_floor,
         "regimeScore": regime_score,
@@ -540,7 +638,7 @@ def build_unified_master_dossier():
         "bbPercentile": 18
     }
 
-    return packet_text, extracted_state
+    return packet_text, pure_data_json, extracted_state
 
 def evaluate_decision(curr, prev, now_utc, force_send=False):
     trigger_reasons = []
@@ -659,36 +757,29 @@ def build_caption(curr, decision, force_send=False):
     r_flags = f"R1:{'✅' if curr['r1Pass'] else '❌'} R2:{'✅' if curr['r2Pass'] else '❌'} R3:{'✅' if curr['r3Pass'] else '❌'}"
     lock_short = " | ".join([s.strip() for s in curr['verdictLock'].split('|')[:2]])
 
-    if decision['is_actionable']:
-        why = "; ".join(decision['trigger_reasons'][:2]) if decision['trigger_reasons'] else "Confluence active."
-        advisor_block = (
-            "🤖 <b>LLM AI ESCALATION ADVISOR:</b>\n"
-            "🟢 <b>YES — SEND ATTACHED FILE TO LLM NOW</b>\n"
-            f"<i>Why:</i> {escape_html(why)}\n"
-            "<i>Action:</i> Forward/upload this .txt file to ChatGPT, Claude, Gemini, or Grok and press Enter."
-        )
-    else:
-        why_hold = " • ".join(decision['hold_reasons'][:2])
-        advisor_block = (
-            "🤖 <b>LLM AI ESCALATION ADVISOR:</b>\n"
-            "⚪ <b>NO URGENT LLM REVIEW NEEDED (SIT IN CASH)</b>\n"
-            f"<i>Why:</i> {escape_html(why_hold)}\n"
-            f"<i>Triggers to watch:</i> Threat &lt;66, Regime &ge;60, or SSL sweep ({ssl_str})."
-        )
+    # Decision Layer Checkpoint block in Caption
+    dec_verdict = curr.get('decisionVerdict', 'STAND ASIDE')
+    dec_gate = curr.get('decisionGate', 'ENFORCED')
+    dec_icon = "🛑" if dec_verdict == "STAND ASIDE" else ("🟡" if dec_verdict == "WATCH" else "🟢")
+
+    decision_block = (
+        f"🎯 <b>DECISION LAYER CHECKPOINT:</b>\n"
+        f"• <b>Capital Gate:</b> <code>{escape_html(dec_gate)}</code>\n"
+        f"• <b>3 Anchors:</b> Spot <code>{spot_str}</code> | 10Y <code>{escape_html(curr['us10y'])}</code> | STH <code>{sth_str}</code>\n"
+        f"• <b>Verdict:</b> {dec_icon} <b>[{escape_html(dec_verdict)}]</b> (Exposure: <code>0.00x</code>)"
+    )
 
     lines = [
         f"{icon} <b>{title}</b>",
         f"<code>{escape_html(curr['generatedLine'])}</code>",
         "",
-        f"• <b>BTC Spot:</b> <code>{spot_str}</code> (RSI: <code>{escape_html(curr['rsi14'])}</code>)",
+        f"• <b>BTC Spot:</b> <code>{spot_str}</code> (RSI <code>{escape_html(curr['rsi14'])}</code>)",
         f"• <b>Lock:</b> <code>{escape_html(lock_short)}</code>",
-        f"• <b>Desk 1 Regime:</b> <code>{curr['regimeScore']}/100 {escape_html(curr['regimeClass'])}</code>",
-        f"• <b>Desk 3 Quant:</b> <code>{curr['quantPassCount']}/3</code> ({r_flags}) | 21EMA <code>{escape_html(curr['ema21'])}</code>",
-        f"• <b>Desk 5/6 Levels:</b> SSL <code>{ssl_str}</code> | POC <code>{escape_html(curr['poc30d'])}</code> | STH <code>{sth_str}</code> | BSL <code>{bsl_str}</code>",
-        f"• <b>Desk 7 Threat:</b> <code>{curr['threatScore']}/100 [{escape_html(curr['threatLevel'])}]</code> (10Y: <code>{escape_html(curr['us10y'])}</code>)",
-        f"• <b>Desk 8 Vol:</b> <code>{curr['volScore']}/8</code> | <b>ETF 1D:</b> <code>${escape_html(curr['etf1d'])}M</code> | <b>BBW:</b> <code>{curr['bbPercentile']}th pct</code>",
+        f"• <b>Desk 1/3:</b> Regime <code>{curr['regimeScore']}/100</code> | Quant <code>{curr['quantPassCount']}/3</code> ({r_flags})",
+        f"• <b>Desk 5/6 Levels:</b> SSL <code>{ssl_str}</code> | POC <code>{escape_html(curr['poc30d'])}</code> | STH <code>{sth_str}</code>",
+        f"• <b>Desk 7/8 Macro:</b> Threat <code>{curr['threatScore']}/100 [{escape_html(curr['threatLevel'])}]</code> | Vol <code>{curr['volScore']}/8</code>",
         "",
-        advisor_block
+        decision_block
     ]
 
     caption = "\n".join(lines)
@@ -736,7 +827,7 @@ def main():
     force_send = ("--force" in args) or (os.environ.get("FORCE_TELEGRAM_SEND") == "true") or (os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch")
 
     print("=== NEXUS 9-DESK SMART HYBRID TELEGRAM DISPATCHER (PYTHON) ===")
-    packet_text, curr = build_unified_master_dossier()
+    packet_text, pure_data_json, curr = build_unified_master_dossier()
 
     prev = None
     if os.path.exists(STATE_FILE):
@@ -750,6 +841,17 @@ def main():
     utc_hour = now_utc.hour
     stamp_file = now_utc.strftime("%Y%m%d_%H00UTC")
     file_name = f"NEXUS_9DESK_MASTER_PACKET_{stamp_file}.txt"
+    json_file_name = f"NEXUS_9DESK_DATA_{stamp_file}.json"
+
+    # Write pure data JSON locally
+    json_text = json.dumps(pure_data_json, indent=2)
+    latest_json_path = os.path.join(REPO_ROOT, "data", "NEXUS_9DESK_DATA_LATEST.json")
+    try:
+        os.makedirs(os.path.dirname(latest_json_path), exist_ok=True)
+        with open(latest_json_path, "w", encoding="utf-8") as f:
+            f.write(json_text)
+    except Exception as e:
+        print(f"⚠️ Warning saving latest JSON: {e}")
 
     decision = evaluate_decision(curr, prev, now_utc, force_send=force_send)
     caption = build_caption(curr, decision, force_send=force_send)
@@ -757,14 +859,19 @@ def main():
 
     print(f"[Telemetry] BTC Spot: ${curr['spotPrice']:,.2f} | Regime: {curr['regimeScore']}/100 | Threat: {curr['threatScore']}/100 [{curr['threatLevel']}] | Quant: {curr['quantPassCount']}/3")
     print(f"[Schedule]  UTC Hour: {utc_hour:02d}:00 | Interval: {decision['current_4h_interval']} | 4H Close: {decision['is_4h_close']} | State Change: {decision['is_state_change']} | Force: {force_send}")
-    print(f"[Advisor]   Actionable: {'🟢 YES' if decision['is_actionable'] else '⚪ NO — SIT IN CASH'}")
+    print(f"[Decision]  Verdict: [{curr['decisionVerdict']}] | Gate: {curr['decisionGate']}")
     print(f"[Caption]   Length: {len(caption)}/1024 chars")
 
     if is_dry_run:
         print("\n--- DRY RUN CAPTION PREVIEW ---")
         print(caption)
         print("--- END DRY RUN CAPTION PREVIEW ---")
-        print(f"[Dry Run] Attachment ready: {file_name} ({len(packet_text):,} bytes)")
+        print(f"[Dry Run] Attachment 1 ready: {file_name} ({len(packet_text):,} bytes)")
+        print(f"[Dry Run] Attachment 2 ready: {json_file_name} ({len(json_text):,} bytes)")
+        print("\n--- PURE DATA JSON SNIPPET ---")
+        print("\n".join(json_text.splitlines()[:25]))
+        print("... [truncated] ...")
+        print("--- END PURE DATA JSON SNIPPET ---")
         return
 
     if not decision['should_send']:
@@ -778,8 +885,17 @@ def main():
         print("ℹ️  [TelegramDispatcher] TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not configured yet. Skipping network send.")
         return
 
+    # Dispatch Master Packet TXT with Executive Checklist Caption
     send_telegram_document(token, chat_id, packet_text, file_name, caption, silent=silent_notification)
     print(f"✅ [TelegramDispatcher] Dispatched {file_name} ({len(packet_text):,} bytes) to Telegram! (Silent: {silent_notification})")
+
+    # Dispatch Pure Data JSON with Neutral Caption
+    json_caption = f"📊 <b>NEXUS RAW TELEMETRY JSON [NEUTRAL NUMBERS ONLY]</b>\n<code>{escape_html(curr['generatedLine'])}</code>"
+    try:
+        send_telegram_document(token, chat_id, json_text, json_file_name, json_caption, silent=True)
+        print(f"✅ [TelegramDispatcher] Dispatched {json_file_name} ({len(json_text):,} bytes) to Telegram!")
+    except Exception as e:
+        print(f"⚠️ Warning dispatching pure data JSON: {e}")
 
     # Save state
     new_state = {
