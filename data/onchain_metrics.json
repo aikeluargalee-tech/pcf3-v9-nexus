@@ -1,15 +1,15 @@
 {
-  "updated_at": "2026-10-13T00:00:00Z",
-  "source": "BlockHorizon Bitcoin Core UTXO Archive Node",
+  "updated_at": "2026-10-17T00:00:00Z",
+  "fetched_at": "2026-10-18T08:35:05Z",
+  "source": "BGeometrics / bitcoin-data.com UTXO Cohort API",
   "methodology": "Direct on-chain UTXO cohort calculation (<155D STS, >=155D LTS)",
   "metrics": {
-    "sth_cost_basis": 74468.34,
-    "lth_cost_basis": 49210.18,
+    "sth_cost_basis": 74604.04,
+    "lth_cost_basis": 48732.98,
     "realized_price": 53844.78,
     "sth_mvrv": 1.1158,
     "lth_mvrv": 1.6885,
-    "nupl": 0.3520,
-    "reference_btc_price": 83093.57
+    "nupl": 0.352
   },
   "chart_ids": {
     "sth_cost_basis": 115,

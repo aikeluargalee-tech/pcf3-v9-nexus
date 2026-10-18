@@ -12,6 +12,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: '3.11'}
       - run: pip install requests
+      - run: python scripts/onchain_collector.py
       - run: python pcf3_collector_default.py
       - run: python scripts/macro_collector.py
       - run: python scripts/send_telegram_master_packet.py
@@ -23,5 +24,5 @@ jobs:
       - run: |
           git config user.name "pcf3-bot"
           git config user.email "bot@pcf3.local"
-          git add PCF3_LIVE_PACKET_DEFAULT.txt data/macro_threat_feed.json data/volatility_confluence_feed.json data/telegram_last_state.json data/oi_history.json data/NEXUS_9DESK_DATA_LATEST.json
+          git add PCF3_LIVE_PACKET_DEFAULT.txt data/macro_threat_feed.json data/volatility_confluence_feed.json data/telegram_last_state.json data/oi_history.json data/NEXUS_9DESK_DATA_LATEST.json data/onchain_metrics.json
           git diff --staged --quiet || (git commit -m "auto: packet & telemetry $(date -u +%Y-%m-%dT%H:%M:%SZ)" && git push)

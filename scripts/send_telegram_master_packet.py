@@ -361,7 +361,7 @@ def build_unified_master_dossier():
                 sth_floor = raw_sth
                 sth_age_seconds = max(0, int((now_utc - up_dt).total_seconds()))
                 sth_fetched_utc = up_dt.strftime("%Y-%m-%d %H:%M:%S UTC")
-                sth_status = "LIVE" if sth_age_seconds <= 86400 else "STALE"
+                sth_status = "LIVE" if sth_age_seconds <= 172800 else "STALE"
             else:
                 # No verifiable snapshot timestamp: fail closed
                 print("⚠️ Warning: STH snapshot has no valid updated_at timestamp, marked MISSING.")
@@ -419,7 +419,7 @@ def build_unified_master_dossier():
     # Data Integrity Evaluation for the 3 Critical Anchors
     crit_miss_spot = 1 if (spot_price is None or spot_status in ("MISSING", "STALE") or spot_age_seconds > 600) else 0
     crit_miss_10y = 1 if (us10y_num is None or us10y_status in ("MISSING", "STALE") or us10y_age_seconds > 7200) else 0
-    crit_miss_sth = 1 if (sth_floor is None or sth_status in ("MISSING", "STALE") or sth_age_seconds > 86400) else 0
+    crit_miss_sth = 1 if (sth_floor is None or sth_status in ("MISSING", "STALE") or sth_age_seconds > 172800) else 0
     critical_missing_count = crit_miss_spot + crit_miss_10y + crit_miss_sth
     is_integrity_breach = (critical_missing_count >= 1)
 

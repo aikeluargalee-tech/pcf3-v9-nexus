@@ -67,6 +67,8 @@ Follow this exact template:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🧠 <b>HERMES DIRECTIVE:</b>
 "[2-3 crisp sentences stating immediate trade posture, key risks, and exact market conditions required to alter exposure.]"
+
+IMPORTANT: Keep internal reasoning focused (under 2,000 tokens) and proceed directly to generating the complete final report with all sections fully closed.
 """
 
 
@@ -109,7 +111,7 @@ def call_deepseek_flash(api_key, system_prompt, user_prompt, max_retries=3, time
             {"role": "user", "content": user_prompt}
         ],
         "temperature": 0.2,
-        "max_tokens": 6000
+        "max_tokens": 8192
     }
     
     for attempt in range(1, max_retries + 1):
