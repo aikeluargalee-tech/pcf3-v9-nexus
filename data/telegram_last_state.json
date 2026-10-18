@@ -1,8 +1,8 @@
 {
-  "updatedAtUtc": "2026-10-18T06:25:43.699022+00:00",
+  "updatedAtUtc": "2026-10-18T06:50:36.006403+00:00",
   "last4hInterval": "20261018_0400UTC",
-  "spotPrice": 81714.57,
-  "verdictLock": "FLAT_100_USDT | MAX_EXPOSURE: 0.00x | GATE_DRIVER: DESK_7_CRIMSON",
+  "spotPrice": 81713.72,
+  "verdictLock": "FLAT_100_USDT | MAX_EXPOSURE: 0.00x | GATE_DRIVER: DATA_INTEGRITY_FAIL (1 MISSING/STALE)",
   "regimeScore": 46,
   "regimeClass": "Transitional (Neutral)",
   "threatScore": 85,
