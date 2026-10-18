@@ -73,7 +73,7 @@ Follow this exact template:
 • <b>Trend Pivot (200 SMA / 21 EMA):</b> $XX,XXX
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🏛️ <b>MASTER SWING VERDICT:</b> [ <code>BUY</code> | <code>HOLD</code> | <code>REDUCE</code> | <code>ABSTAIN</code> ]
+🏛️ <b>MASTER SWING VERDICT (The Trader's Tactical Playbook):</b> [ <code>BUY</code> | <code>HOLD</code> | <code>REDUCE</code> | <code>ABSTAIN</code> ]
 • <b>Action Directive:</b> [e.g. HOLD (If flat, remain 100% USDT; no spot additions justified)]
 • <b>Confidence:</b> [HIGH / MEDIUM / LOW — 1 sentence why]
 • <b>Setup Status:</b> [e.g. No confirmed setup / Conditional — not active / Confirmed Entry]
@@ -81,7 +81,7 @@ Follow this exact template:
 • <b>Bear Breakdown Risk:</b> [Specific structural loss or level that triggers cascade]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🧠 <b>HERMES DIRECTIVE:</b>
+🧠 <b>HERMES DIRECTIVE (The Risk Officer's Strategic Conviction):</b>
 "[2-3 crisp sentences stating immediate trade posture, key risks, and exact market conditions required to alter exposure.]"
 
 IMPORTANT: Keep internal reasoning focused (under 2,000 tokens) and proceed directly to generating the complete final report with all sections fully closed.
