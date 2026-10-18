@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "asof": "2026-10-18T06:25:40Z",
+  "asof": "2026-10-18T06:31:04Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
@@ -65,7 +65,7 @@
       "color": "crimson",
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity.",
       "data_status": "LIVE",
-      "fetched_utc": "2026-10-18T06:25:40Z"
+      "fetched_utc": "2026-10-18T06:31:04Z"
     },
     "module_c_mstr": {
       "price": 136.83,
@@ -130,7 +130,7 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 81607.26,
+      "spot_price": 81602.57,
       "change_24h_pct": 0.05,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
@@ -657,7 +657,7 @@
       "sma50": 34.487,
       "us10y": 5.098,
       "mstr": 136.8,
-      "btc": 81607.0
+      "btc": 81603.0
     }
   ]
 }
