@@ -1,7 +1,7 @@
 {
-  "updatedAtUtc": "2026-10-18T06:50:36.006403+00:00",
-  "last4hInterval": "20261018_0400UTC",
-  "spotPrice": 81713.72,
+  "updatedAtUtc": "2026-10-18T08:12:24.048693+00:00",
+  "last4hInterval": "20261018_0800UTC",
+  "spotPrice": 81680.01,
   "verdictLock": "FLAT_100_USDT | MAX_EXPOSURE: 0.00x | GATE_DRIVER: DATA_INTEGRITY_FAIL (1 MISSING/STALE)",
   "regimeScore": 46,
   "regimeClass": "Transitional (Neutral)",
