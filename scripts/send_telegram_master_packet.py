@@ -542,10 +542,32 @@ def build_unified_master_dossier():
 
     return packet_text, extracted_state
 
-def evaluate_decision(curr, prev, utc_hour, force_send=False):
+def evaluate_decision(curr, prev, now_utc, force_send=False):
     trigger_reasons = []
     hold_reasons = []
-    is_4h_close = (utc_hour % 4 == 0)
+
+    # Calculate 4H interval tag (00:00, 04:00, 08:00, 12:00, 16:00, 20:00 UTC)
+    interval_hour = (now_utc.hour // 4) * 4
+    current_4h_interval = f"{now_utc.strftime('%Y%m%d')}_{interval_hour:02d}00UTC"
+
+    last_interval = prev.get('last4hInterval') if prev else None
+    last_sent_str = prev.get('updatedAtUtc') if prev else None
+
+    elapsed_hours = 999.0
+    if last_sent_str:
+        try:
+            last_sent_dt = datetime.datetime.fromisoformat(last_sent_str.replace("Z", "+00:00"))
+            elapsed_hours = (now_utc - last_sent_dt).total_seconds() / 3600.0
+        except Exception:
+            elapsed_hours = 999.0
+
+    # A 4H briefing is due if:
+    # 1. We transitioned into a new 4H interval that hasn't sent a briefing yet, OR
+    # 2. At least 3.5 hours have elapsed since the last Telegram dispatch, OR
+    # 3. This is a cold start (no previous state).
+    is_new_4h_interval = (last_interval != current_4h_interval)
+    is_time_due = (elapsed_hours >= 3.5)
+    is_4h_close = is_new_4h_interval or is_time_due or (now_utc.hour % 4 == 0 and elapsed_hours >= 1.0)
 
     if prev:
         prev_lock = prev.get('verdictLock', '').split('|')[0].strip()
@@ -613,7 +635,9 @@ def evaluate_decision(curr, prev, utc_hour, force_send=False):
         "is_state_change": is_state_change,
         "is_actionable": is_actionable,
         "trigger_reasons": trigger_reasons,
-        "hold_reasons": hold_reasons
+        "hold_reasons": hold_reasons,
+        "current_4h_interval": current_4h_interval,
+        "elapsed_hours": elapsed_hours
     }
 
 def build_caption(curr, decision, force_send=False):
@@ -625,7 +649,7 @@ def build_caption(curr, decision, force_send=False):
         title = "NEXUS URGENT STATE-CHANGE ALERT"
     else:
         icon = "🏛️"
-        title = "NEXUS 9-DESK 4H TELEMETRY BRIEFING"
+        title = "NEXUS 9-DESK 4H TELEMETRY DOSSIER"
     
     spot_str = f"${curr['spotPrice']:,.2f}" if curr['spotPrice'] else "N/A"
     sth_str = f"${curr['sthFloor']:,.0f}" if curr['sthFloor'] else "N/A"
@@ -711,13 +735,13 @@ def main():
     stamp_file = now_utc.strftime("%Y%m%d_%H00UTC")
     file_name = f"NEXUS_9DESK_MASTER_PACKET_{stamp_file}.txt"
 
-    decision = evaluate_decision(curr, prev, utc_hour, force_send=force_send)
+    decision = evaluate_decision(curr, prev, now_utc, force_send=force_send)
     caption = build_caption(curr, decision, force_send=force_send)
-    silent_notification = (not decision['is_actionable']) and (not force_send)
+    silent_notification = False
 
     print(f"[Telemetry] BTC Spot: ${curr['spotPrice']:,.2f} | Regime: {curr['regimeScore']}/100 | Threat: {curr['threatScore']}/100 [{curr['threatLevel']}] | Quant: {curr['quantPassCount']}/3")
-    print(f"[Schedule]  UTC Hour: {utc_hour:02d}:00 | 4H Close: {decision['is_4h_close']} | State Change: {decision['is_state_change']} | Force: {force_send}")
-    print(f"[Advisor]   Actionable: {'🟢 YES (Loud Notification)' if decision['is_actionable'] else '⚪ NO — SIT IN CASH (Silent Notification)'}")
+    print(f"[Schedule]  UTC Hour: {utc_hour:02d}:00 | Interval: {decision['current_4h_interval']} | 4H Close: {decision['is_4h_close']} | State Change: {decision['is_state_change']} | Force: {force_send}")
+    print(f"[Advisor]   Actionable: {'🟢 YES' if decision['is_actionable'] else '⚪ NO — SIT IN CASH'}")
     print(f"[Caption]   Length: {len(caption)}/1024 chars")
 
     if is_dry_run:
@@ -744,6 +768,7 @@ def main():
     # Save state
     new_state = {
         "updatedAtUtc": now_utc.isoformat(),
+        "last4hInterval": decision["current_4h_interval"],
         "spotPrice": curr['spotPrice'],
         "verdictLock": curr['verdictLock'],
         "regimeScore": curr['regimeScore'],
