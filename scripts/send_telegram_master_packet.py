@@ -241,11 +241,11 @@ def build_unified_master_dossier():
         raw_sp = float(daily_klines_raw[-1][4])
         if raw_sp > 0:
             spot_price = raw_sp
-            close_ms = int(daily_klines_raw[-1][6])
-            spot_age_seconds = max(0, int((now_ms - close_ms) / 1000))
-            spot_dt = datetime.datetime.fromtimestamp(close_ms / 1000.0, datetime.timezone.utc)
-            spot_fetched_utc = spot_dt.strftime("%Y-%m-%d %H:%M:%S UTC")
-            spot_status = "CACHED" if spot_age_seconds <= 600 else "STALE"
+            # Ticker failed: the kline 'close' timestamp may be in the future (unclosed candle),
+            # so we cannot verify freshness. Mark STALE so the integrity gate trips.
+            spot_age_seconds = 999999
+            spot_fetched_utc = "UNVERIFIED (daily kline fallback)"
+            spot_status = "STALE"
 
     # Book spread
     best_bid, best_ask, spread_display = None, None, "Unavailable"
@@ -301,25 +301,31 @@ def build_unified_master_dossier():
                                      f"Election: {bd.get('seasonality_election_window', {}).get('points', 0)}/15")
         mods = threat_feed.get('modules', {})
         if 'module_b_yield' in mods and 'yield_pct' in mods['module_b_yield']:
-            raw_y = mods['module_b_yield']['yield_pct']
-            if raw_y is not None:
+            mb = mods['module_b_yield']
+            raw_y = mb['yield_pct']
+            collector_status = mb.get('data_status')
+            if raw_y is not None and collector_status != "MISSING":
                 raw_y = float(raw_y)
                 if 0.0 < raw_y <= 20.0:
-                    us10y_num = raw_y
-                    us10y_str = f"{us10y_num:.3f}%"
-                    asof_str = mods['module_b_yield'].get('fetched_utc') or threat_feed.get('asof')
+                    asof_str = mb.get('fetched_utc')
+                    asof_dt = None
                     if asof_str and asof_str != "MISSING":
                         try:
-                            asof_dt = datetime.datetime.fromisoformat(asof_str.replace("Z", "+00:00"))
-                            us10y_age_seconds = max(0, int((now_utc - asof_dt).total_seconds()))
-                            us10y_fetched_utc = asof_dt.strftime("%Y-%m-%d %H:%M:%S UTC")
+                            asof_dt = datetime.datetime.fromisoformat(str(asof_str).replace("Z", "+00:00"))
                         except Exception:
-                            us10y_age_seconds = 0
-                            us10y_fetched_utc = ts_utc_str
+                            asof_dt = None
+                    if asof_dt is not None:
+                        us10y_num = raw_y
+                        us10y_str = f"{us10y_num:.3f}%"
+                        us10y_age_seconds = max(0, int((now_utc - asof_dt).total_seconds()))
+                        us10y_fetched_utc = asof_dt.strftime("%Y-%m-%d %H:%M:%S UTC")
+                        if us10y_age_seconds > 7200:
+                            us10y_status = "STALE"
+                        else:
+                            us10y_status = "CACHED" if collector_status == "CACHED" else "LIVE"
                     else:
-                        us10y_age_seconds = 0
-                        us10y_fetched_utc = ts_utc_str
-                    us10y_status = "LIVE" if us10y_age_seconds <= 7200 else "STALE"
+                        # No verifiable timestamp: fail closed
+                        print("⚠️ Warning: 10Y yield has no valid fetch timestamp, marked MISSING.")
                 else:
                     print(f"⚠️ Warning: 10Y yield {raw_y} out of range (0-20), rejected.")
         if 'module_a_breadth' in mods:
@@ -344,24 +350,25 @@ def build_unified_master_dossier():
     if onchain_snapshot and "metrics" in onchain_snapshot and "sth_cost_basis" in onchain_snapshot["metrics"]:
         raw_sth = float(onchain_snapshot["metrics"]["sth_cost_basis"])
         if raw_sth > 0:
-            sth_floor = raw_sth
             up_str = onchain_snapshot.get("updated_at")
+            up_dt = None
             if up_str and up_str != "MISSING":
                 try:
-                    up_dt = datetime.datetime.fromisoformat(up_str.replace("Z", "+00:00"))
-                    sth_age_seconds = max(0, int((now_utc - up_dt).total_seconds()))
-                    sth_fetched_utc = up_dt.strftime("%Y-%m-%d %H:%M:%S UTC")
+                    up_dt = datetime.datetime.fromisoformat(str(up_str).replace("Z", "+00:00"))
                 except Exception:
-                    sth_age_seconds = 0
-                    sth_fetched_utc = ts_utc_str
+                    up_dt = None
+            if up_dt is not None:
+                sth_floor = raw_sth
+                sth_age_seconds = max(0, int((now_utc - up_dt).total_seconds()))
+                sth_fetched_utc = up_dt.strftime("%Y-%m-%d %H:%M:%S UTC")
+                sth_status = "LIVE" if sth_age_seconds <= 86400 else "STALE"
             else:
-                sth_age_seconds = 0
-                sth_fetched_utc = ts_utc_str
-            sth_status = "LIVE" if sth_age_seconds <= 86400 else "STALE"
+                # No verifiable snapshot timestamp: fail closed
+                print("⚠️ Warning: STH snapshot has no valid updated_at timestamp, marked MISSING.")
         else:
             print(f"⚠️ Warning: STH cost basis {raw_sth} <= 0, rejected.")
 
-    # Parse Raw Packet for On-Chain fallback, Regime, Derivatives, Appendix
+    # Parse Raw Packet for Regime, Derivatives, Appendix
     regime_score = 46
     regime_class = "Transitional (Neutral)"
     regime_dir = "Macro Bull (Consolidating)"
@@ -373,15 +380,8 @@ def build_unified_master_dossier():
     raw_appendix = ""
 
     if raw_packet:
-        if not sth_floor:
-            m_sth = re.search(r'STH_COST_BASIS:\s*([0-9,\.]+)', raw_packet)
-            if m_sth:
-                val = float(m_sth.group(1).replace(',', ''))
-                if val > 0:
-                    sth_floor = val
-                    sth_status = "CACHED"
-                    sth_age_seconds = 1800
-                    sth_fetched_utc = ts_utc_str
+        # NOTE: no STH fallback from packet text — it carries no verifiable fetch timestamp.
+        # If the snapshot above failed, STH stays MISSING (null) and the integrity gate trips.
         m_score = re.search(r'(?:TOTAL\s*SCORE|REGIME_SCORE)[:\s=]+(\d+)', raw_packet, re.IGNORECASE)
         if m_score:
             regime_score = int(m_score.group(1))
@@ -459,7 +459,7 @@ def build_unified_master_dossier():
         decision_verdict = "STAND ASIDE"
         decision_posture = "CASH PRESERVATION / DATA INTEGRITY LOCK"
         decision_directive = f"Data integrity breach ({critical_missing_count} critical anchor(s) missing or stale). 100% cash preservation enforced. Zero execution."
-        decision_gate_status = f"[TRIPPED] ({critical_missing_count} Critical Anchor(s) Missing/Stale)"
+        decision_gate_status = f"[TRIPPED] ({critical_missing_count} Critical Anchor(s) Missing/Stale)" + (f" + [MET / ACTIVE] (Threat {threat_score}/100 CRIMSON)" if is_crimson else "")
         decision_override_note = "-> MANDATE: 100% USDT / 0.00x Maximum Exposure. Overrides lower-desk setups due to data integrity."
     elif is_crimson:
         decision_verdict = "STAND ASIDE"
@@ -484,14 +484,19 @@ def build_unified_master_dossier():
     spot_anchor_flag = "CONFIRMED LIVE" if spot_status == "LIVE" else spot_status
 
     us10y_disp = f"{us10y_num:.3f}%" if us10y_num is not None else "MISSING"
-    us10y_anchor_flag = f"CONFIRMED {'ELEVATED >= 5.0%' if (us10y_num and us10y_num >= 5.0) else 'NORMAL < 5.0%'}" if us10y_num is not None else "MISSING"
+    if us10y_num is None:
+        us10y_anchor_flag = "MISSING"
+    else:
+        _lvl = 'ELEVATED >= 5.0%' if us10y_num >= 5.0 else 'NORMAL < 5.0%'
+        us10y_anchor_flag = f"CONFIRMED {_lvl}" if us10y_status == "LIVE" else f"{us10y_status} — {_lvl}"
 
     sth_disp = f"${sth_floor:,.2f}" if sth_floor is not None else "MISSING"
     if sth_floor is not None and spot_price is not None:
         sth_buffer_pct = ((spot_price - sth_floor) / sth_floor) * 100.0
-        sth_anchor_flag = f"CONFIRMED INTACT ({sth_buffer_pct:+.2f}%)"
+        sth_anchor_flag = (f"CONFIRMED INTACT ({sth_buffer_pct:+.2f}%)" if sth_status == "LIVE"
+                           else f"{sth_status} — snapshot {sth_fetched_utc} ({sth_buffer_pct:+.2f}%)")
     elif sth_floor is not None:
-        sth_anchor_flag = f"CONFIRMED [{sth_status}]"
+        sth_anchor_flag = f"{sth_status}"
     else:
         sth_anchor_flag = "MISSING"
 
@@ -541,7 +546,8 @@ def build_unified_master_dossier():
         f"GENERATED: {ts_utc_str} ({ts_myt_str})",
         "ENGINE: Multi-Mirror Parallel Telemetry Arbitrator • v3.2.4 Hardened Spec",
         "DESTINATION: Multi-Agent AI Review (Claude, ChatGPT, Grok, Gemini, Meta AI)",
-        "OPERATIONAL DATA MODE: [LIVE] | ZERO_MOCK_VERIFIED | PROVENANCE: 100% EMPIRICAL",
+        (f"OPERATIONAL DATA MODE: [LIVE] | ZERO_MOCK_VERIFIED | CRITICAL ANCHORS: 3/3 FRESH" if critical_missing_count == 0
+         else f"OPERATIONAL DATA MODE: [DEGRADED] | DATA INTEGRITY TRIPPED | CRITICAL ANCHORS: {3 - critical_missing_count}/3 FRESH ({critical_missing_count} MISSING/STALE)"),
         f"PRE-COMPUTED ARBITRATION LOCK: {verdict_lock}",
         "================================================================================",
         "DATA PROVENANCE & OPERATIONAL INTEGRITY LEDGER:",

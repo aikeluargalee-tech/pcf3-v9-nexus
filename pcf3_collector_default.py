@@ -712,19 +712,14 @@ def fetch_sth_cost_basis(klines_90d=None):
                     val = float(oc_data["metrics"]["sth_cost_basis"])
                     # Range check: STH cost basis > 0
                     if 0 < val <= 250000:
-                        now_stamp = utc_now_iso()
-                        oc_data["updated_at"] = now_stamp
-                        try:
-                            with open(onchain_path, "w", encoding="utf-8") as fw:
-                                json.dump(oc_data, fw, indent=2)
-                        except Exception:
-                            pass
+                        # Use the snapshot's own timestamp (never re-stamp on read)
+                        snap_stamp = oc_data.get("updated_at") or "MISSING"
                         return {
                             "sth_price": val,
                             "source": "BlockHorizon Bitcoin Core UTXO Snapshot",
                             "method": "STH Realized Price = average cost of coins moved <155 days (BlockHorizon UTXO cohort)",
                             "status": "LIVE_ONCHAIN",
-                            "timestamp": now_stamp,
+                            "timestamp": snap_stamp,
                             "is_proxy": False
                         }, "LIVE_ONCHAIN", "BlockHorizon"
                     else:

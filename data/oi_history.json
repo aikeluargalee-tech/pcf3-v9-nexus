@@ -1,8 +1,8 @@
 {
   "latest": {
-    "oi": 29910.504100000086,
-    "ts": "2026-10-18T06:30:38.935082Z",
-    "source": "LIVE_API_OKX_PROXY"
+    "oi": 92956.285,
+    "ts": "2026-10-18T06:46:57.373292Z",
+    "source": "LIVE_API"
   },
   "history": [
     {
@@ -96,10 +96,10 @@
       "source": "LIVE_API_OKX_PROXY"
     },
     {
-      "oi": 29910.504100000086,
-      "ts": "2026-10-18T06:30:38.935082Z",
-      "price": 81700.0,
-      "source": "LIVE_API_OKX_PROXY"
+      "oi": 92956.285,
+      "ts": "2026-10-18T06:46:57.373292Z",
+      "price": 81756.58,
+      "source": "LIVE_API"
     }
   ]
 }

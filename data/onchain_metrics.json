@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-18T05:00:00Z",
+  "updated_at": "2026-10-13T00:00:00Z",
   "source": "BlockHorizon Bitcoin Core UTXO Archive Node",
   "methodology": "Direct on-chain UTXO cohort calculation (<155D STS, >=155D LTS)",
   "metrics": {

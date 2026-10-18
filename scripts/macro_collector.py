@@ -108,22 +108,35 @@ def run_collector():
             print(f"⚠️ Warning: 10Y yield {raw_y} out of range (0-20), rejected.")
 
     if yield_val is None:
-        # Check if previous cached value is in range
+        # Accept previous cached value ONLY if in range AND it carries a real fetch timestamp
         prev_y = prev_mod_b.get('yield_pct')
-        if prev_y and 0.0 < float(prev_y) <= 20.0:
+        prev_ts = prev_mod_b.get('fetched_utc')
+        prev_ts_valid = False
+        if prev_ts and prev_ts != "MISSING":
+            try:
+                datetime.datetime.fromisoformat(str(prev_ts).replace("Z", "+00:00"))
+                prev_ts_valid = True
+            except Exception:
+                prev_ts_valid = False
+        if prev_y is not None and 0.0 < float(prev_y) <= 20.0 and prev_ts_valid:
             yield_val = float(prev_y)
             yield_status = "CACHED"
-            yield_fetched_utc = prev_mod_b.get('fetched_utc', prev_mod_b.get('timestamp', "MISSING"))
+            yield_fetched_utc = prev_ts
         else:
-            yield_val = 5.098
+            # No live and no verifiable cache: explicit MISSING, no substitute number
+            yield_val = None
             yield_status = "MISSING"
             yield_fetched_utc = "MISSING"
+
+    # Threat scoring when 10Y is MISSING: score conservatively (assume toxic) without inventing a value
+    yield_missing = yield_val is None
+    yield_for_scoring = 5.0 if yield_missing else yield_val
 
     mstr_price = mstr_res['price'] if (mstr_res and mstr_res['price']) else prev_mod_c.get('price', 1485.50)
     mstr_prev = mstr_res['prev_close'] if (mstr_res and mstr_res['prev_close']) else mstr_price
     mstr_chg_pct = round(((mstr_price - mstr_prev) / mstr_prev) * 100, 2) if mstr_prev else -1.85
 
-    btc_price = btc_res['price'] if (btc_res and btc_res['price']) else prev_btc.get('spot_price', 62840.00)
+    btc_price = btc_res['price'] if (btc_res and btc_res['price']) else prev_btc.get('spot_price')
     # Range validation for BTC spot (> 0)
     if btc_price is not None and float(btc_price) <= 0:
         btc_price = None
@@ -133,7 +146,7 @@ def run_collector():
     print(f"Observed Prices:")
     print(f"  • S&P 500 (SPX)  : ${spx_price:,.2f} ({spx_chg_pct:+.2f}%)")
     print(f"  • Equal-Weight   : ${rsp_price:,.2f} ({rsp_chg_pct:+.2f}%)")
-    print(f"  • US 10Y Yield   : {yield_val:.3f}% [{yield_status}] (fetched: {yield_fetched_utc})")
+    print(f"  • US 10Y Yield   : {('%.3f%%' % yield_val) if not yield_missing else 'MISSING'} [{yield_status}] (fetched: {yield_fetched_utc})")
     print(f"  • MicroStrategy  : ${mstr_price:,.2f} ({mstr_chg_pct:+.2f}%)")
     print(f"  • BTC Spot       : ${btc_price:,.2f} ({btc_chg_pct:+.2f}%)" if btc_price else "  • BTC Spot       : MISSING")
 
@@ -155,9 +168,9 @@ def run_collector():
         "rsp": round(rsp_price, 2),
         "ratio": round(raw_ratio, 3),
         "sma50": round(sma50, 3),
-        "us10y": round(yield_val, 3),
+        "us10y": round(yield_val, 3) if not yield_missing else None,
         "mstr": round(mstr_price, 1),
-        "btc": round(btc_price, 0)
+        "btc": round(btc_price, 0) if btc_price else None
     }
 
     if history and history[-1].get('date') == today_str:
@@ -171,7 +184,7 @@ def run_collector():
 
     # 4. Evaluate Threat Modules & Composite Score
     breadth_triggered = ratio_diff_pct > 1.0 or raw_ratio > 33.50
-    yield_triggered = yield_val >= 5.000
+    yield_triggered = yield_for_scoring >= 5.000
     mstr_triggered = (mstr_chg_pct < -1.0 and btc_chg_pct > 0) or (mstr_chg_pct < btc_chg_pct - 2.0)
 
     # Check data/events.json and module_d_seasonality catalysts for upcoming high-impact events within 7 days
@@ -208,7 +221,7 @@ def run_collector():
     score = 0
     if breadth_triggered: score += 35
     if yield_triggered: score += 30
-    elif yield_val > 4.25: score += 15
+    elif yield_for_scoring > 4.25: score += 15
     if mstr_triggered: score += 20
     if season_triggered: score += 15
 
@@ -238,7 +251,7 @@ def run_collector():
         "execution_instruction": "HALT all spot dip-buying across Quant Radar, Liquidity Radar, Sweep Desk, and Absorption Radar. Maintain 100% USDT dry powder until US 10Y pulls back below 5.0% and SPX/RSP breadth recovers." if score >= 66 else "Normal spot swing execution permissible within risk dampeners.",
         "breakdown": {
             "spx_rsp_breadth_divergence": { "points": 35 if breadth_triggered else 0, "max": 35, "triggered": breadth_triggered, "reason": "SPX at ATH while RSP lagging down; double-bottom breakout into 2008 fractal" if breadth_triggered else "SPX/RSP breadth ratio within normal bounds" },
-            "us10y_elevated_yield": { "points": 30 if yield_triggered else (15 if yield_val > 4.25 else 0), "max": 30, "triggered": yield_triggered or (yield_val > 4.25), "reason": f"10Y Treasury Yield at {yield_val:.3f}% >= 5.00% toxic threshold" if yield_triggered else f"10Y Treasury Yield at {yield_val:.3f}%" },
+            "us10y_elevated_yield": { "points": 30 if yield_triggered else (15 if yield_for_scoring > 4.25 else 0), "max": 30, "triggered": yield_triggered or (yield_for_scoring > 4.25), "reason": ("10Y Treasury Yield MISSING — scored conservatively as toxic (no substitute value)" if yield_missing else (f"10Y Treasury Yield at {yield_val:.3f}% >= 5.00% toxic threshold" if yield_triggered else f"10Y Treasury Yield at {yield_val:.3f}%")) },
             "mstr_bearish_divergence": { "points": 20 if mstr_triggered else 0, "max": 20, "triggered": mstr_triggered, "reason": mstr_reason },
             "seasonality_election_window": { "points": 15 if season_triggered else 0, "max": 15, "triggered": season_triggered, "reason": season_reason }
         }
@@ -253,7 +266,7 @@ def run_collector():
     data['modules']['module_a_breadth']['ratio_sma_diff_pct'] = ratio_diff_pct
 
     data['modules']['module_b_yield']['yield_pct'] = round(yield_val, 3) if yield_val is not None else None
-    data['modules']['module_b_yield']['status'] = "TOXIC" if yield_val >= 5.0 else ("RESTRICTIVE" if yield_val > 4.25 else "HEALTHY")
+    data['modules']['module_b_yield']['status'] = "MISSING" if yield_missing else ("TOXIC" if yield_val >= 5.0 else ("RESTRICTIVE" if yield_val > 4.25 else "HEALTHY"))
     data['modules']['module_b_yield']['data_status'] = yield_status
     data['modules']['module_b_yield']['fetched_utc'] = yield_fetched_utc
 
@@ -261,7 +274,7 @@ def run_collector():
     data['modules']['module_c_mstr']['change_24h_pct'] = mstr_chg_pct
     data['modules']['module_c_mstr']['status'] = "BEARISH DIVERGENCE / SQUEEZE WARNING" if mstr_triggered else "ALIGNED / NORMAL BETA"
 
-    data['modules']['btc_context']['spot_price'] = round(btc_price, 2)
+    data['modules']['btc_context']['spot_price'] = round(btc_price, 2) if btc_price else None
     data['modules']['btc_context']['change_24h_pct'] = btc_chg_pct
 
     # 6. Save updated cache
@@ -270,7 +283,7 @@ def run_collector():
 
     # Synchronize US 10Y yield into volatility_confluence_feed.json to prevent cross-desk drift
     vol_feed_path = os.path.join(repo_root, "data", "volatility_confluence_feed.json")
-    if os.path.exists(vol_feed_path):
+    if os.path.exists(vol_feed_path) and not yield_missing:
         try:
             import re
             with open(vol_feed_path, 'r', encoding='utf-8') as vf:
