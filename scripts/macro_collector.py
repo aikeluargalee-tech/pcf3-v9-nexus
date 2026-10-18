@@ -91,26 +91,51 @@ def run_collector():
     rsp_prev = rsp_res['prev_close'] if (rsp_res and rsp_res['prev_close']) else rsp_price
     rsp_chg_pct = round(((rsp_price - rsp_prev) / rsp_prev) * 100, 2) if rsp_prev else 0.0
 
-    yield_val = tnx_res['price'] if (tnx_res and tnx_res['price']) else prev_mod_b.get('yield_pct', 5.284)
-    # Check if TNX is in points (e.g. 5.25%) or scaled
-    if yield_val > 50:
-        yield_val = yield_val / 10.0
+    # Range validation for 10Y Yield (0.0 to 20.0)
+    yield_val = None
+    yield_status = "MISSING"
+    yield_fetched_utc = None
+
+    if tnx_res and tnx_res.get('price'):
+        raw_y = float(tnx_res['price'])
+        if raw_y > 50:
+            raw_y = raw_y / 10.0
+        if 0.0 < raw_y <= 20.0:
+            yield_val = raw_y
+            yield_status = "LIVE"
+            yield_fetched_utc = now_utc.strftime("%Y-%m-%dT%H:%M:%SZ")
+        else:
+            print(f"⚠️ Warning: 10Y yield {raw_y} out of range (0-20), rejected.")
+
+    if yield_val is None:
+        # Check if previous cached value is in range
+        prev_y = prev_mod_b.get('yield_pct')
+        if prev_y and 0.0 < float(prev_y) <= 20.0:
+            yield_val = float(prev_y)
+            yield_status = "CACHED"
+            yield_fetched_utc = prev_mod_b.get('fetched_utc', prev_mod_b.get('timestamp', "MISSING"))
+        else:
+            yield_val = 5.098
+            yield_status = "MISSING"
+            yield_fetched_utc = "MISSING"
 
     mstr_price = mstr_res['price'] if (mstr_res and mstr_res['price']) else prev_mod_c.get('price', 1485.50)
-    # MSTR stock split awareness: if post-split ~150, keep proportional comparison
     mstr_prev = mstr_res['prev_close'] if (mstr_res and mstr_res['prev_close']) else mstr_price
     mstr_chg_pct = round(((mstr_price - mstr_prev) / mstr_prev) * 100, 2) if mstr_prev else -1.85
 
     btc_price = btc_res['price'] if (btc_res and btc_res['price']) else prev_btc.get('spot_price', 62840.00)
+    # Range validation for BTC spot (> 0)
+    if btc_price is not None and float(btc_price) <= 0:
+        btc_price = None
     btc_prev = btc_res['prev_close'] if (btc_res and btc_res['prev_close']) else btc_price
-    btc_chg_pct = round(((btc_price - btc_prev) / btc_prev) * 100, 2) if btc_prev else -1.15
+    btc_chg_pct = round(((btc_price - btc_prev) / btc_prev) * 100, 2) if (btc_price and btc_prev) else 0.0
 
     print(f"Observed Prices:")
     print(f"  • S&P 500 (SPX)  : ${spx_price:,.2f} ({spx_chg_pct:+.2f}%)")
     print(f"  • Equal-Weight   : ${rsp_price:,.2f} ({rsp_chg_pct:+.2f}%)")
-    print(f"  • US 10Y Yield   : {yield_val:.3f}%")
+    print(f"  • US 10Y Yield   : {yield_val:.3f}% [{yield_status}] (fetched: {yield_fetched_utc})")
     print(f"  • MicroStrategy  : ${mstr_price:,.2f} ({mstr_chg_pct:+.2f}%)")
-    print(f"  • BTC Spot       : ${btc_price:,.2f} ({btc_chg_pct:+.2f}%)")
+    print(f"  • BTC Spot       : ${btc_price:,.2f} ({btc_chg_pct:+.2f}%)" if btc_price else "  • BTC Spot       : MISSING")
 
     # 3. Compute Breadth Ratio & 50-Day SMA
     raw_ratio = spx_price / rsp_price if rsp_price else 34.335
@@ -227,8 +252,10 @@ def run_collector():
     data['modules']['module_a_breadth']['ratio_50sma'] = round(sma50, 3)
     data['modules']['module_a_breadth']['ratio_sma_diff_pct'] = ratio_diff_pct
 
-    data['modules']['module_b_yield']['yield_pct'] = round(yield_val, 3)
+    data['modules']['module_b_yield']['yield_pct'] = round(yield_val, 3) if yield_val is not None else None
     data['modules']['module_b_yield']['status'] = "TOXIC" if yield_val >= 5.0 else ("RESTRICTIVE" if yield_val > 4.25 else "HEALTHY")
+    data['modules']['module_b_yield']['data_status'] = yield_status
+    data['modules']['module_b_yield']['fetched_utc'] = yield_fetched_utc
 
     data['modules']['module_c_mstr']['price'] = round(mstr_price, 2)
     data['modules']['module_c_mstr']['change_24h_pct'] = mstr_chg_pct

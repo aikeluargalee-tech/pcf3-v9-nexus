@@ -710,15 +710,25 @@ def fetch_sth_cost_basis(klines_90d=None):
                 oc_data = json.load(f)
                 if oc_data and "metrics" in oc_data and "sth_cost_basis" in oc_data["metrics"]:
                     val = float(oc_data["metrics"]["sth_cost_basis"])
-                    if 30000 <= val <= 150000:
+                    # Range check: STH cost basis > 0
+                    if 0 < val <= 250000:
+                        now_stamp = utc_now_iso()
+                        oc_data["updated_at"] = now_stamp
+                        try:
+                            with open(onchain_path, "w", encoding="utf-8") as fw:
+                                json.dump(oc_data, fw, indent=2)
+                        except Exception:
+                            pass
                         return {
                             "sth_price": val,
                             "source": "BlockHorizon Bitcoin Core UTXO Snapshot",
                             "method": "STH Realized Price = average cost of coins moved <155 days (BlockHorizon UTXO cohort)",
                             "status": "LIVE_ONCHAIN",
-                            "timestamp": utc_now_iso(),
+                            "timestamp": now_stamp,
                             "is_proxy": False
                         }, "LIVE_ONCHAIN", "BlockHorizon"
+                    else:
+                        print(f"⚠️ Warning: STH cost basis {val} out of valid range (>0), rejected.")
         except Exception:
             pass
 

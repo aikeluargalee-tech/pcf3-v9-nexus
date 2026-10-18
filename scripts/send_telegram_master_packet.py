@@ -219,16 +219,33 @@ def build_unified_master_dossier():
     raw_packet = fetch_text_safe(['./PCF3_LIVE_PACKET_DEFAULT.txt'])
     onchain_snapshot = fetch_json_safe(['./data/onchain_metrics.json'])
 
-    # Spot Price
+    # 1. Spot Price with Range Validation & Timestamp
     spot_price = None
+    spot_status = "MISSING"
+    spot_age_seconds = 999999
+    spot_fetched_utc = "MISSING"
+
     if ticker_data:
+        raw_sp = None
         if 'price' in ticker_data:
-            spot_price = float(ticker_data['price'])
+            raw_sp = float(ticker_data['price'])
         elif 'data' in ticker_data and 'amount' in ticker_data['data']:
-            spot_price = float(ticker_data['data']['amount'])
+            raw_sp = float(ticker_data['data']['amount'])
+        if raw_sp is not None and raw_sp > 0:
+            spot_price = raw_sp
+            spot_status = "LIVE"
+            spot_age_seconds = 0
+            spot_fetched_utc = ts_utc_str
+
     if not spot_price and daily_klines_raw and len(daily_klines_raw) > 0:
-        spot_price = float(daily_klines_raw[-1][4])
-    spot_price = spot_price or 81691.01
+        raw_sp = float(daily_klines_raw[-1][4])
+        if raw_sp > 0:
+            spot_price = raw_sp
+            close_ms = int(daily_klines_raw[-1][6])
+            spot_age_seconds = max(0, int((now_ms - close_ms) / 1000))
+            spot_dt = datetime.datetime.fromtimestamp(close_ms / 1000.0, datetime.timezone.utc)
+            spot_fetched_utc = spot_dt.strftime("%Y-%m-%d %H:%M:%S UTC")
+            spot_status = "CACHED" if spot_age_seconds <= 600 else "STALE"
 
     # Book spread
     best_bid, best_ask, spread_display = None, None, "Unavailable"
@@ -254,32 +271,57 @@ def build_unified_master_dossier():
     session_3d_low = min([float(k[3]) for k in recent_3d]) if recent_3d else 79471.0
     session_3d_high = max([float(k[2]) for k in recent_3d]) if recent_3d else 86500.0
 
-    # Macro Threat
+    # 2. Macro Threat & US 10Y Yield with Range Validation & Timestamp
     threat_score = 85
     threat_level = "CRIMSON"
     threat_status = "CRITICAL THREAT / SQUEEZE IMMINENT"
     threat_call = "FORCE DMRA REGIME 2: 100% USDT CASH PRESERVATION"
     breakdown_display = "Breadth: 35/35 | Yield: 30/30 | MSTR: 20/20 | Election: 0/15"
-    us10y_str = "5.098%"
+    us10y_str = "MISSING"
+    us10y_num = None
+    us10y_status = "MISSING"
+    us10y_age_seconds = 999999
+    us10y_fetched_utc = "MISSING"
     spx_price = 5864.67
     rsp_price = 175.20
     mstr_str = "MSTR lagging BTC (-11.4% 24h); bearish divergence"
     
-    if threat_feed and 'composite_threat' in threat_feed:
-        ct = threat_feed['composite_threat']
-        threat_score = int(ct.get('score', 85))
-        threat_level = ct.get('level', 'CRIMSON')
-        threat_status = ct.get('status', threat_status)
-        threat_call = ct.get('tactical_call', threat_call)
-        bd = ct.get('breakdown', {})
-        if bd:
-            breakdown_display = (f"Breadth: {bd.get('spx_rsp_breadth_divergence', {}).get('points', 35)}/35 | "
-                                 f"Yield: {bd.get('us10y_elevated_yield', {}).get('points', 30)}/30 | "
-                                 f"MSTR: {bd.get('mstr_bearish_divergence', {}).get('points', 20)}/20 | "
-                                 f"Election: {bd.get('seasonality_election_window', {}).get('points', 0)}/15")
+    if threat_feed:
+        if 'composite_threat' in threat_feed:
+            ct = threat_feed['composite_threat']
+            threat_score = int(ct.get('score', 85))
+            threat_level = ct.get('level', 'CRIMSON')
+            threat_status = ct.get('status', threat_status)
+            threat_call = ct.get('tactical_call', threat_call)
+            bd = ct.get('breakdown', {})
+            if bd:
+                breakdown_display = (f"Breadth: {bd.get('spx_rsp_breadth_divergence', {}).get('points', 35)}/35 | "
+                                     f"Yield: {bd.get('us10y_elevated_yield', {}).get('points', 30)}/30 | "
+                                     f"MSTR: {bd.get('mstr_bearish_divergence', {}).get('points', 20)}/20 | "
+                                     f"Election: {bd.get('seasonality_election_window', {}).get('points', 0)}/15")
         mods = threat_feed.get('modules', {})
         if 'module_b_yield' in mods and 'yield_pct' in mods['module_b_yield']:
-            us10y_str = f"{float(mods['module_b_yield']['yield_pct']):.3f}%"
+            raw_y = mods['module_b_yield']['yield_pct']
+            if raw_y is not None:
+                raw_y = float(raw_y)
+                if 0.0 < raw_y <= 20.0:
+                    us10y_num = raw_y
+                    us10y_str = f"{us10y_num:.3f}%"
+                    asof_str = mods['module_b_yield'].get('fetched_utc') or threat_feed.get('asof')
+                    if asof_str and asof_str != "MISSING":
+                        try:
+                            asof_dt = datetime.datetime.fromisoformat(asof_str.replace("Z", "+00:00"))
+                            us10y_age_seconds = max(0, int((now_utc - asof_dt).total_seconds()))
+                            us10y_fetched_utc = asof_dt.strftime("%Y-%m-%d %H:%M:%S UTC")
+                        except Exception:
+                            us10y_age_seconds = 0
+                            us10y_fetched_utc = ts_utc_str
+                    else:
+                        us10y_age_seconds = 0
+                        us10y_fetched_utc = ts_utc_str
+                    us10y_status = "LIVE" if us10y_age_seconds <= 7200 else "STALE"
+                else:
+                    print(f"⚠️ Warning: 10Y yield {raw_y} out of range (0-20), rejected.")
         if 'module_a_breadth' in mods:
             spx_price = mods['module_a_breadth'].get('spx_price', spx_price)
             rsp_price = mods['module_a_breadth'].get('rsp_price', rsp_price)
@@ -293,8 +335,33 @@ def build_unified_master_dossier():
         vol_score = int(vol_feed['overall'].get('score', -3))
         vol_state = vol_feed['overall'].get('regime', 'BEARISH HEADWIND')
 
-    # Parse Raw Packet for On-Chain, Regime, Derivatives, Appendix
-    sth_floor = 74468.34
+    # 3. STH Realized Cost Basis Floor with Range Validation & Timestamp
+    sth_floor = None
+    sth_status = "MISSING"
+    sth_age_seconds = 999999
+    sth_fetched_utc = "MISSING"
+
+    if onchain_snapshot and "metrics" in onchain_snapshot and "sth_cost_basis" in onchain_snapshot["metrics"]:
+        raw_sth = float(onchain_snapshot["metrics"]["sth_cost_basis"])
+        if raw_sth > 0:
+            sth_floor = raw_sth
+            up_str = onchain_snapshot.get("updated_at")
+            if up_str and up_str != "MISSING":
+                try:
+                    up_dt = datetime.datetime.fromisoformat(up_str.replace("Z", "+00:00"))
+                    sth_age_seconds = max(0, int((now_utc - up_dt).total_seconds()))
+                    sth_fetched_utc = up_dt.strftime("%Y-%m-%d %H:%M:%S UTC")
+                except Exception:
+                    sth_age_seconds = 0
+                    sth_fetched_utc = ts_utc_str
+            else:
+                sth_age_seconds = 0
+                sth_fetched_utc = ts_utc_str
+            sth_status = "LIVE" if sth_age_seconds <= 86400 else "STALE"
+        else:
+            print(f"⚠️ Warning: STH cost basis {raw_sth} <= 0, rejected.")
+
+    # Parse Raw Packet for On-Chain fallback, Regime, Derivatives, Appendix
     regime_score = 46
     regime_class = "Transitional (Neutral)"
     regime_dir = "Macro Bull (Consolidating)"
@@ -306,11 +373,15 @@ def build_unified_master_dossier():
     raw_appendix = ""
 
     if raw_packet:
-        m_sth = re.search(r'STH_COST_BASIS:\s*([0-9,\.]+)', raw_packet)
-        if m_sth:
-            val = float(m_sth.group(1).replace(',', ''))
-            if 0.5 * spot_price <= val <= 1.5 * spot_price:
-                sth_floor = val
+        if not sth_floor:
+            m_sth = re.search(r'STH_COST_BASIS:\s*([0-9,\.]+)', raw_packet)
+            if m_sth:
+                val = float(m_sth.group(1).replace(',', ''))
+                if val > 0:
+                    sth_floor = val
+                    sth_status = "CACHED"
+                    sth_age_seconds = 1800
+                    sth_fetched_utc = ts_utc_str
         m_score = re.search(r'(?:TOTAL\s*SCORE|REGIME_SCORE)[:\s=]+(\d+)', raw_packet, re.IGNORECASE)
         if m_score:
             regime_score = int(m_score.group(1))
@@ -345,16 +416,31 @@ def build_unified_master_dossier():
         except Exception:
             pass
 
+    # Data Integrity Evaluation for the 3 Critical Anchors
+    crit_miss_spot = 1 if (spot_price is None or spot_status in ("MISSING", "STALE") or spot_age_seconds > 600) else 0
+    crit_miss_10y = 1 if (us10y_num is None or us10y_status in ("MISSING", "STALE") or us10y_age_seconds > 7200) else 0
+    crit_miss_sth = 1 if (sth_floor is None or sth_status in ("MISSING", "STALE") or sth_age_seconds > 86400) else 0
+    critical_missing_count = crit_miss_spot + crit_miss_10y + crit_miss_sth
+    is_integrity_breach = (critical_missing_count >= 1)
+
     raw_dampener = max(0.0, min(1.0, (regime_score - 60) / 30.0))
-    effective_dampener = 0.00 if is_crimson else raw_dampener
-    verdict_lock = ("FLAT_100_USDT | MAX_EXPOSURE: 0.00x | GATE_DRIVER: DESK_7_CRIMSON" if is_crimson
-                    else (f"DEFENSIVE_SCALP | MAX_EXPOSURE: {min(effective_dampener, 0.50):.2f}x | GATE_DRIVER: DESK_8_VOL" if vol_score <= -2
-                          else f"TREND_EXECUTION | MAX_EXPOSURE: {effective_dampener:.2f}x | GATE_DRIVER: DESK_3_USSM"))
+    if is_integrity_breach:
+        effective_dampener = 0.00
+        verdict_lock = f"FLAT_100_USDT | MAX_EXPOSURE: 0.00x | GATE_DRIVER: DATA_INTEGRITY_FAIL ({critical_missing_count} MISSING/STALE)"
+    elif is_crimson:
+        effective_dampener = 0.00
+        verdict_lock = "FLAT_100_USDT | MAX_EXPOSURE: 0.00x | GATE_DRIVER: DESK_7_CRIMSON"
+    elif vol_score <= -2:
+        effective_dampener = min(raw_dampener, 0.50)
+        verdict_lock = f"DEFENSIVE_SCALP | MAX_EXPOSURE: {effective_dampener:.2f}x | GATE_DRIVER: DESK_8_VOL"
+    else:
+        effective_dampener = raw_dampener
+        verdict_lock = f"TREND_EXECUTION | MAX_EXPOSURE: {effective_dampener:.2f}x | GATE_DRIVER: DESK_3_USSM"
 
     # Quant rules
-    q_r1 = (spot_price > sma200 and sma_slope_up) if sma200 else False
-    q_r2 = (0.98 * ema21 <= spot_price <= 1.02 * ema21 and 40 <= rsi14 <= 60) if (ema21 and rsi14) else False
-    q_r3 = (spot_price <= poc30d) if poc30d else False
+    q_r1 = (spot_price > sma200 and sma_slope_up) if (spot_price and sma200) else False
+    q_r2 = (0.98 * ema21 <= spot_price <= 1.02 * ema21 and 40 <= rsi14 <= 60) if (spot_price and ema21 and rsi14) else False
+    q_r3 = (spot_price <= poc30d) if (spot_price and poc30d) else False
     quant_aligned = (q_r1 and q_r2 and q_r3)
     quant_pass_count = (1 if q_r1 else 0) + (1 if q_r2 else 0) + (1 if q_r3 else 0)
 
@@ -364,12 +450,18 @@ def build_unified_master_dossier():
     ema21_str = f"${ema21:,.2f}" if ema21 is not None else "N/A"
     sma200_str = f"${sma200:,.2f}" if sma200 is not None else "N/A"
     poc30d_str = f"${poc30d:,.2f}" if poc30d is not None else "$83,800.00"
-    dist_ema_str = f"{((spot_price - ema21)/ema21*100):+.2f}%" if ema21 else "0.00%"
-    atr_pct_str = f"{(atr20/spot_price*100):.2f}%" if atr20 else "0.00%"
-    quant_stop_str = f"${spot_price - 2.5 * atr20:,.2f}" if atr20 else "N/A"
+    dist_ema_str = f"{((spot_price - ema21)/ema21*100):+.2f}%" if (spot_price and ema21) else "0.00%"
+    atr_pct_str = f"{(atr20/spot_price*100):.2f}%" if (spot_price and atr20) else "0.00%"
+    quant_stop_str = f"${spot_price - 2.5 * atr20:,.2f}" if (spot_price and atr20) else "N/A"
 
     # Sizing and limited verdict logic for Decision Layer
-    if is_crimson:
+    if is_integrity_breach:
+        decision_verdict = "STAND ASIDE"
+        decision_posture = "CASH PRESERVATION / DATA INTEGRITY LOCK"
+        decision_directive = f"Data integrity breach ({critical_missing_count} critical anchor(s) missing or stale). 100% cash preservation enforced. Zero execution."
+        decision_gate_status = f"[TRIPPED] ({critical_missing_count} Critical Anchor(s) Missing/Stale)"
+        decision_override_note = "-> MANDATE: 100% USDT / 0.00x Maximum Exposure. Overrides lower-desk setups due to data integrity."
+    elif is_crimson:
         decision_verdict = "STAND ASIDE"
         decision_posture = "CASH PRESERVATION / RISK OFF"
         decision_directive = "Capital preservation overrides all setups. Zero buy/sell signals."
@@ -379,20 +471,31 @@ def build_unified_master_dossier():
         decision_verdict = "WATCH"
         decision_posture = "DEFENSIVE OBSERVATION / LOW CONFIDENCE"
         decision_directive = "Conditions unfavorable for trend expansion. Monitor key levels without execution."
-        decision_gate_status = "[CLEAR] (Threat < 66)"
+        decision_gate_status = "[CLEAR] (Threat < 66 & Data Integrity Verified)"
         decision_override_note = "-> Gate clear but regime/volatility headwinds constrain exposure."
     else:
         decision_verdict = "CONDITIONAL"
         decision_posture = "SELECTIVE PARTICIPATION"
         decision_directive = "Execution subject to confluence and strict invalidation stops. Zero direct trade signals."
-        decision_gate_status = "[CLEAR] (Threat < 66)"
+        decision_gate_status = "[CLEAR] (Threat < 66 & Data Integrity Verified)"
         decision_override_note = "-> Standard technical execution bounds apply."
 
-    sth_buffer_pct = ((spot_price - sth_floor) / sth_floor) * 100.0
-    us10y_num = float(us10y_str.replace('%', '')) if '%' in us10y_str else 0.0
-    us10y_status = "ELEVATED >= 5.0%" if us10y_num >= 5.0 else "NORMAL < 5.0%"
+    spot_disp = f"${spot_price:,.2f}" if spot_price is not None else "MISSING"
+    spot_anchor_flag = "CONFIRMED LIVE" if spot_status == "LIVE" else spot_status
 
-    # Top Decision Layer block
+    us10y_disp = f"{us10y_num:.3f}%" if us10y_num is not None else "MISSING"
+    us10y_anchor_flag = f"CONFIRMED {'ELEVATED >= 5.0%' if (us10y_num and us10y_num >= 5.0) else 'NORMAL < 5.0%'}" if us10y_num is not None else "MISSING"
+
+    sth_disp = f"${sth_floor:,.2f}" if sth_floor is not None else "MISSING"
+    if sth_floor is not None and spot_price is not None:
+        sth_buffer_pct = ((spot_price - sth_floor) / sth_floor) * 100.0
+        sth_anchor_flag = f"CONFIRMED INTACT ({sth_buffer_pct:+.2f}%)"
+    elif sth_floor is not None:
+        sth_anchor_flag = f"CONFIRMED [{sth_status}]"
+    else:
+        sth_anchor_flag = "MISSING"
+
+    # Top Decision Layer block with DATA INTEGRITY
     decision_block = [
         "================================================================================",
         "NEXUS DECISION LAYER — CAPITAL PRESERVATION CHECKPOINT",
@@ -400,13 +503,19 @@ def build_unified_master_dossier():
         f"[1] CAPITAL PRESERVATION GATE : {decision_gate_status}",
         f"    {decision_override_note}",
         "[2] THREE CRITICAL ANCHORS:",
-        f"    • BTC Live Spot Price           : ${spot_price:,.2f} [CONFIRMED LIVE]",
-        f"    • US 10Y Treasury Yield         : {us10y_str}     [CONFIRMED {us10y_status}]",
-        f"    • STH Realized Cost Basis Floor : ${sth_floor:,.2f} [CONFIRMED INTACT ({sth_buffer_pct:+.2f}%)]",
+        f"    • BTC Live Spot Price           : {spot_disp} [{spot_anchor_flag}]",
+        f"    • US 10Y Treasury Yield         : {us10y_disp}     [{us10y_anchor_flag}]",
+        f"    • STH Realized Cost Basis Floor : {sth_disp} [{sth_anchor_flag}]",
         f"[3] SYSTEM DECISION VERDICT         : [{decision_verdict}]",
         f"    • Execution Posture             : {decision_posture}",
         f"    • Max Permitted Exposure        : {effective_dampener:.2f}x",
         f"    • Directive                     : {decision_directive}",
+        "--------------------------------------------------------------------------------",
+        "DATA INTEGRITY:",
+        f"• Spot: [{spot_status}] | age: {spot_age_seconds}s | fetched: {spot_fetched_utc}",
+        f"• 10Y:  [{us10y_status}] | age: {us10y_age_seconds}s | fetched: {us10y_fetched_utc}",
+        f"• STH:  [{sth_status}] | age: {sth_age_seconds}s | fetched: {sth_fetched_utc}",
+        f"• Critical missing count: {critical_missing_count}",
         "================================================================================",
         ""
     ]
@@ -436,24 +545,24 @@ def build_unified_master_dossier():
         f"PRE-COMPUTED ARBITRATION LOCK: {verdict_lock}",
         "================================================================================",
         "DATA PROVENANCE & OPERATIONAL INTEGRITY LEDGER:",
-        f"• [L1: LIVE STREAM]:          Binance Spot & Order Book Depth (${spot_price:,.2f})",
+        f"• [L1: LIVE STREAM]:          Binance Spot & Order Book Depth ({spot_disp})",
         f"• [L2: DERIVED INDICATORS]:   Wilder RSI 14 ({rsi14_str}), Wilder ATR 20 ({atr20_str}), 21 EMA ({ema21_str}), 200 SMA ({sma200_str})",
-        f"• [L3: ON-CHAIN & MACRO]:     STH Cost Basis (${sth_floor:,.2f}), US 10Y Yield ({us10y_str}), SPX (${spx_price:,.2f}), Volatility Radar ({vol_score}/8)",
+        f"• [L3: ON-CHAIN & MACRO]:     STH Cost Basis ({sth_disp}), US 10Y Yield ({us10y_disp}), SPX (${spx_price:,.2f}), Volatility Radar ({vol_score}/8)",
         "• [L4: STRATEGY & MODELS]:    USSM v1.0 Swing Rules, SMC Sweeps, DMRA Cash Gate, March 2023 Fractal Study",
         "--------------------------------------------------------------------------------",
         "SYSTEM OPERATIONAL INTEGRITY & CLEARANCE AUDIT:",
-        "• Operational Mode Audit:     [LIVE] — Verified Empirical Telemetry",
-        "• Spot Stream Telemetry:      ONLINE (Real-Time Binance Ticker Active)",
-        f"• Strategy Precedence Gate:   {'ENFORCED (CRIMSON 100% Cash Preservation Active • Max Exposure 0.00x)' if is_crimson else 'CLEAR'}",
-        f"• Operational Clearance:      {'CLEARED FOR MONITORING • DEFENSIVE 100% USDT CASH PRESERVATION MANDATE ACTIVE' if is_crimson else 'CLEARED FOR EXECUTION'}",
+        f"• Operational Mode Audit:     [{'LIVE' if critical_missing_count == 0 else 'DEGRADED'}] — {'Verified Empirical Telemetry' if critical_missing_count == 0 else f'{critical_missing_count} Critical Metric(s) Missing/Stale'}",
+        f"• Spot Stream Telemetry:      {'ONLINE (Real-Time Binance Ticker Active)' if spot_status == 'LIVE' else f'{spot_status} (age: {spot_age_seconds}s)'}",
+        f"• Strategy Precedence Gate:   {'ENFORCED (DATA INTEGRITY BREACH • Max Exposure 0.00x)' if is_integrity_breach else ('ENFORCED (CRIMSON 100% Cash Preservation Active • Max Exposure 0.00x)' if is_crimson else 'CLEAR')}",
+        f"• Operational Clearance:      {'BLOCKED • DATA INTEGRITY FAILURE MANDATES 100% CASH' if is_integrity_breach else ('CLEARED FOR MONITORING • DEFENSIVE 100% USDT CASH PRESERVATION MANDATE ACTIVE' if is_crimson else 'CLEARED FOR EXECUTION')}",
         "================================================================================",
         "",
         "--------------------------------------------------------------------------------",
         "DESK 1: NEXUS CORE TERMINAL (LIVE SPOT & MARKET MICROSTRUCTURE)",
         "--------------------------------------------------------------------------------",
-        f"• Live BTC Spot Price:        ${spot_price:,.2f}",
+        f"• Live BTC Spot Price:        {spot_disp}",
         f"• Best Bid / Best Ask:        {spread_display}",
-        f"• STH Realized Cost Basis:    ${sth_floor:,.2f} ({((spot_price - sth_floor)/sth_floor*100):+.2f}% vs Floor) [L3: BlockHorizon Bitcoin Core UTXO]",
+        f"• STH Realized Cost Basis:    {sth_disp} ({(((spot_price - sth_floor)/sth_floor*100) if (spot_price and sth_floor) else 0.0):+.2f}% vs Floor) [L3: BlockHorizon Bitcoin Core UTXO]",
         f"• Macro Regime Synthesis:     Score {regime_score}/100 ({regime_class}) • Direction: {regime_dir} • Sizing Dampener: {'0.00x [OVERRIDDEN BY DESK 7 CRIMSON GATE]' if is_crimson else f'{effective_dampener:.2f}x'}",
         f"• Regime Scorecard Breakdown: {regime_bd}",
         f"• Perp Open Interest:         {oi_line}",
@@ -467,12 +576,12 @@ def build_unified_master_dossier():
         "• Rule 1: Weekly Swing Structure:     Floor defense at $79,500.00",
         "• Rule 2: High-Water Mark Trail:      30D High-Water Mark reference ($90k-$95k)",
         f"• Rule 3: Dip-Buying Trigger Arch:    {'[SUSPENDED BY DESK 7 CRIMSON GATE — PASSIVE OBSERVATION ONLY] ' if is_crimson else ''}Rung 1: $79,800 | Rung 2: $75,600 | Rung 3: $71,400",
-        f"• Rule 4: 10-Week EMA Defense:        $78,450.00 ({'Tactical Trend Intact' if spot_price >= 78450 else 'Below 10W EMA'})",
+        f"• Rule 4: 10-Week EMA Defense:        $78,450.00 ({('Tactical Trend Intact' if (spot_price and spot_price >= 78450) else 'Below 10W EMA')})",
         "• Rule 5: 20-Week Institutional:      EMA $76,001.00 / SMA $71,286.65 Floor Buffer",
         f"• Rule 6: Daily Higher-Low Reclaim:   Completed 3-Day Low Defense at ${session_3d_low:,.2f}",
         "• Rule 7: Daily ATR(14) Volatility:   Range Buffer $2,107.58 • Max Drawdown Cap",
         "• Rule 8: Spot Volume vs 30D Mean:    Neutral Volume Absorption",
-        f"• Rule 9: Tactical Trend-Failure Stop:Daily close < STH Cost Basis (${sth_floor:,.2f}) triggers capital preservation",
+        f"• Rule 9: Tactical Trend-Failure Stop:Daily close < STH Cost Basis ({sth_disp}) triggers capital preservation",
         "• 55-Sensor Execution Integrity:      ALL 9 EXECUTION RULES ACTIVE • 9/9 SENSORS BOUND",
         "",
         "--------------------------------------------------------------------------------",
@@ -518,7 +627,7 @@ def build_unified_master_dossier():
         f"• Tactical Allocation Call:   {threat_call}",
         f"• Threat Scoring Breakdown:   {breakdown_display}",
         f"• SPX / RSP Breadth Ratio:    SPX ${spx_price:,.2f} / RSP ${rsp_price:,.2f}",
-        f"• US 10Y Treasury Yield:      {us10y_str} ({'🚨 Elevated Above 5.0% Gate' if float(us10y_str.replace('%','')) >= 5.0 else 'Normal Range'})",
+        f"• US 10Y Treasury Yield:      {us10y_disp} ({'🚨 Elevated Above 5.0% Gate' if (us10y_num and us10y_num >= 5.0) else ('Normal Range' if us10y_num is not None else 'MISSING')})",
         f"• MSTR / BTC Momentum Canary: {mstr_str}",
         f"• Capital Preservation Gate:  {'CRIMSON OVERRIDE ACTIVE: 100% USDT Cash Preservation strictly overrides lower-desk dip-buying (0.00x Exposure)' if is_crimson else 'GATE CLEAR'}",
         "",
@@ -526,7 +635,7 @@ def build_unified_master_dossier():
         "DESK 8: BTC VOLATILITY RADAR PRO (8-PILLAR CONFLUENCE MATRIX v1.1.0)",
         "--------------------------------------------------------------------------------",
         f"• Composite Confluence Score: {vol_score} / 8 ({vol_state})",
-        f"• Cross-Desk Yield Check:     10Y Yield Harmonized to {us10y_str} (Zero Basis-Point Discrepancy vs Desk 7)",
+        f"• Cross-Desk Yield Check:     10Y Yield Harmonized to {us10y_disp} (Zero Basis-Point Discrepancy vs Desk 7)",
         "",
         "--------------------------------------------------------------------------------",
         "DESK 9: FRACTAL LAB (MARCH 2023 SVB REPEAT DETECTOR & VOID RULE)",
@@ -563,13 +672,31 @@ def build_unified_master_dossier():
             "version": "nexus-pure-data-v1.0",
             "spec": "neutral_uninterpreted_telemetry"
         },
+        "data_integrity": {
+            "spot": {
+                "status": spot_status,
+                "age_seconds": spot_age_seconds,
+                "fetched_utc": spot_fetched_utc
+            },
+            "us_10y": {
+                "status": us10y_status,
+                "age_seconds": us10y_age_seconds,
+                "fetched_utc": us10y_fetched_utc
+            },
+            "sth_cost_basis": {
+                "status": sth_status,
+                "age_seconds": sth_age_seconds,
+                "fetched_utc": sth_fetched_utc
+            },
+            "critical_missing_count": critical_missing_count
+        },
         "market_microstructure": {
             "spot_price_usd": spot_price,
             "best_bid_usd": best_bid,
             "best_ask_usd": best_ask,
             "spread_usd": round(abs(best_ask - best_bid), 4) if (best_bid and best_ask) else None,
             "source": "api.binance.com",
-            "status": "LIVE"
+            "status": spot_status
         },
         "technical_indicators_calculated": {
             "sma200_daily_usd": round(sma200, 2) if sma200 else None,
@@ -614,8 +741,11 @@ def build_unified_master_dossier():
         "verdictLock": verdict_lock,
         "decisionVerdict": decision_verdict,
         "decisionGate": decision_gate_status,
+        "effectiveExposure": f"{effective_dampener:.2f}x",
         "spotPrice": spot_price,
         "sthFloor": sth_floor,
+        "criticalMissingCount": critical_missing_count,
+        "dataIntegrityStatus": "PASS (0 missing)" if critical_missing_count == 0 else f"TRIPPED ({critical_missing_count} missing/stale)",
         "regimeScore": regime_score,
         "regimeClass": regime_class,
         "sma200": f"${sma200:,.2f}" if sma200 else "N/A",
@@ -631,7 +761,7 @@ def build_unified_master_dossier():
         "bslPrice": session_3d_high,
         "threatScore": threat_score,
         "threatLevel": threat_level,
-        "us10y": us10y_str,
+        "us10y": us10y_disp,
         "volScore": vol_score,
         "volState": vol_state,
         "etf1d": "-82.4",
@@ -668,6 +798,11 @@ def evaluate_decision(curr, prev, now_utc, force_send=False):
     is_4h_close = is_new_4h_interval or is_time_due or (now_utc.hour % 4 == 0 and elapsed_hours >= 1.0)
 
     if prev:
+        prev_crit = prev.get('criticalMissingCount', 0)
+        curr_crit = curr.get('criticalMissingCount', 0)
+        if prev_crit != curr_crit:
+            trigger_reasons.append(f"Data Integrity Status shifted: {prev_crit} missing → {curr_crit} missing")
+
         prev_lock = prev.get('verdictLock', '').split('|')[0].strip()
         curr_lock = curr['verdictLock'].split('|')[0].strip()
         if prev_lock and prev_lock != curr_lock:
@@ -715,6 +850,8 @@ def evaluate_decision(curr, prev, now_utc, force_send=False):
     is_actionable = is_state_change or (curr['threatLevel'] != 'CRIMSON' and curr['regimeScore'] >= 60) or quant_effective
 
     if not is_actionable:
+        if curr.get('criticalMissingCount', 0) >= 1:
+            hold_reasons.append(f"Data Integrity Breach ({curr['criticalMissingCount']} critical anchor(s) missing/stale)")
         if curr['threatLevel'] == 'CRIMSON':
             hold_reasons.append(f"Threat {curr['threatScore']}/100 [CRIMSON] (100% USDT Gate active)")
         if curr['regimeScore'] < 60:
@@ -761,12 +898,16 @@ def build_caption(curr, decision, force_send=False):
     dec_verdict = curr.get('decisionVerdict', 'STAND ASIDE')
     dec_gate = curr.get('decisionGate', 'ENFORCED')
     dec_icon = "🛑" if dec_verdict == "STAND ASIDE" else ("🟡" if dec_verdict == "WATCH" else "🟢")
+    crit_count = curr.get('criticalMissingCount', 0)
+    integrity_str = "PASS (0 missing)" if crit_count == 0 else f"TRIPPED ({crit_count} missing/stale)"
+    exposure_str = curr.get('effectiveExposure', '0.00x')
 
     decision_block = (
         f"🎯 <b>DECISION LAYER CHECKPOINT:</b>\n"
         f"• <b>Capital Gate:</b> <code>{escape_html(dec_gate)}</code>\n"
         f"• <b>3 Anchors:</b> Spot <code>{spot_str}</code> | 10Y <code>{escape_html(curr['us10y'])}</code> | STH <code>{sth_str}</code>\n"
-        f"• <b>Verdict:</b> {dec_icon} <b>[{escape_html(dec_verdict)}]</b> (Exposure: <code>0.00x</code>)"
+        f"• <b>Integrity:</b> <code>{escape_html(integrity_str)}</code>\n"
+        f"• <b>Verdict:</b> {dec_icon} <b>[{escape_html(dec_verdict)}]</b> (Exposure: <code>{exposure_str}</code>)"
     )
 
     lines = [

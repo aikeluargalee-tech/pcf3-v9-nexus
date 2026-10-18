@@ -1,13 +1,31 @@
 {
   "metadata": {
-    "timestamp_utc": "2026-10-18 05:05:15 UTC",
+    "timestamp_utc": "2026-10-18 06:23:50 UTC",
     "version": "nexus-pure-data-v1.0",
     "spec": "neutral_uninterpreted_telemetry"
   },
+  "data_integrity": {
+    "spot": {
+      "status": "LIVE",
+      "age_seconds": 0,
+      "fetched_utc": "2026-10-18 06:23:50 UTC"
+    },
+    "us_10y": {
+      "status": "LIVE",
+      "age_seconds": 5061,
+      "fetched_utc": "2026-10-18 04:59:29 UTC"
+    },
+    "sth_cost_basis": {
+      "status": "LIVE",
+      "age_seconds": 5030,
+      "fetched_utc": "2026-10-18 05:00:00 UTC"
+    },
+    "critical_missing_count": 0
+  },
   "market_microstructure": {
-    "spot_price_usd": 81782.73,
-    "best_bid_usd": 81782.72,
-    "best_ask_usd": 81782.73,
+    "spot_price_usd": 81718.99,
+    "best_bid_usd": 81718.98,
+    "best_ask_usd": 81718.99,
     "spread_usd": 0.01,
     "source": "api.binance.com",
     "status": "LIVE"
