@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "asof": "2026-10-19T01:02:34Z",
+  "asof": "2026-10-19T04:06:57Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
@@ -27,7 +27,7 @@
         "points": 20,
         "max": 20,
         "triggered": true,
-        "reason": "MSTR 24h (-11.35%) lagging BTC (+0.08%); bearish momentum divergence active"
+        "reason": "MSTR 24h (-11.35%) lagging BTC (+0.32%); bearish momentum divergence active"
       },
       "seasonality_election_window": {
         "points": 0,
@@ -65,7 +65,7 @@
       "color": "crimson",
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity.",
       "data_status": "LIVE",
-      "fetched_utc": "2026-10-19T01:02:34Z"
+      "fetched_utc": "2026-10-19T04:06:57Z"
     },
     "module_c_mstr": {
       "price": 136.83,
@@ -130,8 +130,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 82208.36,
-      "change_24h_pct": 0.08,
+      "spot_price": 82408.05,
+      "change_24h_pct": 0.32,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -667,7 +667,7 @@
       "sma50": 34.536,
       "us10y": 5.098,
       "mstr": 136.8,
-      "btc": 82208.0
+      "btc": 82408.0
     }
   ]
 }
