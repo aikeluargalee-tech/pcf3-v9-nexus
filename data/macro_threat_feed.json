@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "asof": "2026-10-20T07:24:54Z",
+  "asof": "2026-10-20T12:55:14Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
@@ -21,13 +21,13 @@
         "points": 30,
         "max": 30,
         "triggered": true,
-        "reason": "10Y Treasury Yield at 5.136% >= 5.00% toxic threshold"
+        "reason": "10Y Treasury Yield at 5.094% >= 5.00% toxic threshold"
       },
       "mstr_bearish_divergence": {
         "points": 20,
         "max": 20,
         "triggered": true,
-        "reason": "MSTR 24h (-10.91%) lagging BTC (+0.08%); bearish momentum divergence active"
+        "reason": "MSTR 24h (-10.91%) lagging BTC (+0.04%); bearish momentum divergence active"
       },
       "seasonality_election_window": {
         "points": 0,
@@ -55,7 +55,7 @@
       "fractal_note": "Fewer than 10 mega-caps propping up headline index. 2008 double-bottom breakout similarity active."
     },
     "module_b_yield": {
-      "yield_pct": 5.136,
+      "yield_pct": 5.094,
       "change_30d_bps": 42.0,
       "danger_threshold_pct": 5.0,
       "caution_threshold_pct": 4.25,
@@ -65,7 +65,7 @@
       "color": "crimson",
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity.",
       "data_status": "LIVE",
-      "fetched_utc": "2026-10-20T07:24:54Z"
+      "fetched_utc": "2026-10-20T12:55:14Z"
     },
     "module_c_mstr": {
       "price": 136.02,
@@ -103,19 +103,19 @@
         {
           "event": "US FOMC Rate Decision",
           "date": "2026-10-28",
-          "days_away": 8,
+          "days_away": 7,
           "impact": "CRITICAL"
         },
         {
           "event": "US Midterm Election",
           "date": "2026-11-03",
-          "days_away": 14,
+          "days_away": 13,
           "impact": "EXTREME"
         },
         {
           "event": "US Non-Farm Payrolls (NFP)",
           "date": "2026-11-06",
-          "days_away": 17,
+          "days_away": 16,
           "impact": "HIGH"
         }
       ]
@@ -130,8 +130,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 81569.18,
-      "change_24h_pct": 0.08,
+      "spot_price": 81536.21,
+      "change_24h_pct": 0.04,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -675,9 +675,9 @@
       "rsp": 213.4,
       "ratio": 36.039,
       "sma50": 34.596,
-      "us10y": 5.136,
+      "us10y": 5.094,
       "mstr": 136.0,
-      "btc": 81569.0
+      "btc": 81536.0
     }
   ]
 }
