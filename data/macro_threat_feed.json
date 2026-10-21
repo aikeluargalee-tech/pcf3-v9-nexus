@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "asof": "2026-10-21T00:04:39Z",
+  "asof": "2026-10-21T04:34:05Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
@@ -27,13 +27,13 @@
         "points": 20,
         "max": 20,
         "triggered": true,
-        "reason": "MSTR 24h (-6.22%) lagging BTC (+1.83%); bearish momentum divergence active"
+        "reason": "MSTR 24h (-6.22%) lagging BTC (+1.65%); bearish momentum divergence active"
       },
       "seasonality_election_window": {
         "points": 15,
         "max": 15,
         "triggered": true,
-        "reason": "High-impact catalyst within 7d window: FOMC Interest Rate Decision & Press Conference (6.7d), US FOMC Rate Decision (7d)"
+        "reason": "High-impact catalyst within 7d window: FOMC Interest Rate Decision & Press Conference (6.6d), US FOMC Rate Decision (7d)"
       }
     }
   },
@@ -65,7 +65,7 @@
       "color": "crimson",
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity.",
       "data_status": "LIVE",
-      "fetched_utc": "2026-10-21T00:04:39Z"
+      "fetched_utc": "2026-10-21T04:34:05Z"
     },
     "module_c_mstr": {
       "price": 142.72,
@@ -130,8 +130,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 82871.12,
-      "change_24h_pct": 1.83,
+      "spot_price": 82722.8,
+      "change_24h_pct": 1.65,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -687,7 +687,7 @@
       "sma50": 34.624,
       "us10y": 5.117,
       "mstr": 142.7,
-      "btc": 82871.0
+      "btc": 82723.0
     }
   ]
 }
