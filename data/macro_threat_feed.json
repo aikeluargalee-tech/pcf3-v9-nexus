@@ -1,10 +1,10 @@
 {
   "version": "1.0.0",
-  "asof": "2026-10-22T12:18:37Z",
+  "asof": "2026-10-22T17:32:57Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
-    "score": 80,
+    "score": 85,
     "max_score": 100,
     "status": "CRITICAL THREAT / SQUEEZE IMMINENT",
     "level": "CRIMSON",
@@ -18,58 +18,58 @@
         "reason": "SPX at ATH while RSP lagging down; double-bottom breakout into 2008 fractal"
       },
       "us10y_elevated_yield": {
-        "points": 30,
+        "points": 15,
         "max": 30,
         "triggered": true,
-        "reason": "10Y Treasury Yield at 5.146% >= 5.00% toxic threshold"
+        "reason": "10Y Treasury Yield at 4.965%"
       },
       "mstr_bearish_divergence": {
-        "points": 0,
+        "points": 20,
         "max": 20,
-        "triggered": false,
-        "reason": "MSTR 24h (+7.15%) tracking or outperforming BTC (-0.26%); no acute divergence"
+        "triggered": true,
+        "reason": "MSTR 24h (-4.15%) lagging BTC (-1.00%); bearish momentum divergence active"
       },
       "seasonality_election_window": {
         "points": 15,
         "max": 15,
         "triggered": true,
-        "reason": "High-impact catalyst within 7d window: FOMC Interest Rate Decision & Press Conference (5.2d), US FOMC Rate Decision (5d)"
+        "reason": "High-impact catalyst within 7d window: FOMC Interest Rate Decision & Press Conference (5.0d), US FOMC Rate Decision (5d)"
       }
     }
   },
   "modules": {
     "module_a_breadth": {
-      "spx_price": 7757.17,
-      "spx_change_24h": 0.5,
+      "spx_price": 7660.01,
+      "spx_change_24h": -1.09,
       "spx_ath": 5790.2,
       "spx_distance_ath_pct": -0.13,
-      "rsp_price": 216.64,
-      "rsp_change_24h": 2.15,
+      "rsp_price": 217.24,
+      "rsp_change_24h": 1.04,
       "rsp_52w_high": 174.5,
       "rsp_distance_high_pct": -3.48,
-      "ratio_raw": 35.807,
+      "ratio_raw": 35.261,
       "ratio_normalized": 1.428,
-      "ratio_50sma": 34.67,
-      "ratio_sma_diff_pct": 3.28,
+      "ratio_50sma": 34.648,
+      "ratio_sma_diff_pct": 1.77,
       "divergence_flag": "CRITICAL BREADTH DIVERGENCE: TECH CONCENTRATION MIRAGE",
       "fractal_note": "Fewer than 10 mega-caps propping up headline index. 2008 double-bottom breakout similarity active."
     },
     "module_b_yield": {
-      "yield_pct": 5.146,
+      "yield_pct": 4.965,
       "change_30d_bps": 42.0,
       "danger_threshold_pct": 5.0,
       "caution_threshold_pct": 4.25,
       "danger_zone_distance_bps": 3.4,
-      "status": "TOXIC",
+      "status": "RESTRICTIVE",
       "status_label": "YIELD ANOMALY / LIQUIDITY SQUEEZE ACTIVE",
       "color": "crimson",
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity.",
       "data_status": "LIVE",
-      "fetched_utc": "2026-10-22T12:18:37Z"
+      "fetched_utc": "2026-10-22T17:32:57Z"
     },
     "module_c_mstr": {
-      "price": 153.48,
-      "change_24h_pct": 7.15,
+      "price": 145.01,
+      "change_24h_pct": -4.15,
       "cycle_high": 312.71,
       "distance_from_high_pct": -51.34,
       "summary": "MSTR $152.18 (-51.3% from 52W high of $312.71) [Bearish Momentum Divergence Active]",
@@ -77,7 +77,7 @@
       "rolling_corr_btc_30d": 0.842,
       "support_shelf": 142.0,
       "resistance_gate": 175.0,
-      "status": "ALIGNED / NORMAL BETA",
+      "status": "BEARISH DIVERGENCE / SQUEEZE WARNING",
       "color": "amber",
       "interpretation": "MSTR is the high-beta sentiment canary for BTC. Structural failure to reclaim May highs precedes crypto spot corrections."
     },
@@ -130,8 +130,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 81803.71,
-      "change_24h_pct": -0.26,
+      "spot_price": 81198.42,
+      "change_24h_pct": -1.0,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -691,13 +691,13 @@
     },
     {
       "date": "2026-10-22",
-      "spx": 7757.17,
-      "rsp": 216.64,
-      "ratio": 35.807,
-      "sma50": 34.67,
-      "us10y": 5.146,
-      "mstr": 153.5,
-      "btc": 81804.0
+      "spx": 7660.01,
+      "rsp": 217.24,
+      "ratio": 35.261,
+      "sma50": 34.648,
+      "us10y": 4.965,
+      "mstr": 145.0,
+      "btc": 81198.0
     }
   ]
 }
