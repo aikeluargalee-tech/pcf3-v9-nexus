@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "asof": "2026-10-21T22:38:41Z",
+  "asof": "2026-10-22T01:25:42Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
@@ -27,13 +27,13 @@
         "points": 0,
         "max": 20,
         "triggered": false,
-        "reason": "MSTR 24h (+7.15%) tracking or outperforming BTC (+3.91%); no acute divergence"
+        "reason": "MSTR 24h (+7.15%) tracking or outperforming BTC (+2.70%); no acute divergence"
       },
       "seasonality_election_window": {
         "points": 15,
         "max": 15,
         "triggered": true,
-        "reason": "High-impact catalyst within 7d window: FOMC Interest Rate Decision & Press Conference (5.8d), US FOMC Rate Decision (6d)"
+        "reason": "High-impact catalyst within 7d window: FOMC Interest Rate Decision & Press Conference (5.7d), US FOMC Rate Decision (6d)"
       }
     }
   },
@@ -49,8 +49,8 @@
       "rsp_distance_high_pct": -3.48,
       "ratio_raw": 35.807,
       "ratio_normalized": 1.428,
-      "ratio_50sma": 34.627,
-      "ratio_sma_diff_pct": 3.41,
+      "ratio_50sma": 34.67,
+      "ratio_sma_diff_pct": 3.28,
       "divergence_flag": "CRITICAL BREADTH DIVERGENCE: TECH CONCENTRATION MIRAGE",
       "fractal_note": "Fewer than 10 mega-caps propping up headline index. 2008 double-bottom breakout similarity active."
     },
@@ -65,7 +65,7 @@
       "color": "crimson",
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity.",
       "data_status": "LIVE",
-      "fetched_utc": "2026-10-21T22:38:41Z"
+      "fetched_utc": "2026-10-22T01:25:42Z"
     },
     "module_c_mstr": {
       "price": 153.48,
@@ -130,8 +130,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 84560.8,
-      "change_24h_pct": 3.91,
+      "spot_price": 84233.61,
+      "change_24h_pct": 2.7,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -688,6 +688,16 @@
       "us10y": 5.146,
       "mstr": 153.5,
       "btc": 84561.0
+    },
+    {
+      "date": "2026-10-22",
+      "spx": 7757.17,
+      "rsp": 216.64,
+      "ratio": 35.807,
+      "sma50": 34.67,
+      "us10y": 5.146,
+      "mstr": 153.5,
+      "btc": 84234.0
     }
   ]
 }
