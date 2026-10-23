@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "timestamp_utc": "2026-10-22 23:57:45 UTC",
+    "timestamp_utc": "2026-10-23 04:31:29 UTC",
     "version": "nexus-pure-data-v1.0",
     "spec": "neutral_uninterpreted_telemetry"
   },
@@ -8,41 +8,41 @@
     "spot": {
       "status": "LIVE",
       "age_seconds": 0,
-      "fetched_utc": "2026-10-22 23:57:45 UTC"
+      "fetched_utc": "2026-10-23 04:31:29 UTC"
     },
     "us_10y": {
       "status": "LIVE",
       "age_seconds": 0,
-      "fetched_utc": "2026-10-22 23:57:45 UTC"
+      "fetched_utc": "2026-10-23 04:31:29 UTC"
     },
     "sth_cost_basis": {
       "status": "LIVE",
-      "age_seconds": 172665,
-      "fetched_utc": "2026-10-21 00:00:00 UTC"
+      "age_seconds": 102689,
+      "fetched_utc": "2026-10-22 00:00:00 UTC"
     },
     "critical_missing_count": 0
   },
   "market_microstructure": {
-    "spot_price_usd": 81415.28,
-    "best_bid_usd": 81415.28,
-    "best_ask_usd": 81415.29,
+    "spot_price_usd": 81720.01,
+    "best_bid_usd": 81720.0,
+    "best_ask_usd": 81720.01,
     "spread_usd": 0.01,
     "source": "api.binance.com",
     "status": "LIVE"
   },
   "technical_indicators_calculated": {
-    "sma200_daily_usd": 72773.95,
+    "sma200_daily_usd": 72835.86,
     "sma200_slope_positive": true,
-    "ema21_daily_usd": 82736.14,
-    "rsi14_wilder": 56.77,
-    "atr20_wilder_usd": 2122.1,
+    "ema21_daily_usd": 82616.13,
+    "rsi14_wilder": 46.12,
+    "atr20_wilder_usd": 2187.88,
     "volume_profile_poc_30d_usd": 84062.77,
     "range_3d_high_usd": 84898.0,
-    "range_3d_low_usd": 81200.0
+    "range_3d_low_usd": 80939.54
   },
   "onchain_and_order_flow": {
-    "sth_realized_cost_basis_usd": 74864.56,
-    "open_interest_display": "30842.50 BTC",
+    "sth_realized_cost_basis_usd": 75780.57,
+    "open_interest_display": "31332.29 BTC",
     "funding_rate_display": "0.0039% | Mark-Index Spread -0.0548%",
     "spot_cvd_delta_display": "Delta +4.98 BTC | Buy/Sell Ratio 9.15",
     "liquidation_clusters_display": "Long Liq Pocket $79,471 | Short Cluster $82k-$86k ($4.79B)"
