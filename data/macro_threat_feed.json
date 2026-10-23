@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "asof": "2026-10-23T14:22:23Z",
+  "asof": "2026-10-23T18:39:41Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
@@ -21,41 +21,41 @@
         "points": 15,
         "max": 30,
         "triggered": true,
-        "reason": "10Y Treasury Yield at 4.999%"
+        "reason": "10Y Treasury Yield at 4.988%"
       },
       "mstr_bearish_divergence": {
         "points": 0,
         "max": 20,
         "triggered": false,
-        "reason": "MSTR 24h (+6.54%) tracking or outperforming BTC (-0.61%); no acute divergence"
+        "reason": "MSTR 24h (+7.98%) tracking or outperforming BTC (-0.56%); no acute divergence"
       },
       "seasonality_election_window": {
         "points": 15,
         "max": 15,
         "triggered": true,
-        "reason": "High-impact catalyst within 7d window: FOMC Interest Rate Decision & Press Conference (4.2d), US FOMC Rate Decision (4d)"
+        "reason": "High-impact catalyst within 7d window: FOMC Interest Rate Decision & Press Conference (4.0d), US FOMC Rate Decision (4d)"
       }
     }
   },
   "modules": {
     "module_a_breadth": {
-      "spx_price": 7622.4,
-      "spx_change_24h": -0.48,
+      "spx_price": 7627.98,
+      "spx_change_24h": -0.41,
       "spx_ath": 5790.2,
       "spx_distance_ath_pct": -0.13,
-      "rsp_price": 215.84,
-      "rsp_change_24h": 0.82,
+      "rsp_price": 216.64,
+      "rsp_change_24h": 1.19,
       "rsp_52w_high": 174.5,
       "rsp_distance_high_pct": -3.48,
-      "ratio_raw": 35.315,
+      "ratio_raw": 35.21,
       "ratio_normalized": 1.428,
-      "ratio_50sma": 34.679,
-      "ratio_sma_diff_pct": 1.83,
+      "ratio_50sma": 34.675,
+      "ratio_sma_diff_pct": 1.55,
       "divergence_flag": "CRITICAL BREADTH DIVERGENCE: TECH CONCENTRATION MIRAGE",
       "fractal_note": "Fewer than 10 mega-caps propping up headline index. 2008 double-bottom breakout similarity active."
     },
     "module_b_yield": {
-      "yield_pct": 4.999,
+      "yield_pct": 4.988,
       "change_30d_bps": 42.0,
       "danger_threshold_pct": 5.0,
       "caution_threshold_pct": 4.25,
@@ -65,11 +65,11 @@
       "color": "crimson",
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity.",
       "data_status": "LIVE",
-      "fetched_utc": "2026-10-23T14:22:23Z"
+      "fetched_utc": "2026-10-23T18:39:41Z"
     },
     "module_c_mstr": {
-      "price": 145.78,
-      "change_24h_pct": 6.54,
+      "price": 147.75,
+      "change_24h_pct": 7.98,
       "cycle_high": 312.71,
       "distance_from_high_pct": -51.34,
       "summary": "MSTR $152.18 (-51.3% from 52W high of $312.71) [Bearish Momentum Divergence Active]",
@@ -130,8 +130,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 81355.75,
-      "change_24h_pct": -0.61,
+      "spot_price": 81398.37,
+      "change_24h_pct": -0.56,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -701,13 +701,13 @@
     },
     {
       "date": "2026-10-23",
-      "spx": 7622.4,
-      "rsp": 215.84,
-      "ratio": 35.315,
-      "sma50": 34.679,
-      "us10y": 4.999,
-      "mstr": 145.8,
-      "btc": 81356.0
+      "spx": 7627.98,
+      "rsp": 216.64,
+      "ratio": 35.21,
+      "sma50": 34.675,
+      "us10y": 4.988,
+      "mstr": 147.8,
+      "btc": 81398.0
     }
   ]
 }
