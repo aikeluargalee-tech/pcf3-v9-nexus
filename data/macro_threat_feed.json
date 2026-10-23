@@ -1,15 +1,15 @@
 {
   "version": "1.0.0",
-  "asof": "2026-10-23T09:31:11Z",
+  "asof": "2026-10-23T14:22:23Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
-    "score": 85,
+    "score": 65,
     "max_score": 100,
-    "status": "CRITICAL THREAT / SQUEEZE IMMINENT",
-    "level": "CRIMSON",
-    "tactical_call": "FORCE DMRA REGIME 2: 100% USDT CASH PRESERVATION",
-    "execution_instruction": "HALT all spot dip-buying across Quant Radar, Liquidity Radar, Sweep Desk, and Absorption Radar. Maintain 100% USDT dry powder until US 10Y pulls back below 5.0% and SPX/RSP breadth recovers.",
+    "status": "ELEVATED CAUTION / FRICTION",
+    "level": "AMBER",
+    "tactical_call": "DEFENSIVE / HALF POSITION SIZING",
+    "execution_instruction": "Normal spot swing execution permissible within risk dampeners.",
     "breakdown": {
       "spx_rsp_breadth_divergence": {
         "points": 35,
@@ -21,41 +21,41 @@
         "points": 15,
         "max": 30,
         "triggered": true,
-        "reason": "10Y Treasury Yield at 4.953%"
+        "reason": "10Y Treasury Yield at 4.999%"
       },
       "mstr_bearish_divergence": {
-        "points": 20,
+        "points": 0,
         "max": 20,
-        "triggered": true,
-        "reason": "MSTR 24h (-3.63%) lagging BTC (-0.45%); bearish momentum divergence active"
+        "triggered": false,
+        "reason": "MSTR 24h (+6.54%) tracking or outperforming BTC (-0.61%); no acute divergence"
       },
       "seasonality_election_window": {
         "points": 15,
         "max": 15,
         "triggered": true,
-        "reason": "High-impact catalyst within 7d window: FOMC Interest Rate Decision & Press Conference (4.4d), US FOMC Rate Decision (5d)"
+        "reason": "High-impact catalyst within 7d window: FOMC Interest Rate Decision & Press Conference (4.2d), US FOMC Rate Decision (4d)"
       }
     }
   },
   "modules": {
     "module_a_breadth": {
-      "spx_price": 7663.43,
-      "spx_change_24h": -1.04,
+      "spx_price": 7622.4,
+      "spx_change_24h": -0.48,
       "spx_ath": 5790.2,
       "spx_distance_ath_pct": -0.13,
-      "rsp_price": 218.22,
-      "rsp_change_24h": 1.5,
+      "rsp_price": 215.84,
+      "rsp_change_24h": 0.82,
       "rsp_52w_high": 174.5,
       "rsp_distance_high_pct": -3.48,
-      "ratio_raw": 35.118,
+      "ratio_raw": 35.315,
       "ratio_normalized": 1.428,
-      "ratio_50sma": 34.671,
-      "ratio_sma_diff_pct": 1.29,
+      "ratio_50sma": 34.679,
+      "ratio_sma_diff_pct": 1.83,
       "divergence_flag": "CRITICAL BREADTH DIVERGENCE: TECH CONCENTRATION MIRAGE",
       "fractal_note": "Fewer than 10 mega-caps propping up headline index. 2008 double-bottom breakout similarity active."
     },
     "module_b_yield": {
-      "yield_pct": 4.953,
+      "yield_pct": 4.999,
       "change_30d_bps": 42.0,
       "danger_threshold_pct": 5.0,
       "caution_threshold_pct": 4.25,
@@ -65,11 +65,11 @@
       "color": "crimson",
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity.",
       "data_status": "LIVE",
-      "fetched_utc": "2026-10-23T09:31:11Z"
+      "fetched_utc": "2026-10-23T14:22:23Z"
     },
     "module_c_mstr": {
-      "price": 145.8,
-      "change_24h_pct": -3.63,
+      "price": 145.78,
+      "change_24h_pct": 6.54,
       "cycle_high": 312.71,
       "distance_from_high_pct": -51.34,
       "summary": "MSTR $152.18 (-51.3% from 52W high of $312.71) [Bearish Momentum Divergence Active]",
@@ -77,7 +77,7 @@
       "rolling_corr_btc_30d": 0.842,
       "support_shelf": 142.0,
       "resistance_gate": 175.0,
-      "status": "BEARISH DIVERGENCE / SQUEEZE WARNING",
+      "status": "ALIGNED / NORMAL BETA",
       "color": "amber",
       "interpretation": "MSTR is the high-beta sentiment canary for BTC. Structural failure to reclaim May highs precedes crypto spot corrections."
     },
@@ -103,19 +103,19 @@
         {
           "event": "US FOMC Rate Decision",
           "date": "2026-10-28",
-          "days_away": 5,
+          "days_away": 4,
           "impact": "CRITICAL"
         },
         {
           "event": "US Midterm Election",
           "date": "2026-11-03",
-          "days_away": 11,
+          "days_away": 10,
           "impact": "EXTREME"
         },
         {
           "event": "US Non-Farm Payrolls (NFP)",
           "date": "2026-11-06",
-          "days_away": 14,
+          "days_away": 13,
           "impact": "HIGH"
         }
       ]
@@ -130,8 +130,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 81484.12,
-      "change_24h_pct": -0.45,
+      "spot_price": 81355.75,
+      "change_24h_pct": -0.61,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -701,13 +701,13 @@
     },
     {
       "date": "2026-10-23",
-      "spx": 7663.43,
-      "rsp": 218.22,
-      "ratio": 35.118,
-      "sma50": 34.671,
-      "us10y": 4.953,
+      "spx": 7622.4,
+      "rsp": 215.84,
+      "ratio": 35.315,
+      "sma50": 34.679,
+      "us10y": 4.999,
       "mstr": 145.8,
-      "btc": 81484.0
+      "btc": 81356.0
     }
   ]
 }
