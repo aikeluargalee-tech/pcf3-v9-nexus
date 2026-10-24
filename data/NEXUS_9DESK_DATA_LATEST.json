@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "timestamp_utc": "2026-10-24 09:24:56 UTC",
+    "timestamp_utc": "2026-10-24 13:32:50 UTC",
     "version": "nexus-pure-data-v1.0",
     "spec": "neutral_uninterpreted_telemetry"
   },
@@ -8,24 +8,24 @@
     "spot": {
       "status": "LIVE",
       "age_seconds": 0,
-      "fetched_utc": "2026-10-24 09:24:56 UTC"
+      "fetched_utc": "2026-10-24 13:32:50 UTC"
     },
     "us_10y": {
       "status": "LIVE",
       "age_seconds": 0,
-      "fetched_utc": "2026-10-24 09:24:56 UTC"
+      "fetched_utc": "2026-10-24 13:32:50 UTC"
     },
     "sth_cost_basis": {
       "status": "LIVE",
-      "age_seconds": 120296,
+      "age_seconds": 135170,
       "fetched_utc": "2026-10-23 00:00:00 UTC"
     },
     "critical_missing_count": 0
   },
   "market_microstructure": {
-    "spot_price_usd": 80595.72,
-    "best_bid_usd": 80595.72,
-    "best_ask_usd": 80595.73,
+    "spot_price_usd": 80701.44,
+    "best_bid_usd": 80701.43,
+    "best_ask_usd": 80701.44,
     "spread_usd": 0.01,
     "source": "api.binance.com",
     "status": "LIVE"
@@ -42,7 +42,7 @@
   },
   "onchain_and_order_flow": {
     "sth_realized_cost_basis_usd": 75800.28,
-    "open_interest_display": "30488.33 BTC",
+    "open_interest_display": "94538.15 BTC",
     "funding_rate_display": "0.0039% | Mark-Index Spread -0.0548%",
     "spot_cvd_delta_display": "Delta +4.98 BTC | Buy/Sell Ratio 9.15",
     "liquidation_clusters_display": "Long Liq Pocket $79,471 | Short Cluster $82k-$86k ($4.79B)"
