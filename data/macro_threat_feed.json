@@ -1,15 +1,15 @@
 {
   "version": "1.0.0",
-  "asof": "2026-10-28T11:32:43Z",
+  "asof": "2026-10-28T17:18:55Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
-    "score": 65,
+    "score": 100,
     "max_score": 100,
-    "status": "ELEVATED CAUTION / FRICTION",
-    "level": "AMBER",
-    "tactical_call": "DEFENSIVE / HALF POSITION SIZING",
-    "execution_instruction": "Normal spot swing execution permissible within risk dampeners.",
+    "status": "CRITICAL THREAT / SQUEEZE IMMINENT",
+    "level": "CRIMSON",
+    "tactical_call": "FORCE DMRA REGIME 2: 100% USDT CASH PRESERVATION",
+    "execution_instruction": "HALT all spot dip-buying across Quant Radar, Liquidity Radar, Sweep Desk, and Absorption Radar. Maintain 100% USDT dry powder until US 10Y pulls back below 5.0% and SPX/RSP breadth recovers.",
     "breakdown": {
       "spx_rsp_breadth_divergence": {
         "points": 35,
@@ -18,58 +18,58 @@
         "reason": "SPX at ATH while RSP lagging down; double-bottom breakout into 2008 fractal"
       },
       "us10y_elevated_yield": {
-        "points": 15,
+        "points": 30,
         "max": 30,
         "triggered": true,
-        "reason": "10Y Treasury Yield at 4.993%"
+        "reason": "10Y Treasury Yield at 5.020% >= 5.00% toxic threshold"
       },
       "mstr_bearish_divergence": {
-        "points": 0,
+        "points": 20,
         "max": 20,
-        "triggered": false,
-        "reason": "MSTR 24h (-0.92%) tracking or outperforming BTC (+0.62%); no acute divergence"
+        "triggered": true,
+        "reason": "MSTR 24h (-9.30%) lagging BTC (-0.48%); bearish momentum divergence active"
       },
       "seasonality_election_window": {
         "points": 15,
         "max": 15,
         "triggered": true,
-        "reason": "High-impact catalyst within 7d window: US FOMC Rate Decision (0d), US Midterm Election (6d)"
+        "reason": "High-impact catalyst within 7d window: US Midterm Election (5d)"
       }
     }
   },
   "modules": {
     "module_a_breadth": {
-      "spx_price": 7722.6,
-      "spx_change_24h": 0.13,
+      "spx_price": 7735.7,
+      "spx_change_24h": -0.28,
       "spx_ath": 5790.2,
       "spx_distance_ath_pct": -0.13,
-      "rsp_price": 217.52,
-      "rsp_change_24h": 0.77,
+      "rsp_price": 217.24,
+      "rsp_change_24h": 0.28,
       "rsp_52w_high": 174.5,
       "rsp_distance_high_pct": -3.48,
-      "ratio_raw": 35.503,
+      "ratio_raw": 35.609,
       "ratio_normalized": 1.428,
-      "ratio_50sma": 34.849,
-      "ratio_sma_diff_pct": 1.88,
+      "ratio_50sma": 34.853,
+      "ratio_sma_diff_pct": 2.17,
       "divergence_flag": "CRITICAL BREADTH DIVERGENCE: TECH CONCENTRATION MIRAGE",
       "fractal_note": "Fewer than 10 mega-caps propping up headline index. 2008 double-bottom breakout similarity active."
     },
     "module_b_yield": {
-      "yield_pct": 4.993,
+      "yield_pct": 5.02,
       "change_30d_bps": 42.0,
       "danger_threshold_pct": 5.0,
       "caution_threshold_pct": 4.25,
       "danger_zone_distance_bps": 3.4,
-      "status": "RESTRICTIVE",
+      "status": "TOXIC",
       "status_label": "YIELD ANOMALY / LIQUIDITY SQUEEZE ACTIVE",
       "color": "crimson",
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity.",
       "data_status": "LIVE",
-      "fetched_utc": "2026-10-28T11:32:43Z"
+      "fetched_utc": "2026-10-28T17:18:55Z"
     },
     "module_c_mstr": {
-      "price": 141.4,
-      "change_24h_pct": -0.92,
+      "price": 139.2,
+      "change_24h_pct": -9.3,
       "cycle_high": 312.71,
       "distance_from_high_pct": -51.34,
       "summary": "MSTR $152.18 (-51.3% from 52W high of $312.71) [Bearish Momentum Divergence Active]",
@@ -77,7 +77,7 @@
       "rolling_corr_btc_30d": 0.842,
       "support_shelf": 142.0,
       "resistance_gate": 175.0,
-      "status": "ALIGNED / NORMAL BETA",
+      "status": "BEARISH DIVERGENCE / SQUEEZE WARNING",
       "color": "amber",
       "interpretation": "MSTR is the high-beta sentiment canary for BTC. Structural failure to reclaim May highs precedes crypto spot corrections."
     },
@@ -109,13 +109,13 @@
         {
           "event": "US Midterm Election",
           "date": "2026-11-03",
-          "days_away": 6,
+          "days_away": 5,
           "impact": "EXTREME"
         },
         {
           "event": "US Non-Farm Payrolls (NFP)",
           "date": "2026-11-06",
-          "days_away": 9,
+          "days_away": 8,
           "impact": "HIGH"
         }
       ]
@@ -130,8 +130,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 81292.57,
-      "change_24h_pct": 0.62,
+      "spot_price": 80403.91,
+      "change_24h_pct": -0.48,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -731,13 +731,13 @@
     },
     {
       "date": "2026-10-28",
-      "spx": 7722.6,
-      "rsp": 217.52,
-      "ratio": 35.503,
-      "sma50": 34.849,
-      "us10y": 4.993,
-      "mstr": 141.4,
-      "btc": 81293.0
+      "spx": 7735.7,
+      "rsp": 217.24,
+      "ratio": 35.609,
+      "sma50": 34.853,
+      "us10y": 5.02,
+      "mstr": 139.2,
+      "btc": 80404.0
     }
   ]
 }
