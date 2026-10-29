@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "timestamp_utc": "2026-10-28 21:52:35 UTC",
+    "timestamp_utc": "2026-10-29 01:42:42 UTC",
     "version": "nexus-pure-data-v1.0",
     "spec": "neutral_uninterpreted_telemetry"
   },
@@ -8,41 +8,41 @@
     "spot": {
       "status": "LIVE",
       "age_seconds": 0,
-      "fetched_utc": "2026-10-28 21:52:35 UTC"
+      "fetched_utc": "2026-10-29 01:42:42 UTC"
     },
     "us_10y": {
       "status": "LIVE",
       "age_seconds": 0,
-      "fetched_utc": "2026-10-28 21:52:35 UTC"
+      "fetched_utc": "2026-10-29 01:42:42 UTC"
     },
     "sth_cost_basis": {
-      "status": "LIVE",
-      "age_seconds": 165155,
+      "status": "STALE",
+      "age_seconds": 178962,
       "fetched_utc": "2026-10-27 00:00:00 UTC"
     },
-    "critical_missing_count": 0
+    "critical_missing_count": 1
   },
   "market_microstructure": {
-    "spot_price_usd": 81355.21,
-    "best_bid_usd": 81355.2,
-    "best_ask_usd": 81355.21,
+    "spot_price_usd": 80535.61,
+    "best_bid_usd": 80526.1,
+    "best_ask_usd": 80526.11,
     "spread_usd": 0.01,
     "source": "api.binance.com",
     "status": "LIVE"
   },
   "technical_indicators_calculated": {
-    "sma200_daily_usd": 73069.32,
+    "sma200_daily_usd": 73110.83,
     "sma200_slope_positive": true,
-    "ema21_daily_usd": 81865.66,
-    "rsi14_wilder": 45.49,
-    "atr20_wilder_usd": 2054.82,
+    "ema21_daily_usd": 81818.19,
+    "rsi14_wilder": 47.59,
+    "atr20_wilder_usd": 2023.37,
     "volume_profile_poc_30d_usd": 82980.39,
-    "range_3d_high_usd": 81300.0,
+    "range_3d_high_usd": 81823.0,
     "range_3d_low_usd": 79368.67
   },
   "onchain_and_order_flow": {
     "sth_realized_cost_basis_usd": 75808.6,
-    "open_interest_display": "30490.00 BTC",
+    "open_interest_display": "30661.72 BTC",
     "funding_rate_display": "0.0039% | Mark-Index Spread -0.0548%",
     "spot_cvd_delta_display": "Delta +4.98 BTC | Buy/Sell Ratio 9.15",
     "liquidation_clusters_display": "Long Liq Pocket $79,471 | Short Cluster $82k-$86k ($4.79B)"
