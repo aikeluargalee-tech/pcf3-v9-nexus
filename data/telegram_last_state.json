@@ -1,9 +1,9 @@
 {
-  "updatedAtUtc": "2026-10-30T06:20:01.373686+00:00",
-  "last4hInterval": "20261030_0400UTC",
-  "spotPrice": 78662.62,
+  "updatedAtUtc": "2026-10-30T13:25:51.838002+00:00",
+  "last4hInterval": "20261030_1200UTC",
+  "spotPrice": 77286.01,
   "verdictLock": "DEFENSIVE_SCALP | MAX_EXPOSURE: 0.00x | GATE_DRIVER: DESK_8_VOL",
-  "regimeScore": 16,
+  "regimeScore": 11,
   "regimeClass": "Corrective / Defensive (Defensive)",
   "threatScore": 65,
   "threatLevel": "AMBER",
