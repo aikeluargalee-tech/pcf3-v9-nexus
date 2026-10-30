@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "timestamp_utc": "2026-10-29 20:29:52 UTC",
+    "timestamp_utc": "2026-10-30 00:11:31 UTC",
     "version": "nexus-pure-data-v1.0",
     "spec": "neutral_uninterpreted_telemetry"
   },
@@ -8,41 +8,41 @@
     "spot": {
       "status": "LIVE",
       "age_seconds": 0,
-      "fetched_utc": "2026-10-29 20:29:52 UTC"
+      "fetched_utc": "2026-10-30 00:11:31 UTC"
     },
     "us_10y": {
       "status": "LIVE",
       "age_seconds": 0,
-      "fetched_utc": "2026-10-29 20:29:52 UTC"
+      "fetched_utc": "2026-10-30 00:11:31 UTC"
     },
     "sth_cost_basis": {
-      "status": "LIVE",
-      "age_seconds": 160192,
+      "status": "STALE",
+      "age_seconds": 173491,
       "fetched_utc": "2026-10-28 00:00:00 UTC"
     },
-    "critical_missing_count": 0
+    "critical_missing_count": 1
   },
   "market_microstructure": {
-    "spot_price_usd": 80396.09,
-    "best_bid_usd": 80396.08,
-    "best_ask_usd": 80396.09,
+    "spot_price_usd": 77899.76,
+    "best_bid_usd": 77895.74,
+    "best_ask_usd": 77895.75,
     "spread_usd": 0.01,
     "source": "api.binance.com",
     "status": "LIVE"
   },
   "technical_indicators_calculated": {
-    "sma200_daily_usd": 73110.83,
+    "sma200_daily_usd": 73147.08,
     "sma200_slope_positive": true,
-    "ema21_daily_usd": 81818.19,
-    "rsi14_wilder": 47.59,
-    "atr20_wilder_usd": 2023.37,
-    "volume_profile_poc_30d_usd": 82980.39,
-    "range_3d_high_usd": 81823.0,
-    "range_3d_low_usd": 79368.67
+    "ema21_daily_usd": 81470.34,
+    "rsi14_wilder": 36.04,
+    "atr20_wilder_usd": 2125.26,
+    "volume_profile_poc_30d_usd": 81727.1,
+    "range_3d_high_usd": 81971.0,
+    "range_3d_low_usd": 77910.0
   },
   "onchain_and_order_flow": {
     "sth_realized_cost_basis_usd": 75891.97,
-    "open_interest_display": "30524.81 BTC",
+    "open_interest_display": "32898.92 BTC",
     "funding_rate_display": "0.0039% | Mark-Index Spread -0.0548%",
     "spot_cvd_delta_display": "Delta +4.98 BTC | Buy/Sell Ratio 9.15",
     "liquidation_clusters_display": "Long Liq Pocket $79,471 | Short Cluster $82k-$86k ($4.79B)"
@@ -55,9 +55,9 @@
     "threat_score_components": {
       "breadth_divergence_points": 35,
       "yield_elevation_points": 15,
-      "mstr_divergence_points": 20,
+      "mstr_divergence_points": 0,
       "seasonality_window_points": 15,
-      "total_threat_score": 85
+      "total_threat_score": 65
     }
   },
   "volatility_and_institutional_flows": {

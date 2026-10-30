@@ -1,15 +1,15 @@
 {
   "version": "1.0.0",
-  "asof": "2026-10-29T20:29:52Z",
+  "asof": "2026-10-30T00:11:31Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
-    "score": 85,
+    "score": 65,
     "max_score": 100,
-    "status": "CRITICAL THREAT / SQUEEZE IMMINENT",
-    "level": "CRIMSON",
-    "tactical_call": "FORCE DMRA REGIME 2: 100% USDT CASH PRESERVATION",
-    "execution_instruction": "HALT all spot dip-buying across Quant Radar, Liquidity Radar, Sweep Desk, and Absorption Radar. Maintain 100% USDT dry powder until US 10Y pulls back below 5.0% and SPX/RSP breadth recovers.",
+    "status": "ELEVATED CAUTION / FRICTION",
+    "level": "AMBER",
+    "tactical_call": "DEFENSIVE / HALF POSITION SIZING",
+    "execution_instruction": "Normal spot swing execution permissible within risk dampeners.",
     "breakdown": {
       "spx_rsp_breadth_divergence": {
         "points": 35,
@@ -24,16 +24,16 @@
         "reason": "10Y Treasury Yield at 4.989%"
       },
       "mstr_bearish_divergence": {
-        "points": 20,
+        "points": 0,
         "max": 20,
-        "triggered": true,
-        "reason": "MSTR 24h (-2.87%) lagging BTC (+0.35%); bearish momentum divergence active"
+        "triggered": false,
+        "reason": "MSTR 24h (-2.87%) tracking or outperforming BTC (-2.91%); no acute divergence"
       },
       "seasonality_election_window": {
         "points": 15,
         "max": 15,
         "triggered": true,
-        "reason": "High-impact catalyst within 7d window: US Midterm Election (4d)"
+        "reason": "High-impact catalyst within 7d window: US Midterm Election (4d), US Non-Farm Payrolls (NFP) (7d)"
       }
     }
   },
@@ -49,8 +49,8 @@
       "rsp_distance_high_pct": -3.48,
       "ratio_raw": 35.086,
       "ratio_normalized": 1.428,
-      "ratio_50sma": 34.872,
-      "ratio_sma_diff_pct": 0.62,
+      "ratio_50sma": 34.899,
+      "ratio_sma_diff_pct": 0.54,
       "divergence_flag": "CRITICAL BREADTH DIVERGENCE: TECH CONCENTRATION MIRAGE",
       "fractal_note": "Fewer than 10 mega-caps propping up headline index. 2008 double-bottom breakout similarity active."
     },
@@ -65,7 +65,7 @@
       "color": "crimson",
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity.",
       "data_status": "LIVE",
-      "fetched_utc": "2026-10-29T20:29:52Z"
+      "fetched_utc": "2026-10-30T00:11:31Z"
     },
     "module_c_mstr": {
       "price": 141.62,
@@ -77,7 +77,7 @@
       "rolling_corr_btc_30d": 0.842,
       "support_shelf": 142.0,
       "resistance_gate": 175.0,
-      "status": "BEARISH DIVERGENCE / SQUEEZE WARNING",
+      "status": "ALIGNED / NORMAL BETA",
       "color": "amber",
       "interpretation": "MSTR is the high-beta sentiment canary for BTC. Structural failure to reclaim May highs precedes crypto spot corrections."
     },
@@ -130,8 +130,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 80306.19,
-      "change_24h_pct": 0.35,
+      "spot_price": 77678.42,
+      "change_24h_pct": -2.91,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -139,16 +139,6 @@
     }
   },
   "history": [
-    {
-      "date": "2026-08-14",
-      "spx": 5455.21,
-      "rsp": 163.8,
-      "ratio": 33.304,
-      "sma50": 32.8,
-      "us10y": 4.91,
-      "mstr": 1380.0,
-      "btc": 58900
-    },
     {
       "date": "2026-08-15",
       "spx": 5543.22,
@@ -738,6 +728,16 @@
       "us10y": 4.989,
       "mstr": 141.6,
       "btc": 80306.0
+    },
+    {
+      "date": "2026-10-30",
+      "spx": 7720.39,
+      "rsp": 220.04,
+      "ratio": 35.086,
+      "sma50": 34.899,
+      "us10y": 4.989,
+      "mstr": 141.6,
+      "btc": 77678.0
     }
   ]
 }
