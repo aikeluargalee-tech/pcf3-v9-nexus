@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "asof": "2026-10-31T08:45:57Z",
+  "asof": "2026-10-31T15:15:09Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
@@ -27,13 +27,13 @@
         "points": 20,
         "max": 20,
         "triggered": true,
-        "reason": "MSTR 24h (-10.62%) lagging BTC (-4.48%); bearish momentum divergence active"
+        "reason": "MSTR 24h (-10.62%) lagging BTC (-4.34%); bearish momentum divergence active"
       },
       "seasonality_election_window": {
         "points": 15,
         "max": 15,
         "triggered": true,
-        "reason": "High-impact catalyst within 7d window: US Midterm Election (3d), US Non-Farm Payrolls (NFP) (6d)"
+        "reason": "High-impact catalyst within 7d window: US Midterm Election (2d), US Non-Farm Payrolls (NFP) (5d)"
       }
     }
   },
@@ -65,7 +65,7 @@
       "color": "crimson",
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity.",
       "data_status": "LIVE",
-      "fetched_utc": "2026-10-31T08:45:57Z"
+      "fetched_utc": "2026-10-31T15:15:09Z"
     },
     "module_c_mstr": {
       "price": 130.51,
@@ -109,13 +109,13 @@
         {
           "event": "US Midterm Election",
           "date": "2026-11-03",
-          "days_away": 3,
+          "days_away": 2,
           "impact": "EXTREME"
         },
         {
           "event": "US Non-Farm Payrolls (NFP)",
           "date": "2026-11-06",
-          "days_away": 6,
+          "days_away": 5,
           "impact": "HIGH"
         }
       ]
@@ -130,8 +130,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 77182.32,
-      "change_24h_pct": -4.48,
+      "spot_price": 77300.98,
+      "change_24h_pct": -4.34,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -737,7 +737,7 @@
       "sma50": 34.905,
       "us10y": 4.929,
       "mstr": 130.5,
-      "btc": 77182.0
+      "btc": 77301.0
     }
   ]
 }
