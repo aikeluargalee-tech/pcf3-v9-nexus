@@ -1,7 +1,7 @@
 {
-  "updatedAtUtc": "2026-11-01T15:39:59.027439+00:00",
-  "last4hInterval": "20261101_1200UTC",
-  "spotPrice": 78068.78,
+  "updatedAtUtc": "2026-11-01T16:16:20.106658+00:00",
+  "last4hInterval": "20261101_1600UTC",
+  "spotPrice": 78030.01,
   "verdictLock": "FLAT_100_USDT | MAX_EXPOSURE: 0.00x | GATE_DRIVER: DESK_7_CRIMSON",
   "regimeScore": 12,
   "regimeClass": "Corrective / Defensive (Defensive)",
