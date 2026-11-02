@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "asof": "2026-11-02T06:42:41Z",
+  "asof": "2026-11-02T16:58:26Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
@@ -21,41 +21,41 @@
         "points": 15,
         "max": 30,
         "triggered": true,
-        "reason": "10Y Treasury Yield at 4.929%"
+        "reason": "10Y Treasury Yield at 4.884%"
       },
       "mstr_bearish_divergence": {
         "points": 20,
         "max": 20,
         "triggered": true,
-        "reason": "MSTR 24h (-10.62%) lagging BTC (+0.33%); bearish momentum divergence active"
+        "reason": "MSTR 24h (-3.70%) lagging BTC (-0.57%); bearish momentum divergence active"
       },
       "seasonality_election_window": {
         "points": 15,
         "max": 15,
         "triggered": true,
-        "reason": "High-impact catalyst within 7d window: US Midterm Election (1d), US Non-Farm Payrolls (NFP) (4d)"
+        "reason": "High-impact catalyst within 7d window: US Midterm Election (0d), US Non-Farm Payrolls (NFP) (3d)"
       }
     }
   },
   "modules": {
     "module_a_breadth": {
-      "spx_price": 7580.07,
-      "spx_change_24h": -0.57,
+      "spx_price": 7622.15,
+      "spx_change_24h": -0.71,
       "spx_ath": 5790.2,
       "spx_distance_ath_pct": -0.13,
-      "rsp_price": 218.31,
-      "rsp_change_24h": 0.82,
+      "rsp_price": 220.74,
+      "rsp_change_24h": 1.59,
       "rsp_52w_high": 174.5,
       "rsp_distance_high_pct": -3.48,
-      "ratio_raw": 34.722,
+      "ratio_raw": 34.53,
       "ratio_normalized": 1.428,
-      "ratio_50sma": 34.948,
-      "ratio_sma_diff_pct": -0.65,
+      "ratio_50sma": 34.94,
+      "ratio_sma_diff_pct": -1.17,
       "divergence_flag": "CRITICAL BREADTH DIVERGENCE: TECH CONCENTRATION MIRAGE",
       "fractal_note": "Fewer than 10 mega-caps propping up headline index. 2008 double-bottom breakout similarity active."
     },
     "module_b_yield": {
-      "yield_pct": 4.929,
+      "yield_pct": 4.884,
       "change_30d_bps": 42.0,
       "danger_threshold_pct": 5.0,
       "caution_threshold_pct": 4.25,
@@ -65,11 +65,11 @@
       "color": "crimson",
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity.",
       "data_status": "LIVE",
-      "fetched_utc": "2026-11-02T06:42:41Z"
+      "fetched_utc": "2026-11-02T16:58:26Z"
     },
     "module_c_mstr": {
-      "price": 130.51,
-      "change_24h_pct": -10.62,
+      "price": 134.64,
+      "change_24h_pct": -3.7,
       "cycle_high": 312.71,
       "distance_from_high_pct": -51.34,
       "summary": "MSTR $152.18 (-51.3% from 52W high of $312.71) [Bearish Momentum Divergence Active]",
@@ -109,13 +109,13 @@
         {
           "event": "US Midterm Election",
           "date": "2026-11-03",
-          "days_away": 1,
+          "days_away": 0,
           "impact": "EXTREME"
         },
         {
           "event": "US Non-Farm Payrolls (NFP)",
           "date": "2026-11-06",
-          "days_away": 4,
+          "days_away": 3,
           "impact": "HIGH"
         }
       ]
@@ -130,8 +130,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 78032.76,
-      "change_24h_pct": 0.33,
+      "spot_price": 77333.05,
+      "change_24h_pct": -0.57,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -731,13 +731,13 @@
     },
     {
       "date": "2026-11-02",
-      "spx": 7580.07,
-      "rsp": 218.31,
-      "ratio": 34.722,
-      "sma50": 34.948,
-      "us10y": 4.929,
-      "mstr": 130.5,
-      "btc": 78033.0
+      "spx": 7622.15,
+      "rsp": 220.74,
+      "ratio": 34.53,
+      "sma50": 34.94,
+      "us10y": 4.884,
+      "mstr": 134.6,
+      "btc": 77333.0
     }
   ]
 }
