@@ -1,8 +1,8 @@
 {
-  "updatedAtUtc": "2026-11-02T00:31:25.642490+00:00",
-  "last4hInterval": "20261102_0000UTC",
-  "spotPrice": 78116.01,
-  "verdictLock": "FLAT_100_USDT | MAX_EXPOSURE: 0.00x | GATE_DRIVER: DATA_INTEGRITY_FAIL (1 MISSING/STALE)",
+  "updatedAtUtc": "2026-11-02T06:42:44.562107+00:00",
+  "last4hInterval": "20261102_0400UTC",
+  "spotPrice": 78165.99,
+  "verdictLock": "FLAT_100_USDT | MAX_EXPOSURE: 0.00x | GATE_DRIVER: DESK_7_CRIMSON",
   "regimeScore": 12,
   "regimeClass": "Corrective / Defensive (Defensive)",
   "threatScore": 85,
@@ -11,5 +11,5 @@
   "quantPassCount": 2,
   "sslPrice": 76325.98,
   "bslPrice": 78804.01,
-  "sthFloor": 75788.91
+  "sthFloor": 75795.65
 }
