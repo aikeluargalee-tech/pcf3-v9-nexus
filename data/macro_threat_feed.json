@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "asof": "2026-11-02T16:58:26Z",
+  "asof": "2026-11-02T23:51:10Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
@@ -21,13 +21,13 @@
         "points": 15,
         "max": 30,
         "triggered": true,
-        "reason": "10Y Treasury Yield at 4.884%"
+        "reason": "10Y Treasury Yield at 4.894%"
       },
       "mstr_bearish_divergence": {
         "points": 20,
         "max": 20,
         "triggered": true,
-        "reason": "MSTR 24h (-3.70%) lagging BTC (-0.57%); bearish momentum divergence active"
+        "reason": "MSTR 24h (-6.48%) lagging BTC (-1.39%); bearish momentum divergence active"
       },
       "seasonality_election_window": {
         "points": 15,
@@ -39,23 +39,23 @@
   },
   "modules": {
     "module_a_breadth": {
-      "spx_price": 7622.15,
-      "spx_change_24h": -0.71,
+      "spx_price": 7541.4,
+      "spx_change_24h": -1.76,
       "spx_ath": 5790.2,
       "spx_distance_ath_pct": -0.13,
-      "rsp_price": 220.74,
-      "rsp_change_24h": 1.59,
+      "rsp_price": 219.98,
+      "rsp_change_24h": 1.24,
       "rsp_52w_high": 174.5,
       "rsp_distance_high_pct": -3.48,
-      "ratio_raw": 34.53,
+      "ratio_raw": 34.282,
       "ratio_normalized": 1.428,
-      "ratio_50sma": 34.94,
-      "ratio_sma_diff_pct": -1.17,
+      "ratio_50sma": 34.93,
+      "ratio_sma_diff_pct": -1.86,
       "divergence_flag": "CRITICAL BREADTH DIVERGENCE: TECH CONCENTRATION MIRAGE",
       "fractal_note": "Fewer than 10 mega-caps propping up headline index. 2008 double-bottom breakout similarity active."
     },
     "module_b_yield": {
-      "yield_pct": 4.884,
+      "yield_pct": 4.894,
       "change_30d_bps": 42.0,
       "danger_threshold_pct": 5.0,
       "caution_threshold_pct": 4.25,
@@ -65,11 +65,11 @@
       "color": "crimson",
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity.",
       "data_status": "LIVE",
-      "fetched_utc": "2026-11-02T16:58:26Z"
+      "fetched_utc": "2026-11-02T23:51:10Z"
     },
     "module_c_mstr": {
-      "price": 134.64,
-      "change_24h_pct": -3.7,
+      "price": 130.76,
+      "change_24h_pct": -6.48,
       "cycle_high": 312.71,
       "distance_from_high_pct": -51.34,
       "summary": "MSTR $152.18 (-51.3% from 52W high of $312.71) [Bearish Momentum Divergence Active]",
@@ -130,8 +130,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 77333.05,
-      "change_24h_pct": -0.57,
+      "spot_price": 76696.77,
+      "change_24h_pct": -1.39,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -731,13 +731,13 @@
     },
     {
       "date": "2026-11-02",
-      "spx": 7622.15,
-      "rsp": 220.74,
-      "ratio": 34.53,
-      "sma50": 34.94,
-      "us10y": 4.884,
-      "mstr": 134.6,
-      "btc": 77333.0
+      "spx": 7541.4,
+      "rsp": 219.98,
+      "ratio": 34.282,
+      "sma50": 34.93,
+      "us10y": 4.894,
+      "mstr": 130.8,
+      "btc": 76697.0
     }
   ]
 }
