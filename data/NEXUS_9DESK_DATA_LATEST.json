@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "timestamp_utc": "2026-11-03 20:36:32 UTC",
+    "timestamp_utc": "2026-11-04 01:12:53 UTC",
     "version": "nexus-pure-data-v1.0",
     "spec": "neutral_uninterpreted_telemetry"
   },
@@ -8,50 +8,50 @@
     "spot": {
       "status": "LIVE",
       "age_seconds": 0,
-      "fetched_utc": "2026-11-03 20:36:32 UTC"
+      "fetched_utc": "2026-11-04 01:12:53 UTC"
     },
     "us_10y": {
       "status": "LIVE",
-      "age_seconds": 0,
-      "fetched_utc": "2026-11-03 20:36:32 UTC"
+      "age_seconds": 1,
+      "fetched_utc": "2026-11-04 01:12:52 UTC"
     },
     "sth_cost_basis": {
-      "status": "LIVE",
-      "age_seconds": 160592,
+      "status": "STALE",
+      "age_seconds": 177173,
       "fetched_utc": "2026-11-02 00:00:00 UTC"
     },
-    "critical_missing_count": 0
+    "critical_missing_count": 1
   },
   "market_microstructure": {
-    "spot_price_usd": 77784.76,
-    "best_bid_usd": 77784.75,
-    "best_ask_usd": 77784.76,
+    "spot_price_usd": 76816.26,
+    "best_bid_usd": 76816.25,
+    "best_ask_usd": 76816.26,
     "spread_usd": 0.01,
     "source": "api.binance.com",
     "status": "LIVE"
   },
   "technical_indicators_calculated": {
-    "sma200_daily_usd": 73205.12,
+    "sma200_daily_usd": 73207.02,
     "sma200_slope_positive": true,
-    "ema21_daily_usd": 80217.39,
-    "rsi14_wilder": 34.84,
-    "atr20_wilder_usd": 2019.68,
+    "ema21_daily_usd": 79966.16,
+    "rsi14_wilder": 38.06,
+    "atr20_wilder_usd": 2002.42,
     "volume_profile_poc_30d_usd": 81769.28,
     "range_3d_high_usd": 78878.01,
-    "range_3d_low_usd": 76705.0
+    "range_3d_low_usd": 76388.88
   },
   "onchain_and_order_flow": {
     "sth_realized_cost_basis_usd": 75725.01,
-    "open_interest_display": "33291.88 BTC",
+    "open_interest_display": "32594.20 BTC",
     "funding_rate_display": "0.0039% | Mark-Index Spread -0.0548%",
     "spot_cvd_delta_display": "Delta +4.98 BTC | Buy/Sell Ratio 9.15",
     "liquidation_clusters_display": "Long Liq Pocket $79,471 | Short Cluster $82k-$86k ($4.79B)"
   },
   "macro_threat_components": {
     "us_10y_yield_pct": 4.952,
-    "spx_price_usd": 7562.96,
-    "rsp_price_usd": 219.12,
-    "spx_rsp_ratio": 34.5152,
+    "spx_price_usd": 7568.92,
+    "rsp_price_usd": 219.26,
+    "spx_rsp_ratio": 34.5203,
     "threat_score_components": {
       "breadth_divergence_points": 35,
       "yield_elevation_points": 15,
