@@ -1,6 +1,6 @@
 {
   "updated_at": "2026-11-04T00:00:00Z",
-  "fetched_at": "2026-11-05T10:41:19Z",
+  "fetched_at": "2026-11-05T18:39:09Z",
   "source": "BGeometrics / bitcoin-data.com UTXO Cohort API",
   "methodology": "Direct on-chain UTXO cohort calculation (<155D STS, >=155D LTS)",
   "metrics": {

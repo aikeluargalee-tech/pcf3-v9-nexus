@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "asof": "2026-11-05T10:41:43Z",
+  "asof": "2026-11-05T18:39:32Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
@@ -21,41 +21,41 @@
         "points": 15,
         "max": 30,
         "triggered": true,
-        "reason": "10Y Treasury Yield at 4.894%"
+        "reason": "10Y Treasury Yield at 4.831%"
       },
       "mstr_bearish_divergence": {
         "points": 20,
         "max": 20,
         "triggered": true,
-        "reason": "MSTR 24h (-1.80%) lagging BTC (+2.59%); bearish momentum divergence active"
+        "reason": "MSTR 24h (-9.32%) lagging BTC (-2.81%); bearish momentum divergence active"
       },
       "seasonality_election_window": {
         "points": 15,
         "max": 15,
         "triggered": true,
-        "reason": "High-impact catalyst within 7d window: US Non-Farm Payrolls (NFP) (1d)"
+        "reason": "High-impact catalyst within 7d window: US Non-Farm Payrolls (NFP) (0d)"
       }
     }
   },
   "modules": {
     "module_a_breadth": {
-      "spx_price": 7688.62,
-      "spx_change_24h": -0.71,
+      "spx_price": 7386.29,
+      "spx_change_24h": -4.33,
       "spx_ath": 5790.2,
       "spx_distance_ath_pct": -0.13,
-      "rsp_price": 223.33,
-      "rsp_change_24h": 2.71,
+      "rsp_price": 217.08,
+      "rsp_change_24h": -1.35,
       "rsp_52w_high": 174.5,
       "rsp_distance_high_pct": -3.48,
-      "ratio_raw": 34.427,
+      "ratio_raw": 34.026,
       "ratio_normalized": 1.428,
-      "ratio_50sma": 34.984,
-      "ratio_sma_diff_pct": -1.59,
+      "ratio_50sma": 34.968,
+      "ratio_sma_diff_pct": -2.69,
       "divergence_flag": "CRITICAL BREADTH DIVERGENCE: TECH CONCENTRATION MIRAGE",
       "fractal_note": "Fewer than 10 mega-caps propping up headline index. 2008 double-bottom breakout similarity active."
     },
     "module_b_yield": {
-      "yield_pct": 4.894,
+      "yield_pct": 4.831,
       "change_30d_bps": 42.0,
       "danger_threshold_pct": 5.0,
       "caution_threshold_pct": 4.25,
@@ -65,11 +65,11 @@
       "color": "crimson",
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity.",
       "data_status": "LIVE",
-      "fetched_utc": "2026-11-05T10:41:43Z"
+      "fetched_utc": "2026-11-05T18:39:32Z"
     },
     "module_c_mstr": {
-      "price": 142.54,
-      "change_24h_pct": -1.8,
+      "price": 128.41,
+      "change_24h_pct": -9.32,
       "cycle_high": 312.71,
       "distance_from_high_pct": -51.34,
       "summary": "MSTR $152.18 (-51.3% from 52W high of $312.71) [Bearish Momentum Divergence Active]",
@@ -115,7 +115,7 @@
         {
           "event": "US Non-Farm Payrolls (NFP)",
           "date": "2026-11-06",
-          "days_away": 1,
+          "days_away": 0,
           "impact": "HIGH"
         }
       ]
@@ -130,8 +130,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 80274.24,
-      "change_24h_pct": 2.59,
+      "spot_price": 76049.32,
+      "change_24h_pct": -2.81,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -731,13 +731,13 @@
     },
     {
       "date": "2026-11-05",
-      "spx": 7688.62,
-      "rsp": 223.33,
-      "ratio": 34.427,
-      "sma50": 34.984,
-      "us10y": 4.894,
-      "mstr": 142.5,
-      "btc": 80274.0
+      "spx": 7386.29,
+      "rsp": 217.08,
+      "ratio": 34.026,
+      "sma50": 34.968,
+      "us10y": 4.831,
+      "mstr": 128.4,
+      "btc": 76049.0
     }
   ]
 }
