@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "timestamp_utc": "2026-11-05 18:39:32 UTC",
+    "timestamp_utc": "2026-11-06 00:02:09 UTC",
     "version": "nexus-pure-data-v1.0",
     "spec": "neutral_uninterpreted_telemetry"
   },
@@ -8,50 +8,50 @@
     "spot": {
       "status": "LIVE",
       "age_seconds": 0,
-      "fetched_utc": "2026-11-05 18:39:32 UTC"
+      "fetched_utc": "2026-11-06 00:02:09 UTC"
     },
     "us_10y": {
       "status": "LIVE",
       "age_seconds": 0,
-      "fetched_utc": "2026-11-05 18:39:32 UTC"
+      "fetched_utc": "2026-11-06 00:02:09 UTC"
     },
     "sth_cost_basis": {
-      "status": "LIVE",
-      "age_seconds": 153572,
+      "status": "STALE",
+      "age_seconds": 172929,
       "fetched_utc": "2026-11-04 00:00:00 UTC"
     },
-    "critical_missing_count": 0
+    "critical_missing_count": 1
   },
   "market_microstructure": {
-    "spot_price_usd": 76182.01,
-    "best_bid_usd": 76182.0,
-    "best_ask_usd": 76182.01,
+    "spot_price_usd": 76180.01,
+    "best_bid_usd": 76180.01,
+    "best_ask_usd": 76180.02,
     "spread_usd": 0.01,
     "source": "api.binance.com",
     "status": "LIVE"
   },
   "technical_indicators_calculated": {
-    "sma200_daily_usd": 73231.09,
+    "sma200_daily_usd": 73242.52,
     "sma200_slope_positive": true,
-    "ema21_daily_usd": 80015.06,
-    "rsi14_wilder": 50.64,
-    "atr20_wilder_usd": 2175.28,
-    "volume_profile_poc_30d_usd": 81765.82,
+    "ema21_daily_usd": 79658.05,
+    "rsi14_wilder": 38.46,
+    "atr20_wilder_usd": 2351.99,
+    "volume_profile_poc_30d_usd": 81753.99,
     "range_3d_high_usd": 81196.01,
-    "range_3d_low_usd": 75736.38
+    "range_3d_low_usd": 75208.42
   },
   "onchain_and_order_flow": {
     "sth_realized_cost_basis_usd": 75876.61,
-    "open_interest_display": "34624.65 BTC",
+    "open_interest_display": "34730.87 BTC",
     "funding_rate_display": "0.0039% | Mark-Index Spread -0.0548%",
     "spot_cvd_delta_display": "Delta +4.98 BTC | Buy/Sell Ratio 9.15",
     "liquidation_clusters_display": "Long Liq Pocket $79,471 | Short Cluster $82k-$86k ($4.79B)"
   },
   "macro_threat_components": {
-    "us_10y_yield_pct": 4.831,
-    "spx_price_usd": 7386.29,
-    "rsp_price_usd": 217.08,
-    "spx_rsp_ratio": 34.0257,
+    "us_10y_yield_pct": 4.837,
+    "spx_price_usd": 7353.73,
+    "rsp_price_usd": 216.87,
+    "spx_rsp_ratio": 33.9085,
     "threat_score_components": {
       "breadth_divergence_points": 35,
       "yield_elevation_points": 15,
