@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "timestamp_utc": "2026-11-07 22:14:22 UTC",
+    "timestamp_utc": "2026-11-08 01:45:38 UTC",
     "version": "nexus-pure-data-v1.0",
     "spec": "neutral_uninterpreted_telemetry"
   },
@@ -8,41 +8,41 @@
     "spot": {
       "status": "LIVE",
       "age_seconds": 0,
-      "fetched_utc": "2026-11-07 22:14:22 UTC"
+      "fetched_utc": "2026-11-08 01:45:38 UTC"
     },
     "us_10y": {
       "status": "LIVE",
       "age_seconds": 0,
-      "fetched_utc": "2026-11-07 22:14:22 UTC"
+      "fetched_utc": "2026-11-08 01:45:38 UTC"
     },
     "sth_cost_basis": {
-      "status": "LIVE",
-      "age_seconds": 166462,
+      "status": "STALE",
+      "age_seconds": 179138,
       "fetched_utc": "2026-11-06 00:00:00 UTC"
     },
-    "critical_missing_count": 0
+    "critical_missing_count": 1
   },
   "market_microstructure": {
-    "spot_price_usd": 75733.0,
-    "best_bid_usd": 75732.99,
-    "best_ask_usd": 75733.0,
+    "spot_price_usd": 75779.4,
+    "best_bid_usd": 75779.4,
+    "best_ask_usd": 75779.41,
     "spread_usd": 0.01,
     "source": "api.binance.com",
     "status": "LIVE"
   },
   "technical_indicators_calculated": {
-    "sma200_daily_usd": 73242.53,
+    "sma200_daily_usd": 73240.19,
     "sma200_slope_positive": true,
-    "ema21_daily_usd": 79311.32,
-    "rsi14_wilder": 37.92,
-    "atr20_wilder_usd": 2310.8,
+    "ema21_daily_usd": 78998.25,
+    "rsi14_wilder": 38.01,
+    "atr20_wilder_usd": 2229.21,
     "volume_profile_poc_30d_usd": 81794.9,
-    "range_3d_high_usd": 81196.01,
+    "range_3d_high_usd": 80918.01,
     "range_3d_low_usd": 74888.0
   },
   "onchain_and_order_flow": {
     "sth_realized_cost_basis_usd": 75831.37,
-    "open_interest_display": "34562.59 BTC",
+    "open_interest_display": "34409.10 BTC",
     "funding_rate_display": "0.0039% | Mark-Index Spread -0.0548%",
     "spot_cvd_delta_display": "Delta +4.98 BTC | Buy/Sell Ratio 9.15",
     "liquidation_clusters_display": "Long Liq Pocket $79,471 | Short Cluster $82k-$86k ($4.79B)"

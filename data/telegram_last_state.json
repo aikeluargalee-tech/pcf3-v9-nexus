@@ -1,8 +1,8 @@
 {
-  "updatedAtUtc": "2026-11-07T22:14:24.567306+00:00",
-  "last4hInterval": "20261107_2000UTC",
-  "spotPrice": 75733.0,
-  "verdictLock": "DEFENSIVE_SCALP | MAX_EXPOSURE: 0.00x | GATE_DRIVER: DESK_8_VOL",
+  "updatedAtUtc": "2026-11-08T01:45:40.247676+00:00",
+  "last4hInterval": "20261108_0000UTC",
+  "spotPrice": 75779.4,
+  "verdictLock": "FLAT_100_USDT | MAX_EXPOSURE: 0.00x | GATE_DRIVER: DATA_INTEGRITY_FAIL (1 MISSING/STALE)",
   "regimeScore": 46,
   "regimeClass": "Corrective / Defensive (Defensive)",
   "threatScore": 50,
@@ -10,6 +10,6 @@
   "quantAligned": false,
   "quantPassCount": 2,
   "sslPrice": 74888.0,
-  "bslPrice": 81196.01,
+  "bslPrice": 80918.01,
   "sthFloor": 75831.37
 }
