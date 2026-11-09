@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "asof": "2026-11-08T23:57:19Z",
+  "asof": "2026-11-09T05:57:52Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
@@ -27,7 +27,7 @@
         "points": 0,
         "max": 20,
         "triggered": false,
-        "reason": "MSTR 24h (-1.21%) tracking or outperforming BTC (-7.26%); no acute divergence"
+        "reason": "MSTR 24h (-1.21%) tracking or outperforming BTC (-2.06%); no acute divergence"
       },
       "seasonality_election_window": {
         "points": 0,
@@ -49,8 +49,8 @@
       "rsp_distance_high_pct": -3.48,
       "ratio_raw": 34.144,
       "ratio_normalized": 1.428,
-      "ratio_50sma": 34.99,
-      "ratio_sma_diff_pct": -2.42,
+      "ratio_50sma": 34.993,
+      "ratio_sma_diff_pct": -2.43,
       "divergence_flag": "CRITICAL BREADTH DIVERGENCE: TECH CONCENTRATION MIRAGE",
       "fractal_note": "Fewer than 10 mega-caps propping up headline index. 2008 double-bottom breakout similarity active."
     },
@@ -65,7 +65,7 @@
       "color": "crimson",
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity.",
       "data_status": "LIVE",
-      "fetched_utc": "2026-11-08T23:57:19Z"
+      "fetched_utc": "2026-11-09T05:57:52Z"
     },
     "module_c_mstr": {
       "price": 128.93,
@@ -130,8 +130,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 74567.96,
-      "change_24h_pct": -7.26,
+      "spot_price": 74380.62,
+      "change_24h_pct": -2.06,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -139,16 +139,6 @@
     }
   },
   "history": [
-    {
-      "date": "2026-08-28",
-      "spx": 5598.4,
-      "rsp": 166.4,
-      "ratio": 33.644,
-      "sma50": 33.05,
-      "us10y": 5.06,
-      "mstr": 1440.0,
-      "btc": 59000
-    },
     {
       "date": "2026-08-29",
       "spx": 5648.4,
@@ -738,6 +728,16 @@
       "us10y": 4.859,
       "mstr": 128.9,
       "btc": 74568.0
+    },
+    {
+      "date": "2026-11-09",
+      "spx": 7376.86,
+      "rsp": 216.05,
+      "ratio": 34.144,
+      "sma50": 34.993,
+      "us10y": 4.859,
+      "mstr": 128.9,
+      "btc": 74381.0
     }
   ]
 }
