@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "timestamp_utc": "2026-11-09 15:58:02 UTC",
+    "timestamp_utc": "2026-11-10 00:06:45 UTC",
     "version": "nexus-pure-data-v1.0",
     "spec": "neutral_uninterpreted_telemetry"
   },
@@ -8,56 +8,56 @@
     "spot": {
       "status": "LIVE",
       "age_seconds": 0,
-      "fetched_utc": "2026-11-09 15:58:02 UTC"
+      "fetched_utc": "2026-11-10 00:06:45 UTC"
     },
     "us_10y": {
       "status": "LIVE",
       "age_seconds": 0,
-      "fetched_utc": "2026-11-09 15:58:02 UTC"
+      "fetched_utc": "2026-11-10 00:06:45 UTC"
     },
     "sth_cost_basis": {
-      "status": "LIVE",
-      "age_seconds": 143882,
+      "status": "STALE",
+      "age_seconds": 173205,
       "fetched_utc": "2026-11-08 00:00:00 UTC"
     },
-    "critical_missing_count": 0
+    "critical_missing_count": 1
   },
   "market_microstructure": {
-    "spot_price_usd": 75503.92,
-    "best_bid_usd": 75503.91,
-    "best_ask_usd": 75503.92,
+    "spot_price_usd": 75369.54,
+    "best_bid_usd": 75369.54,
+    "best_ask_usd": 75369.55,
     "spread_usd": 0.01,
     "source": "api.binance.com",
     "status": "LIVE"
   },
   "technical_indicators_calculated": {
-    "sma200_daily_usd": 73223.56,
+    "sma200_daily_usd": 73209.11,
     "sma200_slope_positive": true,
-    "ema21_daily_usd": 78621.27,
-    "rsi14_wilder": 35.59,
-    "atr20_wilder_usd": 2252.25,
+    "ema21_daily_usd": 78325.56,
+    "rsi14_wilder": 37.76,
+    "atr20_wilder_usd": 2232.1,
     "volume_profile_poc_30d_usd": 80912.2,
-    "range_3d_high_usd": 76416.24,
+    "range_3d_high_usd": 76249.99,
     "range_3d_low_usd": 73510.0
   },
   "onchain_and_order_flow": {
     "sth_realized_cost_basis_usd": 75857.29,
-    "open_interest_display": "35267.25 BTC",
+    "open_interest_display": "34739.23 BTC",
     "funding_rate_display": "0.0039% | Mark-Index Spread -0.0548%",
     "spot_cvd_delta_display": "Delta +4.98 BTC | Buy/Sell Ratio 9.15",
     "liquidation_clusters_display": "Long Liq Pocket $79,471 | Short Cluster $82k-$86k ($4.79B)"
   },
   "macro_threat_components": {
-    "us_10y_yield_pct": 4.874,
-    "spx_price_usd": 7537.43,
-    "rsp_price_usd": 219.99,
-    "spx_rsp_ratio": 34.2626,
+    "us_10y_yield_pct": 4.864,
+    "spx_price_usd": 7549.94,
+    "rsp_price_usd": 220.95,
+    "spx_rsp_ratio": 34.1704,
     "threat_score_components": {
       "breadth_divergence_points": 35,
       "yield_elevation_points": 15,
-      "mstr_divergence_points": 0,
+      "mstr_divergence_points": 20,
       "seasonality_window_points": 0,
-      "total_threat_score": 50
+      "total_threat_score": 70
     }
   },
   "volatility_and_institutional_flows": {
