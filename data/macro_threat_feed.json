@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "asof": "2026-11-11T09:12:44Z",
+  "asof": "2026-11-11T17:23:34Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
@@ -21,13 +21,13 @@
         "points": 15,
         "max": 30,
         "triggered": true,
-        "reason": "10Y Treasury Yield at 4.983%"
+        "reason": "10Y Treasury Yield at 4.998%"
       },
       "mstr_bearish_divergence": {
         "points": 20,
         "max": 20,
         "triggered": true,
-        "reason": "MSTR 24h (-10.74%) lagging BTC (-2.77%); bearish momentum divergence active"
+        "reason": "MSTR 24h (-13.28%) lagging BTC (-1.56%); bearish momentum divergence active"
       },
       "seasonality_election_window": {
         "points": 0,
@@ -39,23 +39,23 @@
   },
   "modules": {
     "module_a_breadth": {
-      "spx_price": 7520.93,
-      "spx_change_24h": -0.63,
+      "spx_price": 7633.35,
+      "spx_change_24h": -0.72,
       "spx_ath": 5790.2,
       "spx_distance_ath_pct": -0.13,
-      "rsp_price": 220.88,
-      "rsp_change_24h": 0.74,
+      "rsp_price": 222.34,
+      "rsp_change_24h": -0.44,
       "rsp_52w_high": 174.5,
       "rsp_distance_high_pct": -3.48,
-      "ratio_raw": 34.05,
+      "ratio_raw": 34.331,
       "ratio_normalized": 1.428,
-      "ratio_50sma": 34.996,
-      "ratio_sma_diff_pct": -2.7,
+      "ratio_50sma": 35.007,
+      "ratio_sma_diff_pct": -1.93,
       "divergence_flag": "CRITICAL BREADTH DIVERGENCE: TECH CONCENTRATION MIRAGE",
       "fractal_note": "Fewer than 10 mega-caps propping up headline index. 2008 double-bottom breakout similarity active."
     },
     "module_b_yield": {
-      "yield_pct": 4.983,
+      "yield_pct": 4.998,
       "change_30d_bps": 42.0,
       "danger_threshold_pct": 5.0,
       "caution_threshold_pct": 4.25,
@@ -65,11 +65,11 @@
       "color": "crimson",
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity.",
       "data_status": "LIVE",
-      "fetched_utc": "2026-11-11T09:12:44Z"
+      "fetched_utc": "2026-11-11T17:23:34Z"
     },
     "module_c_mstr": {
-      "price": 121.07,
-      "change_24h_pct": -10.74,
+      "price": 123.61,
+      "change_24h_pct": -13.28,
       "cycle_high": 312.71,
       "distance_from_high_pct": -51.34,
       "summary": "MSTR $152.18 (-51.3% from 52W high of $312.71) [Bearish Momentum Divergence Active]",
@@ -130,8 +130,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 73648.13,
-      "change_24h_pct": -2.77,
+      "spot_price": 74566.49,
+      "change_24h_pct": -1.56,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -731,13 +731,13 @@
     },
     {
       "date": "2026-11-11",
-      "spx": 7520.93,
-      "rsp": 220.88,
-      "ratio": 34.05,
-      "sma50": 34.996,
-      "us10y": 4.983,
-      "mstr": 121.1,
-      "btc": 73648.0
+      "spx": 7633.35,
+      "rsp": 222.34,
+      "ratio": 34.331,
+      "sma50": 35.007,
+      "us10y": 4.998,
+      "mstr": 123.6,
+      "btc": 74566.0
     }
   ]
 }
