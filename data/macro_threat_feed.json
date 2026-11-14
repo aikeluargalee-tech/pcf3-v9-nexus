@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "asof": "2026-11-13T23:48:29Z",
+  "asof": "2026-11-14T06:02:17Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
@@ -27,7 +27,7 @@
         "points": 20,
         "max": 20,
         "triggered": true,
-        "reason": "MSTR 24h (-13.43%) lagging BTC (-9.50%); bearish momentum divergence active"
+        "reason": "MSTR 24h (-13.43%) lagging BTC (-8.78%); bearish momentum divergence active"
       },
       "seasonality_election_window": {
         "points": 0,
@@ -65,7 +65,7 @@
       "color": "crimson",
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity.",
       "data_status": "LIVE",
-      "fetched_utc": "2026-11-13T23:48:29Z"
+      "fetched_utc": "2026-11-14T06:02:17Z"
     },
     "module_c_mstr": {
       "price": 111.62,
@@ -130,8 +130,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 68074.99,
-      "change_24h_pct": -9.5,
+      "spot_price": 67250.96,
+      "change_24h_pct": -8.78,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -139,16 +139,6 @@
     }
   },
   "history": [
-    {
-      "date": "2026-09-05",
-      "spx": 5408.42,
-      "rsp": 161.2,
-      "ratio": 33.551,
-      "sma50": 33.16,
-      "us10y": 5.16,
-      "mstr": 1310.0,
-      "btc": 54200
-    },
     {
       "date": "2026-09-08",
       "spx": 5471.05,
@@ -738,6 +728,16 @@
       "us10y": 5.154,
       "mstr": 111.6,
       "btc": 68075.0
+    },
+    {
+      "date": "2026-11-14",
+      "spx": 7561.67,
+      "rsp": 221.16,
+      "ratio": 34.191,
+      "sma50": 35.007,
+      "us10y": 5.154,
+      "mstr": 111.6,
+      "btc": 67251.0
     }
   ]
 }

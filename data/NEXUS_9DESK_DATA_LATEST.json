@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "timestamp_utc": "2026-11-13 23:48:29 UTC",
+    "timestamp_utc": "2026-11-14 06:02:17 UTC",
     "version": "nexus-pure-data-v1.0",
     "spec": "neutral_uninterpreted_telemetry"
   },
@@ -8,41 +8,41 @@
     "spot": {
       "status": "LIVE",
       "age_seconds": 0,
-      "fetched_utc": "2026-11-13 23:48:29 UTC"
+      "fetched_utc": "2026-11-14 06:02:17 UTC"
     },
     "us_10y": {
       "status": "LIVE",
       "age_seconds": 0,
-      "fetched_utc": "2026-11-13 23:48:29 UTC"
+      "fetched_utc": "2026-11-14 06:02:17 UTC"
     },
     "sth_cost_basis": {
       "status": "LIVE",
-      "age_seconds": 172109,
-      "fetched_utc": "2026-11-12 00:00:00 UTC"
+      "age_seconds": 108137,
+      "fetched_utc": "2026-11-13 00:00:00 UTC"
     },
     "critical_missing_count": 0
   },
   "market_microstructure": {
-    "spot_price_usd": 68152.01,
-    "best_bid_usd": 68152.0,
-    "best_ask_usd": 68152.01,
+    "spot_price_usd": 67314.01,
+    "best_bid_usd": 67314.0,
+    "best_ask_usd": 67314.01,
     "spread_usd": 0.01,
     "source": "api.binance.com",
     "status": "LIVE"
   },
   "technical_indicators_calculated": {
-    "sma200_daily_usd": 73136.87,
+    "sma200_daily_usd": 73091.58,
     "sma200_slope_positive": true,
-    "ema21_daily_usd": 77004.88,
-    "rsi14_wilder": 29.52,
-    "atr20_wilder_usd": 2267.58,
-    "volume_profile_poc_30d_usd": 80900.37,
-    "range_3d_high_usd": 75442.01,
-    "range_3d_low_usd": 71113.06
+    "ema21_daily_usd": 76214.8,
+    "rsi14_wilder": 24.47,
+    "atr20_wilder_usd": 2351.5,
+    "volume_profile_poc_30d_usd": 80912.1,
+    "range_3d_high_usd": 74811.45,
+    "range_3d_low_usd": 67568.0
   },
   "onchain_and_order_flow": {
-    "sth_realized_cost_basis_usd": 75456.87,
-    "open_interest_display": "33610.88 BTC",
+    "sth_realized_cost_basis_usd": 75041.76,
+    "open_interest_display": "33373.07 BTC",
     "funding_rate_display": "0.0039% | Mark-Index Spread -0.0548%",
     "spot_cvd_delta_display": "Delta +4.98 BTC | Buy/Sell Ratio 9.15",
     "liquidation_clusters_display": "Long Liq Pocket $79,471 | Short Cluster $82k-$86k ($4.79B)"
