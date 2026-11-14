@@ -1,15 +1,15 @@
 {
   "version": "1.0.0",
-  "asof": "2026-11-14T18:50:09Z",
+  "asof": "2026-11-14T22:55:36Z",
   "source": "Nexus Macro Threat Engine (Dual Live + Fallback Telemetry)",
   "regime_target": "DMRA Regime 2: 100% USDT Cash Preservation Gate",
   "composite_threat": {
-    "score": 85,
+    "score": 65,
     "max_score": 100,
-    "status": "CRITICAL THREAT / SQUEEZE IMMINENT",
-    "level": "CRIMSON",
-    "tactical_call": "FORCE DMRA REGIME 2: 100% USDT CASH PRESERVATION",
-    "execution_instruction": "HALT all spot dip-buying across Quant Radar, Liquidity Radar, Sweep Desk, and Absorption Radar. Maintain 100% USDT dry powder until US 10Y pulls back below 5.0% and SPX/RSP breadth recovers.",
+    "status": "ELEVATED CAUTION / FRICTION",
+    "level": "AMBER",
+    "tactical_call": "DEFENSIVE / HALF POSITION SIZING",
+    "execution_instruction": "Normal spot swing execution permissible within risk dampeners.",
     "breakdown": {
       "spx_rsp_breadth_divergence": {
         "points": 35,
@@ -24,10 +24,10 @@
         "reason": "10Y Treasury Yield at 5.154% >= 5.00% toxic threshold"
       },
       "mstr_bearish_divergence": {
-        "points": 20,
+        "points": 0,
         "max": 20,
-        "triggered": true,
-        "reason": "MSTR 24h (-13.43%) lagging BTC (-11.11%); bearish momentum divergence active"
+        "triggered": false,
+        "reason": "MSTR 24h (-13.43%) tracking or outperforming BTC (-13.86%); no acute divergence"
       },
       "seasonality_election_window": {
         "points": 0,
@@ -65,7 +65,7 @@
       "color": "crimson",
       "cost_of_capital_impact": "High / Restrictive cost of capital compresses risk-asset multiples and drains institutional liquidity.",
       "data_status": "LIVE",
-      "fetched_utc": "2026-11-14T18:50:09Z"
+      "fetched_utc": "2026-11-14T22:55:36Z"
     },
     "module_c_mstr": {
       "price": 111.62,
@@ -77,7 +77,7 @@
       "rolling_corr_btc_30d": 0.842,
       "support_shelf": 142.0,
       "resistance_gate": 175.0,
-      "status": "BEARISH DIVERGENCE / SQUEEZE WARNING",
+      "status": "ALIGNED / NORMAL BETA",
       "color": "amber",
       "interpretation": "MSTR is the high-beta sentiment canary for BTC. Structural failure to reclaim May highs precedes crypto spot corrections."
     },
@@ -130,8 +130,8 @@
       "status": "EXTREME OVEREXTENSION (Mean reversion risk elevated)"
     },
     "btc_context": {
-      "spot_price": 65532.42,
-      "change_24h_pct": -11.11,
+      "spot_price": 63499.39,
+      "change_24h_pct": -13.86,
       "htf_support": 60000.0,
       "htf_resistance": 65200.0,
       "distance_to_support_pct": 4.73,
@@ -737,7 +737,7 @@
       "sma50": 35.007,
       "us10y": 5.154,
       "mstr": 111.6,
-      "btc": 65532.0
+      "btc": 63499.0
     }
   ]
 }
