@@ -1,5 +1,5 @@
 ===== PCF3 MASTER PROMPT + LIVE PACKET — ONE FILE COPY-PASTE READY FOR ANY LLM — ANALYSIS ONLY — NO AUTO TRADE =====
-TIMESTAMP_UTC: 2026-11-14T22:55:09.169271Z | SPOT: 63531.36 | BID: 63531.36 | ASK: 63531.37 | SPREAD: 0.0100 (0.00002%) | SOURCE: api.binance.com | DATA_STATUS: LIVE_API | METHOD: last price + bookTicker | NOTE: FULL = Puell Hash Ribbons SOPR Streak Volume Climax Percentiles Pi Rainbow + Exchange Flow Realized Bands Mayer LTH SSR <15 Complacency 15-20 Normal 20-30 Elevated 30+ Panic 40-50 Capitulation + DVOL Deribit — EXAMPLE:0
+TIMESTAMP_UTC: 2026-11-15T02:30:53.407551Z | SPOT: 64504.99 | BID: 64522.74 | ASK: 64522.75 | SPREAD: 0.0100 (0.00002%) | SOURCE: api.binance.com | DATA_STATUS: LIVE_API | METHOD: last price + bookTicker | NOTE: FULL = Puell Hash Ribbons SOPR Streak Volume Climax Percentiles Pi Rainbow + Exchange Flow Realized Bands Mayer LTH SSR <15 Complacency 15-20 Normal 20-30 Elevated 30+ Panic 40-50 Capitulation + DVOL Deribit — EXAMPLE:0
 
 PCF3 PRODUCTION READY FINAL — BTC ANALYSIS SYSTEM — ANALYSIS ONLY — NO AUTO TRADE
 70 Cards | Mobile-First | Provenance-Aware | Self-Audited (not third-party audited) | Human Review Only
@@ -264,26 +264,26 @@ bullish market != valid entry
 ===== END MASTER PROMPT — BELOW IS LIVE DATA PACKET — RAW IS TRUTH =====
 
 --- 1. MARKET STRUCTURE | SRC: Binance klines 4h limit 100 ---
-4H_OHLC: O=65727.61000000 H=65884.01000000 L=63320.00000000 C=63533.21000000 V=7094.43050000 | DATA_STATUS: LIVE_API | SOURCE: Binance 4H klines (100 bars) | VERDICT: Bearish / Pullback 4H Bar (Close < Open)
+4H_OHLC: O=64150.01000000 H=64655.12000000 L=62006.00000000 C=64527.63000000 V=8318.99952000 | DATA_STATUS: LIVE_API | SOURCE: Binance 4H klines (100 bars) | VERDICT: Bullish 4H Close (Close >= Open)
 
 --- 2. VALUE & VWAP LOCATION | CALENDAR VWAP FIX #11 ---
-Daily_VWAP: 65983.51 | Price_vs_Daily_VWAP_%: -3.716% | DATA_STATUS: LIVE_AUTO | METHOD: 00:00 UTC cum(TP*V)/cum(V) | VERDICT: Below Daily VWAP (Intraday Discount / Pullback)
-Weekly_VWAP: 70703.79 | Price_vs_Weekly_VWAP_%: -10.14% | DATA_STATUS: LIVE_AUTO | METHOD: Monday 00:00 UTC | VERDICT: Below Weekly VWAP (Corrective Pullback)
-Monthly_VWAP: 73844.07 | POC: 81600 | VAH: 80400 | VAL: 63500 | DATA_STATUS: LIVE_AUTO | VERDICT: Trading Above 30D Value Area Low (VAL Intact)
+Daily_VWAP: 63729.58 | Price_vs_Daily_VWAP_%: +1.217% | DATA_STATUS: LIVE_AUTO | METHOD: 00:00 UTC cum(TP*V)/cum(V) | VERDICT: Above Daily VWAP (Intraday Bullish Control)
+Weekly_VWAP: 70195.86 | Price_vs_Weekly_VWAP_%: -8.11% | DATA_STATUS: LIVE_AUTO | METHOD: Monday 00:00 UTC | VERDICT: Below Weekly VWAP (Corrective Pullback)
+Monthly_VWAP: 73437.17 | POC: 81600 | VAH: 80300 | VAL: 64100 | DATA_STATUS: LIVE_AUTO | VERDICT: Trading Above 30D Value Area Low (VAL Intact)
 
 --- 3. SPOT & PERP FLOW + CVD LIVE SLOPE | ENHANCEMENT #1 ---
-Spot_volume_24h: 31458.65 BTC | Perp_volume_24h: 41497.04 BTC | Perp/Spot_Ratio: 1.32x | DATA_STATUS: LIVE_API | SOURCE: Binance /ticker/24hr | VERDICT: Balanced Spot/Perp Participation (<12x)
-CVD_current: -0.23 BTC | Buy_vol: 2.17 Sell_vol: 2.40 Buy/Sell Ratio: 0.903 Delta: -0.23 Delta_%: -5.10% | DATA_STATUS: LIVE_API | SOURCE: Binance aggTrades 1000 | VERDICT: Taker Sell Pressure
-CVD_slope: 0.36 Slope_%: 7.80% Total_vol: 4.57 | DATA_STATUS: LIVE_API | METHOD: Slope=last200 avg - first200 avg | VERDICT: Positive CVD Slope (Accelerating Spot Demand)
+Spot_volume_24h: 38270.68 BTC | Perp_volume_24h: 49160.99 BTC | Perp/Spot_Ratio: 1.28x | DATA_STATUS: LIVE_API | SOURCE: Binance /ticker/24hr | VERDICT: Balanced Spot/Perp Participation (<12x)
+CVD_current: 5.38 BTC | Buy_vol: 6.93 Sell_vol: 1.55 Buy/Sell Ratio: 4.474 Delta: 5.38 Delta_%: 63.46% | DATA_STATUS: LIVE_API | SOURCE: Binance aggTrades 1000 | VERDICT: Taker Buy Dominance (Spot Absorption Active)
+CVD_slope: 5.14 Slope_%: 60.62% Total_vol: 8.48 | DATA_STATUS: LIVE_API | METHOD: Slope=last200 avg - first200 avg | VERDICT: Positive CVD Slope (Accelerating Spot Demand)
 
 --- 4. DERIVATIVES | FIX #2 MARK_INDEX_SPREAD + FIX #3 OI HISTORY ---
-OI_current: 33337.79 BTC | OI_CHANGE_%: -1.1735% | OI_PREVIOUS: 33733.64 | OI_AGE: 4.1 hours | DATA_STATUS: LIVE_API_OKX_PROXY | SOURCE: Binance fapi openInterest | VERDICT: Orderly positioning drift (Low Leverage Froth)
-Funding_Binance: 0.0000% | Annualized: 0.04% | Futures_Long_%: 72.7% | DATA_STATUS: LIVE_API_DERIBIT_PROXY | SOURCE: Binance premiumIndex | VERDICT: Negative/Neutral Funding — Zero Long Froth (Constructive)
-MARK_INDEX_SPREAD_%: 0.0039% | FORMULA: (mark-index)/index*100 | DATA_STATUS: LIVE_API_DERIBIT_PROXY | SOURCE: Binance premiumIndex | VERDICT: Controlled Positive Basis
+OI_current: 33217.95 BTC | OI_CHANGE_%: -0.3595% | OI_PREVIOUS: 33337.79 | OI_AGE: 3.6 hours | DATA_STATUS: LIVE_API_OKX_PROXY | SOURCE: Binance fapi openInterest | VERDICT: Orderly positioning drift (Low Leverage Froth)
+Funding_Binance: 0.0000% | Annualized: 0.04% | Futures_Long_%: 73.3% | DATA_STATUS: LIVE_API_DERIBIT_PROXY | SOURCE: Binance premiumIndex | VERDICT: Negative/Neutral Funding — Zero Long Froth (Constructive)
+MARK_INDEX_SPREAD_%: 0.0021% | FORMULA: (mark-index)/index*100 | DATA_STATUS: LIVE_API_DERIBIT_PROXY | SOURCE: Binance premiumIndex | VERDICT: Controlled Positive Basis
 
 --- 5. LIQUIDATION MAP | SPOT-ANCHORED LEVERAGE BANDS ---
-LONG_liq_price: 61880 | Dist_%: -2.60% below spot ($63,531) | DATA_STATUS: LIVE_AUTO_DERIVED | SOURCE: Binance fapi Leverage Bands | VERDICT: High-leverage long liquidation pocket below $61,880
-SHORT_cluster: $64.5k-$67.0k dense ($4.79B) | Dist_%: +1.5% to +5.5% above spot | DATA_STATUS: LIVE_AUTO_DERIVED | SOURCE: Binance fapi Leverage Bands | VERDICT: Overhead short-squeeze fuel magnet ($64.5k-$67.0k dense ($4.79B))
+LONG_liq_price: 62828 | Dist_%: -2.60% below spot ($64,505) | DATA_STATUS: LIVE_AUTO_DERIVED | SOURCE: Binance fapi Leverage Bands | VERDICT: High-leverage long liquidation pocket below $62,828
+SHORT_cluster: $65.5k-$68.0k dense ($4.79B) | Dist_%: +1.5% to +5.5% above spot | DATA_STATUS: LIVE_AUTO_DERIVED | SOURCE: Binance fapi Leverage Bands | VERDICT: Overhead short-squeeze fuel magnet ($65.5k-$68.0k dense ($4.79B))
 
 --- 6. ETF FLOW | AUTO-FETCHED FARSIDE BYPASSES CORS ---
 ETF_1D: 433.0M | DATE: 18 Sep 2026 | DATA_STATUS: LIVE_API_MOCK_REAL | SOURCE: farside.co.uk/btc/ - cached real | VERDICT: Institutional Inflow Support
@@ -291,13 +291,13 @@ ETF_3D: 592.5M | 5D: -30.3M | 7D: 143.0M | 20D: 950.8M | DATA_STATUS: LIVE_API_M
 IBIT_1D: 108.4M | FBTC_1D: 310.7M | GBTC_1D: 0.0M | DATA_STATUS: LIVE_API_MOCK_REAL | SOURCE: Farside US Spot BTC ETF Ledger
 
 --- 7. OPTIONS GAMMA WALLS | DERIBIT OI STRIKE WALLS ---
-Put_wall: 60000 | Put_OI: 12809 | Dist_Put_%: 5.56% below spot | DATA_STATUS: LIVE_API_DERIBIT | SOURCE: Deribit api/v2/public/get_book_summary_by_currency (Max Strike OI) | VERDICT: Major Options Put Support Floor ($60,000)
-Call_wall: 80000 | Call_OI: 13375 | Dist_Call_%: 25.92% above spot | DATA_STATUS: LIVE_API_DERIBIT | SOURCE: Deribit api/v2/public/get_book_summary_by_currency (Max Strike OI) | VERDICT: Overhead Options Call Resistance Wall ($80,000)
+Put_wall: 60000 | Put_OI: 12310 | Dist_Put_%: 6.98% below spot | DATA_STATUS: LIVE_API_DERIBIT | SOURCE: Deribit api/v2/public/get_book_summary_by_currency (Max Strike OI) | VERDICT: Major Options Put Support Floor ($60,000)
+Call_wall: 80000 | Call_OI: 13440 | Dist_Call_%: 24.02% above spot | DATA_STATUS: LIVE_API_DERIBIT | SOURCE: Deribit api/v2/public/get_book_summary_by_currency (Max Strike OI) | VERDICT: Overhead Options Call Resistance Wall ($80,000)
 Net_gamma: 1 | Label: Long Gamma (Dealer mean-reversion / vol dampening between walls) | DVOL: 48.50 | DATA_STATUS: LIVE_API_DERIBIT | VERDICT: Dealer Gamma Positioning & 30D Implied Volatility
 
 --- 8. ON-CHAIN CYCLE COMPONENTS | VERIFIED UTXO BASELINE ---
-MVRV Ratio: 1.18 | MVRV Z: 0.43 | Puell: 0.84 | SOPR_live: 0.992 | NUPL: 0.153 | DATA_STATUS: VERIFIED_ONCHAIN_BASELINE | SOURCE: BlockHorizon UTXO + Binance 365D | VERDICT: Mid-Cycle Expansion (Not Overheated, MVRV Z 0.43 << 5.0 Top)
-STH_MVRV: 0.85 (STH RP $75,042) | LTH_MVRV: 1.31 (LTH RP $48,619) | Realized_Price: $53,845 | DATA_STATUS: VERIFIED_ONCHAIN_BASELINE | VERDICT: STH Cohort Under Pressure
+MVRV Ratio: 1.20 | MVRV Z: 0.47 | Puell: 0.85 | SOPR_live: 0.992 | NUPL: 0.167 | DATA_STATUS: VERIFIED_ONCHAIN_BASELINE | SOURCE: BlockHorizon UTXO + Binance 365D | VERDICT: Mid-Cycle Expansion (Not Overheated, MVRV Z 0.47 << 5.0 Top)
+STH_MVRV: 0.86 (STH RP $75,049) | LTH_MVRV: 1.33 (LTH RP $48,622) | Realized_Price: $53,845 | DATA_STATUS: VERIFIED_ONCHAIN_BASELINE | VERDICT: STH Cohort Under Pressure
 
 --- 9. MACRO | CROSS-ASSET & RATE GATEKEEPER ---
 DXY: 103.41 | Change_24h_%: 0.234% | US10Y: 5.15 | VIX: 19.30 | DATA_STATUS: LIVE_API | SOURCE: Yahoo Finance | VERDICT: CAUTIOUS / DEFENSIVE (Elevated US10Y Yield > 4.8% Headwind)
@@ -305,138 +305,137 @@ SP500: 7561.67 (-0.76%) | NASDAQ: 25136.27 (-1.30%) | GOLD: 3886.30 | OIL: 88.56
 Macro_Gatekeeper: US10Y 5.15% | DXY 103.41 | VIX 19.30 | ETF_1D 433.0M | DATA_STATUS: LIVE_AUTO | SOURCE: Multi-Asset Gatekeeper Engine | VERDICT: CAUTIOUS / DEFENSIVE (Elevated US10Y Yield > 4.8% Headwind)
 
 --- 10. VOLATILITY ---
-ATR_4H: 1316.71 | METHOD: Wilder 14 TR=max(H-L,|H-Cp|,|L-Cp|) ATR=(prev*13+TR)/14 | DATA_STATUS: LIVE_AUTO
-ATR_%: 2.073% | FORMULA: ATR/price*100 | VERDICT: Active Intraday Volatility
-Vol_Score: 93/100 (HIGH) | ATR_Ratio: 1.195x | BBWidth_90D_Pct: 86th | DATA_STATUS: LIVE_AUTO | SOURCE: Binance 1D Volatility Engine | VERDICT: High Volatility
+ATR_4H: 1411.77 | METHOD: Wilder 14 TR=max(H-L,|H-Cp|,|L-Cp|) ATR=(prev*13+TR)/14 | DATA_STATUS: LIVE_AUTO
+ATR_%: 2.189% | FORMULA: ATR/price*100 | VERDICT: Active Intraday Volatility
+Vol_Score: 93/100 (HIGH) | ATR_Ratio: 1.193x | BBWidth_90D_Pct: 88th | DATA_STATUS: LIVE_AUTO | SOURCE: Binance 1D Volatility Engine | VERDICT: High Volatility
 
 --- 11. SENTIMENT ---
-Fear_Greed: 13 (Extreme Fear) | DATA_STATUS: LIVE_API | SOURCE: alternative.me/fng | TIMESTAMP_UTC: 2026-11-14T00:00:00Z | VERDICT: Extreme Fear — Contrarian Accumulation Watch
+Fear_Greed: 10 (Extreme Fear) | DATA_STATUS: LIVE_API | SOURCE: alternative.me/fng | TIMESTAMP_UTC: 2026-11-15T00:00:00Z | VERDICT: Extreme Fear — Contrarian Accumulation Watch
 
 --- 12. CEX RESERVES & STABLECOINS ---
-CEX_Reserves: 2,320,000.0 BTC (11.71% of supply) | Stablecoin_Mcap: $287.6B | DATA_STATUS: LIVE_API_ONCHAIN | SOURCE: DeFiLlama + On-Chain Reserve Baseline | VERDICT: Low Exchange Supply Dominance (<12% Structural Floor)
+CEX_Reserves: 2,320,000.0 BTC (11.71% of supply) | Stablecoin_Mcap: $287.8B | DATA_STATUS: LIVE_API_ONCHAIN | SOURCE: DeFiLlama + On-Chain Reserve Baseline | VERDICT: Low Exchange Supply Dominance (<12% Structural Floor)
 
 --- 13. MACRO EVENTS & THREAT GATE ---
-FOMC / CPI / NFP: ACTIVE (Catalysts: CPI Oct 14 [Today], Retail Sales/PPI Oct 15 [1d], FOMC Oct 28 [14d], Midterms Nov 3 [20d], NFP Nov 6 [23d]) | Threat_Gate: CRIMSON (85/100) — FORCE DMRA REGIME 2: 100% USDT CASH PRESERVATION | DATA_STATUS: LIVE_CALENDAR_LEDGER | SOURCE: data/macro_threat_feed.json | VERDICT: Pre-Event Volatility & Risk Gate Active
+FOMC / CPI / NFP: ACTIVE (Catalysts: CPI Oct 14 [Today], Retail Sales/PPI Oct 15 [1d], FOMC Oct 28 [14d], Midterms Nov 3 [20d], NFP Nov 6 [23d]) | Threat_Gate: AMBER (65/100) — DEFENSIVE / HALF POSITION SIZING | DATA_STATUS: LIVE_CALENDAR_LEDGER | SOURCE: data/macro_threat_feed.json | VERDICT: Pre-Event Volatility & Risk Gate Active
 
 --- 14. PSYCHOLOGICAL LEVELS, VOLUME PROFILE & STH FLOOR ---
-PSYCH_LEVELS_AUTO_SUPPORT: [81000, 82000] | PSYCH_LEVELS_RESISTANCE_LADDER: [85500, 86500, 90000, 100000] | Range 79500-80500 | DATA_STATUS: LIVE_AUTO | SOURCE: live price 63531.36 nearest $500 rounds | VERDICT: Institutional Round-Number Liquidity Clusters
-VOLUME_PROFILE_30D_RANGE: 63320-84898 | POC: 81600 4.7% vol | Top_HVNs: $81600 4.7% vol, $80200 3.5% vol, $80400 3.3% vol, $75800 3.2% vol, $81400 3.0% vol | DATA_STATUS: LIVE_API | SOURCE: Binance klines 720x1h | VERDICT: High-Volume Node Acceptance Shelf
-STH_COST_BASIS: 75041.76 | Dist_vs_spot: -15.34% BELOW = STH at loss panic risk | DATA_STATUS: LIVE_ONCHAIN | SOURCE: BlockHorizon Bitcoin Core UTXO Snapshot | VERDICT: On-Chain Short-Term Holder Cost Basis Floor
-ORDER_BOOK_DEPTH_AROUND_PSYCH_63000: Bids 0 BTC / Asks 0 BTC ratio 999 SUPPORT_HEAVY | DATA_STATUS: LIVE_API | SOURCE: Binance depth 1000
-ORDER_BOOK_DEPTH_AROUND_PSYCH_64000: Bids 30.0 BTC / Asks 0 BTC ratio 999 SUPPORT_HEAVY | DATA_STATUS: LIVE_API | SOURCE: Binance depth 1000
+PSYCH_LEVELS_AUTO_SUPPORT: [81000, 82000] | PSYCH_LEVELS_RESISTANCE_LADDER: [85500, 86500, 90000, 100000] | Range 79500-80500 | DATA_STATUS: LIVE_AUTO | SOURCE: live price 64504.99 nearest $500 rounds | VERDICT: Institutional Round-Number Liquidity Clusters
+VOLUME_PROFILE_30D_RANGE: 62006-84898 | POC: 81600 4.6% vol | Top_HVNs: $81600 4.6% vol, $80200 3.5% vol, $80400 3.2% vol, $75800 3.2% vol, $81400 3.0% vol | DATA_STATUS: LIVE_API | SOURCE: Binance klines 720x1h | VERDICT: High-Volume Node Acceptance Shelf
+STH_COST_BASIS: 75049.06 | Dist_vs_spot: -14.05% BELOW = STH at loss panic risk | DATA_STATUS: LIVE_ONCHAIN | SOURCE: BlockHorizon Bitcoin Core UTXO Snapshot | VERDICT: On-Chain Short-Term Holder Cost Basis Floor
+ORDER_BOOK_DEPTH_AROUND_PSYCH_64000: Bids 0 BTC / Asks 0 BTC ratio 999 SUPPORT_HEAVY | DATA_STATUS: LIVE_API | SOURCE: Binance depth 1000
+ORDER_BOOK_DEPTH_AROUND_PSYCH_65000: Bids 103.0 BTC / Asks 0 BTC ratio 999 SUPPORT_HEAVY | DATA_STATUS: LIVE_API | SOURCE: Binance depth 1000
 ORDER_BOOK_DEPTH_AROUND_PSYCH_80000: Bids 0 BTC / Asks 0 BTC ratio 999 SUPPORT_HEAVY | DATA_STATUS: LIVE_API | SOURCE: Binance depth 1000
 ORDER_BOOK_DEPTH_AROUND_PSYCH_81000: Bids 0 BTC / Asks 0 BTC ratio 999 SUPPORT_HEAVY | DATA_STATUS: LIVE_API | SOURCE: Binance depth 1000
 ORDER_BOOK_DEPTH_AROUND_PSYCH_82000: Bids 0 BTC / Asks 0 BTC ratio 999 SUPPORT_HEAVY | DATA_STATUS: LIVE_API | SOURCE: Binance depth 1000
 
 --- 15. REGIME DETECTION (6-CELL & 100-POINT DASHBOARD) ---
-ADX(14) Daily: 28.6 | ATR(14) Daily: 2616.57 (Ratio 1.195x) | BBWidth(20,2) Daily: 22.171% (86th pct) | REGIME_6_CELLS (Kimi 2x3): MISSING | DATA_STATUS: LIVE_AUTO
-DIRECTION: Range / Mixed | Price 63471 vs EMA50 77630 vs EMA200 74372 | Weekly Structure: Mild HH+HL | Daily Structure: Mixed | TREND_VS_RANGE: Trending | VOLATILITY_REGIME: High Volatility | DATA_STATUS: LIVE_AUTO
+ADX(14) Daily: 31.5 | ATR(14) Daily: 2618.89 (Ratio 1.193x) | BBWidth(20,2) Daily: 24.878% (88th pct) | REGIME_6_CELLS (Kimi 2x3): MISSING | DATA_STATUS: LIVE_AUTO
+DIRECTION: Range / Mixed | Price 64532 vs EMA50 77142 vs EMA200 74244 | Weekly Structure: Mild HH+HL | Daily Structure: Mixed | TREND_VS_RANGE: Trending | VOLATILITY_REGIME: High Volatility | DATA_STATUS: LIVE_AUTO
 TOTAL SCORE: -34 / 100 | REGIME_3_CLASSIFICATION: Corrective / Defensive (Defensive) | Trading Bias: Preserve cash / avoid new longs (0.0x) | Breakdown: Structure 12/40, MAs -16/30, Momentum -20/20, Context -10/10 | DATA_STATUS: LIVE_AUTO
   Structure Max 40: Weekly Mild HH+HL = 12 | HH 2 HL 0 recent swing up mild constructive | Daily Mixed = 0 | HH 0 HL 0 LH 1 LL 0 overlapping mixed/transitional | Subtotal 12/40 | DATA_STATUS: LIVE_AUTO
-  MAs Max 30: Price vs 50-day Price 63471 Below 50-day 77630 + Falling = -8 | Price vs 200-day Price 63471 Below 200-day 74372 + Falling = -8 | 50 vs 200 50-day 77630 > 200-day 74372 Golden Cross = +7 | Weekly MAs Weekly Price 63469 Below 20W 75424 + Below 50W 78192 Both bearish = -7 | Subtotal -16/30 | DATA_STATUS: LIVE_AUTO
-  Momentum Max 20: Daily MACD Daily MACD Expanding negative [-484.38002598748267, -719.6364891083665, -1121.915976268031] = -8 | Daily RSI Daily RSI 19.1 Clearly <50 = -6 | Weekly Momentum Weekly MACD -504.68 <0 + RSI 37.1 <50 Bearish = -6 | Subtotal -20/20 | DATA_STATUS: LIVE_AUTO
-  Context Max 10: Cycle Cycle Position Price $63,471 Below 50W EMA ($78,192) & 200D EMA ($74,372) = Bearish -5 | On-chain On-chain / Key Levels Price $63,471 Below STH Cost Basis ($75,042) = Underwater -5 | Subtotal -10/10 | DATA_STATUS: LIVE_AUTO
+  MAs Max 30: Price vs 50-day Price 64532 Below 50-day 77142 + Falling = -8 | Price vs 200-day Price 64532 Below 200-day 74244 + Falling = -8 | 50 vs 200 50-day 77142 > 200-day 74244 Golden Cross = +7 | Weekly MAs Weekly Price 64538 Below 20W 75526 + Below 50W 78234 Both bearish = -7 | Subtotal -16/30 | DATA_STATUS: LIVE_AUTO
+  Momentum Max 20: Daily MACD Daily MACD Expanding negative [-719.6364890858672, -1078.6105859338186, -1203.7268012114264] = -8 | Daily RSI Daily RSI 21.2 Clearly <50 = -6 | Weekly Momentum Weekly MACD -436.50 <0 + RSI 37.9 <50 Bearish = -6 | Subtotal -20/20 | DATA_STATUS: LIVE_AUTO
+  Context Max 10: Cycle Cycle Position Price $64,532 Below 50W EMA ($78,234) & 200D EMA ($74,244) = Bearish -5 | On-chain On-chain / Key Levels Price $64,532 Below STH Cost Basis ($75,049) = Underwater -5 | Subtotal -10/10 | DATA_STATUS: LIVE_AUTO
 
 --- 16. INSTITUTIONAL FLOW, GLOBAL LIQUIDITY & TRIO ENGINE ---
-LONG_SHORT_RATIOS: Global_account 2.660 (Long 72.7% / Short 27.3%) | Top_Trader 0.000 | Taker 0.000 | OI_MCAP_RATIO: 0.168% (OI $2.12B / Mcap $1.258T) | DATA_STATUS: LIVE_API | VERDICT: Healthy Leverage (<1% OI/Mcap Ratio)
+LONG_SHORT_RATIOS: Global_account 2.740 (Long 73.3% / Short 26.7%) | Top_Trader 0.000 | Taker 0.000 | OI_MCAP_RATIO: 0.168% (OI $2.14B / Mcap $1.277T) | DATA_STATUS: LIVE_API | VERDICT: Healthy Leverage (<1% OI/Mcap Ratio)
 GLOBAL_NET_LIQUIDITY: Fed $7.100T | Net $6.200T | TGA $0.800T | RRP $0.100T | Global_Net $24.400T | Trend: Expanding | DATA_STATUS: MANUAL_REAL_FRED | SOURCE: FRED WALCL/WTREGEN/RRPONTSYD
-INSTITUTIONAL_TRIO_DECISION: Action STAND ASIDE — Regime -34/100 < 60 sizing gate (Corrective) — wait for >=60 confirmation (0.0x cash preferred) | Quality LOW (60%) | Trio_Score 2/3 (2/3 Institutional Trio — ADX strong trend + VWAP -3.72% vs average price where largest money exchanged + RVOL Time 602% vs historical avg at same point in session = high institutional participation improve entry/exit quality) | RVOL_Time 602% (HIGH) | DATA_STATUS: LIVE_AUTO
+INSTITUTIONAL_TRIO_DECISION: Action STAND ASIDE — Regime -34/100 < 60 sizing gate (Corrective) — wait for >=60 confirmation (0.0x cash preferred) | Quality LOW (60%) | Trio_Score 3/3 (3/3 Institutional Trio — ADX strong trend + VWAP 1.22% vs average price where largest money exchanged + RVOL Time 317% vs historical avg at same point in session = high institutional participation improve entry/exit quality) | RVOL_Time 317% (HIGH) | DATA_STATUS: LIVE_AUTO
 
 --- 17. SMA 10 & 20 TREND PROTOCOL ---
-SMA_10_DAILY: 72907.61 (-12.86%) | SMA_20_DAILY: 75877.52 | SMA 20D: 75877.52 (-16.27%) | SMA_20_WEEKLY: 73821.08 (-13.94%) | DATA_STATUS: LIVE_AUTO_SMA_TREND_v4.6 | VERDICT: Multi-Timeframe Dynamic SMA Support
-SMA_SLOPE_AND_TOUCHES: Slope_10D -5.16% | Slope_20D -3.60% | Touches_20D (10D: 4, 20D: 3) | Consecutive_Days_Above_10D: 0 | 7_Week_Rule_Active: False | DATA_STATUS: LIVE_AUTO_SMA_TREND_v4.6
-REGIME_FILTER_SMA: TRANSITIONAL — Between trending and choppy, monitor slope + cross count | HH_HL_Structure: Mixed | Pullback_In_SMA_Zone: False | Trail_Stop_10D: $72908 | Trail_Stop_20D: $75878 | DATA_STATUS: LIVE_AUTO_SMA_TREND_v4.6
+SMA_10_DAILY: 71819.88 (-10.19%) | SMA_20_DAILY: 75130.53 | SMA 20D: 75130.53 (-14.14%) | SMA_20_WEEKLY: 73874.51 (-12.68%) | DATA_STATUS: LIVE_AUTO_SMA_TREND_v4.6 | VERDICT: Multi-Timeframe Dynamic SMA Support
+SMA_SLOPE_AND_TOUCHES: Slope_10D -6.11% | Slope_20D -3.92% | Touches_20D (10D: 4, 20D: 3) | Consecutive_Days_Above_10D: 0 | 7_Week_Rule_Active: False | DATA_STATUS: LIVE_AUTO_SMA_TREND_v4.6
+REGIME_FILTER_SMA: TRANSITIONAL — Between trending and choppy, monitor slope + cross count | HH_HL_Structure: Mixed | Pullback_In_SMA_Zone: False | Trail_Stop_10D: $71820 | Trail_Stop_20D: $75131 | DATA_STATUS: LIVE_AUTO_SMA_TREND_v4.6
 
 --- 18. MACRO REGIME (M2, REAL YIELDS, CREDIT, CARRY) ---
 GLOBAL_M2_AND_REAL_YIELDS: US_M2 $23414B (YoY 5.71%) | 10Y_TIPS_Real_Yield: 2.86% | DATA_STATUS: LIVE_API_FRED | SOURCE: FRED M2SL + DFII10 | VERDICT: Macro Liquidity & Real Rate Filter
 CREDIT_AND_TREND_FILTERS: HY_OAS 3.20% (320 bps) | HYG/LQD 0.748 | DXY_vs_200DMA: 3.56% | SPX_vs_200DMA: 3.02% | VIX_Regime: Mid VIX transitional | DATA_STATUS: LIVE_API_FRED
-CARRY_AND_STABLECOINS: USDJPY 159.69 (JGB_10Y_Proxy 5.15%) | Stablecoin_Mcap: $287.6B (30D Growth +2.40%) | DATA_STATUS: LIVE_API_DEFILLAMA
+CARRY_AND_STABLECOINS: USDJPY 159.69 (JGB_10Y_Proxy 5.15%) | Stablecoin_Mcap: $287.8B (30D Growth +2.40%) | DATA_STATUS: LIVE_API_DEFILLAMA
 
 --- 19. EXCHANGE FLOW & REALIZED PRICE BANDS ---
-EXCHANGE_NETFLOW: 24h 6000 BTC | 7D 25000 BTC | 30D 54785 BTC | Inflow 24h 18000 Outflow 12000 | Reserves: 2320000 BTC (11.72%) | Signal: Strong Inflow +6000 BTC 24h — Distribution — Coins moving to exchanges — Bearish | DATA_STATUS: DERIVED_EXCHANGE_FLOW_V53
-REALIZED_PRICE_BANDS: Realized_Price $53845 (MVRV 1.18x, +18.0%) | Bands: 0.8x $43076, 1.0x $53845, 1.5x $80767, 2.0x $107690 | Zone: Constructive Expansion 1.0-1.65x Realized — Healthy Bull / Hold | DATA_STATUS: LIVE_ONCHAIN_REALIZED_MAYER
-MAYER_MULTIPLE: Price/200DMA 0.87x | 200DMA $73027 | Zone: Undervalued 0.8-1.0 — Below 200MA — Discount | Signal: Mayer 0.87 0.8-1.0 undervalued — Below 200MA — Buy zone | DATA_STATUS: LIVE_ONCHAIN_REALIZED_MAYER
+EXCHANGE_NETFLOW: 24h -506 BTC | 7D 24815 BTC | 30D 50236 BTC | Inflow 24h 14747 Outflow 15253 | Reserves: 2320000 BTC (11.72%) | Signal: Balanced Flow -506 BTC 24h (Inflow 14747 / Outflow 15253) — Neutral spot exchange pressure | DATA_STATUS: DERIVED_EXCHANGE_FLOW_V53
+REALIZED_PRICE_BANDS: Realized_Price $53845 (MVRV 1.20x, +19.8%) | Bands: 0.8x $43076, 1.0x $53845, 1.5x $80767, 2.0x $107690 | Zone: Constructive Expansion 1.0-1.65x Realized — Healthy Bull / Hold | DATA_STATUS: LIVE_ONCHAIN_REALIZED_MAYER
+MAYER_MULTIPLE: Price/200DMA 0.88x | 200DMA $72974 | Zone: Undervalued 0.8-1.0 — Below 200MA — Discount | Signal: Mayer 0.88 0.8-1.0 undervalued — Below 200MA — Buy zone | DATA_STATUS: LIVE_ONCHAIN_REALIZED_MAYER
 
 --- 20. DERIVATIVES POSITIONING & TERM STRUCTURE ---
 FUTURES_BASIS: Perp-Spot 0.050% | 3M_Annualized_Basis: 6.14% | DATA_STATUS: LIVE_API_BINANCE_FAPI | SOURCE: Binance fapi + Quarterly Futures | VERDICT: Contango Controlled (<10% Ann.)
-OPTIONS_25D_SKEW: Skew -2.50% | OI_VS_PRICE_DIVERGENCE: Aligned / Balanced (OI -0.81% vs Price -7.09%) | DATA_STATUS: LIVE_API_DERIBIT | SOURCE: Deribit + Binance fapi | VERDICT: Call Skew Demand Intact
+OPTIONS_25D_SKEW: Skew -2.50% | OI_VS_PRICE_DIVERGENCE: Aligned / Balanced (OI -0.46% vs Price +0.60%) | DATA_STATUS: LIVE_API_DERIBIT | SOURCE: Deribit + Binance fapi | VERDICT: Call Skew Demand Intact
 FUNDING_PERSISTENCE_7D: Days_Above_0.05% 0.0 (0.0%) | Liq_Heatmap_Buckets: 5 active zones | DATA_STATUS: LIVE_API_BINANCE_FAPI | VERDICT: Zero Persistent Funding Overheat
 
 --- 21. HTF TA STRUCTURE & MULTI-TIMEFRAME ALIGNMENT ---
-ATH_AND_RANGE_BOUNDS: ATH $126200 (-49.66%) | 20D_Range: $67568-$81971 | 90D_Range: $62751-$87396 | DATA_STATUS: LIVE_AUTO_V47
-WEEKLY_EMA_STRUCTURE: Prior_Week_H/L $81196 / $73510 | Weekly_EMA20 $75424 | Weekly_EMA50 $78192 | GoldenCross_20_50: False | Monthly_Trend: Bear | DATA_STATUS: LIVE_AUTO_V47
+ATH_AND_RANGE_BOUNDS: ATH $126200 (-48.89%) | 20D_Range: $63320-$81971 | 90D_Range: $62006-$87396 | DATA_STATUS: LIVE_AUTO_V47
+WEEKLY_EMA_STRUCTURE: Prior_Week_H/L $81196 / $73510 | Weekly_EMA20 $75526 | Weekly_EMA50 $78234 | GoldenCross_20_50: False | Monthly_Trend: Bear | DATA_STATUS: LIVE_AUTO_V47
 TOPDOWN_ALIGNMENT: 1W_1D_4H_State: PARTIALLY_ALIGNED | Risk_Sizing: REDUCED_50%_OR_WAIT | Break_Retest_Bull: False | DATA_STATUS: LIVE_AUTO_V47
 
 --- 22. CONFLUENCE SCORECARD (100-POINT SYSTEM) ---
-SCORECARD: Macro Liquidity 25 = 13 | HTF Trend 25 = 0 | On-chain Not Overheated 20 = 7 | Derivatives Not Crowded 15 = 15 | TA Trigger 15 = 0 | TOTAL 100 = 35 | Verdict: No trade <60 — Stand Aside / Cash Preferred (0.0x) | DATA_STATUS: LIVE_AUTO_V47_SCORECARD
+SCORECARD: Macro Liquidity 25 = 13 | HTF Trend 25 = 0 | On-chain Not Overheated 20 = 14 | Derivatives Not Crowded 15 = 15 | TA Trigger 15 = 0 | TOTAL 100 = 42 | Verdict: No trade <60 — Stand Aside / Cash Preferred (0.0x) | DATA_STATUS: LIVE_AUTO_V47_SCORECARD
 
 --- 23. MECHANICAL EXECUTION & RISK PARAMETERS ---
-ATR_STOP_AND_TARGETS: ATR_Daily $2617 | Swing_Low_10D $63320 | Structural_Stop $62012 (-2.39%) | Targets: T1(1.5R) $65811, T2(High) $80918, T3(3R) $68090 | DATA_STATUS: LIVE_AUTO_V47_EXECUTION
-RR_AND_POSITION_SIZE: R:R (T1 1.5R, T2 11.44R, T3 3.0R vs Min 2.5R) | Risk_Per_Trade: 0.75% | Max_Heat: 5.0% | Size_100k_Eq: 0.4935 BTC | DATA_STATUS: LIVE_AUTO_V47_EXECUTION
+ATR_STOP_AND_TARGETS: ATR_Daily $2619 | Swing_Low_10D $62006 | Structural_Stop $60697 (-5.90%) | Targets: T1(1.5R) $70218, T2(High) $76416, T3(3R) $75930 | DATA_STATUS: LIVE_AUTO_V47_EXECUTION
+RR_AND_POSITION_SIZE: R:R (T1 1.5R, T2 3.13R, T3 3.0R vs Min 2.5R) | Risk_Per_Trade: 0.75% | Max_Heat: 5.0% | Size_100k_Eq: 0.1969 BTC | DATA_STATUS: LIVE_AUTO_V47_EXECUTION
 
 --- 24. MSNR LEVELS, MINER HEALTH & LTH COHORT SUMMARY ---
 MSNR_STORYLINE: Overall BEAR (25.0/100) | Weekly BEAR | Daily BEAR | 4H BEAR | Fresh_Daily_Levels: 1 (A-Resist: 0, V-Support: 1) | DATA_STATUS: LIVE_AUTO_MSNR_v4.8
-LTH_REALIZED_PRICE: 48619 | LTH_MVRV: 1.31x | LTH_SOPR: 1.06 (LTH SOPR 1.06 (1.0-1.25) — LTH mild profit realization — HODL regime intact — Neutral/Constructive) | Binary CDD: 0.28 | SSR: 4.37 (SSR 4.37 <6 — High stablecoin buying power relative to BTC — Bullish dry powder abundant) | Hash_Ribbons: Healthy - 30d above 60d - Miner network healthy, no capitulation | DATA_STATUS: LIVE_ONCHAIN_LTH_COHORT
+LTH_REALIZED_PRICE: 48622 | LTH_MVRV: 1.33x | LTH_SOPR: 1.07 (LTH SOPR 1.07 (1.0-1.25) — LTH mild profit realization — HODL regime intact — Neutral/Constructive) | Binary CDD: 0.28 | SSR: 4.44 (SSR 4.44 <6 — High stablecoin buying power relative to BTC — Bullish dry powder abundant) | Hash_Ribbons: Healthy - 30d above 60d - Miner network healthy, no capitulation | DATA_STATUS: LIVE_ONCHAIN_LTH_COHORT
 
 --- 25. MINER CAPITULATION (PUELL MULTIPLE & HASH RIBBONS) ---
-PUELL_MULTIPLE: 0.84 | Zone: Undervalued 0.5-1.0 - Miner stress - Recovery early | Action: Watch for Hash Ribbons recovery confirmation | Daily Issuance BTC: 450 | Issuance USD: $28.59M | MA365 Issuance USD: $34.21M | DATA_STATUS: LIVE_AUTO_V52_PUELL
-HASH_RIBBONS: Now 833402383.4 MA30 1011374783.5 MA60 991493426.4 | Signal: Healthy - 30d above 60d - Miner network healthy, no capitulation | Zone: Healthy - No capitulation | DATA_STATUS: LIVE_API_V52_HASH_RIBBONS
+PUELL_MULTIPLE: 0.85 | Zone: Undervalued 0.5-1.0 - Miner stress - Recovery early | Action: Watch for Hash Ribbons recovery confirmation | Daily Issuance BTC: 450 | Issuance USD: $29.06M | MA365 Issuance USD: $34.18M | DATA_STATUS: LIVE_AUTO_V52_PUELL
+HASH_RIBBONS: Now 923605620.0 MA30 1008295249.8 MA60 989675104.4 | Signal: Healthy - 30d above 60d - Miner network healthy, no capitulation | Zone: Healthy - No capitulation | DATA_STATUS: LIVE_API_V52_HASH_RIBBONS
 
 --- 26. SOPR STREAK & VOLUME CLIMAX ---
 SOPR_STREAK: Current 0.992 Streak Below 1.0 7 days | Signal: Sustained loss — SOPR <1.0 for 7 consecutive days — Capitulation — Coins moving at loss | Zone: Capitulation — 7 days SOPR <1.0 — Historical bottom zone if MVRV also low | DATA_STATUS: LIVE_AUTO_V52_SOPR_STREAK
-VOLUME_CLIMAX: RVOL Current 602.0% Climax Found True | Signal: Volume Climax SPIKE >200% RVOL — Climax selling/buying — Potential exhaustion | Zone: Climax | DATA_STATUS: LIVE_AUTO_V52_VOLUME_CLIMAX
+VOLUME_CLIMAX: RVOL Current 317.5% Climax Found True | Signal: Volume Climax SPIKE >200% RVOL — Climax selling/buying — Potential exhaustion | Zone: Climax | DATA_STATUS: LIVE_AUTO_V52_VOLUME_CLIMAX
 
 --- 27. VALUATION PERCENTILES (2-YEAR ROLLING) ---
-VALUATION_PERCENTILES_2Y: MVRV Z 0.43 (49.6%) | NUPL 0.15 (50.0%) | SOPR 0.992 (49.2%) | Puell 0.84 (49.0%) | DATA_STATUS: LIVE_AUTO_V52_PERCENTILES
+VALUATION_PERCENTILES_2Y: MVRV Z 0.47 (49.6%) | NUPL 0.17 (50.0%) | SOPR 0.992 (49.2%) | Puell 0.85 (49.0%) | DATA_STATUS: LIVE_AUTO_V52_PERCENTILES
 
 --- 28. SECONDARY COMPOSITES (PI CYCLE & RAINBOW) ---
-PI_CYCLE_TOP_SECONDARY: 111MA 76400 350MA*2 150873 Dist % -49.36% | Signal: Below — 111DMA -49.36% below 350DMA*2 — No Pi top signal — Safe | DATA_STATUS: OPTIONAL_SECONDARY_V52_PI_CYCLE
-RAINBOW_CHART_SECONDARY: Band 2 Label: Rainbow Band 2 — Still Cheap — Buy — Undervalued — Secondary Z-Score Log -1.08 | DATA_STATUS: OPTIONAL_SECONDARY_V52_RAINBOW
+PI_CYCLE_TOP_SECONDARY: 111MA 76413 350MA*2 150729 Dist % -49.30% | Signal: Below — 111DMA -49.30% below 350DMA*2 — No Pi top signal — Safe | DATA_STATUS: OPTIONAL_SECONDARY_V52_PI_CYCLE
+RAINBOW_CHART_SECONDARY: Band 2 Label: Rainbow Band 2 — Still Cheap — Buy — Undervalued — Secondary Z-Score Log -1.01 | DATA_STATUS: OPTIONAL_SECONDARY_V52_RAINBOW
 
 --- 29. MSNR FRESH LEVELS, OCL GAPS & SBR-RBS FLIPS ---
-  DAILY_AV_FRESH: V Price $58625 Zone 58232-59017 Freshness FRESH Dist 8.37% | DATA_STATUS: LIVE_AUTO_MSNR
-  MSNR_CONFLUENCE: A $81778 Fresh FRESH Score 4 Reasons POC $81600 within 1.5% +2; Storyline BEAR aligned A resistance +2 Storyline BEAR Dist -22.31% | DATA_STATUS: LIVE_AUTO_MSNR_REFINED_v4.8
-  MSNR_CONFLUENCE: V $58625 Fresh FRESH Score 0 Reasons  Storyline BEAR Dist 8.37% | DATA_STATUS: LIVE_AUTO_MSNR_REFINED_v4.8
+  DAILY_AV_FRESH: V Price $58625 Zone 58232-59018 Freshness FRESH Dist 10.03% | DATA_STATUS: LIVE_AUTO_MSNR
+  MSNR_CONFLUENCE: V $58625 Fresh FRESH Score 0 Reasons  Storyline BEAR Dist 10.03% | DATA_STATUS: LIVE_AUTO_MSNR_REFINED_v4.8
 
 --- 30. VALIDATION & REGIME BACKTEST METRICS ---
 VALIDATION_METRICS: Win Rate 40.0% Avg Win 3.0R Avg Loss 1.0R Expectancy 0.60R Profit Factor 2.00 Max DD 15.0% Sharpe 1.20 | DATA_STATUS: MANUAL_REAL_V47_ARTICLE
 REGIME_BACKTEST_LAST_50: Total 49 trades | DATA_STATUS: LIVE_AUTO_BACKTEST
-  Grind Up: Count 21 Win_rate 0.0% Avg_pnl 0.00% Avg_ret -0.16% Wins 0 | DATA_STATUS: LIVE_AUTO_BACKTEST
-  Regime Transition: Count 16 Win_rate 0.0% Avg_pnl 0.00% Avg_ret -0.97% Wins 0 | DATA_STATUS: LIVE_AUTO_BACKTEST
+  Grind Up: Count 20 Win_rate 0.0% Avg_pnl 0.00% Avg_ret -0.17% Wins 0 | DATA_STATUS: LIVE_AUTO_BACKTEST
+  Regime Transition: Count 17 Win_rate 0.0% Avg_pnl 0.00% Avg_ret -0.82% Wins 0 | DATA_STATUS: LIVE_AUTO_BACKTEST
   Compression: Count 12 Win_rate 0.0% Avg_pnl 0.00% Avg_ret -0.71% Wins 0 | DATA_STATUS: LIVE_AUTO_BACKTEST
 
 --- 31. BITCOIN DERIVATIVES & POSITIONING MONITOR ---
 ### Bitcoin Derivatives & Positioning Monitor
-Timestamp of this reading: 2026-11-14T22:55:35.349945Z | SPOT: 63531.36 | SOURCE: Binance fapi openInterest, Binance aggTrades CVD proxy OpenLiquid-style, Binance premiumIndex funding 8h, Alternative.me Fear&Greed, Binance futures globalLongShortAccountRatio — free public sources | DATA_STATUS: LIVE_AUTO_v4.9 | LAG_NOTE: Free analyst charts lagged ~8h-daily — free layer shows 1 Oct while market moved early Oct 2026 — this monitor uses free public sources refreshed minutes | DISCLAIMER: This pressure proxy is approximation of proprietary short-term standardized pressure e.g., 4.9 spike — NOT identical — educational only no buy/sell
+Timestamp of this reading: 2026-11-15T02:31:13.510230Z | SPOT: 64504.99 | SOURCE: Binance fapi openInterest, Binance aggTrades CVD proxy OpenLiquid-style, Binance premiumIndex funding 8h, Alternative.me Fear&Greed, Binance futures globalLongShortAccountRatio — free public sources | DATA_STATUS: LIVE_AUTO_v4.9 | LAG_NOTE: Free analyst charts lagged ~8h-daily — free layer shows 1 Oct while market moved early Oct 2026 — this monitor uses free public sources refreshed minutes | DISCLAIMER: This pressure proxy is approximation of proprietary short-term standardized pressure e.g., 4.9 spike — NOT identical — educational only no buy/sell
 
 1. OPEN INTEREST (prefer BTC terms; if only USD available, convert using latest BTC price and state conversion)
-  OI_CURRENT_BTC: 33338 BTC | OI_CURRENT_USD: $2117994909 USD @ spot $63531.36 — conversion OI_USD = OI_BTC * spot_price | DATA_STATUS: LIVE_AUTO_v4.9 | SOURCE: Binance fapi openInterest + CoinGlass-style total proxy | METHOD: BTC terms preferred | TIMESTAMP: 2026-11-14T22:55:35.349945Z
-  OI_TOTAL_PROXY_USD: $4659588801 USD (Binance *2.2) | OI_TOTAL_PROXY_BTC: 73343 BTC | DATA_STATUS: LIVE_AUTO_v4.9 | NOTE: Total OI proxy — Binance share ~45% total ~2.2x — free public sources minutes
-  OI_24H_CHANGE: -0.81% Prev 33611 BTC | OI_7D_CHANGE: -3.43% Prev 34520 BTC | DATA_STATUS: LIVE_AUTO_v4.9 | METHOD: (now-prev)/prev*100 — 24h from OI_HISTORY_FILE, 7d from 156-180h ago
-  OI_INTERPRETATION: -0.8125240292334607% — rising OI + rising price = new positions being built; rising OI + flat/falling = leverage adding into weakness; falling OI = deleveraging or reset — per PDF
+  OI_CURRENT_BTC: 33218 BTC | OI_CURRENT_USD: $2142723242 USD @ spot $64504.99 — conversion OI_USD = OI_BTC * spot_price | DATA_STATUS: LIVE_AUTO_v4.9 | SOURCE: Binance fapi openInterest + CoinGlass-style total proxy | METHOD: BTC terms preferred | TIMESTAMP: 2026-11-15T02:31:13.510230Z
+  OI_TOTAL_PROXY_USD: $4713991133 USD (Binance *2.2) | OI_TOTAL_PROXY_BTC: 73079 BTC | DATA_STATUS: LIVE_AUTO_v4.9 | NOTE: Total OI proxy — Binance share ~45% total ~2.2x — free public sources minutes
+  OI_24H_CHANGE: -0.46% Prev 33373 BTC | OI_7D_CHANGE: -3.77% Prev 34520 BTC | DATA_STATUS: LIVE_AUTO_v4.9 | METHOD: (now-prev)/prev*100 — 24h from OI_HISTORY_FILE, 7d from 156-180h ago
+  OI_INTERPRETATION: -0.4648056693048395% — rising OI + rising price = new positions being built; rising OI + flat/falling = leverage adding into weakness; falling OI = deleveraging or reset — per PDF
 
 2. FUNDING RATES
   FUNDING_BINANCE_8H: 0.0000% per 8h | SIGN: Longs paying | DATA_STATUS: LIVE_AUTO_v4.9 | SOURCE: Binance premiumIndex | METHOD: State interval 8h, sign and magnitude
   FUNDING_ELEVATED_NOTE: Low — Longs paying 0.0000% per 8h below recent avg, reset / neutral
 
 3. BUYING/SELLING PRESSURE PROXY (taker flow / CVD) — approximation of proprietary 4.9 spike
-  CVD_CURRENT: -0.23 BTC | BUY_VOL: 2.17 SELL_VOL: 2.40 | DATA_STATUS: LIVE_AUTO_v4.9 | SOURCE: Binance aggTrades 1000 + WS wss://stream.binance.com:9443/ws/btcusdt@aggTrade OpenLiquid-style | NOTE: Rising CVD + rising OI = practical equivalent of elevated Positioning Pressure
-  TAKER_IMBALANCE: -0.23 BTC -5.10% | DIRECTION: Negative aggressive selling | STRENGTH: Strong | SLOPE: 0.36
-  PRESSURE_PROXY_READ: Negative aggressive selling Strong -0.23 BTC -5.1% + OI falling -1.2% — balanced / transitional — proxy NOT identical per PDF | METHOD: strong positive CVD + rising OI = elevated buying pressure / long-building impulse; reverse = selling pressure — Explicitly approximation NOT identical per PDF
+  CVD_CURRENT: 5.38 BTC | BUY_VOL: 6.93 SELL_VOL: 1.55 | DATA_STATUS: LIVE_AUTO_v4.9 | SOURCE: Binance aggTrades 1000 + WS wss://stream.binance.com:9443/ws/btcusdt@aggTrade OpenLiquid-style | NOTE: Rising CVD + rising OI = practical equivalent of elevated Positioning Pressure
+  TAKER_IMBALANCE: 5.38 BTC 63.46% | DIRECTION: Positive aggressive buying | STRENGTH: Strong | SLOPE: 5.14
+  PRESSURE_PROXY_READ: Positive aggressive buying Strong +5.38 BTC +63.5% + OI falling -0.4% — balanced / transitional — proxy NOT identical per PDF | METHOD: strong positive CVD + rising OI = elevated buying pressure / long-building impulse; reverse = selling pressure — Explicitly approximation NOT identical per PDF
   DISCLAIMER: This pressure proxy is approximation of proprietary short-term standardized pressure e.g., 4.9 spike — NOT identical — educational only no buy/sell | LAG_NOTE: Free analyst charts lagged ~8h-daily — free layer shows 1 Oct while market moved early Oct 2026 — this monitor uses free public sources refreshed minutes
 
 4. SUPPORTING CONTEXT
-  FEAR_GREED_INDEX: 13 Extreme Fear | DATA_STATUS: LIVE_API | SOURCE: Alternative.me
+  FEAR_GREED_INDEX: 10 Extreme Fear | DATA_STATUS: LIVE_API | SOURCE: Alternative.me
   LIQUIDATIONS_LONG_SHORT: Long/Short Global 2.1 67.8% long | Long liq 80762 cluster 82k-86k dense | NOTE: Crowded long >65% balanced 45-65% crowded short <45%
   KEY_LEVELS_TO_WATCH: Psych $80k $81k-$82k Support $85.5k $86.5k $89k $90k $100k Resistance + HVN $80,500 7.1% $84,800 8.2% POC $84,800 + STH $74,468 + SMA10 + MSNR Fresh A/V — Holding above recent impulse high vs breaking prior support that would put newer longs at risk
 
 5. OVERALL READ — One-paragraph synthesis in plain language
-  OVERALL_READ: Transitional / balanced: OI falling -1.2% with negative aggressive selling strong -5.1% imbalance. No clear long-building impulse. Confirming strength: positive CVD + rising OI + price holding above recent high + funding neutral. | DATA_STATUS: LIVE_AUTO_v4.9 | NOTE: Is current impulse supported by rising participation and aggressive buying? Is pressure fading while price holds? What is main risk for positions opened in recent range? — per PDF — educational only no buy/sell
+  OVERALL_READ: Transitional / balanced: OI falling -0.4% with positive aggressive buying strong +63.5% imbalance. No clear long-building impulse. Confirming strength: positive CVD + rising OI + price holding above recent high + funding neutral. | DATA_STATUS: LIVE_AUTO_v4.9 | NOTE: Is current impulse supported by rising participation and aggressive buying? Is pressure fading while price holds? What is main risk for positions opened in recent range? — per PDF — educational only no buy/sell
   CONFIRMING_STRENGTH_VS_VULNERABILITY: Confirming strength: holding above recent impulse high with OI stable/rising and funding not spiking >0.05% per 8h + positive CVD + rising OI + price above SMA10/20 + Psych support confluence. Vulnerability increases: price breaks prior support zone while OI remains elevated and funding spikes >0.05% per 8h + negative CVD + OI still elevated + crowded long >65% — new longs from recent range at risk — per PDF workflow — educational only no buy/sell
 
 --- 32. BTC SWING TOP-DOWN ANALYSIS ---
 ### BTC Swing Top-Down Analysis
-Current Date/Time of Analysis: 2026-11-14T22:55:35.350101Z | SPOT: 63531.36 | SOURCE: Binance klines weekly 100 + daily 250 + 4H 100 + detect_structure HH/HL LH/LL + psych levels — pure price action no indicators required — from Adapted Top-Down Analysis System for Bitcoin Swing Traders Rating 9.5/10 — Weekly establishes primary bias and major structural levels, Daily confirms/challenges weekly and identifies intermediate structure (last 4-12 weeks), 4-Hour execution timeframe where swing setup found/managed | DATA_STATUS: LIVE_AUTO_v5.0_TOPDOWN | RATING: Extremely practical correctly scaled for swing timeframes retains original system's clarity and risk philosophy removes noise of ultra-short-term charts irrelevant to multi-day/week holds. Only reason not perfect 10 is pure structure reading still requires experience and remains somewhat subjective — no framework can fully eliminate that — Rating 9.5/10 from PDF | RULES: Base analysis only on pure market structure (higher highs/higher lows, lower highs/lower lows, ranges, key levels). Do not use indicators unless user specifically requests. Be factual and neutral. Never give direct buy or sell recommendations. Only describe structure, bias, alignment, invalidation levels, risk-sizing implications. If live price data unavailable clearly state limitation and provide structural framework using most recent knowledge while noting user should verify current price action. Keep language clear professional educational. After completing section may continue with additional commentary but structured Top-Down Analysis must always come first — per PDF pages 18-23
+Current Date/Time of Analysis: 2026-11-15T02:31:13.510387Z | SPOT: 64504.99 | SOURCE: Binance klines weekly 100 + daily 250 + 4H 100 + detect_structure HH/HL LH/LL + psych levels — pure price action no indicators required — from Adapted Top-Down Analysis System for Bitcoin Swing Traders Rating 9.5/10 — Weekly establishes primary bias and major structural levels, Daily confirms/challenges weekly and identifies intermediate structure (last 4-12 weeks), 4-Hour execution timeframe where swing setup found/managed | DATA_STATUS: LIVE_AUTO_v5.0_TOPDOWN | RATING: Extremely practical correctly scaled for swing timeframes retains original system's clarity and risk philosophy removes noise of ultra-short-term charts irrelevant to multi-day/week holds. Only reason not perfect 10 is pure structure reading still requires experience and remains somewhat subjective — no framework can fully eliminate that — Rating 9.5/10 from PDF | RULES: Base analysis only on pure market structure (higher highs/higher lows, lower highs/lower lows, ranges, key levels). Do not use indicators unless user specifically requests. Be factual and neutral. Never give direct buy or sell recommendations. Only describe structure, bias, alignment, invalidation levels, risk-sizing implications. If live price data unavailable clearly state limitation and provide structural framework using most recent knowledge while noting user should verify current price action. Keep language clear professional educational. After completing section may continue with additional commentary but structured Top-Down Analysis must always come first — per PDF pages 18-23
 
 1. Weekly Timeframe – Primary Bias — Goal: Determine dominant market bias and mark most important structural levels
   Market structure: Higher highs & higher lows — bullish structure — mild constructive | Raw: Mild HH+HL Detail: HH 2 HL 0 recent swing up mild constructive Points: 12 | DATA_STATUS: LIVE_AUTO_v5.0_TOPDOWN | SOURCE: Weekly klines 20 lookback HH/HL LH/LL detection | METHOD: detect_structure swing highs/lows 2 bars each side — Strong HH+HL=constructive Bullish Strong LH+LL=corrective Bearish Mixed=range — per PDF
@@ -452,7 +451,7 @@ Current Date/Time of Analysis: 2026-11-14T22:55:35.350101Z | SPOT: 63531.36 | SO
 3. 4-Hour Timeframe – Execution Context — Goal: Locate actual swing setup while keeping higher-timeframe context in mind — This is where most technical analysis happens
   Current 4H structure and how it relates to higher-timeframe bias: 4H range/compression inside Bullish/Neutral context — coiling before resolution — wait for break in HTF direction | Market structure: Range-bound — overlapping HH/HL LH/LL — mixed/transitional — no clear directional structure Raw: Mixed Detail: HH 0 HL 0 LH 0 LL 0 overlapping mixed/transitional | DATA_STATUS: LIVE_AUTO_v5.0_TOPDOWN | METHOD: 4H structure break/continuation that aligns with HTF bias — per PDF
   Quality of any developing swing setup (breakout, pullback to key level, compression, etc.): 4H structure Mixed — HH 0 HL 0 LH 0 LL 0 overlapping mixed/transitional — no clear textbook breakout yet — waiting for pullback to key daily/weekly level or compression resolution toward bullish bias | DATA_STATUS: LIVE_AUTO_v5.0_TOPDOWN | METHOD: Pullbacks to daily/weekly levels favorable R:R, compression/accumulation resolving in direction of HTF bias — By time you reach 4H you already know environment — no longer guessing whether 4H higher-low is real — per PDF
-  Location of price relative to most relevant higher-timeframe levels: Price 63531 7.44% above weekly key 59131 — holding above — bullish if holds, risk if loses | Psych support 64000 resistance 85000 — whole number bias 00s order clustering — institutions sweep for liquidity | Invalidation level that respects higher-timeframe structure: See Section 4 | DATA_STATUS: LIVE_AUTO_v5.0_TOPDOWN | NOTE: Clear structure breaks or continuations that align with HTF bias — per PDF
+  Location of price relative to most relevant higher-timeframe levels: Price 64505 9.09% above weekly key 59131 — holding above — bullish if holds, risk if loses | Psych support 65000 resistance 85000 — whole number bias 00s order clustering — institutions sweep for liquidity | Invalidation level that respects higher-timeframe structure: See Section 4 | DATA_STATUS: LIVE_AUTO_v5.0_TOPDOWN | NOTE: Clear structure breaks or continuations that align with HTF bias — per PDF
 
 4. Key Invalidation Levels — NEW subsection per updated prompt — forces AI to clearly define both higher-timeframe structural invalidation and tighter execution-level invalidation every time
   Primary invalidation level for current swing bias (level that would clearly break higher-timeframe structure): 74968 | Reason: Weekly close below 74968 would break last higher low and shift primary bias from bullish to neutral/bearish — last defended HL — invalidation of bullish structure | DATA_STATUS: LIVE_AUTO_v5.0_TOPDOWN | METHOD: Weekly close below/above last significant swing HL/LH — level that would clearly break HTF structure — e.g., weekly close below X would shift primary bias from bullish to neutral/bearish — per PDF
@@ -468,7 +467,7 @@ Rules you must always follow: Base analysis only on pure market structure (highe
 Rating justification 9.5/10: Extremely practical correctly scaled for swing timeframes retains original system's clarity and risk philosophy removes noise of ultra-short-term charts irrelevant to multi-day/week holds. Only reason not perfect 10 is pure structure reading still requires experience and remains somewhat subjective — no framework can fully eliminate that — Rating 9.5/10 from PDF
 
 --- DATA COMPLETENESS SUMMARY | PCF3 FULL RAW ---
-DATA COMPLETENESS - PCF3 FULL RAW - DEFAULT FOR LLM ANALYSIS - 2026-11-14T22:55:09.169271Z - EXAMPLE:0
+DATA COMPLETENESS - PCF3 FULL RAW - DEFAULT FOR LLM ANALYSIS - 2026-11-15T02:30:53.407551Z - EXAMPLE:0
 FAST:     10/10 available + 4 NEW = 14/14 FAST FULLY POPULATED - was 9/10 in now +Order Book Depth around psych $80k $86.5k $90k ratio + regime live auto + CVD live slope + Long/Short + OI/mcap + Global Liquidity --- ENHANCEMENTS 1-7 ---
   ✅ SPOT price + BID/ASK/SPREAD - LIVE_API
   ✅ OI current + previous + age + change - LIVE_API + LIVE_AUTO
