@@ -1,7 +1,7 @@
 {
-  "updatedAtUtc": "2026-11-20T17:11:09.096964+00:00",
-  "last4hInterval": "20261120_1600UTC",
-  "spotPrice": 59508.2,
+  "updatedAtUtc": "2026-11-20T23:17:48.429994+00:00",
+  "last4hInterval": "20261120_2000UTC",
+  "spotPrice": 59094.24,
   "verdictLock": "DEFENSIVE_SCALP | MAX_EXPOSURE: 0.00x | GATE_DRIVER: DESK_8_VOL",
   "regimeScore": 46,
   "regimeClass": "Corrective / Defensive (Defensive)",
