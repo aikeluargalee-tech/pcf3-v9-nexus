@@ -1,7 +1,7 @@
 {
-  "updatedAtUtc": "2026-11-22T21:40:27.696854+00:00",
-  "last4hInterval": "20261122_2000UTC",
-  "spotPrice": 60990.01,
+  "updatedAtUtc": "2026-11-23T02:28:28.724398+00:00",
+  "last4hInterval": "20261123_0000UTC",
+  "spotPrice": 60723.63,
   "verdictLock": "DEFENSIVE_SCALP | MAX_EXPOSURE: 0.00x | GATE_DRIVER: DESK_8_VOL",
   "regimeScore": 46,
   "regimeClass": "Corrective / Defensive (Defensive)",
@@ -10,6 +10,6 @@
   "quantAligned": false,
   "quantPassCount": 1,
   "sslPrice": 55130.0,
-  "bslPrice": 64080.8,
-  "sthFloor": 72827.57
+  "bslPrice": 62639.52,
+  "sthFloor": 72722.03
 }
