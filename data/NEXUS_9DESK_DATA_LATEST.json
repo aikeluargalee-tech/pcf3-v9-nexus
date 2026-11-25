@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "timestamp_utc": "2026-11-25 12:32:50 UTC",
+    "timestamp_utc": "2026-11-25 21:57:04 UTC",
     "version": "nexus-pure-data-v1.0",
     "spec": "neutral_uninterpreted_telemetry"
   },
@@ -8,24 +8,24 @@
     "spot": {
       "status": "LIVE",
       "age_seconds": 0,
-      "fetched_utc": "2026-11-25 12:32:50 UTC"
+      "fetched_utc": "2026-11-25 21:57:04 UTC"
     },
     "us_10y": {
       "status": "LIVE",
-      "age_seconds": 1,
-      "fetched_utc": "2026-11-25 12:32:49 UTC"
+      "age_seconds": 0,
+      "fetched_utc": "2026-11-25 21:57:04 UTC"
     },
     "sth_cost_basis": {
       "status": "LIVE",
-      "age_seconds": 131570,
+      "age_seconds": 165424,
       "fetched_utc": "2026-11-24 00:00:00 UTC"
     },
     "critical_missing_count": 0
   },
   "market_microstructure": {
-    "spot_price_usd": 58688.01,
-    "best_bid_usd": 58688.0,
-    "best_ask_usd": 58688.01,
+    "spot_price_usd": 60304.94,
+    "best_bid_usd": 60297.92,
+    "best_ask_usd": 60297.93,
     "spread_usd": 0.01,
     "source": "api.binance.com",
     "status": "LIVE"
@@ -42,22 +42,22 @@
   },
   "onchain_and_order_flow": {
     "sth_realized_cost_basis_usd": 72380.48,
-    "open_interest_display": "31835.48 BTC",
+    "open_interest_display": "31695.49 BTC",
     "funding_rate_display": "0.0039% | Mark-Index Spread -0.0548%",
     "spot_cvd_delta_display": "Delta +4.98 BTC | Buy/Sell Ratio 9.15",
     "liquidation_clusters_display": "Long Liq Pocket $79,471 | Short Cluster $82k-$86k ($4.79B)"
   },
   "macro_threat_components": {
-    "us_10y_yield_pct": 4.904,
-    "spx_price_usd": 7201.09,
-    "rsp_price_usd": 213.96,
-    "spx_rsp_ratio": 33.6562,
+    "us_10y_yield_pct": 4.848,
+    "spx_price_usd": 7182.78,
+    "rsp_price_usd": 215.74,
+    "spx_rsp_ratio": 33.2937,
     "threat_score_components": {
-      "breadth_divergence_points": 35,
+      "breadth_divergence_points": 0,
       "yield_elevation_points": 15,
       "mstr_divergence_points": 20,
       "seasonality_window_points": 0,
-      "total_threat_score": 70
+      "total_threat_score": 35
     }
   },
   "volatility_and_institutional_flows": {
