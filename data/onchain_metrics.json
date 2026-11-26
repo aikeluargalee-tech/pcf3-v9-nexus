@@ -1,11 +1,11 @@
 {
-  "updated_at": "2026-11-24T00:00:00Z",
-  "fetched_at": "2026-11-25T21:56:38Z",
+  "updated_at": "2026-11-25T00:00:00Z",
+  "fetched_at": "2026-11-26T04:04:07Z",
   "source": "BGeometrics / bitcoin-data.com UTXO Cohort API",
   "methodology": "Direct on-chain UTXO cohort calculation (<155D STS, >=155D LTS)",
   "metrics": {
-    "sth_cost_basis": 72380.48,
-    "lth_cost_basis": 48211.06,
+    "sth_cost_basis": 72125.11,
+    "lth_cost_basis": 48159.81,
     "realized_price": 53844.78,
     "sth_mvrv": 1.1158,
     "lth_mvrv": 1.6885,
